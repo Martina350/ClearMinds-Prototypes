@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert, ScrollView, Modal, Animated, Dimensions } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert, ScrollView, Modal, Animated, Dimensions, Platform } from 'react-native';
 // @ts-ignore
 import * as ImagePicker from 'expo-image-picker';
 
@@ -20,6 +20,13 @@ export const InformeForm: React.FC<Props> = ({ onBack }) => {
   const [showImagePreview, setShowImagePreview] = useState(false);
   const [previewImage, setPreviewImage] = useState<string>('');
   const [fadeAnim] = useState(new Animated.Value(0));
+  
+  // Estados para el picker de hora
+  const [showTimePicker, setShowTimePicker] = useState(false);
+  const [timePickerMode, setTimePickerMode] = useState<'in' | 'out'>('in');
+  const [selectedHour, setSelectedHour] = useState(8);
+  const [selectedMinute, setSelectedMinute] = useState(0);
+  const [selectedPeriod, setSelectedPeriod] = useState<'AM' | 'PM'>('AM');
 
   React.useEffect(() => {
     Animated.timing(fadeAnim, {
@@ -44,16 +51,14 @@ export const InformeForm: React.FC<Props> = ({ onBack }) => {
         
         result = await ImagePicker.launchCameraAsync({
           mediaTypes: ImagePicker.MediaTypeOptions.Images,
-          allowsEditing: true,
-          aspect: [4, 3],
-          quality: 0.8,
+          allowsEditing: false,
+          quality: 1.0,
         });
       } else {
         result = await ImagePicker.launchImageLibraryAsync({
           mediaTypes: ImagePicker.MediaTypeOptions.Images,
-          allowsEditing: true,
-          aspect: [4, 3],
-          quality: 0.8,
+          allowsEditing: false,
+          quality: 1.0,
         });
       }
 
@@ -91,6 +96,53 @@ export const InformeForm: React.FC<Props> = ({ onBack }) => {
     } else {
       setPhotoAfterUris(photoAfterUris.filter((_, i) => i !== index));
     }
+  };
+
+  // Funciones para el picker de hora
+  const openTimePicker = (mode: 'in' | 'out') => {
+    setTimePickerMode(mode);
+    
+    // Parsear la hora actual para mostrar en el picker
+    const currentTime = mode === 'in' ? checkInTime : checkOutTime;
+    const [hours, minutes] = currentTime.split(':').map(Number);
+    
+    setSelectedHour(hours % 12 || 12);
+    setSelectedMinute(minutes);
+    setSelectedPeriod(hours >= 12 ? 'PM' : 'AM');
+    setShowTimePicker(true);
+  };
+
+  const handleTimeConfirm = () => {
+    // Convertir a formato 24 horas
+    let hour24 = selectedHour;
+    if (selectedPeriod === 'PM' && selectedHour !== 12) {
+      hour24 = selectedHour + 12;
+    } else if (selectedPeriod === 'AM' && selectedHour === 12) {
+      hour24 = 0;
+    }
+    
+    const timeString = `${hour24.toString().padStart(2, '0')}:${selectedMinute.toString().padStart(2, '0')}`;
+    
+    if (timePickerMode === 'in') {
+      setCheckInTime(timeString);
+    } else {
+      setCheckOutTime(timeString);
+    }
+    
+    setShowTimePicker(false);
+  };
+
+  const handleTimeCancel = () => {
+    setShowTimePicker(false);
+  };
+
+  const formatTimeForDisplay = (time: string) => {
+    if (!time) return 'Seleccionar hora';
+    const [hours, minutes] = time.split(':');
+    const hour = parseInt(hours);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const displayHour = hour % 12 || 12;
+    return `${displayHour}:${minutes} ${ampm}`;
   };
 
 
@@ -198,16 +250,13 @@ export const InformeForm: React.FC<Props> = ({ onBack }) => {
           <View style={styles.timeContainer}>
             <TouchableOpacity
               style={[styles.timeButton, styles.halfInput]}
-              onPress={() => {
-                // Aquí se podría abrir un picker de hora nativo
-                Alert.alert('Hora de Entrada', 'Selecciona la hora de entrada');
-              }}
+              onPress={() => openTimePicker('in')}
               activeOpacity={0.7}
             >
               <View style={styles.timeButtonContent}>
                 <Text style={styles.timeButtonLabel}>Hora de Entrada</Text>
                 <Text style={styles.timeButtonValue}>
-                  {checkInTime || 'Seleccionar hora'}
+                  {formatTimeForDisplay(checkInTime)}
                 </Text>
               </View>
               <Text style={styles.timeButtonIcon}>🕐</Text>
@@ -219,16 +268,13 @@ export const InformeForm: React.FC<Props> = ({ onBack }) => {
 
             <TouchableOpacity
               style={[styles.timeButton, styles.halfInput]}
-              onPress={() => {
-                // Aquí se podría abrir un picker de hora nativo
-                Alert.alert('Hora de Salida', 'Selecciona la hora de salida');
-              }}
+              onPress={() => openTimePicker('out')}
               activeOpacity={0.7}
             >
               <View style={styles.timeButtonContent}>
                 <Text style={styles.timeButtonLabel}>Hora de Salida</Text>
                 <Text style={styles.timeButtonValue}>
-                  {checkOutTime || 'Seleccionar hora'}
+                  {formatTimeForDisplay(checkOutTime)}
                 </Text>
               </View>
               <Text style={styles.timeButtonIcon}>🕐</Text>
@@ -278,10 +324,11 @@ export const InformeForm: React.FC<Props> = ({ onBack }) => {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Vista previa</Text>
+              <Text style={styles.modalTitle}>📸 Vista previa de imagen</Text>
               <TouchableOpacity
                 style={styles.modalCloseButton}
                 onPress={() => setShowImagePreview(false)}
+                activeOpacity={0.8}
               >
                 <Text style={styles.modalCloseText}>✕</Text>
               </TouchableOpacity>
@@ -296,6 +343,135 @@ export const InformeForm: React.FC<Props> = ({ onBack }) => {
           </View>
         </View>
       </Modal>
+
+      {/* Picker de hora personalizado */}
+      {showTimePicker && (
+        <Modal
+          visible={showTimePicker}
+          transparent={true}
+          animationType="slide"
+        >
+          <View style={styles.timePickerModalOverlay}>
+            <View style={styles.timePickerModalContent}>
+              <View style={styles.timePickerHeader}>
+                <Text style={styles.timePickerTitle}>
+                  {timePickerMode === 'in' ? 'Hora de Entrada' : 'Hora de Salida'}
+                </Text>
+              </View>
+              
+              <View style={styles.timePickerBody}>
+                <View style={styles.timePickerRow}>
+                  {/* Selector de hora */}
+                  <View style={styles.timePickerColumn}>
+                    <Text style={styles.timePickerLabel}>Hora</Text>
+                    <ScrollView style={styles.timePickerScroll} showsVerticalScrollIndicator={false}>
+                      {Array.from({ length: 12 }, (_, i) => i + 1).map((hour) => (
+                        <TouchableOpacity
+                          key={hour}
+                          style={[
+                            styles.timePickerOption,
+                            selectedHour === hour && styles.timePickerOptionSelected
+                          ]}
+                          onPress={() => setSelectedHour(hour)}
+                          activeOpacity={0.7}
+                        >
+                          <Text style={[
+                            styles.timePickerOptionText,
+                            selectedHour === hour && styles.timePickerOptionTextSelected
+                          ]}>
+                            {hour.toString().padStart(2, '0')}
+                          </Text>
+                        </TouchableOpacity>
+                      ))}
+                    </ScrollView>
+                  </View>
+                  
+                  <Text style={styles.timePickerSeparator}>:</Text>
+                  
+                  {/* Selector de minutos */}
+                  <View style={styles.timePickerColumn}>
+                    <Text style={styles.timePickerLabel}>Minutos</Text>
+                    <ScrollView style={styles.timePickerScroll} showsVerticalScrollIndicator={false}>
+                      {Array.from({ length: 60 }, (_, i) => i).map((minute) => (
+                        <TouchableOpacity
+                          key={minute}
+                          style={[
+                            styles.timePickerOption,
+                            selectedMinute === minute && styles.timePickerOptionSelected
+                          ]}
+                          onPress={() => setSelectedMinute(minute)}
+                          activeOpacity={0.7}
+                        >
+                          <Text style={[
+                            styles.timePickerOptionText,
+                            selectedMinute === minute && styles.timePickerOptionTextSelected
+                          ]}>
+                            {minute.toString().padStart(2, '0')}
+                          </Text>
+                        </TouchableOpacity>
+                      ))}
+                    </ScrollView>
+                  </View>
+                  
+                  {/* Selector de AM/PM */}
+                  <View style={styles.timePickerColumn}>
+                    <Text style={styles.timePickerLabel}>Periodo</Text>
+                    <View style={styles.periodContainer}>
+                      <TouchableOpacity
+                        style={[
+                          styles.periodOption,
+                          selectedPeriod === 'AM' && styles.periodOptionSelected
+                        ]}
+                        onPress={() => setSelectedPeriod('AM')}
+                        activeOpacity={0.7}
+                      >
+                        <Text style={[
+                          styles.periodOptionText,
+                          selectedPeriod === 'AM' && styles.periodOptionTextSelected
+                        ]}>
+                          AM
+                        </Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={[
+                          styles.periodOption,
+                          selectedPeriod === 'PM' && styles.periodOptionSelected
+                        ]}
+                        onPress={() => setSelectedPeriod('PM')}
+                        activeOpacity={0.7}
+                      >
+                        <Text style={[
+                          styles.periodOptionText,
+                          selectedPeriod === 'PM' && styles.periodOptionTextSelected
+                        ]}>
+                          PM
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </View>
+              </View>
+              
+              <View style={styles.timePickerFooter}>
+                <TouchableOpacity
+                  style={styles.timePickerCancelButton}
+                  onPress={handleTimeCancel}
+                  activeOpacity={0.8}
+                >
+                  <Text style={styles.timePickerCancelText}>Cancelar</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.timePickerConfirmButton}
+                  onPress={handleTimeConfirm}
+                  activeOpacity={0.8}
+                >
+                  <Text style={styles.timePickerConfirmText}>Confirmar</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
+      )}
     </Animated.View>
   );
 };
@@ -572,8 +748,8 @@ const styles = StyleSheet.create({
   modalContent: {
     backgroundColor: 'white',
     borderRadius: 20,
-    width: '95%',
-    height: '85%',
+    width: '100%',
+    height: '100%',
     overflow: 'hidden',
   },
   modalHeader: {
@@ -581,8 +757,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 20,
+    paddingTop: 40,
     borderBottomWidth: 1,
     borderBottomColor: '#E9ECEF',
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
   },
   modalTitle: {
     fontSize: 18,
@@ -590,28 +768,33 @@ const styles = StyleSheet.create({
     color: '#212529',
   },
   modalCloseButton: {
-    backgroundColor: '#6C757D',
-    borderRadius: 20,
-    width: 32,
-    height: 32,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    borderRadius: 25,
+    width: 40,
+    height: 40,
     justifyContent: 'center',
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
   },
   modalCloseText: {
     color: 'white',
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
   },
   modalImageContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    padding: 0,
   },
   modalImage: {
     width: '100%',
     height: '100%',
-    borderRadius: 12,
+    borderRadius: 0,
   },
   timeButton: {
     flex: 1,
@@ -646,5 +829,138 @@ const styles = StyleSheet.create({
   },
   timeSeparatorContainer: {
     paddingHorizontal: 20,
+  },
+  // Estilos para el Picker de hora personalizado
+  timePickerModalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'flex-end',
+  },
+  timePickerModalContent: {
+    backgroundColor: '#FFFFFF',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    paddingBottom: 20,
+  },
+  timePickerHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E9ECEF',
+  },
+  timePickerTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#212529',
+  },
+  timePickerBody: {
+    padding: 20,
+  },
+  timePickerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+  },
+  timePickerColumn: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  timePickerLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#6C757D',
+    marginBottom: 10,
+  },
+  timePickerScroll: {
+    height: 200,
+    width: '100%',
+  },
+  timePickerOption: {
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    marginVertical: 2,
+    alignItems: 'center',
+  },
+  timePickerOptionSelected: {
+    backgroundColor: '#007BFF',
+  },
+  timePickerOptionText: {
+    fontSize: 16,
+    color: '#495057',
+    fontWeight: '500',
+  },
+  timePickerOptionTextSelected: {
+    color: 'white',
+    fontWeight: '700',
+  },
+  timePickerSeparator: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#495057',
+    marginHorizontal: 10,
+  },
+  periodContainer: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  periodOption: {
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#E9ECEF',
+    backgroundColor: '#F8F9FA',
+  },
+  periodOptionSelected: {
+    backgroundColor: '#007BFF',
+    borderColor: '#007BFF',
+  },
+  periodOptionText: {
+    fontSize: 16,
+    color: '#495057',
+    fontWeight: '600',
+  },
+  periodOptionTextSelected: {
+    color: 'white',
+  },
+  timePickerFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 20,
+    borderTopWidth: 1,
+    borderTopColor: '#E9ECEF',
+  },
+  timePickerCancelButton: {
+    flex: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#6C757D',
+    backgroundColor: 'transparent',
+    marginRight: 10,
+    alignItems: 'center',
+  },
+  timePickerCancelText: {
+    color: '#6C757D',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  timePickerConfirmButton: {
+    flex: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    backgroundColor: '#007BFF',
+    marginLeft: 10,
+    alignItems: 'center',
+  },
+  timePickerConfirmText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
