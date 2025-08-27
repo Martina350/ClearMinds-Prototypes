@@ -99,7 +99,6 @@ export const RoleSelectionScreen: React.FC<Props> = ({ onSelectRole }) => {
         >
           <View style={styles.header}>
             <Text style={styles.logo}>🔧</Text>
-            <Text style={styles.title}>ClearMinds</Text>
             <Text style={styles.subtitle}>Sistema de Mantenimiento</Text>
           </View>
 
@@ -117,11 +116,7 @@ export const RoleSelectionScreen: React.FC<Props> = ({ onSelectRole }) => {
                   <Text style={styles.roleIcon}>👨‍💼</Text>
                 </View>
                 <Text style={styles.roleTitle}>Administrador</Text>
-                <Text style={styles.roleDescription}>
-                  Gestiona usuarios, revisa informes y administra el sistema
-                </Text>
                 <View style={styles.roleFeatures}>
-                  <Text style={styles.feature}>📊 Dashboard completo</Text>
                   <Text style={styles.feature}>👥 Gestión de usuarios</Text>
                   <Text style={styles.feature}>📋 Revisión de informes</Text>
                 </View>
@@ -136,12 +131,8 @@ export const RoleSelectionScreen: React.FC<Props> = ({ onSelectRole }) => {
                   <Text style={styles.roleIcon}>🔧</Text>
                 </View>
                 <Text style={styles.roleTitle}>Técnico</Text>
-                <Text style={styles.roleDescription}>
-                  Realiza mantenimientos y genera informes de trabajo
-                </Text>
                 <View style={styles.roleFeatures}>
                   <Text style={styles.feature}>📱 Captura de fotos</Text>
-                  <Text style={styles.feature}>✍️ Firmas digitales</Text>
                   <Text style={styles.feature}>📝 Informes detallados</Text>
                 </View>
               </TouchableOpacity>

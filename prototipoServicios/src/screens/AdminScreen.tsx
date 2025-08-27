@@ -148,14 +148,7 @@ export const AdminScreen: React.FC<Props> = ({ onBack }) => {
                 <Text style={styles.actionText}>Revisar Informes</Text>
               </TouchableOpacity>
               
-              <TouchableOpacity 
-                style={styles.actionButton} 
-                onPress={() => handleQuickAction('analytics')}
-                activeOpacity={0.8}
-              >
-                <Text style={styles.actionIcon}>📈</Text>
-                <Text style={styles.actionText}>Ver Reportes</Text>
-              </TouchableOpacity>
+              
               
               <TouchableOpacity 
                 style={styles.actionButton} 
@@ -437,84 +430,6 @@ export const AdminScreen: React.FC<Props> = ({ onBack }) => {
           </View>
         </View>
       </Modal>
-
-      {/* Modal de Analytics */}
-      <Modal
-        visible={showAnalytics}
-        transparent={true}
-        animationType="slide"
-        onRequestClose={() => setShowAnalytics(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>📈 Analytics y Reportes</Text>
-              <TouchableOpacity 
-                style={styles.modalCloseButton}
-                onPress={() => setShowAnalytics(false)}
-                activeOpacity={0.8}
-              >
-                <Text style={styles.modalCloseText}>✕</Text>
-              </TouchableOpacity>
-            </View>
-            
-            <ScrollView style={styles.modalBody}>
-              <View style={styles.analyticsSection}>
-                <Text style={styles.sectionDescription}>
-                  Estadísticas y métricas del sistema
-                </Text>
-                
-                <View style={styles.analyticsGrid}>
-                  <View style={styles.analyticsCard}>
-                    <Text style={styles.analyticsIcon}>📊</Text>
-                    <Text style={styles.analyticsNumber}>156</Text>
-                    <Text style={styles.analyticsLabel}>Informes este mes</Text>
-                  </View>
-                  
-                  <View style={styles.analyticsCard}>
-                    <Text style={styles.analyticsIcon}>⏱️</Text>
-                    <Text style={styles.analyticsNumber}>2.3h</Text>
-                    <Text style={styles.analyticsLabel}>Tiempo promedio</Text>
-                  </View>
-                  
-                  <View style={styles.analyticsCard}>
-                    <Text style={styles.analyticsIcon}>⭐</Text>
-                    <Text style={styles.analyticsNumber}>4.8</Text>
-                    <Text style={styles.analyticsLabel}>Satisfacción</Text>
-                  </View>
-                  
-                  <View style={styles.analyticsCard}>
-                    <Text style={styles.analyticsIcon}>💰</Text>
-                    <Text style={styles.analyticsNumber}>$12.5k</Text>
-                    <Text style={styles.analyticsLabel}>Ahorro mensual</Text>
-                  </View>
-                </View>
-                
-                <View style={styles.analyticsActions}>
-                  <TouchableOpacity 
-                    style={styles.analyticsAction}
-                    onPress={() => Alert.alert('Analytics', 'Generando reporte PDF...')}
-                    activeOpacity={0.8}
-                  >
-                    <Text style={styles.analyticsActionIcon}>📄</Text>
-                    <Text style={styles.analyticsActionText}>Exportar PDF</Text>
-                  </TouchableOpacity>
-                  
-                  <TouchableOpacity 
-                    style={styles.analyticsAction}
-                    onPress={() => Alert.alert('Analytics', 'Enviando por email...')}
-                    activeOpacity={0.8}
-                  >
-                    <Text style={styles.analyticsActionIcon}>📧</Text>
-                    <Text style={styles.analyticsActionText}>Enviar por Email</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </ScrollView>
-          </View>
-        </View>
-      </Modal>
-
       {/* Modal de Configuración */}
       <Modal
         visible={showSettings}

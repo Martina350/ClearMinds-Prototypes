@@ -196,31 +196,43 @@ export const InformeForm: React.FC<Props> = ({ onBack }) => {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>⏰ Horarios</Text>
           <View style={styles.timeContainer}>
-            <View style={styles.timeInput}>
-              <Text style={styles.timeLabel}>Entrada</Text>
-              <TextInput
-                style={styles.timeField}
-                value={checkInTime}
-                onChangeText={setCheckInTime}
-                placeholder="08:00"
-                keyboardType="numeric"
-                placeholderTextColor="#999"
-              />
-            </View>
-            <View style={styles.timeSeparator}>
+            <TouchableOpacity
+              style={[styles.timeButton, styles.halfInput]}
+              onPress={() => {
+                // Aquí se podría abrir un picker de hora nativo
+                Alert.alert('Hora de Entrada', 'Selecciona la hora de entrada');
+              }}
+              activeOpacity={0.7}
+            >
+              <View style={styles.timeButtonContent}>
+                <Text style={styles.timeButtonLabel}>Hora de Entrada</Text>
+                <Text style={styles.timeButtonValue}>
+                  {checkInTime || 'Seleccionar hora'}
+                </Text>
+              </View>
+              <Text style={styles.timeButtonIcon}>🕐</Text>
+            </TouchableOpacity>
+
+            <View style={styles.timeSeparatorContainer}>
               <Text style={styles.separatorText}>→</Text>
             </View>
-            <View style={styles.timeInput}>
-              <Text style={styles.timeLabel}>Salida</Text>
-              <TextInput
-                style={styles.timeField}
-                value={checkOutTime}
-                onChangeText={setCheckOutTime}
-                placeholder="10:00"
-                keyboardType="numeric"
-                placeholderTextColor="#999"
-              />
-            </View>
+
+            <TouchableOpacity
+              style={[styles.timeButton, styles.halfInput]}
+              onPress={() => {
+                // Aquí se podría abrir un picker de hora nativo
+                Alert.alert('Hora de Salida', 'Selecciona la hora de salida');
+              }}
+              activeOpacity={0.7}
+            >
+              <View style={styles.timeButtonContent}>
+                <Text style={styles.timeButtonLabel}>Hora de Salida</Text>
+                <Text style={styles.timeButtonValue}>
+                  {checkOutTime || 'Seleccionar hora'}
+                </Text>
+              </View>
+              <Text style={styles.timeButtonIcon}>🕐</Text>
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -600,5 +612,39 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     borderRadius: 12,
+  },
+  timeButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    backgroundColor: '#E9ECEF',
+    marginHorizontal: 4,
+  },
+  halfInput: {
+    flex: 1,
+  },
+  timeButtonContent: {
+    flex: 1,
+    marginRight: 10,
+  },
+  timeButtonLabel: {
+    fontSize: 12,
+    color: '#6C757D',
+    marginBottom: 4,
+  },
+  timeButtonValue: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#212529',
+  },
+  timeButtonIcon: {
+    fontSize: 24,
+  },
+  timeSeparatorContainer: {
+    paddingHorizontal: 20,
   },
 });
