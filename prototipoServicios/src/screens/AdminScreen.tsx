@@ -91,12 +91,14 @@ export const AdminScreen: React.FC<Props> = ({ onBack }) => {
 
   // Funciones para gestión de usuarios
   const handleAddUser = () => {
+    setShowUserManagement(false); // Cerrar el modal de gestión
     setShowAddUser(true);
     setEditingUser(null);
     setFormData({ name: '', email: '', role: 'Técnico' });
   };
 
   const handleViewUserList = () => {
+    setShowUserManagement(false); // Cerrar el modal de gestión
     setShowUserList(true);
   };
 
@@ -123,6 +125,7 @@ export const AdminScreen: React.FC<Props> = ({ onBack }) => {
     }
 
     setShowAddUser(false);
+    setShowUserManagement(true); // Volver al modal de gestión
     setEditingUser(null);
     setFormData({ name: '', email: '', role: 'Técnico' });
   };
@@ -454,7 +457,10 @@ export const AdminScreen: React.FC<Props> = ({ onBack }) => {
               </View>
               <TouchableOpacity 
                 style={styles.modalCloseButton}
-                onPress={() => setShowAddUser(false)}
+                onPress={() => {
+                  setShowAddUser(false);
+                  setShowUserManagement(true); // Volver al modal de gestión
+                }}
                 activeOpacity={0.8}
               >
                 <Ionicons name="close" size={16} color="#fff" />
@@ -542,7 +548,10 @@ export const AdminScreen: React.FC<Props> = ({ onBack }) => {
               </View>
               <TouchableOpacity 
                 style={styles.modalCloseButton}
-                onPress={() => setShowUserList(false)}
+                onPress={() => {
+                  setShowUserList(false);
+                  setShowUserManagement(true); // Volver al modal de gestión
+                }}
                 activeOpacity={0.8}
               >
                 <Ionicons name="close" size={16} color="#fff" />

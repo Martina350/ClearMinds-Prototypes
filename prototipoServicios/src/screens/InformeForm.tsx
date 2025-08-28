@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert, ScrollView, Modal, Animated, Dimensions, Platform } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert, ScrollView, Modal, Dimensions, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 // @ts-ignore
 import * as ImagePicker from 'expo-image-picker';
@@ -20,7 +20,6 @@ export const InformeForm: React.FC<Props> = ({ onBack }) => {
   const [imageLoading, setImageLoading] = useState(false);
   const [showImagePreview, setShowImagePreview] = useState(false);
   const [previewImage, setPreviewImage] = useState<string>('');
-  const [fadeAnim] = useState(new Animated.Value(0));
   
   // Estados para el picker de hora
   const [showTimePicker, setShowTimePicker] = useState(false);
@@ -29,13 +28,7 @@ export const InformeForm: React.FC<Props> = ({ onBack }) => {
   const [selectedMinute, setSelectedMinute] = useState(0);
   const [selectedPeriod, setSelectedPeriod] = useState<'AM' | 'PM'>('AM');
 
-  React.useEffect(() => {
-    Animated.timing(fadeAnim, {
-      toValue: 1,
-      duration: 800,
-      useNativeDriver: true,
-    }).start();
-  }, []);
+
 
   const handlePickImage = async (type: 'before' | 'after', source: 'camera' | 'gallery') => {
     try {
@@ -233,7 +226,7 @@ export const InformeForm: React.FC<Props> = ({ onBack }) => {
   );
 
   return (
-    <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
+    <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={onBack} activeOpacity={0.8}>
           <Ionicons name="chevron-back" size={18} color="#000" style={{ marginRight: 4 }} />
@@ -477,7 +470,7 @@ export const InformeForm: React.FC<Props> = ({ onBack }) => {
           </View>
         </Modal>
       )}
-    </Animated.View>
+    </View>
   );
 };
 
