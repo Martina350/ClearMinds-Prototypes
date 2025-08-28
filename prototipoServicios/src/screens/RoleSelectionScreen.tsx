@@ -385,7 +385,10 @@ export const RoleSelectionScreen: React.FC<Props> = ({ onSelectRole }) => {
                 
                 <View style={styles.settingItem}>
                   <View style={styles.settingInfo}>
-                    <Text style={styles.settingTitle}>🔔 Notificaciones</Text>
+                    <View style={styles.settingTitleContainer}>
+                      <Ionicons name="notifications-outline" size={20} color="#FFD700" style={{ marginRight: 8 }} />
+                      <Text style={styles.settingTitle}>Notificaciones</Text>
+                    </View>
                     <Text style={styles.settingSubtitle}>Recibir alertas de nuevas tareas</Text>
                   </View>
                   <TouchableOpacity 
@@ -399,7 +402,10 @@ export const RoleSelectionScreen: React.FC<Props> = ({ onSelectRole }) => {
                 
                 <View style={styles.settingItem}>
                   <View style={styles.settingInfo}>
-                    <Text style={styles.settingTitle}>🌙 Modo oscuro</Text>
+                    <View style={styles.settingTitleContainer}>
+                      <Ionicons name="moon-outline" size={20} color="#FFD700" style={{ marginRight: 8 }} />
+                      <Text style={styles.settingTitle}>Modo oscuro</Text>
+                    </View>
                     <Text style={styles.settingSubtitle}>Cambiar tema de la aplicación</Text>
                   </View>
                   <TouchableOpacity 
@@ -413,7 +419,10 @@ export const RoleSelectionScreen: React.FC<Props> = ({ onSelectRole }) => {
                 
                 <View style={styles.settingItem}>
                   <View style={styles.settingInfo}>
-                    <Text style={styles.settingTitle}>📱 Calidad de fotos</Text>
+                    <View style={styles.settingTitleContainer}>
+                      <Ionicons name="camera-outline" size={20} color="#000000" style={{ marginRight: 8 }} />
+                      <Text style={styles.settingTitle}>Calidad de fotos</Text>
+                    </View>
                     <Text style={styles.settingSubtitle}>Alta calidad (más espacio)</Text>
                   </View>
                   <TouchableOpacity 
@@ -427,7 +436,10 @@ export const RoleSelectionScreen: React.FC<Props> = ({ onSelectRole }) => {
                 
                 <View style={styles.settingItem}>
                   <View style={styles.settingInfo}>
-                    <Text style={styles.settingTitle}>🔄 Sincronización automática</Text>
+                    <View style={styles.settingTitleContainer}>
+                      <Ionicons name="sync-outline" size={20} color="#007BFF" style={{ marginRight: 8 }} />
+                      <Text style={styles.settingTitle}>Sincronización automática</Text>
+                    </View>
                     <Text style={styles.settingSubtitle}>Sincronizar datos en segundo plano</Text>
                   </View>
                   <TouchableOpacity 
@@ -826,6 +838,10 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#495057',
     marginBottom: 4,
+  },
+  settingTitleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   settingSubtitle: {
     fontSize: 14,

@@ -3,19 +3,24 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert, Scro
 import { Ionicons } from '@expo/vector-icons';
 // @ts-ignore
 import * as ImagePicker from 'expo-image-picker';
+import ReportService, { Report } from '../services/ReportService';
 
 const { width: screenWidth } = Dimensions.get('window');
 
 type Props = {
   onBack: () => void;
+  technicianId?: string;
+  technicianName?: string;
 };
 
-export const InformeForm: React.FC<Props> = ({ onBack }) => {
+export const InformeForm: React.FC<Props> = ({ onBack, technicianId = '1', technicianName = 'Técnico' }) => {
   const [checkInTime, setCheckInTime] = useState('08:00');
   const [checkOutTime, setCheckOutTime] = useState('10:00');
   const [description, setDescription] = useState('');
   const [photoBeforeUris, setPhotoBeforeUris] = useState<string[]>([]);
   const [photoAfterUris, setPhotoAfterUris] = useState<string[]>([]);
+  const [title, setTitle] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [imageLoading, setImageLoading] = useState(false);
   const [showImagePreview, setShowImagePreview] = useState(false);
@@ -141,15 +146,51 @@ export const InformeForm: React.FC<Props> = ({ onBack }) => {
 
 
 
-  const handleSubmit = () => {
-    console.log('Informe enviado:', {
-      checkInTime,
-      checkOutTime,
-      description,
-      photoBeforeUris,
-      photoAfterUris,
-    });
-    Alert.alert('¡Éxito!', 'Informe enviado correctamente');
+  const handleSubmit = async () => {
+    if (!title.trim()) {
+      Alert.alert('Error', 'Por favor ingresa un título para el informe');
+      return;
+    }
+
+    if (!description.trim()) {
+      Alert.alert('Error', 'Por favor ingresa una descripción del trabajo');
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const reportService = ReportService.getInstance();
+      
+      const reportData = {
+        technicianId,
+        technicianName,
+        title: title.trim(),
+        checkInTime,
+        checkOutTime,
+        description: description.trim(),
+        photoBeforeUris,
+        photoAfterUris,
+        status: 'pending' as const,
+      };
+
+      await reportService.createReport(reportData);
+      
+      Alert.alert(
+        '¡Éxito!', 
+        'Informe guardado correctamente en caché local. Será revisado por el administrador.',
+        [
+          {
+            text: 'OK',
+            onPress: () => onBack()
+          }
+        ]
+      );
+    } catch (error) {
+      console.error('Error al guardar informe:', error);
+      Alert.alert('Error', 'No se pudo guardar el informe. Inténtalo de nuevo.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const renderPhotoSection = (type: 'before' | 'after', photos: string[]) => (
@@ -281,6 +322,17 @@ export const InformeForm: React.FC<Props> = ({ onBack }) => {
         </View>
 
         <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Título del informe</Text>
+          <TextInput
+            style={styles.titleInput}
+            value={title}
+            onChangeText={setTitle}
+            placeholder="Ej: Mantenimiento A/C - Edificio A"
+            placeholderTextColor="#999"
+          />
+        </View>
+
+        <View style={styles.section}>
           <Text style={styles.sectionTitle}>Descripción del trabajo</Text>
           <TextInput
             style={styles.descriptionInput}
@@ -305,11 +357,14 @@ export const InformeForm: React.FC<Props> = ({ onBack }) => {
 
 
         <TouchableOpacity 
-          style={styles.submitButton} 
+          style={[styles.submitButton, isSubmitting && styles.submitButtonDisabled]} 
           onPress={handleSubmit}
           activeOpacity={0.8}
+          disabled={isSubmitting}
         >
-          <Text style={styles.submitButtonText}>Enviar Informe</Text>
+          <Text style={styles.submitButtonText}>
+            {isSubmitting ? 'Guardando...' : 'Enviar Informe'}
+          </Text>
         </TouchableOpacity>
       </ScrollView>
 
@@ -578,6 +633,15 @@ const styles = StyleSheet.create({
     color: '#6C757D',
     fontWeight: '600',
   },
+  titleInput: {
+    borderWidth: 2,
+    borderColor: '#E5E9F0',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    backgroundColor: '#F5F7FA',
+    fontSize: 16,
+  },
   descriptionInput: {
     borderWidth: 2,
     borderColor: '#E5E9F0',
@@ -725,6 +789,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 10,
     elevation: 5,
+  },
+  submitButtonDisabled: {
+    backgroundColor: '#6C757D',
+    shadowOpacity: 0.1,
   },
   submitButtonText: {
     color: 'white',

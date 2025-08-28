@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Animated, ScrollView, Modal, Alert, TextInput } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import ReportService, { Report } from '../services/ReportService';
+import { ReportDetailScreen } from './ReportDetailScreen';
 
 type Props = {
   onBack: () => void;
@@ -21,6 +23,12 @@ export const AdminScreen: React.FC<Props> = ({ onBack }) => {
   const [showAnalytics, setShowAnalytics] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [showSupport, setShowSupport] = useState(false);
+  
+  // Estados para gestión de informes
+  const [reports, setReports] = useState<Report[]>([]);
+  const [selectedReport, setSelectedReport] = useState<Report | null>(null);
+  const [showReportDetail, setShowReportDetail] = useState(false);
+  const [reportsFilter, setReportsFilter] = useState<'all' | 'pending' | 'in_review' | 'approved' | 'rejected'>('all');
   
   // Estados para gestión de usuarios
   const [users, setUsers] = useState<User[]>([
@@ -46,6 +54,31 @@ export const AdminScreen: React.FC<Props> = ({ onBack }) => {
       useNativeDriver: true,
     }).start();
   }, []);
+
+  // Cargar informes y suscribirse a cambios
+  useEffect(() => {
+    const loadReports = async () => {
+      const reportService = ReportService.getInstance();
+      const allReports = await reportService.getAllReports();
+      setReports(allReports);
+    };
+
+    loadReports();
+
+    // Suscribirse a cambios en los informes
+    const reportService = ReportService.getInstance();
+    const unsubscribe = reportService.subscribe((updatedReports) => {
+      setReports(updatedReports);
+    });
+
+    return unsubscribe;
+  }, []);
+
+  // Filtrar informes según el filtro seleccionado
+  const filteredReports = reports.filter(report => {
+    if (reportsFilter === 'all') return true;
+    return report.status === reportsFilter;
+  });
 
   const handleMenuAction = (action: string) => {
     setShowMenu(false);
@@ -159,6 +192,54 @@ export const AdminScreen: React.FC<Props> = ({ onBack }) => {
 
   const getUsersByRole = (role: string) => {
     return users.filter(user => user.role === role).length;
+  };
+
+  // Funciones para gestión de informes
+  const handleViewReport = (report: Report) => {
+    setSelectedReport(report);
+    setShowReportDetail(true);
+  };
+
+  const handleUpdateReportStatus = async (reportId: string, newStatus: Report['status']) => {
+    try {
+      const reportService = ReportService.getInstance();
+      await reportService.updateReportStatus(reportId, newStatus);
+      Alert.alert('Éxito', 'Estado del informe actualizado correctamente');
+    } catch (error) {
+      console.error('Error al actualizar estado:', error);
+      Alert.alert('Error', 'No se pudo actualizar el estado del informe');
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('es-ES', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  const getStatusColor = (status: Report['status']) => {
+    switch (status) {
+      case 'pending': return '#FFA500';
+      case 'in_review': return '#007BFF';
+      case 'approved': return '#28A745';
+      case 'rejected': return '#DC3545';
+      default: return '#6C757D';
+    }
+  };
+
+  const getStatusText = (status: Report['status']) => {
+    switch (status) {
+      case 'pending': return 'Pendiente';
+      case 'in_review': return 'En Revisión';
+      case 'approved': return 'Aprobado';
+      case 'rejected': return 'Rechazado';
+      default: return 'Desconocido';
+    }
   };
 
   return (
@@ -632,53 +713,68 @@ export const AdminScreen: React.FC<Props> = ({ onBack }) => {
                 </Text>
                 
                 <View style={styles.reportFilters}>
-                  <TouchableOpacity style={styles.filterButton} activeOpacity={0.8}>
-                    <Text style={styles.filterText}>Hoy</Text>
+                  <TouchableOpacity 
+                    style={[styles.filterButton, reportsFilter === 'all' && styles.filterButtonActive]} 
+                    onPress={() => setReportsFilter('all')}
+                    activeOpacity={0.8}
+                  >
+                    <Text style={[styles.filterText, reportsFilter === 'all' && styles.filterTextActive]}>Todos</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={styles.filterButton} activeOpacity={0.8}>
-                    <Text style={styles.filterText}>Esta semana</Text>
+                  <TouchableOpacity 
+                    style={[styles.filterButton, reportsFilter === 'pending' && styles.filterButtonActive]} 
+                    onPress={() => setReportsFilter('pending')}
+                    activeOpacity={0.8}
+                  >
+                    <Text style={[styles.filterText, reportsFilter === 'pending' && styles.filterTextActive]}>Pendientes</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={styles.filterButton} activeOpacity={0.8}>
-                    <Text style={styles.filterText}>Este mes</Text>
+                  <TouchableOpacity 
+                    style={[styles.filterButton, reportsFilter === 'in_review' && styles.filterButtonActive]} 
+                    onPress={() => setReportsFilter('in_review')}
+                    activeOpacity={0.8}
+                  >
+                    <Text style={[styles.filterText, reportsFilter === 'in_review' && styles.filterTextActive]}>En Revisión</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity 
+                    style={[styles.filterButton, reportsFilter === 'approved' && styles.filterButtonActive]} 
+                    onPress={() => setReportsFilter('approved')}
+                    activeOpacity={0.8}
+                  >
+                    <Text style={[styles.filterText, reportsFilter === 'approved' && styles.filterTextActive]}>Aprobados</Text>
                   </TouchableOpacity>
                 </View>
                 
                 <View style={styles.reportList}>
-                  <View style={styles.reportItem}>
-                    <Text style={styles.reportIcon}></Text>
-                    <View style={styles.reportContent}>
-                      <Text style={styles.reportTitle}>Mantenimiento A/C - Edificio A</Text>
-                      <Text style={styles.reportAuthor}>Por: Juan Pérez</Text>
-                      <Text style={styles.reportDate}>Hoy, 10:30 AM</Text>
+                  {filteredReports.length === 0 ? (
+                    <View style={styles.emptyReportsState}>
+                      <Ionicons name="document-text-outline" size={48} color="#ADB5BD" />
+                      <Text style={styles.emptyReportsText}>
+                        {reports.length === 0 ? 'No hay informes disponibles' : 'No hay informes con el filtro seleccionado'}
+                      </Text>
                     </View>
-                    <TouchableOpacity style={styles.reportStatus}>
-                      <Text style={styles.reportStatusText}></Text>
-                    </TouchableOpacity>
-                  </View>
-                  
-                  <View style={styles.reportItem}>
-                    <Text style={styles.reportIcon}></Text>
-                    <View style={styles.reportContent}>
-                      <Text style={styles.reportTitle}>Cambio de Lámparas - Pasillo</Text>
-                      <Text style={styles.reportAuthor}>Por: María García</Text>
-                      <Text style={styles.reportDate}>Ayer, 3:45 PM</Text>
-                    </View>
-                    <TouchableOpacity style={styles.reportStatus}>
-                      <Text style={styles.reportStatusText}></Text>
-                    </TouchableOpacity>
-                  </View>
-                  
-                  <View style={styles.reportItem}>
-                    <Text style={styles.reportIcon}></Text>
-                    <View style={styles.reportContent}>
-                      <Text style={styles.reportTitle}>Reparación Eléctrica - Oficina 201</Text>
-                      <Text style={styles.reportAuthor}>Por: Carlos López</Text>
-                      <Text style={styles.reportDate}>Hace 2 días</Text>
-                    </View>
-                    <TouchableOpacity style={styles.reportStatus}>
-                      <Text style={styles.reportStatusText}></Text>
-                    </TouchableOpacity>
-                  </View>
+                  ) : (
+                    filteredReports.map((report) => (
+                      <View key={report.id} style={styles.reportItem}>
+                        <Ionicons name="document-text-outline" size={20} color="#007BFF" style={{ marginRight: 12 }} />
+                        <View style={styles.reportContent}>
+                          <Text style={styles.reportTitle}>{report.title}</Text>
+                          <Text style={styles.reportAuthor}>Por: {report.technicianName}</Text>
+                          <Text style={styles.reportDate}>{formatDate(report.createdAt)}</Text>
+                        </View>
+                        <View style={styles.reportActions}>
+                          <View style={[styles.reportStatusBadge, { backgroundColor: getStatusColor(report.status) }]}>
+                            <Text style={styles.reportStatusText}>{getStatusText(report.status)}</Text>
+                          </View>
+                          <TouchableOpacity 
+                            style={styles.viewReportButton}
+                            onPress={() => handleViewReport(report)}
+                            activeOpacity={0.8}
+                          >
+                            <Ionicons name="eye-outline" size={16} color="#007BFF" />
+                          </TouchableOpacity>
+                        </View>
+                      </View>
+                    ))
+                  )}
                 </View>
               </View>
             </ScrollView>
@@ -826,6 +922,42 @@ export const AdminScreen: React.FC<Props> = ({ onBack }) => {
           </View>
         </View>
       </Modal>
+
+      {/* Modal de Detalle de Informe */}
+      {showReportDetail && selectedReport && (
+        <Modal
+          visible={showReportDetail}
+          transparent={true}
+          animationType="slide"
+          onRequestClose={() => setShowReportDetail(false)}
+        >
+          <View style={styles.modalOverlayCentered}>
+            <View style={styles.modalContent}>
+              <View style={styles.modalHeader}>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <Ionicons name="document-text-outline" size={20} color="#212529" style={{ marginRight: 8 }} />
+                  <Text style={styles.modalTitle}>Detalle del Informe</Text>
+                </View>
+                <TouchableOpacity 
+                  style={styles.modalCloseButton}
+                  onPress={() => setShowReportDetail(false)}
+                  activeOpacity={0.8}
+                >
+                  <Ionicons name="close" size={16} color="#fff" />
+                </TouchableOpacity>
+              </View>
+              
+              <View style={styles.modalBody}>
+                <ReportDetailScreen
+                  reportId={selectedReport.id}
+                  onBack={() => setShowReportDetail(false)}
+                  canEdit={false}
+                />
+              </View>
+            </View>
+          </View>
+        </Modal>
+      )}
     </View>
   );
 };
@@ -1204,10 +1336,17 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#2196F3',
   },
+  filterButtonActive: {
+    backgroundColor: '#2196F3',
+    borderColor: '#1976D2',
+  },
   filterText: {
     fontSize: 12,
     fontWeight: '600',
     color: '#2196F3',
+  },
+  filterTextActive: {
+    color: '#FFFFFF',
   },
   reportList: {
     gap: 12,
@@ -1254,6 +1393,31 @@ const styles = StyleSheet.create({
   reportStatusText: {
     fontSize: 12,
     color: 'white',
+  },
+  emptyReportsState: {
+    alignItems: 'center',
+    paddingVertical: 40,
+  },
+  emptyReportsText: {
+    fontSize: 16,
+    color: '#6C757D',
+    marginTop: 12,
+    textAlign: 'center',
+  },
+  reportActions: {
+    alignItems: 'flex-end',
+    gap: 8,
+  },
+  reportStatusBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    alignSelf: 'flex-start',
+  },
+  viewReportButton: {
+    padding: 8,
+    borderRadius: 8,
+    backgroundColor: '#E3F2FD',
   },
   // Estilos para Analytics
   analyticsSection: {

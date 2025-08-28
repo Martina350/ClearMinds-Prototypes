@@ -1,25 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Animated, ScrollView, Modal, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import ReportService, { Report } from '../services/ReportService';
+import { InformeForm } from './InformeForm';
+import { ReportDetailScreen } from './ReportDetailScreen';
+import { MyReportsScreen } from './MyReportsScreen';
 
 type Props = {
   onBack: () => void;
-  onCreateReport: () => void;
+  technicianId?: string;
+  technicianName?: string;
 };
 
-export const TecnicoScreen: React.FC<Props> = ({ onBack, onCreateReport }) => {
+export const TecnicoScreen: React.FC<Props> = ({ 
+  onBack, 
+  technicianId = '1', 
+  technicianName = 'Técnico' 
+}) => {
   const [fadeAnim] = useState(new Animated.Value(0));
   const [showMenu, setShowMenu] = useState(false);
   const [showMyReports, setShowMyReports] = useState(false);
-  const [showCalendar, setShowCalendar] = useState(false);
-  const [showStats, setShowStats] = useState(false);
-  const [showSettings, setShowSettings] = useState(false);
-  const [showSupport, setShowSupport] = useState(false);
-  const [taskStatus, setTaskStatus] = useState({
-    task1: 'pending', // pending, in-progress, completed
-    task2: 'completed',
-    task3: 'pending'
-  });
+  const [showNewReport, setShowNewReport] = useState(false);
+  const [showReportDetail, setShowReportDetail] = useState(false);
+  const [selectedReport, setSelectedReport] = useState<Report | null>(null);
+  
+  // Estados para gestión de informes
+  const [reports, setReports] = useState<Report[]>([]);
+  const [reportsFilter, setReportsFilter] = useState<'all' | 'pending' | 'in_review' | 'approved' | 'rejected'>('all');
 
   React.useEffect(() => {
     Animated.timing(fadeAnim, {
@@ -29,64 +36,97 @@ export const TecnicoScreen: React.FC<Props> = ({ onBack, onCreateReport }) => {
     }).start();
   }, []);
 
+  // Cargar informes del técnico y suscribirse a cambios
+  useEffect(() => {
+    const loadReports = async () => {
+      const reportService = ReportService.getInstance();
+      const technicianReports = await reportService.getReportsByTechnician(technicianId);
+      setReports(technicianReports);
+    };
+
+    loadReports();
+
+    // Suscribirse a cambios en los informes
+    const reportService = ReportService.getInstance();
+    const unsubscribe = reportService.subscribe((allReports) => {
+      const technicianReports = allReports.filter(report => report.technicianId === technicianId);
+      setReports(technicianReports);
+    });
+
+    return unsubscribe;
+  }, [technicianId]);
+
+  // Filtrar informes según el filtro seleccionado
+  const filteredReports = reports.filter(report => {
+    if (reportsFilter === 'all') return true;
+    return report.status === reportsFilter;
+  });
+
   const handleMenuAction = (action: string) => {
     setShowMenu(false);
     
     switch (action) {
-      case 'home':
-        // Ya estamos en la pantalla principal
+      case 'dashboard':
+        // Ya estamos en el dashboard
         break;
-      case 'newReport':
-        onCreateReport();
-        break;
-      case 'myReports':
+      case 'reports':
         setShowMyReports(true);
         break;
-      case 'calendar':
-        setShowCalendar(true);
-        break;
-      case 'stats':
-        setShowStats(true);
-        break;
-      case 'settings':
-        setShowSettings(true);
-        break;
-      case 'support':
-        setShowSupport(true);
+      case 'new_report':
+        setShowNewReport(true);
         break;
     }
   };
 
-  const handleActionButton = (action: string) => {
+  const handleQuickAction = (action: string) => {
     switch (action) {
-      case 'createReport':
-        onCreateReport();
-        break;
-      case 'myReports':
+      case 'reports':
         setShowMyReports(true);
         break;
-      case 'calendar':
-        setShowCalendar(true);
-        break;
-      case 'stats':
-        setShowStats(true);
+      case 'new_report':
+        setShowNewReport(true);
         break;
     }
   };
 
-  const handleTaskAction = (taskId: string, action: string) => {
-    switch (action) {
-      case 'start':
-        setTaskStatus(prev => ({ ...prev, [taskId]: 'in-progress' }));
-        Alert.alert('Tarea iniciada', 'Has comenzado la tarea de mantenimiento');
-        break;
-      case 'view':
-        Alert.alert('Detalles de tarea', 'Mostrando detalles completos de la tarea');
-        break;
-      case 'pending':
-        Alert.alert('Tarea pendiente', 'Esta tarea está programada para más tarde');
-        break;
+  const handleViewReport = (report: Report) => {
+    setSelectedReport(report);
+    setShowReportDetail(true);
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('es-ES', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  const getStatusColor = (status: Report['status']) => {
+    switch (status) {
+      case 'pending': return '#FFA500';
+      case 'in_review': return '#007BFF';
+      case 'approved': return '#28A745';
+      case 'rejected': return '#DC3545';
+      default: return '#6C757D';
     }
+  };
+
+  const getStatusText = (status: Report['status']) => {
+    switch (status) {
+      case 'pending': return 'Pendiente';
+      case 'in_review': return 'En Revisión';
+      case 'approved': return 'Aprobado';
+      case 'rejected': return 'Rechazado';
+      default: return 'Desconocido';
+    }
+  };
+
+  const getReportsCountByStatus = (status: Report['status']) => {
+    return reports.filter(report => report.status === status).length;
   };
 
   return (
@@ -124,144 +164,85 @@ export const TecnicoScreen: React.FC<Props> = ({ onBack, onCreateReport }) => {
           bounces={true}
         >
           <View style={styles.welcomeSection}>
-            <Text style={styles.welcomeTitle}>Bienvenido, Técnico</Text>
-            <Text style={styles.welcomeSubtitle}>Gestiona tus tareas de mantenimiento</Text>
+            <Text style={styles.welcomeTitle}>Bienvenido, {technicianName}</Text>
+            <Text style={styles.welcomeSubtitle}>Gestiona tus informes de mantenimiento</Text>
           </View>
 
-          <View style={styles.quickActions}>
-            <Text style={styles.sectionTitle}>Acciones Principales</Text>
+          <View style={styles.statsContainer}>
+            <Text style={styles.sectionTitle}>Mis Estadísticas</Text>
+            <View style={styles.statsGrid}>
+              <View style={styles.statCard}>
+                <Text style={styles.statNumber}>{reports.length}</Text>
+                <Text style={styles.statLabel}>Total Informes</Text>
+              </View>
+              <View style={styles.statCard}>
+                <Text style={styles.statNumber}>{getReportsCountByStatus('pending')}</Text>
+                <Text style={styles.statLabel}>Pendientes</Text>
+              </View>
+              <View style={styles.statCard}>
+                <Text style={styles.statNumber}>{getReportsCountByStatus('approved')}</Text>
+                <Text style={styles.statLabel}>Aprobados</Text>
+              </View>
+              <View style={styles.statCard}>
+                <Text style={styles.statNumber}>{getReportsCountByStatus('rejected')}</Text>
+                <Text style={styles.statLabel}>Rechazados</Text>
+              </View>
+            </View>
+          </View>
+
+          <View style={styles.actionsContainer}>
+            <Text style={styles.sectionTitle}>Acciones Rápidas</Text>
             <View style={styles.actionButtons}>
               <TouchableOpacity 
-                style={[styles.actionButton, styles.primaryAction]} 
-                onPress={() => handleActionButton('createReport')}
+                style={styles.actionButton} 
+                onPress={() => handleQuickAction('new_report')}
                 activeOpacity={0.8}
               >
-                <Ionicons name="create-outline" size={24} color="#2196F3" style={{ marginBottom: 8 }} />
-                <Text style={styles.actionText}>Crear Informe</Text>
-                <Text style={styles.actionSubtext}>Nuevo mantenimiento</Text>
+                <Ionicons name="add-circle-outline" size={22} color="#495057" style={{ marginRight: 12 }} />
+                <Text style={styles.actionText}>Nuevo Informe</Text>
               </TouchableOpacity>
               
               <TouchableOpacity 
                 style={styles.actionButton} 
-                onPress={() => handleActionButton('myReports')}
+                onPress={() => handleQuickAction('reports')}
                 activeOpacity={0.8}
               >
-                <Ionicons name="documents-outline" size={24} color="#495057" style={{ marginBottom: 8 }} />
+                <Ionicons name="document-text-outline" size={22} color="#495057" style={{ marginRight: 12 }} />
                 <Text style={styles.actionText}>Mis Informes</Text>
-                <Text style={styles.actionSubtext}>Ver historial</Text>
-              </TouchableOpacity>
-              
-              <TouchableOpacity 
-                style={styles.actionButton} 
-                onPress={() => handleActionButton('calendar')}
-                activeOpacity={0.8}
-              >
-                <Ionicons name="calendar-outline" size={24} color="#495057" style={{ marginBottom: 8 }} />
-                <Text style={styles.actionText}>Calendario</Text>
-                <Text style={styles.actionSubtext}>Tareas programadas</Text>
-              </TouchableOpacity>
-              
-              <TouchableOpacity 
-                style={styles.actionButton} 
-                onPress={() => handleActionButton('stats')}
-                activeOpacity={0.8}
-              >
-                <Ionicons name="bar-chart-outline" size={24} color="#495057" style={{ marginBottom: 8 }} />
-                <Text style={styles.actionText}>Estadísticas</Text>
-                <Text style={styles.actionSubtext}>Mi rendimiento</Text>
               </TouchableOpacity>
             </View>
           </View>
 
-          <View style={styles.todayTasks}>
-            <Text style={styles.sectionTitle}>Tareas de Hoy</Text>
-            <View style={styles.taskList}>
-              <View style={styles.taskItem}>
-                <View style={styles.taskStatus}>
-                  <Ionicons name="time-outline" size={20} color="#6C757D" />
-                </View>
-                <View style={styles.taskContent}>
-                  <Text style={styles.taskTitle}>Mantenimiento A/C - Edificio A</Text>
-                  <Text style={styles.taskLocation}>Piso 3, Oficina 305</Text>
-                  <Text style={styles.taskTime}>10:00 AM - 12:00 PM</Text>
-                </View>
+          <View style={styles.recentActivity}>
+            <Text style={styles.sectionTitle}>Actividad Reciente</Text>
+            {reports.length === 0 ? (
+              <View style={styles.emptyState}>
+                <Ionicons name="document-text-outline" size={48} color="#ADB5BD" />
+                <Text style={styles.emptyStateText}>No tienes informes aún</Text>
                 <TouchableOpacity 
-                  style={styles.taskButton} 
-                  onPress={() => handleTaskAction('task1', 'start')}
+                  style={styles.createFirstReportButton}
+                  onPress={() => setShowNewReport(true)}
                   activeOpacity={0.8}
                 >
-                  <Text style={styles.taskButtonText}>Iniciar</Text>
+                  <Text style={styles.createFirstReportText}>Crear mi primer informe</Text>
                 </TouchableOpacity>
               </View>
-              
-              <View style={styles.taskItem}>
-                <View style={styles.taskStatus}>
-                  <Ionicons name="checkmark-circle-outline" size={20} color="#28A745" />
-                </View>
-                <View style={styles.taskContent}>
-                  <Text style={styles.taskTitle}>Revisión Eléctrica - Sótano</Text>
-                  <Text style={styles.taskLocation}>Sótano, Cuarto Eléctrico</Text>
-                  <Text style={styles.taskTime}>2:00 PM - 3:30 PM</Text>
-                </View>
-                <TouchableOpacity 
-                  style={styles.taskButton} 
-                  onPress={() => handleTaskAction('task2', 'view')}
-                  activeOpacity={0.8}
-                >
-                  <Text style={styles.taskButtonText}>Ver</Text>
-                </TouchableOpacity>
+            ) : (
+              <View style={styles.activityList}>
+                {reports.slice(0, 3).map((report) => (
+                  <View key={report.id} style={styles.activityItem}>
+                    <Ionicons name="document-text-outline" size={20} color="#0D6EFD" style={{ marginRight: 12 }} />
+                    <View style={styles.activityContent}>
+                      <Text style={styles.activityText}>{report.title}</Text>
+                      <Text style={styles.activityTime}>{formatDate(report.createdAt)}</Text>
+                    </View>
+                    <View style={[styles.statusBadge, { backgroundColor: getStatusColor(report.status) }]}>
+                      <Text style={styles.statusText}>{getStatusText(report.status)}</Text>
+                    </View>
+                  </View>
+                ))}
               </View>
-              
-              <View style={styles.taskItem}>
-                <View style={styles.taskStatus}>
-                  <Ionicons name="ellipse-outline" size={20} color="#6C757D" />
-                </View>
-                <View style={styles.taskContent}>
-                  <Text style={styles.taskTitle}>Limpieza Filtros - HVAC</Text>
-                  <Text style={styles.taskLocation}>Azotea, Unidad 2</Text>
-                  <Text style={styles.taskTime}>4:00 PM - 5:00 PM</Text>
-                </View>
-                <TouchableOpacity 
-                  style={styles.taskButton} 
-                  onPress={() => handleTaskAction('task3', 'pending')}
-                  activeOpacity={0.8}
-                >
-                  <Text style={styles.taskButtonText}>Pendiente</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-
-          <View style={styles.recentReports}>
-            <Text style={styles.sectionTitle}>Informes Recientes</Text>
-            <View style={styles.reportList}>
-              <View style={styles.reportItem}>
-                <Ionicons name="construct-outline" size={20} color="#495057" style={{ marginRight: 12 }} />
-                <View style={styles.reportContent}>
-                  <Text style={styles.reportTitle}>Mantenimiento Preventivo - Elevador 1</Text>
-                  <Text style={styles.reportDate}>Hoy, 9:30 AM</Text>
-                  <Text style={styles.reportStatus}>Completado</Text>
-                </View>
-              </View>
-              
-              <View style={styles.reportItem}>
-                <Ionicons name="bulb-outline" size={20} color="#495057" style={{ marginRight: 12 }} />
-                <View style={styles.reportContent}>
-                  <Text style={styles.reportTitle}>Cambio de Lámparas - Pasillo Principal</Text>
-                  <Text style={styles.reportDate}>Ayer, 3:45 PM</Text>
-                  <Text style={styles.reportStatus}>Completado</Text>
-                </View>
-              </View>
-              
-              <View style={styles.reportItem}>
-                <Ionicons name="flash-outline" size={20} color="#495057" style={{ marginRight: 12 }} />
-                <View style={styles.reportContent}>
-                  <Text style={styles.reportTitle}>Reparación Enchufe - Oficina 201</Text>
-                  <Text style={styles.reportDate}>Hace 2 días, 11:20 AM</Text>
-                  <Text style={styles.reportStatus}>Completado</Text>
-                </View>
-              </View>
-            </View>
+            )}
           </View>
         </ScrollView>
       </Animated.View>
@@ -282,72 +263,36 @@ export const TecnicoScreen: React.FC<Props> = ({ onBack, onCreateReport }) => {
                 onPress={() => setShowMenu(false)}
                 activeOpacity={0.8}
               >
-                <Text style={styles.closeButtonText}>✕</Text>
+                <Ionicons name="close" size={16} color="#fff" />
               </TouchableOpacity>
             </View>
             
             <View style={styles.menuItems}>
               <TouchableOpacity 
                 style={styles.menuItem} 
-                onPress={() => handleMenuAction('home')}
+                onPress={() => handleMenuAction('dashboard')}
                 activeOpacity={0.7}
               >
-                <Ionicons name="home-outline" size={20} color="#495057" style={{ marginRight: 16 }} />
-                <Text style={styles.menuItemText}>Inicio</Text>
+                <Ionicons name="grid-outline" size={20} color="#495057" style={{ marginRight: 16 }} />
+                <Text style={styles.menuItemText}>Dashboard</Text>
               </TouchableOpacity>
               
               <TouchableOpacity 
                 style={styles.menuItem} 
-                onPress={() => handleMenuAction('newReport')}
+                onPress={() => handleMenuAction('new_report')}
                 activeOpacity={0.7}
               >
-                <Ionicons name="create-outline" size={20} color="#495057" style={{ marginRight: 16 }} />
+                <Ionicons name="add-circle-outline" size={20} color="#495057" style={{ marginRight: 16 }} />
                 <Text style={styles.menuItemText}>Nuevo Informe</Text>
               </TouchableOpacity>
               
               <TouchableOpacity 
                 style={styles.menuItem} 
-                onPress={() => handleMenuAction('myReports')}
+                onPress={() => handleMenuAction('reports')}
                 activeOpacity={0.7}
               >
-                <Ionicons name="documents-outline" size={20} color="#495057" style={{ marginRight: 16 }} />
+                <Ionicons name="document-text-outline" size={20} color="#495057" style={{ marginRight: 16 }} />
                 <Text style={styles.menuItemText}>Mis Informes</Text>
-              </TouchableOpacity>
-              
-              <TouchableOpacity 
-                style={styles.menuItem} 
-                onPress={() => handleMenuAction('calendar')}
-                activeOpacity={0.7}
-              >
-                <Ionicons name="calendar-outline" size={20} color="#495057" style={{ marginRight: 16 }} />
-                <Text style={styles.menuItemText}>Calendario</Text>
-              </TouchableOpacity>
-              
-              <TouchableOpacity 
-                style={styles.menuItem} 
-                onPress={() => handleMenuAction('stats')}
-                activeOpacity={0.7}
-              >
-                <Ionicons name="bar-chart-outline" size={20} color="#495057" style={{ marginRight: 16 }} />
-                <Text style={styles.menuItemText}>Estadísticas</Text>
-              </TouchableOpacity>
-              
-              <TouchableOpacity 
-                style={styles.menuItem} 
-                onPress={() => handleMenuAction('settings')}
-                activeOpacity={0.7}
-              >
-                <Ionicons name="settings-outline" size={20} color="#495057" style={{ marginRight: 16 }} />
-                <Text style={styles.menuItemText}>Configuración</Text>
-              </TouchableOpacity>
-              
-              <TouchableOpacity 
-                style={styles.menuItem} 
-                onPress={() => handleMenuAction('support')}
-                activeOpacity={0.7}
-              >
-                <Ionicons name="call-outline" size={20} color="#495057" style={{ marginRight: 16 }} />
-                <Text style={styles.menuItemText}>Soporte</Text>
               </TouchableOpacity>
             </View>
             
@@ -365,432 +310,48 @@ export const TecnicoScreen: React.FC<Props> = ({ onBack, onCreateReport }) => {
         animationType="slide"
         onRequestClose={() => setShowMyReports(false)}
       >
-        <View style={styles.modalOverlayCentered}>
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Ionicons name="documents-outline" size={20} color="#212529" style={{ marginRight: 8 }} />
-                <Text style={styles.modalTitle}>Mis Informes</Text>
-              </View>
-              <TouchableOpacity 
-                style={styles.modalCloseButton}
-                onPress={() => setShowMyReports(false)}
-                activeOpacity={0.8}
-              >
-                <Ionicons name="close" size={16} color="#fff" />
-              </TouchableOpacity>
-            </View>
-            
-            <ScrollView style={styles.modalBody}>
-              <View style={styles.reportsSection}>
-                <Text style={styles.sectionDescription}>
-                  Historial de tus informes de mantenimiento
-                </Text>
-                
-                <View style={styles.reportFilters}>
-                  <TouchableOpacity style={styles.filterButton} activeOpacity={0.8}>
-                    <Text style={styles.filterText}>📅 Hoy</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={styles.filterButton} activeOpacity={0.8}>
-                    <Text style={styles.filterText}>📅 Esta semana</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={styles.filterButton} activeOpacity={0.8}>
-                    <Text style={styles.filterText}>📅 Este mes</Text>
-                  </TouchableOpacity>
-                </View>
-                
-                <View style={styles.myReportList}>
-                  <View style={styles.myReportItem}>
-                    <Text style={styles.myReportIcon}></Text>
-                    <View style={styles.myReportContent}>
-                      <Text style={styles.myReportTitle}>Mantenimiento Preventivo - Elevador 1</Text>
-                      <Text style={styles.myReportDate}>Hoy, 9:30 AM</Text>
-                      <Text style={styles.myReportStatus}>Completado</Text>
-                    </View>
-                    <TouchableOpacity 
-                      style={styles.myReportAction}
-                      onPress={() => Alert.alert('Informe', 'Mostrando detalles del informe...')}
-                      activeOpacity={0.8}
-                    >
-                      <Text style={styles.myReportActionText}>Ver</Text>
-                    </TouchableOpacity>
-                  </View>
-                  
-                  <View style={styles.myReportItem}>
-                    <Text style={styles.myReportIcon}></Text>
-                    <View style={styles.myReportContent}>
-                      <Text style={styles.myReportTitle}>Cambio de Lámparas - Pasillo Principal</Text>
-                      <Text style={styles.myReportDate}>Ayer, 3:45 PM</Text>
-                      <Text style={styles.myReportStatus}>Completado</Text>
-                    </View>
-                    <TouchableOpacity 
-                      style={styles.myReportAction}
-                      onPress={() => Alert.alert('Informe', 'Mostrando detalles del informe...')}
-                      activeOpacity={0.8}
-                    >
-                      <Text style={styles.myReportActionText}>Ver</Text>
-                    </TouchableOpacity>
-                  </View>
-                  
-                  <View style={styles.myReportItem}>
-                    <Text style={styles.myReportIcon}></Text>
-                    <View style={styles.myReportContent}>
-                      <Text style={styles.myReportTitle}>Reparación Enchufe - Oficina 201</Text>
-                      <Text style={styles.myReportDate}>Hace 2 días, 11:20 AM</Text>
-                      <Text style={styles.myReportStatus}>Completado</Text>
-                    </View>
-                    <TouchableOpacity 
-                      style={styles.myReportAction}
-                      onPress={() => Alert.alert('Informe', 'Mostrando detalles del informe...')}
-                      activeOpacity={0.8}
-                    >
-                      <Text style={styles.myReportActionText}>Ver</Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              </View>
-            </ScrollView>
-          </View>
+        <View style={styles.modalOverlayFull}>
+          <MyReportsScreen
+            technicianId={technicianId}
+            technicianName={technicianName}
+            onBack={() => setShowMyReports(false)}
+          />
         </View>
       </Modal>
 
-      {/* Modal de Calendario */}
+      {/* Modal de Nuevo Informe */}
       <Modal
-        visible={showCalendar}
+        visible={showNewReport}
         transparent={true}
         animationType="slide"
-        onRequestClose={() => setShowCalendar(false)}
+        onRequestClose={() => setShowNewReport(false)}
       >
-        <View style={styles.modalOverlayCentered}>
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Ionicons name="calendar-outline" size={20} color="#212529" style={{ marginRight: 8 }} />
-                <Text style={styles.modalTitle}>Calendario de Tareas</Text>
-              </View>
-              <TouchableOpacity 
-                style={styles.modalCloseButton}
-                onPress={() => setShowCalendar(false)}
-                activeOpacity={0.8}
-              >
-                <Ionicons name="close" size={16} color="#fff" />
-              </TouchableOpacity>
-            </View>
-            
-            <ScrollView style={styles.modalBody}>
-              <View style={styles.calendarSection}>
-                <Text style={styles.sectionDescription}>
-                  Tareas programadas para esta semana
-                </Text>
-                
-                <View style={styles.calendarWeek}>
-                  <View style={styles.calendarDay}>
-                    <Text style={styles.dayHeader}>Lun</Text>
-                    <View style={styles.dayTasks}>
-                      <View style={styles.calendarTask}>
-                        <Text style={styles.calendarTaskIcon}>🔧</Text>
-                        <Text style={styles.calendarTaskText}>A/C Edificio A</Text>
-                      </View>
-                    </View>
-                  </View>
-                  
-                  <View style={styles.calendarDay}>
-                    <Text style={styles.dayHeader}>Mar</Text>
-                    <View style={styles.dayTasks}>
-                      <View style={styles.calendarTask}>
-                        <Text style={styles.calendarTaskIcon}>💡</Text>
-                        <Text style={styles.calendarTaskText}>Lámparas Pasillo</Text>
-                      </View>
-                    </View>
-                  </View>
-                  
-                  <View style={styles.calendarDay}>
-                    <Text style={styles.dayHeader}>Mié</Text>
-                    <View style={styles.dayTasks}>
-                      <View style={styles.calendarTask}>
-                        <Text style={styles.calendarTaskIcon}>🔌</Text>
-                        <Text style={styles.calendarTaskText}>Enchufe Oficina</Text>
-                      </View>
-                    </View>
-                  </View>
-                  
-                  <View style={styles.calendarDay}>
-                    <Text style={styles.dayHeader}>Jue</Text>
-                    <View style={styles.dayTasks}>
-                      <View style={styles.calendarTask}>
-                        <Text style={styles.calendarTaskIcon}>🌡️</Text>
-                        <Text style={styles.calendarTaskText}>HVAC Filtros</Text>
-                      </View>
-                    </View>
-                  </View>
-                  
-                  <View style={styles.calendarDay}>
-                    <Text style={styles.dayHeader}>Vie</Text>
-                    <View style={styles.dayTasks}>
-                      <Text style={styles.noTasks}>Sin tareas</Text>
-                    </View>
-                  </View>
-                </View>
-              </View>
-            </ScrollView>
-          </View>
+        <View style={styles.modalOverlayFull}>
+          <InformeForm
+            onBack={() => setShowNewReport(false)}
+            technicianId={technicianId}
+            technicianName={technicianName}
+          />
         </View>
       </Modal>
 
-      {/* Modal de Estadísticas */}
-      <Modal
-        visible={showStats}
-        transparent={true}
-        animationType="slide"
-        onRequestClose={() => setShowStats(false)}
-      >
-        <View style={styles.modalOverlayCentered}>
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Ionicons name="bar-chart-outline" size={20} color="#212529" style={{ marginRight: 8 }} />
-                <Text style={styles.modalTitle}>Mis Estadísticas</Text>
-              </View>
-              <TouchableOpacity 
-                style={styles.modalCloseButton}
-                onPress={() => setShowStats(false)}
-                activeOpacity={0.8}
-              >
-                <Ionicons name="close" size={16} color="#fff" />
-              </TouchableOpacity>
-            </View>
-            
-            <ScrollView style={styles.modalBody}>
-              <View style={styles.statsSection}>
-                <Text style={styles.sectionDescription}>
-                  Tu rendimiento y métricas personales
-                </Text>
-                
-                <View style={styles.statsGrid}>
-                  <View style={styles.statCard}>
-                    <Text style={styles.statIcon}>📋</Text>
-                    <Text style={styles.statNumber}>45</Text>
-                    <Text style={styles.statLabel}>Informes este mes</Text>
-                  </View>
-                  
-                  <View style={styles.statCard}>
-                    <Text style={styles.statIcon}>⏱️</Text>
-                    <Text style={styles.statNumber}>2.1h</Text>
-                    <Text style={styles.statLabel}>Tiempo promedio</Text>
-                  </View>
-                  
-                  <View style={styles.statCard}>
-                    <Text style={styles.statIcon}>⭐</Text>
-                    <Text style={styles.statNumber}>4.9</Text>
-                    <Text style={styles.statLabel}>Calificación</Text>
-                  </View>
-                  
-                  <View style={styles.statCard}>
-                    <Text style={styles.statIcon}>🎯</Text>
-                    <Text style={styles.statNumber}>98%</Text>
-                    <Text style={styles.statLabel}>Cumplimiento</Text>
-                  </View>
-                </View>
-                
-                <View style={styles.performanceChart}>
-                  <Text style={styles.chartTitle}>📈 Rendimiento Semanal</Text>
-                  <View style={styles.chartBars}>
-                    <View style={styles.chartBar}>
-                      <View style={[styles.barFill, { height: 60 }]} />
-                      <Text style={styles.barLabel}>Lun</Text>
-                    </View>
-                    <View style={styles.chartBar}>
-                      <View style={[styles.barFill, { height: 80 }]} />
-                      <Text style={styles.barLabel}>Mar</Text>
-                    </View>
-                    <View style={styles.chartBar}>
-                      <View style={[styles.barFill, { height: 45 }]} />
-                      <Text style={styles.barLabel}>Mié</Text>
-                    </View>
-                    <View style={styles.chartBar}>
-                      <View style={[styles.barFill, { height: 90 }]} />
-                      <Text style={styles.barLabel}>Jue</Text>
-                    </View>
-                    <View style={styles.chartBar}>
-                      <View style={[styles.barFill, { height: 70 }]} />
-                      <Text style={styles.barLabel}>Vie</Text>
-                    </View>
-                  </View>
-                </View>
-              </View>
-            </ScrollView>
+      {/* Modal de Detalle de Informe */}
+      {showReportDetail && selectedReport && (
+        <Modal
+          visible={showReportDetail}
+          transparent={true}
+          animationType="slide"
+          onRequestClose={() => setShowReportDetail(false)}
+        >
+          <View style={styles.modalOverlayFull}>
+            <ReportDetailScreen
+              reportId={selectedReport.id}
+              onBack={() => setShowReportDetail(false)}
+              canEdit={selectedReport.status === 'pending'}
+            />
           </View>
-        </View>
-      </Modal>
-
-      {/* Modal de Configuración */}
-      <Modal
-        visible={showSettings}
-        transparent={true}
-        animationType="slide"
-        onRequestClose={() => setShowSettings(false)}
-      >
-        <View style={styles.modalOverlayCentered}>
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Ionicons name="settings-outline" size={20} color="#212529" style={{ marginRight: 8 }} />
-                <Text style={styles.modalTitle}>Configuración Personal</Text>
-              </View>
-              <TouchableOpacity 
-                style={styles.modalCloseButton}
-                onPress={() => setShowSettings(false)}
-                activeOpacity={0.8}
-              >
-                <Ionicons name="close" size={16} color="#fff" />
-              </TouchableOpacity>
-            </View>
-            
-            <ScrollView style={styles.modalBody}>
-              <View style={styles.settingsSection}>
-                <Text style={styles.sectionDescription}>
-                  Personaliza tu experiencia de trabajo
-                </Text>
-                
-                <View style={styles.settingItem}>
-                  <View style={styles.settingInfo}>
-                    <Text style={styles.settingTitle}>🔔 Notificaciones de tareas</Text>
-                    <Text style={styles.settingSubtitle}>Alertas de nuevas asignaciones</Text>
-                  </View>
-                  <TouchableOpacity 
-                    style={styles.toggleButton}
-                    onPress={() => Alert.alert('Configuración', 'Notificaciones activadas')}
-                    activeOpacity={0.8}
-                  >
-                    <Text style={styles.toggleText}>ON</Text>
-                  </TouchableOpacity>
-                </View>
-                
-                <View style={styles.settingItem}>
-                  <View style={styles.settingInfo}>
-                    <Text style={styles.settingTitle}>📱 Calidad de fotos</Text>
-                    <Text style={styles.settingSubtitle}>Alta calidad en informes</Text>
-                  </View>
-                  <TouchableOpacity 
-                    style={styles.toggleButton}
-                    onPress={() => Alert.alert('Configuración', 'Calidad alta activada')}
-                    activeOpacity={0.8}
-                  >
-                    <Text style={styles.toggleText}>ON</Text>
-                  </TouchableOpacity>
-                </View>
-                
-                <View style={styles.settingItem}>
-                  <View style={styles.settingInfo}>
-                    <Text style={styles.settingTitle}>🌙 Modo oscuro</Text>
-                    <Text style={styles.settingSubtitle}>Tema oscuro para la app</Text>
-                  </View>
-                  <TouchableOpacity 
-                    style={[styles.toggleButton, styles.toggleOff]}
-                    onPress={() => Alert.alert('Configuración', 'Modo oscuro desactivado')}
-                    activeOpacity={0.8}
-                  >
-                    <Text style={styles.toggleTextOff}>OFF</Text>
-                  </TouchableOpacity>
-                </View>
-                
-                <View style={styles.settingItem}>
-                  <View style={styles.settingInfo}>
-                    <Text style={styles.settingTitle}>🔄 Sincronización automática</Text>
-                    <Text style={styles.settingSubtitle}>Guardar datos automáticamente</Text>
-                  </View>
-                  <TouchableOpacity 
-                    style={styles.toggleButton}
-                    onPress={() => Alert.alert('Configuración', 'Sincronización activada')}
-                    activeOpacity={0.8}
-                  >
-                    <Text style={styles.toggleText}>ON</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </ScrollView>
-          </View>
-        </View>
-      </Modal>
-
-      {/* Modal de Soporte */}
-      <Modal
-        visible={showSupport}
-        transparent={true}
-        animationType="slide"
-        onRequestClose={() => setShowSupport(false)}
-      >
-        <View style={styles.modalOverlayCentered}>
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Ionicons name="call-outline" size={20} color="#212529" style={{ marginRight: 8 }} />
-                <Text style={styles.modalTitle}>Soporte Técnico</Text>
-              </View>
-              <TouchableOpacity 
-                style={styles.modalCloseButton}
-                onPress={() => setShowSupport(false)}
-                activeOpacity={0.8}
-              >
-                <Ionicons name="close" size={16} color="#fff" />
-              </TouchableOpacity>
-            </View>
-            
-            <ScrollView style={styles.modalBody}>
-              <View style={styles.supportSection}>
-                <Text style={styles.sectionDescription}>
-                  ¿Necesitas ayuda? Contacta al soporte técnico
-                </Text>
-                
-                <View style={styles.contactMethods}>
-                  <TouchableOpacity 
-                    style={styles.contactMethod}
-                    onPress={() => Alert.alert('Soporte', 'Conectando con soporte técnico...')}
-                    activeOpacity={0.8}
-                  >
-                    <Ionicons name="call-outline" size={22} color="#495057" style={{ marginBottom: 8 }} />
-                    <Text style={styles.contactTitle}>Llamar al soporte</Text>
-                    <Text style={styles.contactSubtitle}>+1 (555) 123-4567</Text>
-                  </TouchableOpacity>
-                  
-                  <TouchableOpacity 
-                    style={styles.contactMethod}
-                    onPress={() => Alert.alert('Soporte', 'Abriendo chat en vivo...')}
-                    activeOpacity={0.8}
-                  >
-                    <Ionicons name="chatbubble-ellipses-outline" size={22} color="#495057" style={{ marginBottom: 8 }} />
-                    <Text style={styles.contactTitle}>Chat en vivo</Text>
-                    <Text style={styles.contactSubtitle}>Disponible 24/7</Text>
-                  </TouchableOpacity>
-                  
-                  <TouchableOpacity 
-                    style={styles.contactMethod}
-                    onPress={() => Alert.alert('Soporte', 'Abriendo manual de usuario...')}
-                    activeOpacity={0.8}
-                  >
-                    <Ionicons name="book-outline" size={22} color="#495057" style={{ marginBottom: 8 }} />
-                    <Text style={styles.contactTitle}>Manual de usuario</Text>
-                    <Text style={styles.contactSubtitle}>Guías y tutoriales</Text>
-                  </TouchableOpacity>
-                </View>
-                
-                <View style={styles.faqSection}>
-                  <Text style={styles.faqTitle}>❓ Preguntas Frecuentes</Text>
-                  <TouchableOpacity style={styles.faqItem} activeOpacity={0.7}>
-                    <Text style={styles.faqQuestion}>¿Cómo subo fotos en los informes?</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={styles.faqItem} activeOpacity={0.7}>
-                    <Text style={styles.faqQuestion}>¿Cómo cambio mi contraseña?</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={styles.faqItem} activeOpacity={0.7}>
-                    <Text style={styles.faqQuestion}>¿Cómo veo mi historial de tareas?</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </ScrollView>
-          </View>
-        </View>
-      </Modal>
+        </Modal>
+      )}
     </View>
   );
 };
@@ -803,7 +364,6 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
   },
-  // Header con botón hamburguesa
   topHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -823,13 +383,6 @@ const styles = StyleSheet.create({
     padding: 8,
     borderRadius: 8,
     backgroundColor: '#F8F9FA',
-  },
-  hamburgerLine: {
-    width: 24,
-    height: 3,
-    backgroundColor: '#495057',
-    marginVertical: 2,
-    borderRadius: 2,
   },
   headerTitle: {
     flex: 1,
@@ -876,7 +429,41 @@ const styles = StyleSheet.create({
     color: '#212529',
     marginBottom: 16,
   },
-  quickActions: {
+  statsContainer: {
+    marginBottom: 30,
+  },
+  statsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
+  statCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 16,
+    alignItems: 'center',
+    flex: 1,
+    minWidth: '45%',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  statNumber: {
+    fontSize: 28,
+    fontWeight: '800',
+    color: '#007BFF',
+    marginBottom: 4,
+  },
+  statLabel: {
+    fontSize: 12,
+    color: '#6C757D',
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+  actionsContainer: {
     marginBottom: 30,
   },
   actionButtons: {
@@ -886,91 +473,48 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
     padding: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 8,
     elevation: 2,
-  },
-  primaryAction: {
-    backgroundColor: '#E3F2FD',
-    borderWidth: 2,
-    borderColor: '#2196F3',
-  },
-  actionIcon: {
-    fontSize: 24,
-    marginBottom: 8,
   },
   actionText: {
     fontSize: 16,
-    fontWeight: '700',
-    color: '#495057',
-    marginBottom: 4,
-  },
-  actionSubtext: {
-    fontSize: 12,
-    color: '#6C757D',
-  },
-  todayTasks: {
-    marginBottom: 30,
-  },
-  taskList: {
-    gap: 12,
-  },
-  taskItem: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  taskStatus: {
-    marginRight: 12,
-  },
-  taskStatusIcon: {
-    fontSize: 20,
-  },
-  taskContent: {
-    flex: 1,
-  },
-  taskTitle: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#495057',
-    marginBottom: 4,
-  },
-  taskLocation: {
-    fontSize: 12,
-    color: '#6C757D',
-    marginBottom: 2,
-  },
-  taskTime: {
-    fontSize: 12,
-    color: '#6C757D',
-  },
-  taskButton: {
-    backgroundColor: '#28A745',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 20,
-  },
-  taskButtonText: {
-    color: 'white',
-    fontSize: 12,
     fontWeight: '600',
+    color: '#495057',
   },
-  recentReports: {
+  recentActivity: {
     marginBottom: 20,
   },
-  reportList: {
+  emptyState: {
+    alignItems: 'center',
+    paddingVertical: 40,
+  },
+  emptyStateText: {
+    fontSize: 16,
+    color: '#6C757D',
+    marginTop: 12,
+    textAlign: 'center',
+  },
+  createFirstReportButton: {
+    backgroundColor: '#007BFF',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 25,
+    marginTop: 16,
+  },
+  createFirstReportText: {
+    color: 'white',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  activityList: {
     gap: 12,
   },
-  reportItem: {
+  activityItem: {
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
     padding: 16,
@@ -982,77 +526,30 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 2,
   },
-  reportIcon: {
-    fontSize: 20,
-    marginRight: 12,
-  },
-  reportContent: {
+  activityContent: {
     flex: 1,
   },
-  reportTitle: {
+  activityText: {
     fontSize: 14,
     fontWeight: '600',
     color: '#495057',
-    marginBottom: 4,
-  },
-  reportDate: {
-    fontSize: 12,
-    color: '#6C757D',
     marginBottom: 2,
   },
-  reportStatus: {
+  activityTime: {
     fontSize: 12,
-    color: '#28A745',
-    fontWeight: '600',
+    color: '#6C757D',
   },
-  // Duplicates for My Reports to avoid naming conflicts
-  myReportList: {
-    gap: 12,
-  },
-  myReportItem: {
-    backgroundColor: '#F8F9FA',
+  statusBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
     borderRadius: 12,
-    padding: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#E9ECEF',
+    alignSelf: 'flex-start',
   },
-  myReportIcon: {
-    fontSize: 20,
-    marginRight: 12,
-  },
-  myReportContent: {
-    flex: 1,
-  },
-  myReportTitle: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#495057',
-    marginBottom: 4,
-  },
-  myReportDate: {
-    fontSize: 12,
-    color: '#6C757D',
-    marginBottom: 2,
-  },
-  myReportStatus: {
-    fontSize: 12,
-    color: '#28A745',
+  statusText: {
+    fontSize: 10,
     fontWeight: '600',
-  },
-  myReportAction: {
-    backgroundColor: '#007BFF',
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 16,
-  },
-  myReportActionText: {
     color: 'white',
-    fontSize: 12,
-    fontWeight: '600',
   },
-  // Estilos del modal del menú
   modalOverlaySidebar: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.5)',
@@ -1092,11 +589,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  closeButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
   menuItems: {
     flex: 1,
     paddingTop: 20,
@@ -1108,10 +600,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderBottomWidth: 1,
     borderBottomColor: '#F1F3F4',
-  },
-  menuItemIcon: {
-    fontSize: 20,
-    marginRight: 16,
   },
   menuItemText: {
     fontSize: 16,
@@ -1130,16 +618,15 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontWeight: '500',
   },
-  // Estilos para los modales adicionales
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)'
-  },
   modalOverlayCentered: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.5)',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  modalOverlayFull: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
   },
   modalContent: {
     backgroundColor: '#FFFFFF',
@@ -1174,13 +661,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  modalCloseText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
   modalBody: {
-    padding: 20,
+    flex: 1,
+  },
+  reportsSection: {
+    gap: 20,
   },
   sectionDescription: {
     fontSize: 16,
@@ -1188,10 +673,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 20,
     lineHeight: 22,
-  },
-  // Estilos para Mis Informes
-  reportsSection: {
-    gap: 20,
   },
   reportFilters: {
     flexDirection: 'row',
@@ -1206,220 +687,70 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#2196F3',
   },
+  filterButtonActive: {
+    backgroundColor: '#2196F3',
+    borderColor: '#1976D2',
+  },
   filterText: {
     fontSize: 12,
     fontWeight: '600',
     color: '#2196F3',
   },
-  
-  // Estilos para Calendario
-  calendarSection: {
-    gap: 20,
+  filterTextActive: {
+    color: '#FFFFFF',
   },
-  calendarWeek: {
+  reportList: {
     gap: 12,
   },
-  calendarDay: {
+  reportItem: {
     backgroundColor: '#F8F9FA',
     borderRadius: 12,
     padding: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
     borderWidth: 1,
     borderColor: '#E9ECEF',
   },
-  dayHeader: {
-    fontSize: 16,
+  reportContent: {
+    flex: 1,
+  },
+  reportTitle: {
+    fontSize: 14,
     fontWeight: '700',
     color: '#495057',
-    marginBottom: 12,
-    textAlign: 'center',
+    marginBottom: 4,
   },
-  dayTasks: {
+  reportDate: {
+    fontSize: 12,
+    color: '#6C757D',
+  },
+  reportActions: {
+    alignItems: 'flex-end',
     gap: 8,
   },
-  calendarTask: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 8,
+  reportStatusBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    alignSelf: 'flex-start',
+  },
+  reportStatusText: {
+    fontSize: 12,
+    color: 'white',
+  },
+  viewReportButton: {
     padding: 8,
-  },
-  calendarTaskIcon: {
-    fontSize: 16,
-    marginRight: 8,
-  },
-  calendarTaskText: {
-    fontSize: 14,
-    color: '#495057',
-    fontWeight: '600',
-  },
-  noTasks: {
-    fontSize: 14,
-    color: '#6C757D',
-    textAlign: 'center',
-    fontStyle: 'italic',
-  },
-  // Estilos para Estadísticas
-  statsSection: {
-    gap: 20,
-  },
-  statsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    gap: 12,
-    marginBottom: 20,
-  },
-  statCard: {
-    backgroundColor: '#F8F9FA',
-    borderRadius: 12,
-    padding: 16,
-    alignItems: 'center',
-    flex: 1,
-    minWidth: '45%',
-    borderWidth: 1,
-    borderColor: '#E9ECEF',
-  },
-  statIcon: {
-    fontSize: 24,
-    marginBottom: 8,
-  },
-  statNumber: {
-    fontSize: 20,
-    fontWeight: '800',
-    color: '#007BFF',
-    marginBottom: 4,
-  },
-  statLabel: {
-    fontSize: 12,
-    color: '#6C757D',
-    fontWeight: '600',
-    textAlign: 'center',
-  },
-  performanceChart: {
-    backgroundColor: '#F8F9FA',
-    borderRadius: 12,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: '#E9ECEF',
-  },
-  chartTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#495057',
-    marginBottom: 16,
-    textAlign: 'center',
-  },
-  chartBars: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'flex-end',
-    height: 100,
-  },
-  chartBar: {
-    alignItems: 'center',
-  },
-  barFill: {
-    width: 20,
-    backgroundColor: '#007BFF',
-    borderRadius: 10,
-    marginBottom: 8,
-  },
-  barLabel: {
-    fontSize: 12,
-    color: '#6C757D',
-    fontWeight: '600',
-  },
-  // Estilos para Configuración
-  settingsSection: {
-    gap: 16,
-  },
-  settingItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: '#F8F9FA',
-    borderRadius: 12,
-    padding: 16,
-  },
-  settingInfo: {
-    flex: 1,
-  },
-  settingTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#495057',
-    marginBottom: 4,
-  },
-  settingSubtitle: {
-    fontSize: 14,
-    color: '#6C757D',
-  },
-  toggleButton: {
-    backgroundColor: '#28A745',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 20,
-  },
-  toggleOff: {
-    backgroundColor: '#6C757D',
-  },
-  toggleText: {
-    color: 'white',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  toggleTextOff: {
-    color: 'white',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  // Estilos para Soporte
-  supportSection: {
-    gap: 20,
-  },
-  contactMethods: {
-    gap: 12,
-  },
-  contactMethod: {
-    backgroundColor: '#F8F9FA',
-    borderRadius: 12,
-    padding: 16,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#E9ECEF',
-  },
-  contactIcon: {
-    fontSize: 24,
-    marginBottom: 8,
-  },
-  contactTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#495057',
-    marginBottom: 4,
-  },
-  contactSubtitle: {
-    fontSize: 14,
-    color: '#6C757D',
-  },
-  faqSection: {
-    marginTop: 20,
-  },
-  faqTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#212529',
-    marginBottom: 12,
-  },
-  faqItem: {
-    backgroundColor: '#F8F9FA',
     borderRadius: 8,
-    padding: 12,
-    marginBottom: 8,
+    backgroundColor: '#E3F2FD',
   },
-  faqQuestion: {
-    fontSize: 14,
-    color: '#495057',
-    fontWeight: '600',
+  emptyReportsState: {
+    alignItems: 'center',
+    paddingVertical: 40,
+  },
+  emptyReportsText: {
+    fontSize: 16,
+    color: '#6C757D',
+    marginTop: 12,
+    textAlign: 'center',
   },
 });

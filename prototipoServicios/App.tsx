@@ -52,9 +52,8 @@ export default function App() {
             setSelectedRole(undefined);
             navigate('RoleSelection');
           }}
-          onCreateReport={() => {
-            navigate('InformeForm');
-          }}
+          technicianId="1"
+          technicianName="Juan Pérez"
         />
       ) : route === 'InformeForm' ? (
         <InformeForm
