@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Animated, ScrollView, Modal, Alert } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 type Props = {
   onBack: () => void;
@@ -103,9 +104,7 @@ export const TecnicoScreen: React.FC<Props> = ({ onBack, onCreateReport }) => {
             onPress={() => setShowMenu(true)}
             activeOpacity={0.8}
           >
-            <View style={styles.hamburgerLine} />
-            <View style={styles.hamburgerLine} />
-            <View style={styles.hamburgerLine} />
+            <Ionicons name="menu-outline" size={24} color="#495057" />
           </TouchableOpacity>
           <View style={styles.headerTitle}>
             <Text style={styles.headerTitleText}>Panel de Técnico</Text>
@@ -125,19 +124,19 @@ export const TecnicoScreen: React.FC<Props> = ({ onBack, onCreateReport }) => {
           bounces={true}
         >
           <View style={styles.welcomeSection}>
-            <Text style={styles.welcomeTitle}>🔧 Bienvenido, Técnico</Text>
+            <Text style={styles.welcomeTitle}>Bienvenido, Técnico</Text>
             <Text style={styles.welcomeSubtitle}>Gestiona tus tareas de mantenimiento</Text>
           </View>
 
           <View style={styles.quickActions}>
-            <Text style={styles.sectionTitle}>⚡ Acciones Principales</Text>
+            <Text style={styles.sectionTitle}>Acciones Principales</Text>
             <View style={styles.actionButtons}>
               <TouchableOpacity 
                 style={[styles.actionButton, styles.primaryAction]} 
                 onPress={() => handleActionButton('createReport')}
                 activeOpacity={0.8}
               >
-                <Text style={styles.actionIcon}>📝</Text>
+                <Ionicons name="create-outline" size={24} color="#2196F3" style={{ marginBottom: 8 }} />
                 <Text style={styles.actionText}>Crear Informe</Text>
                 <Text style={styles.actionSubtext}>Nuevo mantenimiento</Text>
               </TouchableOpacity>
@@ -147,7 +146,7 @@ export const TecnicoScreen: React.FC<Props> = ({ onBack, onCreateReport }) => {
                 onPress={() => handleActionButton('myReports')}
                 activeOpacity={0.8}
               >
-                <Text style={styles.actionIcon}>📋</Text>
+                <Ionicons name="documents-outline" size={24} color="#495057" style={{ marginBottom: 8 }} />
                 <Text style={styles.actionText}>Mis Informes</Text>
                 <Text style={styles.actionSubtext}>Ver historial</Text>
               </TouchableOpacity>
@@ -157,7 +156,7 @@ export const TecnicoScreen: React.FC<Props> = ({ onBack, onCreateReport }) => {
                 onPress={() => handleActionButton('calendar')}
                 activeOpacity={0.8}
               >
-                <Text style={styles.actionIcon}>📅</Text>
+                <Ionicons name="calendar-outline" size={24} color="#495057" style={{ marginBottom: 8 }} />
                 <Text style={styles.actionText}>Calendario</Text>
                 <Text style={styles.actionSubtext}>Tareas programadas</Text>
               </TouchableOpacity>
@@ -167,7 +166,7 @@ export const TecnicoScreen: React.FC<Props> = ({ onBack, onCreateReport }) => {
                 onPress={() => handleActionButton('stats')}
                 activeOpacity={0.8}
               >
-                <Text style={styles.actionIcon}>📊</Text>
+                <Ionicons name="bar-chart-outline" size={24} color="#495057" style={{ marginBottom: 8 }} />
                 <Text style={styles.actionText}>Estadísticas</Text>
                 <Text style={styles.actionSubtext}>Mi rendimiento</Text>
               </TouchableOpacity>
@@ -175,16 +174,16 @@ export const TecnicoScreen: React.FC<Props> = ({ onBack, onCreateReport }) => {
           </View>
 
           <View style={styles.todayTasks}>
-            <Text style={styles.sectionTitle}>📅 Tareas de Hoy</Text>
+            <Text style={styles.sectionTitle}>Tareas de Hoy</Text>
             <View style={styles.taskList}>
               <View style={styles.taskItem}>
                 <View style={styles.taskStatus}>
-                  <Text style={styles.taskStatusIcon}>⏳</Text>
+                  <Ionicons name="time-outline" size={20} color="#6C757D" />
                 </View>
                 <View style={styles.taskContent}>
                   <Text style={styles.taskTitle}>Mantenimiento A/C - Edificio A</Text>
-                  <Text style={styles.taskLocation}>📍 Piso 3, Oficina 305</Text>
-                  <Text style={styles.taskTime}>🕐 10:00 AM - 12:00 PM</Text>
+                  <Text style={styles.taskLocation}>Piso 3, Oficina 305</Text>
+                  <Text style={styles.taskTime}>10:00 AM - 12:00 PM</Text>
                 </View>
                 <TouchableOpacity 
                   style={styles.taskButton} 
@@ -197,12 +196,12 @@ export const TecnicoScreen: React.FC<Props> = ({ onBack, onCreateReport }) => {
               
               <View style={styles.taskItem}>
                 <View style={styles.taskStatus}>
-                  <Text style={styles.taskStatusIcon}>✅</Text>
+                  <Ionicons name="checkmark-circle-outline" size={20} color="#28A745" />
                 </View>
                 <View style={styles.taskContent}>
                   <Text style={styles.taskTitle}>Revisión Eléctrica - Sótano</Text>
-                  <Text style={styles.taskLocation}>📍 Sótano, Cuarto Eléctrico</Text>
-                  <Text style={styles.taskTime}>🕐 2:00 PM - 3:30 PM</Text>
+                  <Text style={styles.taskLocation}>Sótano, Cuarto Eléctrico</Text>
+                  <Text style={styles.taskTime}>2:00 PM - 3:30 PM</Text>
                 </View>
                 <TouchableOpacity 
                   style={styles.taskButton} 
@@ -215,12 +214,12 @@ export const TecnicoScreen: React.FC<Props> = ({ onBack, onCreateReport }) => {
               
               <View style={styles.taskItem}>
                 <View style={styles.taskStatus}>
-                  <Text style={styles.taskStatusIcon}>📋</Text>
+                  <Ionicons name="ellipse-outline" size={20} color="#6C757D" />
                 </View>
                 <View style={styles.taskContent}>
                   <Text style={styles.taskTitle}>Limpieza Filtros - HVAC</Text>
-                  <Text style={styles.taskLocation}>📍 Azotea, Unidad 2</Text>
-                  <Text style={styles.taskTime}>🕐 4:00 PM - 5:00 PM</Text>
+                  <Text style={styles.taskLocation}>Azotea, Unidad 2</Text>
+                  <Text style={styles.taskTime}>4:00 PM - 5:00 PM</Text>
                 </View>
                 <TouchableOpacity 
                   style={styles.taskButton} 
@@ -234,32 +233,32 @@ export const TecnicoScreen: React.FC<Props> = ({ onBack, onCreateReport }) => {
           </View>
 
           <View style={styles.recentReports}>
-            <Text style={styles.sectionTitle}>📋 Informes Recientes</Text>
+            <Text style={styles.sectionTitle}>Informes Recientes</Text>
             <View style={styles.reportList}>
               <View style={styles.reportItem}>
-                <Text style={styles.reportIcon}>🔧</Text>
+                <Ionicons name="construct-outline" size={20} color="#495057" style={{ marginRight: 12 }} />
                 <View style={styles.reportContent}>
                   <Text style={styles.reportTitle}>Mantenimiento Preventivo - Elevador 1</Text>
                   <Text style={styles.reportDate}>Hoy, 9:30 AM</Text>
-                  <Text style={styles.reportStatus}>✅ Completado</Text>
+                  <Text style={styles.reportStatus}>Completado</Text>
                 </View>
               </View>
               
               <View style={styles.reportItem}>
-                <Text style={styles.reportIcon}>💡</Text>
+                <Ionicons name="bulb-outline" size={20} color="#495057" style={{ marginRight: 12 }} />
                 <View style={styles.reportContent}>
                   <Text style={styles.reportTitle}>Cambio de Lámparas - Pasillo Principal</Text>
                   <Text style={styles.reportDate}>Ayer, 3:45 PM</Text>
-                  <Text style={styles.reportStatus}>✅ Completado</Text>
+                  <Text style={styles.reportStatus}>Completado</Text>
                 </View>
               </View>
               
               <View style={styles.reportItem}>
-                <Text style={styles.reportIcon}>🔌</Text>
+                <Ionicons name="flash-outline" size={20} color="#495057" style={{ marginRight: 12 }} />
                 <View style={styles.reportContent}>
                   <Text style={styles.reportTitle}>Reparación Enchufe - Oficina 201</Text>
                   <Text style={styles.reportDate}>Hace 2 días, 11:20 AM</Text>
-                  <Text style={styles.reportStatus}>✅ Completado</Text>
+                  <Text style={styles.reportStatus}>Completado</Text>
                 </View>
               </View>
             </View>
@@ -274,7 +273,7 @@ export const TecnicoScreen: React.FC<Props> = ({ onBack, onCreateReport }) => {
         animationType="slide"
         onRequestClose={() => setShowMenu(false)}
       >
-        <View style={styles.modalOverlay}>
+        <View style={styles.modalOverlaySidebar}>
           <View style={styles.menuContainer}>
             <View style={styles.menuHeader}>
               <Text style={styles.menuTitle}>Menú Técnico</Text>
@@ -293,7 +292,7 @@ export const TecnicoScreen: React.FC<Props> = ({ onBack, onCreateReport }) => {
                 onPress={() => handleMenuAction('home')}
                 activeOpacity={0.7}
               >
-                <Text style={styles.menuItemIcon}>🏠</Text>
+                <Ionicons name="home-outline" size={20} color="#495057" style={{ marginRight: 16 }} />
                 <Text style={styles.menuItemText}>Inicio</Text>
               </TouchableOpacity>
               
@@ -302,7 +301,7 @@ export const TecnicoScreen: React.FC<Props> = ({ onBack, onCreateReport }) => {
                 onPress={() => handleMenuAction('newReport')}
                 activeOpacity={0.7}
               >
-                <Text style={styles.menuItemIcon}>📝</Text>
+                <Ionicons name="create-outline" size={20} color="#495057" style={{ marginRight: 16 }} />
                 <Text style={styles.menuItemText}>Nuevo Informe</Text>
               </TouchableOpacity>
               
@@ -311,7 +310,7 @@ export const TecnicoScreen: React.FC<Props> = ({ onBack, onCreateReport }) => {
                 onPress={() => handleMenuAction('myReports')}
                 activeOpacity={0.7}
               >
-                <Text style={styles.menuItemIcon}>📋</Text>
+                <Ionicons name="documents-outline" size={20} color="#495057" style={{ marginRight: 16 }} />
                 <Text style={styles.menuItemText}>Mis Informes</Text>
               </TouchableOpacity>
               
@@ -320,7 +319,7 @@ export const TecnicoScreen: React.FC<Props> = ({ onBack, onCreateReport }) => {
                 onPress={() => handleMenuAction('calendar')}
                 activeOpacity={0.7}
               >
-                <Text style={styles.menuItemIcon}>📅</Text>
+                <Ionicons name="calendar-outline" size={20} color="#495057" style={{ marginRight: 16 }} />
                 <Text style={styles.menuItemText}>Calendario</Text>
               </TouchableOpacity>
               
@@ -329,7 +328,7 @@ export const TecnicoScreen: React.FC<Props> = ({ onBack, onCreateReport }) => {
                 onPress={() => handleMenuAction('stats')}
                 activeOpacity={0.7}
               >
-                <Text style={styles.menuItemIcon}>📊</Text>
+                <Ionicons name="bar-chart-outline" size={20} color="#495057" style={{ marginRight: 16 }} />
                 <Text style={styles.menuItemText}>Estadísticas</Text>
               </TouchableOpacity>
               
@@ -338,7 +337,7 @@ export const TecnicoScreen: React.FC<Props> = ({ onBack, onCreateReport }) => {
                 onPress={() => handleMenuAction('settings')}
                 activeOpacity={0.7}
               >
-                <Text style={styles.menuItemIcon}>⚙️</Text>
+                <Ionicons name="settings-outline" size={20} color="#495057" style={{ marginRight: 16 }} />
                 <Text style={styles.menuItemText}>Configuración</Text>
               </TouchableOpacity>
               
@@ -347,7 +346,7 @@ export const TecnicoScreen: React.FC<Props> = ({ onBack, onCreateReport }) => {
                 onPress={() => handleMenuAction('support')}
                 activeOpacity={0.7}
               >
-                <Text style={styles.menuItemIcon}>📞</Text>
+                <Ionicons name="call-outline" size={20} color="#495057" style={{ marginRight: 16 }} />
                 <Text style={styles.menuItemText}>Soporte</Text>
               </TouchableOpacity>
             </View>
@@ -366,16 +365,19 @@ export const TecnicoScreen: React.FC<Props> = ({ onBack, onCreateReport }) => {
         animationType="slide"
         onRequestClose={() => setShowMyReports(false)}
       >
-        <View style={styles.modalOverlay}>
+        <View style={styles.modalOverlayCentered}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>📋 Mis Informes</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Ionicons name="documents-outline" size={20} color="#212529" style={{ marginRight: 8 }} />
+                <Text style={styles.modalTitle}>Mis Informes</Text>
+              </View>
               <TouchableOpacity 
                 style={styles.modalCloseButton}
                 onPress={() => setShowMyReports(false)}
                 activeOpacity={0.8}
               >
-                <Text style={styles.modalCloseText}>✕</Text>
+                <Ionicons name="close" size={16} color="#fff" />
               </TouchableOpacity>
             </View>
             
@@ -397,52 +399,52 @@ export const TecnicoScreen: React.FC<Props> = ({ onBack, onCreateReport }) => {
                   </TouchableOpacity>
                 </View>
                 
-                <View style={styles.reportList}>
-                  <View style={styles.reportItem}>
-                    <Text style={styles.reportIcon}>🔧</Text>
-                    <View style={styles.reportContent}>
-                      <Text style={styles.reportTitle}>Mantenimiento Preventivo - Elevador 1</Text>
-                      <Text style={styles.reportDate}>Hoy, 9:30 AM</Text>
-                      <Text style={styles.reportStatus}>✅ Completado</Text>
+                <View style={styles.myReportList}>
+                  <View style={styles.myReportItem}>
+                    <Text style={styles.myReportIcon}></Text>
+                    <View style={styles.myReportContent}>
+                      <Text style={styles.myReportTitle}>Mantenimiento Preventivo - Elevador 1</Text>
+                      <Text style={styles.myReportDate}>Hoy, 9:30 AM</Text>
+                      <Text style={styles.myReportStatus}>Completado</Text>
                     </View>
                     <TouchableOpacity 
-                      style={styles.reportAction}
+                      style={styles.myReportAction}
                       onPress={() => Alert.alert('Informe', 'Mostrando detalles del informe...')}
                       activeOpacity={0.8}
                     >
-                      <Text style={styles.reportActionText}>Ver</Text>
+                      <Text style={styles.myReportActionText}>Ver</Text>
                     </TouchableOpacity>
                   </View>
                   
-                  <View style={styles.reportItem}>
-                    <Text style={styles.reportIcon}>💡</Text>
-                    <View style={styles.reportContent}>
-                      <Text style={styles.reportTitle}>Cambio de Lámparas - Pasillo Principal</Text>
-                      <Text style={styles.reportDate}>Ayer, 3:45 PM</Text>
-                      <Text style={styles.reportStatus}>✅ Completado</Text>
+                  <View style={styles.myReportItem}>
+                    <Text style={styles.myReportIcon}></Text>
+                    <View style={styles.myReportContent}>
+                      <Text style={styles.myReportTitle}>Cambio de Lámparas - Pasillo Principal</Text>
+                      <Text style={styles.myReportDate}>Ayer, 3:45 PM</Text>
+                      <Text style={styles.myReportStatus}>Completado</Text>
                     </View>
                     <TouchableOpacity 
-                      style={styles.reportAction}
+                      style={styles.myReportAction}
                       onPress={() => Alert.alert('Informe', 'Mostrando detalles del informe...')}
                       activeOpacity={0.8}
                     >
-                      <Text style={styles.reportActionText}>Ver</Text>
+                      <Text style={styles.myReportActionText}>Ver</Text>
                     </TouchableOpacity>
                   </View>
                   
-                  <View style={styles.reportItem}>
-                    <Text style={styles.reportIcon}>🔌</Text>
-                    <View style={styles.reportContent}>
-                      <Text style={styles.reportTitle}>Reparación Enchufe - Oficina 201</Text>
-                      <Text style={styles.reportDate}>Hace 2 días, 11:20 AM</Text>
-                      <Text style={styles.reportStatus}>✅ Completado</Text>
+                  <View style={styles.myReportItem}>
+                    <Text style={styles.myReportIcon}></Text>
+                    <View style={styles.myReportContent}>
+                      <Text style={styles.myReportTitle}>Reparación Enchufe - Oficina 201</Text>
+                      <Text style={styles.myReportDate}>Hace 2 días, 11:20 AM</Text>
+                      <Text style={styles.myReportStatus}>Completado</Text>
                     </View>
                     <TouchableOpacity 
-                      style={styles.reportAction}
+                      style={styles.myReportAction}
                       onPress={() => Alert.alert('Informe', 'Mostrando detalles del informe...')}
                       activeOpacity={0.8}
                     >
-                      <Text style={styles.reportActionText}>Ver</Text>
+                      <Text style={styles.myReportActionText}>Ver</Text>
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -459,16 +461,19 @@ export const TecnicoScreen: React.FC<Props> = ({ onBack, onCreateReport }) => {
         animationType="slide"
         onRequestClose={() => setShowCalendar(false)}
       >
-        <View style={styles.modalOverlay}>
+        <View style={styles.modalOverlayCentered}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>📅 Calendario de Tareas</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Ionicons name="calendar-outline" size={20} color="#212529" style={{ marginRight: 8 }} />
+                <Text style={styles.modalTitle}>Calendario de Tareas</Text>
+              </View>
               <TouchableOpacity 
                 style={styles.modalCloseButton}
                 onPress={() => setShowCalendar(false)}
                 activeOpacity={0.8}
               >
-                <Text style={styles.modalCloseText}>✕</Text>
+                <Ionicons name="close" size={16} color="#fff" />
               </TouchableOpacity>
             </View>
             
@@ -539,16 +544,19 @@ export const TecnicoScreen: React.FC<Props> = ({ onBack, onCreateReport }) => {
         animationType="slide"
         onRequestClose={() => setShowStats(false)}
       >
-        <View style={styles.modalOverlay}>
+        <View style={styles.modalOverlayCentered}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>📊 Mis Estadísticas</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Ionicons name="bar-chart-outline" size={20} color="#212529" style={{ marginRight: 8 }} />
+                <Text style={styles.modalTitle}>Mis Estadísticas</Text>
+              </View>
               <TouchableOpacity 
                 style={styles.modalCloseButton}
                 onPress={() => setShowStats(false)}
                 activeOpacity={0.8}
               >
-                <Text style={styles.modalCloseText}>✕</Text>
+                <Ionicons name="close" size={16} color="#fff" />
               </TouchableOpacity>
             </View>
             
@@ -622,16 +630,19 @@ export const TecnicoScreen: React.FC<Props> = ({ onBack, onCreateReport }) => {
         animationType="slide"
         onRequestClose={() => setShowSettings(false)}
       >
-        <View style={styles.modalOverlay}>
+        <View style={styles.modalOverlayCentered}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>⚙️ Configuración Personal</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Ionicons name="settings-outline" size={20} color="#212529" style={{ marginRight: 8 }} />
+                <Text style={styles.modalTitle}>Configuración Personal</Text>
+              </View>
               <TouchableOpacity 
                 style={styles.modalCloseButton}
                 onPress={() => setShowSettings(false)}
                 activeOpacity={0.8}
               >
-                <Text style={styles.modalCloseText}>✕</Text>
+                <Ionicons name="close" size={16} color="#fff" />
               </TouchableOpacity>
             </View>
             
@@ -709,16 +720,19 @@ export const TecnicoScreen: React.FC<Props> = ({ onBack, onCreateReport }) => {
         animationType="slide"
         onRequestClose={() => setShowSupport(false)}
       >
-        <View style={styles.modalOverlay}>
+        <View style={styles.modalOverlayCentered}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>📞 Soporte Técnico</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Ionicons name="call-outline" size={20} color="#212529" style={{ marginRight: 8 }} />
+                <Text style={styles.modalTitle}>Soporte Técnico</Text>
+              </View>
               <TouchableOpacity 
                 style={styles.modalCloseButton}
                 onPress={() => setShowSupport(false)}
                 activeOpacity={0.8}
               >
-                <Text style={styles.modalCloseText}>✕</Text>
+                <Ionicons name="close" size={16} color="#fff" />
               </TouchableOpacity>
             </View>
             
@@ -734,7 +748,7 @@ export const TecnicoScreen: React.FC<Props> = ({ onBack, onCreateReport }) => {
                     onPress={() => Alert.alert('Soporte', 'Conectando con soporte técnico...')}
                     activeOpacity={0.8}
                   >
-                    <Text style={styles.contactIcon}>📞</Text>
+                    <Ionicons name="call-outline" size={22} color="#495057" style={{ marginBottom: 8 }} />
                     <Text style={styles.contactTitle}>Llamar al soporte</Text>
                     <Text style={styles.contactSubtitle}>+1 (555) 123-4567</Text>
                   </TouchableOpacity>
@@ -744,7 +758,7 @@ export const TecnicoScreen: React.FC<Props> = ({ onBack, onCreateReport }) => {
                     onPress={() => Alert.alert('Soporte', 'Abriendo chat en vivo...')}
                     activeOpacity={0.8}
                   >
-                    <Text style={styles.contactIcon}>💬</Text>
+                    <Ionicons name="chatbubble-ellipses-outline" size={22} color="#495057" style={{ marginBottom: 8 }} />
                     <Text style={styles.contactTitle}>Chat en vivo</Text>
                     <Text style={styles.contactSubtitle}>Disponible 24/7</Text>
                   </TouchableOpacity>
@@ -754,7 +768,7 @@ export const TecnicoScreen: React.FC<Props> = ({ onBack, onCreateReport }) => {
                     onPress={() => Alert.alert('Soporte', 'Abriendo manual de usuario...')}
                     activeOpacity={0.8}
                   >
-                    <Text style={styles.contactIcon}>📚</Text>
+                    <Ionicons name="book-outline" size={22} color="#495057" style={{ marginBottom: 8 }} />
                     <Text style={styles.contactTitle}>Manual de usuario</Text>
                     <Text style={styles.contactSubtitle}>Guías y tutoriales</Text>
                   </TouchableOpacity>
@@ -991,8 +1005,55 @@ const styles = StyleSheet.create({
     color: '#28A745',
     fontWeight: '600',
   },
+  // Duplicates for My Reports to avoid naming conflicts
+  myReportList: {
+    gap: 12,
+  },
+  myReportItem: {
+    backgroundColor: '#F8F9FA',
+    borderRadius: 12,
+    padding: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#E9ECEF',
+  },
+  myReportIcon: {
+    fontSize: 20,
+    marginRight: 12,
+  },
+  myReportContent: {
+    flex: 1,
+  },
+  myReportTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#495057',
+    marginBottom: 4,
+  },
+  myReportDate: {
+    fontSize: 12,
+    color: '#6C757D',
+    marginBottom: 2,
+  },
+  myReportStatus: {
+    fontSize: 12,
+    color: '#28A745',
+    fontWeight: '600',
+  },
+  myReportAction: {
+    backgroundColor: '#007BFF',
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 16,
+  },
+  myReportActionText: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: '600',
+  },
   // Estilos del modal del menú
-  modalOverlay: {
+  modalOverlaySidebar: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.5)',
   },
@@ -1072,6 +1133,10 @@ const styles = StyleSheet.create({
   // Estilos para los modales adicionales
   modalOverlay: {
     flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)'
+  },
+  modalOverlayCentered: {
+    flex: 1,
     backgroundColor: 'rgba(0,0,0,0.5)',
     justifyContent: 'center',
     alignItems: 'center',
@@ -1146,52 +1211,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#2196F3',
   },
-  reportList: {
-    gap: 12,
-  },
-  reportItem: {
-    backgroundColor: '#F8F9FA',
-    borderRadius: 12,
-    padding: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#E9ECEF',
-  },
-  reportIcon: {
-    fontSize: 20,
-    marginRight: 12,
-  },
-  reportContent: {
-    flex: 1,
-  },
-  reportTitle: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#495057',
-    marginBottom: 4,
-  },
-  reportDate: {
-    fontSize: 12,
-    color: '#6C757D',
-    marginBottom: 2,
-  },
-  reportStatus: {
-    fontSize: 12,
-    color: '#28A745',
-    fontWeight: '600',
-  },
-  reportAction: {
-    backgroundColor: '#007BFF',
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 16,
-  },
-  reportActionText: {
-    color: 'white',
-    fontSize: 12,
-    fontWeight: '600',
-  },
+  
   // Estilos para Calendario
   calendarSection: {
     gap: 20,

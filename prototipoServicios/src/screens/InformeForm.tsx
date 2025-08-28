@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert, ScrollView, Modal, Animated, Dimensions, Platform } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 // @ts-ignore
 import * as ImagePicker from 'expo-image-picker';
 
@@ -162,7 +163,7 @@ export const InformeForm: React.FC<Props> = ({ onBack }) => {
     <View style={styles.photoSection}>
       <View style={styles.photoHeader}>
         <Text style={styles.photoLabel}>
-          {type === 'before' ? '🕐 Antes' : '✅ Después'} ({photos.length}/5)
+          {type === 'before' ? 'Antes' : 'Después'} ({photos.length}/5)
         </Text>
         <View style={styles.photoProgress}>
           <View style={[styles.progressBar, { width: `${(photos.length / 5) * 100}%` }]} />
@@ -171,24 +172,29 @@ export const InformeForm: React.FC<Props> = ({ onBack }) => {
       
       <View style={styles.photoButtons}>
         <TouchableOpacity 
-          style={[styles.photoButton, styles.cameraButton]} 
+          style={[styles.photoButton, styles.primaryButton]} 
           onPress={() => handlePickImage(type, 'camera')}
           activeOpacity={0.8}
         >
-          <Text style={styles.photoButtonText}>📷 Cámara</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Ionicons name="camera-outline" size={16} color="#fff" style={{ marginRight: 6 }} />
+            <Text style={styles.photoButtonText}>Cámara</Text>
+          </View>
         </TouchableOpacity>
         <TouchableOpacity 
-          style={[styles.photoButton, styles.galleryButton]} 
+          style={[styles.photoButton, styles.secondaryButton]} 
           onPress={() => handlePickImage(type, 'gallery')}
           activeOpacity={0.8}
         >
-          <Text style={styles.photoButtonText}>🖼️ Galería</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Ionicons name="image-outline" size={16} color="#fff" style={{ marginRight: 6 }} />
+            <Text style={styles.photoButtonText}>Galería</Text>
+          </View>
         </TouchableOpacity>
       </View>
       
       {photos.length === 0 ? (
         <View style={styles.photoPlaceholder}>
-          <Text style={styles.placeholderIcon}>📸</Text>
           <Text style={styles.placeholderText}>Sin fotos</Text>
         </View>
       ) : (
@@ -208,7 +214,7 @@ export const InformeForm: React.FC<Props> = ({ onBack }) => {
                 />
                 {imageLoading && (
                   <View style={styles.imageOverlay}>
-                    <Text style={styles.overlayText}>⏳</Text>
+                    <Ionicons name="hourglass-outline" size={20} color="#fff" />
                   </View>
                 )}
               </TouchableOpacity>
@@ -217,7 +223,7 @@ export const InformeForm: React.FC<Props> = ({ onBack }) => {
                 onPress={() => removePhoto(type, index)}
                 activeOpacity={0.7}
               >
-                <Text style={styles.removePhotoText}>✕</Text>
+                <Ionicons name="close" size={14} color="#fff" />
               </TouchableOpacity>
             </View>
           ))}
@@ -230,11 +236,10 @@ export const InformeForm: React.FC<Props> = ({ onBack }) => {
     <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={onBack} activeOpacity={0.8}>
-          <Text style={styles.backIcon}>←</Text>
-          <Text style={styles.backText}>Volver</Text>
+          <Ionicons name="chevron-back" size={18} color="#000" style={{ marginRight: 4 }} />
         </TouchableOpacity>
         <View style={styles.titleContainer}>
-          <Text style={styles.title}>📋 Informe de Mantenimiento</Text>
+          <Text style={styles.title}>Informe de Mantenimiento</Text>
           <Text style={styles.subtitle}>Registro detallado del servicio</Text>
         </View>
         <View style={{ width: 80 }} />
@@ -246,7 +251,7 @@ export const InformeForm: React.FC<Props> = ({ onBack }) => {
         bounces={true}
       >
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>⏰ Horarios</Text>
+          <Text style={styles.sectionTitle}>Horarios</Text>
           <View style={styles.timeContainer}>
             <TouchableOpacity
               style={[styles.timeButton, styles.halfInput]}
@@ -259,7 +264,7 @@ export const InformeForm: React.FC<Props> = ({ onBack }) => {
                   {formatTimeForDisplay(checkInTime)}
                 </Text>
               </View>
-              <Text style={styles.timeButtonIcon}>🕐</Text>
+              <Ionicons name="time-outline" size={20} color="#6B7280" />
             </TouchableOpacity>
 
             <View style={styles.timeSeparatorContainer}>
@@ -277,13 +282,13 @@ export const InformeForm: React.FC<Props> = ({ onBack }) => {
                   {formatTimeForDisplay(checkOutTime)}
                 </Text>
               </View>
-              <Text style={styles.timeButtonIcon}>🕐</Text>
+              <Ionicons name="time-outline" size={20} color="#6B7280" />
             </TouchableOpacity>
           </View>
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>📝 Descripción del trabajo</Text>
+          <Text style={styles.sectionTitle}>Descripción del trabajo</Text>
           <TextInput
             style={styles.descriptionInput}
             value={description}
@@ -297,7 +302,7 @@ export const InformeForm: React.FC<Props> = ({ onBack }) => {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>📸 Evidencia fotográfica</Text>
+          <Text style={styles.sectionTitle}>Evidencia fotográfica</Text>
           <View style={styles.photoContainer}>
             {renderPhotoSection('before', photoBeforeUris)}
             {renderPhotoSection('after', photoAfterUris)}
@@ -311,7 +316,7 @@ export const InformeForm: React.FC<Props> = ({ onBack }) => {
           onPress={handleSubmit}
           activeOpacity={0.8}
         >
-          <Text style={styles.submitButtonText}>🚀 Enviar Informe</Text>
+          <Text style={styles.submitButtonText}>Enviar Informe</Text>
         </TouchableOpacity>
       </ScrollView>
 
@@ -324,13 +329,13 @@ export const InformeForm: React.FC<Props> = ({ onBack }) => {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>📸 Vista previa de imagen</Text>
+              <Text style={styles.modalTitle}>Vista previa de imagen</Text>
               <TouchableOpacity
                 style={styles.modalCloseButton}
                 onPress={() => setShowImagePreview(false)}
                 activeOpacity={0.8}
               >
-                <Text style={styles.modalCloseText}>✕</Text>
+                <Ionicons name="close" size={18} color="#fff" />
               </TouchableOpacity>
             </View>
             <View style={styles.modalImageContainer}>
@@ -488,20 +493,19 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
-    borderBottomColor: '#E9ECEF',
+    borderBottomColor: '#E5E9F0',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    shadowOpacity: 0.06,
+    shadowRadius: 6,
     elevation: 3,
   },
   backButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#6C757D',
+    backgroundColor: 'transparent',
     paddingVertical: 10,
     paddingHorizontal: 16,
-    borderRadius: 25,
   },
   backIcon: {
     color: 'white',
@@ -519,12 +523,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 22,
     fontWeight: '700',
-    color: '#212529',
+    color: '#1F2937',
     textAlign: 'center',
   },
   subtitle: {
     fontSize: 12,
-    color: '#6C757D',
+    color: '#6B7280',
     marginTop: 2,
   },
   formContainer: {
@@ -538,14 +542,14 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
+    shadowOpacity: 0.04,
+    shadowRadius: 10,
     elevation: 2,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#212529',
+    color: '#1F2937',
     marginBottom: 16,
   },
   timeContainer: {
@@ -559,16 +563,16 @@ const styles = StyleSheet.create({
   timeLabel: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#495057',
+    color: '#374151',
     marginBottom: 8,
   },
   timeField: {
     borderWidth: 2,
-    borderColor: '#E9ECEF',
+    borderColor: '#E5E9F0',
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: '#F5F7FA',
     fontSize: 16,
     fontWeight: '600',
     textAlign: 'center',
@@ -583,11 +587,11 @@ const styles = StyleSheet.create({
   },
   descriptionInput: {
     borderWidth: 2,
-    borderColor: '#E9ECEF',
+    borderColor: '#E5E9F0',
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 16,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: '#F5F7FA',
     fontSize: 16,
     minHeight: 120,
     textAlignVertical: 'top',
@@ -596,7 +600,7 @@ const styles = StyleSheet.create({
     gap: 20,
   },
   photoSection: {
-    backgroundColor: '#F8F9FA',
+    backgroundColor: '#F5F7FA',
     borderRadius: 12,
     padding: 16,
   },
@@ -606,18 +610,18 @@ const styles = StyleSheet.create({
   photoLabel: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#495057',
+    color: '#374151',
     marginBottom: 8,
   },
   photoProgress: {
     height: 4,
-    backgroundColor: '#E9ECEF',
+    backgroundColor: '#E5E9F0',
     borderRadius: 2,
     overflow: 'hidden',
   },
   progressBar: {
     height: '100%',
-    backgroundColor: '#28A745',
+    backgroundColor: '#0D6EFD',
     borderRadius: 2,
   },
   photoButtons: {
@@ -633,11 +637,11 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     alignItems: 'center',
   },
-  cameraButton: {
-    backgroundColor: '#28A745',
+  primaryButton: {
+    backgroundColor: '#0D6EFD',
   },
-  galleryButton: {
-    backgroundColor: '#FFC107',
+  secondaryButton: {
+    backgroundColor: '#6C757D',
   },
   photoButtonText: {
     color: 'white',
@@ -645,21 +649,17 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   photoPlaceholder: {
-    height: 100,
+    height: 110,
     borderRadius: 12,
-    backgroundColor: '#E9ECEF',
+    backgroundColor: '#EFF2F6',
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: '#DEE2E6',
+    borderColor: '#E1E6EC',
     borderStyle: 'dashed',
   },
-  placeholderIcon: {
-    fontSize: 24,
-    marginBottom: 4,
-  },
   placeholderText: {
-    color: '#6C757D',
+    color: '#6B7280',
     fontSize: 14,
     fontWeight: '500',
   },
@@ -704,7 +704,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 4,
     right: 4,
-    backgroundColor: '#DC3545',
+    backgroundColor: '#C53030',
     borderRadius: 12,
     width: 24,
     height: 24,
@@ -723,14 +723,14 @@ const styles = StyleSheet.create({
   },
 
   submitButton: {
-    backgroundColor: '#007BFF',
+    backgroundColor: '#0D6EFD',
     paddingVertical: 18,
     borderRadius: 25,
     marginTop: 20,
-    shadowColor: '#007BFF',
+    shadowColor: '#0D6EFD',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
+    shadowOpacity: 0.25,
+    shadowRadius: 10,
     elevation: 5,
   },
   submitButtonText: {
@@ -759,13 +759,13 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingTop: 40,
     borderBottomWidth: 1,
-    borderBottomColor: '#E9ECEF',
+    borderBottomColor: '#E5E9F0',
     backgroundColor: 'rgba(255, 255, 255, 0.95)',
   },
   modalTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#212529',
+    color: '#1F2937',
   },
   modalCloseButton: {
     backgroundColor: 'rgba(0, 0, 0, 0.7)',
@@ -804,7 +804,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 12,
-    backgroundColor: '#E9ECEF',
+    backgroundColor: '#EFF2F6',
     marginHorizontal: 4,
   },
   halfInput: {
@@ -816,13 +816,13 @@ const styles = StyleSheet.create({
   },
   timeButtonLabel: {
     fontSize: 12,
-    color: '#6C757D',
+    color: '#6B7280',
     marginBottom: 4,
   },
   timeButtonValue: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#212529',
+    color: '#1F2937',
   },
   timeButtonIcon: {
     fontSize: 24,
@@ -848,12 +848,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#E9ECEF',
+    borderBottomColor: '#E5E9F0',
   },
   timePickerTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#212529',
+    color: '#1F2937',
   },
   timePickerBody: {
     padding: 20,
@@ -870,7 +870,7 @@ const styles = StyleSheet.create({
   timePickerLabel: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#6C757D',
+    color: '#6B7280',
     marginBottom: 10,
   },
   timePickerScroll: {
@@ -885,11 +885,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   timePickerOptionSelected: {
-    backgroundColor: '#007BFF',
+    backgroundColor: '#0D6EFD',
   },
   timePickerOptionText: {
     fontSize: 16,
-    color: '#495057',
+    color: '#374151',
     fontWeight: '500',
   },
   timePickerOptionTextSelected: {
@@ -899,7 +899,7 @@ const styles = StyleSheet.create({
   timePickerSeparator: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#495057',
+    color: '#374151',
     marginHorizontal: 10,
   },
   periodContainer: {
@@ -911,16 +911,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#E9ECEF',
-    backgroundColor: '#F8F9FA',
+    borderColor: '#E5E9F0',
+    backgroundColor: '#F5F7FA',
   },
   periodOptionSelected: {
-    backgroundColor: '#007BFF',
-    borderColor: '#007BFF',
+    backgroundColor: '#0D6EFD',
+    borderColor: '#0D6EFD',
   },
   periodOptionText: {
     fontSize: 16,
-    color: '#495057',
+    color: '#374151',
     fontWeight: '600',
   },
   periodOptionTextSelected: {
@@ -931,7 +931,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     padding: 20,
     borderTopWidth: 1,
-    borderTopColor: '#E9ECEF',
+    borderTopColor: '#E5E9F0',
   },
   timePickerCancelButton: {
     flex: 1,
@@ -939,13 +939,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#6C757D',
+    borderColor: '#6B7280',
     backgroundColor: 'transparent',
     marginRight: 10,
     alignItems: 'center',
   },
   timePickerCancelText: {
-    color: '#6C757D',
+    color: '#6B7280',
     fontSize: 16,
     fontWeight: '600',
   },
@@ -954,7 +954,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderRadius: 8,
-    backgroundColor: '#007BFF',
+    backgroundColor: '#0D6EFD',
     marginLeft: 10,
     alignItems: 'center',
   },

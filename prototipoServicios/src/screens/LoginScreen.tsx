@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Animated, Alert, Modal } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 type Props = {
   role: 'admin' | 'tecnico';
@@ -74,8 +75,8 @@ export const LoginScreen: React.FC<Props> = ({ role, onLoginSuccess, onBack }) =
 
   const getRoleInfo = () => {
     return role === 'admin' 
-      ? { icon: '👨‍💼', title: 'Administrador', color: '#6F42C1' }
-      : { icon: '🔧', title: 'Técnico', color: '#28A745' };
+      ? { icon: '', title: 'Administrador', color: '#0D6EFD' }
+      : { icon: '', title: 'Técnico', color: '#0D6EFD' };
   };
 
   const roleInfo = getRoleInfo();
@@ -92,30 +93,29 @@ export const LoginScreen: React.FC<Props> = ({ role, onLoginSuccess, onBack }) =
         ]}
       >
         <View style={styles.header}>
-          <TouchableOpacity style={styles.backButton} onPress={onBack} activeOpacity={0.8}>
-            <Text style={styles.backIcon}>←</Text>
-            <Text style={styles.backText}>Volver</Text>
-          </TouchableOpacity>
+        <TouchableOpacity style={styles.backButton} onPress={onBack} activeOpacity={0.8}>
+          <Ionicons name="chevron-back" size={18} color="#000" style={{ marginRight: 4 }} />
+        </TouchableOpacity>
           <View style={styles.titleContainer}>
             <Text style={styles.title}>Iniciar sesión</Text>
             <View style={[styles.roleBadge, { backgroundColor: roleInfo.color }]}>
-              <Text style={styles.roleIcon}>{roleInfo.icon}</Text>
+              <Ionicons name={role === 'admin' ? 'person-outline' : 'construct-outline'} size={16} color="#fff" style={{ marginRight: 6 }} />
               <Text style={styles.roleText}>{roleInfo.title}</Text>
             </View>
           </View>
-          <View style={{ width: 80 }} />
+          <View style={styles.placeholderView} />
         </View>
 
         <View style={styles.formContainer}>
           <View style={styles.welcomeSection}>
-            <Text style={styles.welcomeTitle}>¡Bienvenido de vuelta!</Text>
+            <Text style={styles.welcomeTitle}>Bienvenido de vuelta</Text>
             <Text style={styles.welcomeSubtitle}>
               Accede a tu cuenta para continuar
             </Text>
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>📧 Correo electrónico</Text>
+            <Text style={styles.label}>Correo electrónico</Text>
             <TextInput
               placeholder="correo@empresa.com"
               style={styles.input}
@@ -128,7 +128,7 @@ export const LoginScreen: React.FC<Props> = ({ role, onLoginSuccess, onBack }) =
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>🔒 Contraseña</Text>
+            <Text style={styles.label}>Contraseña</Text>
             <TextInput
               placeholder="••••••••"
               style={styles.input}
@@ -146,7 +146,7 @@ export const LoginScreen: React.FC<Props> = ({ role, onLoginSuccess, onBack }) =
             activeOpacity={0.8}
           >
             <Text style={styles.loginButtonText}>
-              {isLoading ? '⏳ Iniciando sesión...' : '🚀 Iniciar sesión'}
+              {isLoading ? 'Iniciando sesión...' : 'Iniciar sesión'}
             </Text>
           </TouchableOpacity>
 
@@ -174,13 +174,13 @@ export const LoginScreen: React.FC<Props> = ({ role, onLoginSuccess, onBack }) =
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>🔐 Recuperar Contraseña</Text>
+              <Text style={styles.modalTitle}>Recuperar Contraseña</Text>
               <TouchableOpacity 
                 style={styles.modalCloseButton}
                 onPress={() => setShowForgotPassword(false)}
                 activeOpacity={0.8}
               >
-                <Text style={styles.modalCloseText}>✕</Text>
+                <Ionicons name="close" size={16} color="#fff" />
               </TouchableOpacity>
             </View>
             
@@ -190,7 +190,7 @@ export const LoginScreen: React.FC<Props> = ({ role, onLoginSuccess, onBack }) =
               </Text>
               
               <View style={styles.modalInputGroup}>
-                <Text style={styles.modalLabel}>📧 Correo electrónico</Text>
+                <Text style={styles.modalLabel}>Correo electrónico</Text>
                 <TextInput
                   placeholder="correo@empresa.com"
                   style={styles.modalInput}
@@ -207,7 +207,7 @@ export const LoginScreen: React.FC<Props> = ({ role, onLoginSuccess, onBack }) =
                 onPress={handleRecoverySubmit}
                 activeOpacity={0.8}
               >
-                <Text style={styles.modalSubmitText}>📤 Enviar enlace de recuperación</Text>
+                <Text style={styles.modalSubmitText}>Enviar enlace de recuperación</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -242,10 +242,9 @@ const styles = StyleSheet.create({
   backButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#6C757D',
+    backgroundColor: 'transparent',
     paddingVertical: 10,
     paddingHorizontal: 16,
-    borderRadius: 25,
   },
   backIcon: {
     color: 'white',
@@ -258,7 +257,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   titleContainer: {
+    flex: 1,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   title: {
     fontSize: 22,
@@ -282,6 +283,9 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 12,
     fontWeight: '600',
+  },
+  placeholderView: {
+    width: 80,
   },
   formContainer: {
     flex: 1,

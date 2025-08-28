@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Animated, Dimensions, ScrollView, Modal, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Animated, Dimensions, ScrollView, Modal, Alert, Image } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -85,9 +86,7 @@ export const RoleSelectionScreen: React.FC<Props> = ({ onSelectRole }) => {
             onPress={() => setShowMenu(true)}
             activeOpacity={0.8}
           >
-            <View style={styles.hamburgerLine} />
-            <View style={styles.hamburgerLine} />
-            <View style={styles.hamburgerLine} />
+            <Ionicons name="menu-outline" size={24} color="#495057" />
           </TouchableOpacity>
           <View style={styles.headerSpacer} />
         </View>
@@ -98,7 +97,11 @@ export const RoleSelectionScreen: React.FC<Props> = ({ onSelectRole }) => {
           bounces={true}
         >
           <View style={styles.header}>
-            <Text style={styles.logo}>🔧</Text>
+            <Image 
+              source={require('../widgets/logo.png')} 
+              style={styles.logo}
+              resizeMode="contain"
+            />
             <Text style={styles.subtitle}>Sistema de Mantenimiento</Text>
           </View>
 
@@ -113,12 +116,12 @@ export const RoleSelectionScreen: React.FC<Props> = ({ onSelectRole }) => {
                 activeOpacity={0.8}
               >
                 <View style={styles.roleIconContainer}>
-                  <Text style={styles.roleIcon}>👨‍💼</Text>
+                  <Ionicons name="briefcase-outline" size={36} color="#0D6EFD" />
                 </View>
                 <Text style={styles.roleTitle}>Administrador</Text>
                 <View style={styles.roleFeatures}>
-                  <Text style={styles.feature}>👥 Gestión de usuarios</Text>
-                  <Text style={styles.feature}>📋 Revisión de informes</Text>
+                  <Text style={styles.feature}>Gestión de usuarios</Text>
+                  <Text style={styles.feature}>Revisión de informes</Text>
                 </View>
               </TouchableOpacity>
 
@@ -128,12 +131,12 @@ export const RoleSelectionScreen: React.FC<Props> = ({ onSelectRole }) => {
                 activeOpacity={0.8}
               >
                 <View style={styles.roleIconContainer}>
-                  <Text style={styles.roleIcon}>🔧</Text>
+                  <Ionicons name="construct-outline" size={36} color="#0D6EFD" />
                 </View>
                 <Text style={styles.roleTitle}>Técnico</Text>
                 <View style={styles.roleFeatures}>
-                  <Text style={styles.feature}>📱 Captura de fotos</Text>
-                  <Text style={styles.feature}>📝 Informes detallados</Text>
+                  <Text style={styles.feature}>Captura de fotos</Text>
+                  <Text style={styles.feature}>Informes detallados</Text>
                 </View>
               </TouchableOpacity>
             </View>
@@ -161,7 +164,7 @@ export const RoleSelectionScreen: React.FC<Props> = ({ onSelectRole }) => {
                 onPress={() => setShowMenu(false)}
                 activeOpacity={0.8}
               >
-                <Text style={styles.closeButtonText}>✕</Text>
+                <Ionicons name="close" size={16} color="#fff" />
               </TouchableOpacity>
             </View>
             
@@ -171,7 +174,7 @@ export const RoleSelectionScreen: React.FC<Props> = ({ onSelectRole }) => {
                 onPress={() => handleMenuAction('home')}
                 activeOpacity={0.7}
               >
-                <Text style={styles.menuItemIcon}>🏠</Text>
+                <Ionicons name="home-outline" size={20} color="#495057" style={{ marginRight: 16 }} />
                 <Text style={styles.menuItemText}>Inicio</Text>
               </TouchableOpacity>
               
@@ -180,7 +183,7 @@ export const RoleSelectionScreen: React.FC<Props> = ({ onSelectRole }) => {
                 onPress={() => handleMenuAction('settings')}
                 activeOpacity={0.7}
               >
-                <Text style={styles.menuItemIcon}>⚙️</Text>
+                <Ionicons name="settings-outline" size={20} color="#495057" style={{ marginRight: 16 }} />
                 <Text style={styles.menuItemText}>Configuración</Text>
               </TouchableOpacity>
               
@@ -189,7 +192,7 @@ export const RoleSelectionScreen: React.FC<Props> = ({ onSelectRole }) => {
                 onPress={() => handleMenuAction('support')}
                 activeOpacity={0.7}
               >
-                <Text style={styles.menuItemIcon}>📞</Text>
+                <Ionicons name="call-outline" size={20} color="#495057" style={{ marginRight: 16 }} />
                 <Text style={styles.menuItemText}>Soporte</Text>
               </TouchableOpacity>
               
@@ -198,7 +201,7 @@ export const RoleSelectionScreen: React.FC<Props> = ({ onSelectRole }) => {
                 onPress={() => handleMenuAction('about')}
                 activeOpacity={0.7}
               >
-                <Text style={styles.menuItemIcon}>ℹ️</Text>
+                <Ionicons name="information-circle-outline" size={20} color="#495057" style={{ marginRight: 16 }} />
                 <Text style={styles.menuItemText}>Acerca de</Text>
               </TouchableOpacity>
             </View>
@@ -220,19 +223,22 @@ export const RoleSelectionScreen: React.FC<Props> = ({ onSelectRole }) => {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>ℹ️ Acerca de ClearMinds</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Ionicons name="information-circle-outline" size={20} color="#212529" style={{ marginRight: 8 }} />
+                <Text style={styles.modalTitle}>Acerca de ClearMinds</Text>
+              </View>
               <TouchableOpacity 
                 style={styles.modalCloseButton}
                 onPress={() => setShowAbout(false)}
                 activeOpacity={0.8}
               >
-                <Text style={styles.modalCloseText}>✕</Text>
+                <Ionicons name="close" size={16} color="#fff" />
               </TouchableOpacity>
             </View>
             
             <ScrollView style={styles.modalBody}>
               <View style={styles.aboutSection}>
-                <Text style={styles.aboutTitle}>🔧 ClearMinds</Text>
+                <Text style={styles.aboutTitle}>ClearMinds</Text>
                 <Text style={styles.aboutSubtitle}>Sistema de Mantenimiento Inteligente</Text>
                 
                 <View style={styles.aboutInfo}>
@@ -257,11 +263,11 @@ export const RoleSelectionScreen: React.FC<Props> = ({ onSelectRole }) => {
                 </Text>
                 
                 <View style={styles.featureList}>
-                  <Text style={styles.featureItem}>✅ Gestión de usuarios y roles</Text>
-                  <Text style={styles.featureItem}>✅ Informes detallados con fotos</Text>
-                  <Text style={styles.featureItem}>✅ Dashboard en tiempo real</Text>
-                  <Text style={styles.featureItem}>✅ Notificaciones automáticas</Text>
-                  <Text style={styles.featureItem}>✅ Historial completo de actividades</Text>
+                  <Text style={styles.featureItem}>Gestión de usuarios y roles</Text>
+                  <Text style={styles.featureItem}>Informes detallados con fotos</Text>
+                  <Text style={styles.featureItem}>Dashboard en tiempo real</Text>
+                  <Text style={styles.featureItem}>Notificaciones automáticas</Text>
+                  <Text style={styles.featureItem}>Historial completo de actividades</Text>
                 </View>
               </View>
             </ScrollView>
@@ -279,13 +285,16 @@ export const RoleSelectionScreen: React.FC<Props> = ({ onSelectRole }) => {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>📞 Soporte Técnico</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Ionicons name="call-outline" size={20} color="#212529" style={{ marginRight: 8 }} />
+                <Text style={styles.modalTitle}>Soporte Técnico</Text>
+              </View>
               <TouchableOpacity 
                 style={styles.modalCloseButton}
                 onPress={() => setShowSupport(false)}
                 activeOpacity={0.8}
               >
-                <Text style={styles.modalCloseText}>✕</Text>
+                <Ionicons name="close" size={16} color="#fff" />
               </TouchableOpacity>
             </View>
             
@@ -301,7 +310,7 @@ export const RoleSelectionScreen: React.FC<Props> = ({ onSelectRole }) => {
                     onPress={() => Alert.alert('Llamada', 'Iniciando llamada al soporte...')}
                     activeOpacity={0.8}
                   >
-                    <Text style={styles.contactIcon}>📞</Text>
+                    <Ionicons name="call-outline" size={22} color="#495057" style={{ marginBottom: 8 }} />
                     <Text style={styles.contactTitle}>Llamar al soporte</Text>
                     <Text style={styles.contactSubtitle}>+1 (555) 123-4567</Text>
                   </TouchableOpacity>
@@ -311,7 +320,7 @@ export const RoleSelectionScreen: React.FC<Props> = ({ onSelectRole }) => {
                     onPress={() => Alert.alert('Email', 'Abriendo cliente de email...')}
                     activeOpacity={0.8}
                   >
-                    <Text style={styles.contactIcon}>📧</Text>
+                    <Ionicons name="mail-outline" size={22} color="#495057" style={{ marginBottom: 8 }} />
                     <Text style={styles.contactTitle}>Enviar email</Text>
                     <Text style={styles.contactSubtitle}>soporte@clearminds.com</Text>
                   </TouchableOpacity>
@@ -321,14 +330,14 @@ export const RoleSelectionScreen: React.FC<Props> = ({ onSelectRole }) => {
                     onPress={() => Alert.alert('Chat', 'Iniciando chat en vivo...')}
                     activeOpacity={0.8}
                   >
-                    <Text style={styles.contactIcon}>💬</Text>
+                    <Ionicons name="chatbubble-ellipses-outline" size={22} color="#495057" style={{ marginBottom: 8 }} />
                     <Text style={styles.contactTitle}>Chat en vivo</Text>
                     <Text style={styles.contactSubtitle}>Disponible 24/7</Text>
                   </TouchableOpacity>
                 </View>
                 
                 <View style={styles.faqSection}>
-                  <Text style={styles.faqTitle}>❓ Preguntas Frecuentes</Text>
+                  <Text style={styles.faqTitle}>Preguntas Frecuentes</Text>
                   <TouchableOpacity style={styles.faqItem} activeOpacity={0.7}>
                     <Text style={styles.faqQuestion}>¿Cómo cambio mi contraseña?</Text>
                   </TouchableOpacity>
@@ -355,13 +364,16 @@ export const RoleSelectionScreen: React.FC<Props> = ({ onSelectRole }) => {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>⚙️ Configuración</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Ionicons name="settings-outline" size={20} color="#212529" style={{ marginRight: 8 }} />
+                <Text style={styles.modalTitle}>Configuración</Text>
+              </View>
               <TouchableOpacity 
                 style={styles.modalCloseButton}
                 onPress={() => setShowSettings(false)}
                 activeOpacity={0.8}
               >
-                <Text style={styles.modalCloseText}>✕</Text>
+                <Ionicons name="close" size={16} color="#fff" />
               </TouchableOpacity>
             </View>
             
@@ -451,10 +463,11 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: 'center',
-    marginTop: 60,
+    marginTop: 20,
   },
   logo: {
-    fontSize: 64,
+    width: 120,
+    height: 120,
     marginBottom: 16,
   },
   title: {
