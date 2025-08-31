@@ -257,7 +257,7 @@ export const AdminScreen: React.FC<Props> = ({ onBack }) => {
             onPress={() => setShowMenu(true)}
             activeOpacity={0.8}
           >
-            <Ionicons name="menu-outline" size={24} color="#495057" />
+            <Ionicons name="menu-outline" size={28} color="#374151" />
           </TouchableOpacity>
           <View style={styles.headerTitle}>
             <Text style={styles.headerTitleText}>Panel de Administración</Text>
@@ -278,7 +278,7 @@ export const AdminScreen: React.FC<Props> = ({ onBack }) => {
         >
           <View style={styles.welcomeSection}>
             <Text style={styles.welcomeTitle}>Bienvenido, Administrador</Text>
-            <Text style={styles.welcomeSubtitle}>Gestiona tu sistema de mantenimiento</Text>
+            <Text style={styles.welcomeSubtitle}>Gestiona tu sistema de mantenimiento de forma eficiente</Text>
           </View>
 
           <View style={styles.statsContainer}>
@@ -311,7 +311,7 @@ export const AdminScreen: React.FC<Props> = ({ onBack }) => {
                 onPress={() => handleQuickAction('users')}
                 activeOpacity={0.8}
               >
-                <Ionicons name="people-outline" size={22} color="#495057" style={{ marginRight: 12 }} />
+                <Ionicons name="people-outline" size={24} color="#6366F1" style={{ marginRight: 12 }} />
                 <Text style={styles.actionText}>Gestionar Usuarios</Text>
               </TouchableOpacity>
               
@@ -320,18 +320,25 @@ export const AdminScreen: React.FC<Props> = ({ onBack }) => {
                 onPress={() => handleQuickAction('reports')}
                 activeOpacity={0.8}
               >
-                <Ionicons name="document-text-outline" size={22} color="#495057" style={{ marginRight: 12 }} />
+                <Ionicons name="document-text-outline" size={24} color="#10B981" style={{ marginRight: 12 }} />
                 <Text style={styles.actionText}>Revisar Informes</Text>
               </TouchableOpacity>
               
-              
+              <TouchableOpacity 
+                style={styles.actionButton} 
+                onPress={() => handleQuickAction('analytics')}
+                activeOpacity={0.8}
+              >
+                <Ionicons name="analytics-outline" size={24} color="#F59E0B" style={{ marginRight: 12 }} />
+                <Text style={styles.actionText}>Analíticas</Text>
+              </TouchableOpacity>
               
               <TouchableOpacity 
                 style={styles.actionButton} 
                 onPress={() => handleQuickAction('settings')}
                 activeOpacity={0.8}
               >
-                <Ionicons name="settings-outline" size={22} color="#495057" style={{ marginRight: 12 }} />
+                <Ionicons name="settings-outline" size={24} color="#EF4444" style={{ marginRight: 12 }} />
                 <Text style={styles.actionText}>Configuración</Text>
               </TouchableOpacity>
             </View>
@@ -965,7 +972,7 @@ export const AdminScreen: React.FC<Props> = ({ onBack }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: '#F8FAFC',
   },
   content: {
     flex: 1,
@@ -975,21 +982,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
+    paddingHorizontal: 24,
+    paddingVertical: 20,
     backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
-    borderBottomColor: '#E9ECEF',
+    borderBottomColor: '#E2E8F0',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
   },
   hamburgerButton: {
-    padding: 8,
-    borderRadius: 8,
-    backgroundColor: '#F8F9FA',
+    padding: 12,
+    borderRadius: 12,
+    backgroundColor: '#F1F5F9',
   },
   hamburgerLine: {
     width: 24,
@@ -1003,94 +1010,98 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   headerTitleText: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#212529',
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#1E293B',
   },
   backButton: {
-    backgroundColor: '#DC3545',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 20,
+    backgroundColor: '#EF4444',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 12,
   },
   backButtonText: {
     color: 'white',
-    fontWeight: '600',
+    fontWeight: '700',
     fontSize: 14,
   },
   scrollContent: {
-    padding: 20,
+    paddingHorizontal: 24,
+    paddingVertical: 32,
     paddingBottom: 40,
   },
   welcomeSection: {
     alignItems: 'center',
-    marginBottom: 30,
+    marginBottom: 40,
   },
   welcomeTitle: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#212529',
-    marginBottom: 8,
+    fontSize: 28,
+    fontWeight: '800',
+    color: '#1E293B',
+    marginBottom: 12,
   },
   welcomeSubtitle: {
-    fontSize: 16,
-    color: '#6C757D',
+    fontSize: 17,
+    color: '#64748B',
     textAlign: 'center',
+    lineHeight: 24,
   },
   sectionTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#212529',
-    marginBottom: 16,
+    fontSize: 22,
+    fontWeight: '800',
+    color: '#1E293B',
+    marginBottom: 20,
   },
   statsContainer: {
-    marginBottom: 30,
+    marginBottom: 40,
   },
   statsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    gap: 12,
+    gap: 16,
   },
   statCard: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 16,
+    borderRadius: 16,
+    padding: 24,
     alignItems: 'center',
     flex: 1,
     minWidth: '45%',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 4,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
   },
   statNumber: {
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: '800',
-    color: '#007BFF',
-    marginBottom: 4,
+    color: '#6366F1',
+    marginBottom: 8,
   },
   statLabel: {
-    fontSize: 12,
-    color: '#6C757D',
+    fontSize: 13,
+    color: '#64748B',
     fontWeight: '600',
     textAlign: 'center',
   },
   actionsContainer: {
-    marginBottom: 30,
+    marginBottom: 40,
   },
   actionButtons: {
-    gap: 12,
+    gap: 16,
   },
   actionButton: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 20,
+    borderRadius: 16,
+    padding: 24,
     flexDirection: 'row',
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.05,
     shadowRadius: 8,
     elevation: 2,

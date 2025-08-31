@@ -86,7 +86,7 @@ export const RoleSelectionScreen: React.FC<Props> = ({ onSelectRole }) => {
             onPress={() => setShowMenu(true)}
             activeOpacity={0.8}
           >
-            <Ionicons name="menu-outline" size={24} color="#495057" />
+            <Ionicons name="menu-outline" size={28} color="#374151" />
           </TouchableOpacity>
           <View style={styles.headerSpacer} />
         </View>
@@ -116,7 +116,7 @@ export const RoleSelectionScreen: React.FC<Props> = ({ onSelectRole }) => {
                 activeOpacity={0.8}
               >
                 <View style={styles.roleIconContainer}>
-                  <Ionicons name="briefcase-outline" size={36} color="#0D6EFD" />
+                  <Ionicons name="briefcase-outline" size={48} color="#6366F1" />
                 </View>
                 <Text style={styles.roleTitle}>Administrador</Text>
                 <View style={styles.roleFeatures}>
@@ -131,7 +131,7 @@ export const RoleSelectionScreen: React.FC<Props> = ({ onSelectRole }) => {
                 activeOpacity={0.8}
               >
                 <View style={styles.roleIconContainer}>
-                  <Ionicons name="construct-outline" size={36} color="#0D6EFD" />
+                  <Ionicons name="construct-outline" size={48} color="#10B981" />
                 </View>
                 <Text style={styles.roleTitle}>Técnico</Text>
                 <View style={styles.roleFeatures}>
@@ -462,7 +462,7 @@ export const RoleSelectionScreen: React.FC<Props> = ({ onSelectRole }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: '#F8FAFC',
   },
   content: {
     flex: 1,
@@ -470,17 +470,18 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     justifyContent: 'space-between',
-    padding: 24,
+    paddingHorizontal: 24,
+    paddingVertical: 32,
     paddingBottom: 40,
   },
   header: {
     alignItems: 'center',
-    marginTop: 20,
+    marginTop: 32,
   },
   logo: {
-    width: 120,
-    height: 120,
-    marginBottom: 16,
+    width: 140,
+    height: 140,
+    marginBottom: 20,
   },
   title: {
     fontSize: 32,
@@ -489,55 +490,62 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   subtitle: {
-    fontSize: 16,
-    color: '#6C757D',
+    fontSize: 18,
+    color: '#64748B',
     fontWeight: '500',
   },
   selectionContainer: {
     paddingHorizontal: 20,
-    marginVertical: 20,
+    marginVertical: 32,
   },
   selectionTitle: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: '#212529',
+    fontSize: 32,
+    fontWeight: '800',
+    color: '#1E293B',
     textAlign: 'center',
-    marginBottom: 8,
+    marginBottom: 12,
   },
   selectionSubtitle: {
-    fontSize: 16,
-    color: '#6C757D',
+    fontSize: 18,
+    color: '#64748B',
     textAlign: 'center',
-    marginBottom: 40,
+    marginBottom: 48,
+    lineHeight: 24,
   },
   roleCards: {
-    gap: 20,
+    gap: 24,
   },
   roleCard: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 20,
-    padding: 24,
+    borderRadius: 24,
+    padding: 32,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 5,
-    borderWidth: 2,
-    borderColor: '#E9ECEF',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.08,
+    shadowRadius: 16,
+    elevation: 8,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
   },
   roleIconContainer: {
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 24,
+    backgroundColor: '#F8FAFC',
+    borderRadius: 20,
+    padding: 20,
+    width: 80,
+    height: 80,
+    justifyContent: 'center',
   },
   roleIcon: {
     fontSize: 48,
   },
   roleTitle: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#212529',
+    fontSize: 26,
+    fontWeight: '800',
+    color: '#1E293B',
     textAlign: 'center',
-    marginBottom: 12,
+    marginBottom: 16,
   },
   roleDescription: {
     fontSize: 14,
@@ -547,20 +555,21 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   roleFeatures: {
-    gap: 8,
+    gap: 12,
   },
   feature: {
-    fontSize: 14,
-    color: '#495057',
-    fontWeight: '500',
+    fontSize: 15,
+    color: '#475569',
+    fontWeight: '600',
+    textAlign: 'center',
   },
   footer: {
     alignItems: 'center',
     marginBottom: 20,
   },
   footerText: {
-    fontSize: 12,
-    color: '#ADB5BD',
+    fontSize: 13,
+    color: '#94A3B8',
     fontWeight: '500',
   },
   // Estilos del botón hamburguesa
@@ -568,16 +577,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
+    paddingHorizontal: 24,
+    paddingVertical: 20,
     backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
-    borderBottomColor: '#E9ECEF',
+    borderBottomColor: '#E2E8F0',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
   },
   hamburgerButton: {
-    padding: 8,
-    borderRadius: 8,
-    backgroundColor: '#F8F9FA',
+    padding: 12,
+    borderRadius: 12,
+    backgroundColor: '#F1F5F9',
   },
   hamburgerLine: {
     width: 24,

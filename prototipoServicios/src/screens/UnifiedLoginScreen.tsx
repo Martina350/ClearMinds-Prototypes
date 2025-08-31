@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Animated, Alert, Modal } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Animated, Alert, Modal, ScrollView, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 type Props = {
-  role: 'admin' | 'tecnico';
-  onLoginSuccess: () => void;
-  onBack: () => void;
+  onLoginSuccess: (role: 'admin' | 'tecnico') => void;
 };
 
-export const LoginScreen: React.FC<Props> = ({ role, onLoginSuccess, onBack }) => {
+export const UnifiedLoginScreen: React.FC<Props> = ({ onLoginSuccess }) => {
+  const [selectedRole, setSelectedRole] = useState<'admin' | 'tecnico' | undefined>(undefined);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -32,7 +31,16 @@ export const LoginScreen: React.FC<Props> = ({ role, onLoginSuccess, onBack }) =
     ]).start();
   }, []);
 
+  const handleRoleSelect = (role: 'admin' | 'tecnico') => {
+    setSelectedRole(role);
+  };
+
   const handleLogin = async () => {
+    if (!selectedRole) {
+      Alert.alert('Rol requerido', 'Por favor selecciona tu rol');
+      return;
+    }
+
     if (!email.trim() || !password.trim()) {
       Alert.alert('Campos requeridos', 'Por favor completa todos los campos');
       return;
@@ -43,7 +51,7 @@ export const LoginScreen: React.FC<Props> = ({ role, onLoginSuccess, onBack }) =
     // Simular proceso de login
     setTimeout(() => {
       setIsLoading(false);
-      onLoginSuccess();
+      onLoginSuccess(selectedRole);
     }, 1500);
   };
 
@@ -73,13 +81,13 @@ export const LoginScreen: React.FC<Props> = ({ role, onLoginSuccess, onBack }) =
     );
   };
 
-  const getRoleInfo = () => {
+  const getRoleInfo = (role: 'admin' | 'tecnico') => {
     return role === 'admin' 
       ? { icon: 'person-outline' as const, title: 'Administrador', color: '#6366F1', gradient: ['#6366F1', '#8B5CF6'] }
       : { icon: 'construct-outline' as const, title: 'Técnico', color: '#10B981', gradient: ['#10B981', '#059669'] };
   };
 
-  const roleInfo = getRoleInfo();
+  const isFormValid = selectedRole && email.trim() && password.trim();
 
   return (
     <View style={styles.container}>
@@ -92,76 +100,148 @@ export const LoginScreen: React.FC<Props> = ({ role, onLoginSuccess, onBack }) =
           }
         ]}
       >
-        <View style={styles.header}>
-          <TouchableOpacity style={styles.backButton} onPress={onBack} activeOpacity={0.8}>
-            <Ionicons name="chevron-back" size={24} color="#374151" />
-          </TouchableOpacity>
-          <View style={styles.titleContainer}>
-            <Text style={styles.title}>Iniciar sesión</Text>
-            <View style={[styles.roleBadge, { backgroundColor: roleInfo.color }]}>
-              <Ionicons name={roleInfo.icon} size={16} color="#fff" style={{ marginRight: 6 }} />
-              <Text style={styles.roleText}>{roleInfo.title}</Text>
+        <ScrollView 
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          bounces={true}
+        >
+          {/* Header con logo */}
+          <View style={styles.header}>
+            <Image 
+              source={require('../widgets/logo.png')} 
+              style={styles.logo}
+              resizeMode="contain"
+            />
+            <Text style={styles.subtitle}>Sistema de Mantenimiento</Text>
+          </View>
+
+          {/* Selección de rol */}
+          <View style={styles.roleSelectionSection}>
+            <Text style={styles.sectionTitle}>Selecciona tu rol</Text>
+            <Text style={styles.sectionSubtitle}>¿Cómo vas a usar la aplicación hoy?</Text>
+            
+            <View style={styles.roleCards}>
+              <TouchableOpacity 
+                style={[
+                  styles.roleCard,
+                  selectedRole === 'admin' && styles.roleCardSelected
+                ]}
+                onPress={() => handleRoleSelect('admin')}
+                activeOpacity={0.8}
+              >
+                <View style={[
+                  styles.roleIconContainer,
+                  selectedRole === 'admin' && styles.roleIconContainerSelected
+                ]}>
+                                     <Ionicons 
+                     name="briefcase-outline" 
+                     size={56} 
+                     color={selectedRole === 'admin' ? '#6366F1' : '#94A3B8'} 
+                   />
+                </View>
+                <Text style={[
+                  styles.roleTitle,
+                  selectedRole === 'admin' && styles.roleTitleSelected
+                ]}>Administrador</Text>
+                <View style={styles.roleFeatures}>
+                  <Text style={styles.feature}>Gestión de usuarios</Text>
+                  <Text style={styles.feature}>Revisión de informes</Text>
+                </View>
+              </TouchableOpacity>
+
+              <TouchableOpacity 
+                style={[
+                  styles.roleCard,
+                  selectedRole === 'tecnico' && styles.roleCardSelected
+                ]}
+                onPress={() => handleRoleSelect('tecnico')}
+                activeOpacity={0.8}
+              >
+                <View style={[
+                  styles.roleIconContainer,
+                  selectedRole === 'tecnico' && styles.roleIconContainerSelected
+                ]}>
+                                     <Ionicons 
+                     name="construct-outline" 
+                     size={56} 
+                     color={selectedRole === 'tecnico' ? '#10B981' : '#94A3B8'} 
+                   />
+                </View>
+                <Text style={[
+                  styles.roleTitle,
+                  selectedRole === 'tecnico' && styles.roleTitleSelected
+                ]}>Técnico</Text>
+                <View style={styles.roleFeatures}>
+                  <Text style={styles.feature}>Captura de fotos</Text>
+                  <Text style={styles.feature}>Informes detallados</Text>
+                </View>
+              </TouchableOpacity>
             </View>
           </View>
-          <View style={styles.placeholderView} />
-        </View>
 
-        <View style={styles.formContainer}>
-          <View style={styles.welcomeSection}>
-            <Text style={styles.welcomeTitle}>Bienvenido de vuelta</Text>
-            <Text style={styles.welcomeSubtitle}>
-              Accede a tu cuenta para continuar
+          {/* Formulario de login */}
+          <View style={styles.loginSection}>
+            <Text style={styles.sectionTitle}>Iniciar sesión</Text>
+            <Text style={styles.sectionSubtitle}>
+              {selectedRole 
+                ? `Accede como ${getRoleInfo(selectedRole).title.toLowerCase()}`
+                : 'Selecciona tu rol para continuar'
+              }
             </Text>
-          </View>
 
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Correo electrónico</Text>
-            <TextInput
-              placeholder="correo@empresa.com"
-              style={styles.input}
-              value={email}
-              onChangeText={setEmail}
-              autoCapitalize="none"
-              keyboardType="email-address"
-              placeholderTextColor="#ADB5BD"
-            />
-          </View>
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Correo electrónico</Text>
+              <TextInput
+                placeholder="correo@empresa.com"
+                style={styles.input}
+                value={email}
+                onChangeText={setEmail}
+                autoCapitalize="none"
+                keyboardType="email-address"
+                placeholderTextColor="#ADB5BD"
+              />
+            </View>
 
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Contraseña</Text>
-            <TextInput
-              placeholder="••••••••"
-              style={styles.input}
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-              placeholderTextColor="#ADB5BD"
-            />
-          </View>
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Contraseña</Text>
+              <TextInput
+                placeholder="••••••••"
+                style={styles.input}
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry
+                placeholderTextColor="#ADB5BD"
+              />
+            </View>
 
-          <TouchableOpacity 
-            style={[styles.loginButton, isLoading && styles.loginButtonDisabled]} 
-            onPress={handleLogin}
-            disabled={isLoading}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.loginButtonText}>
-              {isLoading ? 'Iniciando sesión...' : 'Iniciar sesión'}
-            </Text>
-          </TouchableOpacity>
-
-          <View style={styles.helpSection}>
-            <TouchableOpacity style={styles.helpButton} onPress={handleForgotPassword} activeOpacity={0.7}>
-              <Text style={styles.helpText}>¿Olvidaste tu contraseña?</Text>
+            <TouchableOpacity 
+              style={[
+                styles.loginButton, 
+                (!isFormValid || isLoading) && styles.loginButtonDisabled
+              ]} 
+              onPress={handleLogin}
+              disabled={!isFormValid || isLoading}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.loginButtonText}>
+                {isLoading ? 'Iniciando sesión...' : 'Iniciar sesión'}
+              </Text>
             </TouchableOpacity>
-          </View>
-        </View>
 
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>
-            Al iniciar sesión, aceptas nuestros términos y condiciones
-          </Text>
-        </View>
+            <View style={styles.helpSection}>
+              <TouchableOpacity style={styles.helpButton} onPress={handleForgotPassword} activeOpacity={0.7}>
+                <Text style={styles.helpText}>¿Olvidaste tu contraseña?</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          <View style={styles.footer}>
+            <Text style={styles.footerText}>
+              Al iniciar sesión, aceptas nuestros términos y condiciones
+            </Text>
+            <Text style={styles.versionText}>Versión 1.0.0</Text>
+          </View>
+        </ScrollView>
       </Animated.View>
 
       {/* Modal de recuperación de contraseña */}
@@ -225,100 +305,111 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+  scrollContent: {
+    flexGrow: 1,
     paddingHorizontal: 24,
-    paddingVertical: 20,
-    backgroundColor: '#FFFFFF',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E2E8F0',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
+    paddingVertical: 32,
+    paddingBottom: 40,
   },
-  backButton: {
-    flexDirection: 'row',
+  header: {
     alignItems: 'center',
-    backgroundColor: '#F1F5F9',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 12,
+    marginBottom: 40,
   },
-  backIcon: {
-    color: 'white',
+  logo: {
+    width: 120,
+    height: 120,
+    marginBottom: 16,
+  },
+  subtitle: {
     fontSize: 18,
-    marginRight: 4,
+    color: '#64748B',
+    fontWeight: '500',
   },
-  backText: {
-    color: 'white',
-    fontWeight: '600',
-    fontSize: 14,
+  roleSelectionSection: {
+    marginBottom: 40,
   },
-  titleContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 24,
+  sectionTitle: {
+    fontSize: 28,
     fontWeight: '800',
     color: '#1E293B',
     textAlign: 'center',
     marginBottom: 8,
   },
-  roleBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 24,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  roleIcon: {
+  sectionSubtitle: {
     fontSize: 16,
-    marginRight: 6,
-  },
-  roleText: {
-    color: 'white',
-    fontSize: 13,
-    fontWeight: '700',
-  },
-  placeholderView: {
-    width: 80,
-  },
-  formContainer: {
-    flex: 1,
-    paddingHorizontal: 24,
-    paddingVertical: 32,
-    justifyContent: 'center',
-  },
-  welcomeSection: {
-    alignItems: 'center',
-    marginBottom: 48,
-  },
-  welcomeTitle: {
-    fontSize: 32,
-    fontWeight: '800',
-    color: '#1E293B',
-    textAlign: 'center',
-    marginBottom: 12,
-  },
-  welcomeSubtitle: {
-    fontSize: 17,
     color: '#64748B',
     textAlign: 'center',
-    lineHeight: 24,
+    marginBottom: 32,
+    lineHeight: 22,
+  },
+  roleCards: {
+    gap: 20,
+  },
+  roleCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    padding: 32,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.06,
+    shadowRadius: 12,
+    elevation: 4,
+    borderWidth: 2,
+    borderColor: '#E2E8F0',
+  },
+  roleCardSelected: {
+    borderColor: '#6366F1',
+    shadowColor: '#6366F1',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.15,
+    shadowRadius: 16,
+    elevation: 8,
+  },
+  roleIconContainer: {
+    alignItems: 'center',
+    marginBottom: 24,
+    backgroundColor: '#F8FAFC',
+    borderRadius: 24,
+    padding: 24,
+    width: 100,
+    height: 100,
+    justifyContent: 'center',
+  },
+  roleIconContainerSelected: {
+    backgroundColor: '#EEF2FF',
+    borderWidth: 3,
+    borderColor: '#6366F1',
+    shadowColor: '#6366F1',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  roleTitle: {
+    fontSize: 22,
+    fontWeight: '800',
+    color: '#64748B',
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  roleTitleSelected: {
+    color: '#1E293B',
+  },
+  roleFeatures: {
+    gap: 8,
+  },
+  feature: {
+    fontSize: 14,
+    color: '#64748B',
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+  loginSection: {
+    marginBottom: 40,
   },
   inputGroup: {
-    marginBottom: 28,
+    marginBottom: 24,
   },
   label: {
     fontSize: 16,
@@ -363,7 +454,7 @@ const styles = StyleSheet.create({
   },
   helpSection: {
     alignItems: 'center',
-    marginTop: 32,
+    marginTop: 24,
   },
   helpButton: {
     paddingVertical: 12,
@@ -377,8 +468,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   footer: {
-    paddingHorizontal: 24,
-    paddingVertical: 20,
     alignItems: 'center',
   },
   footerText: {
@@ -386,6 +475,12 @@ const styles = StyleSheet.create({
     color: '#94A3B8',
     textAlign: 'center',
     lineHeight: 18,
+    marginBottom: 8,
+  },
+  versionText: {
+    fontSize: 12,
+    color: '#CBD5E1',
+    fontWeight: '500',
   },
   // Estilos del modal
   modalOverlay: {
@@ -425,11 +520,6 @@ const styles = StyleSheet.create({
     height: 36,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  modalCloseText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
   },
   modalBody: {
     padding: 24,
@@ -481,5 +571,3 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 });
-
-

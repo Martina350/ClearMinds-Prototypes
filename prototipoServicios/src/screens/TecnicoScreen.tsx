@@ -144,7 +144,7 @@ export const TecnicoScreen: React.FC<Props> = ({
             onPress={() => setShowMenu(true)}
             activeOpacity={0.8}
           >
-            <Ionicons name="menu-outline" size={24} color="#495057" />
+            <Ionicons name="menu-outline" size={28} color="#374151" />
           </TouchableOpacity>
           <View style={styles.headerTitle}>
             <Text style={styles.headerTitleText}>Panel de Técnico</Text>
@@ -165,7 +165,7 @@ export const TecnicoScreen: React.FC<Props> = ({
         >
           <View style={styles.welcomeSection}>
             <Text style={styles.welcomeTitle}>Bienvenido, {technicianName}</Text>
-            <Text style={styles.welcomeSubtitle}>Gestiona tus informes de mantenimiento</Text>
+            <Text style={styles.welcomeSubtitle}>Gestiona tus informes de mantenimiento de forma eficiente</Text>
           </View>
 
           <View style={styles.statsContainer}>
@@ -198,7 +198,7 @@ export const TecnicoScreen: React.FC<Props> = ({
                 onPress={() => handleQuickAction('new_report')}
                 activeOpacity={0.8}
               >
-                <Ionicons name="add-circle-outline" size={22} color="#495057" style={{ marginRight: 12 }} />
+                <Ionicons name="add-circle-outline" size={24} color="#6366F1" style={{ marginRight: 12 }} />
                 <Text style={styles.actionText}>Nuevo Informe</Text>
               </TouchableOpacity>
               
@@ -207,7 +207,7 @@ export const TecnicoScreen: React.FC<Props> = ({
                 onPress={() => handleQuickAction('reports')}
                 activeOpacity={0.8}
               >
-                <Ionicons name="document-text-outline" size={22} color="#495057" style={{ marginRight: 12 }} />
+                <Ionicons name="document-text-outline" size={24} color="#10B981" style={{ marginRight: 12 }} />
                 <Text style={styles.actionText}>Mis Informes</Text>
               </TouchableOpacity>
             </View>
@@ -359,7 +359,7 @@ export const TecnicoScreen: React.FC<Props> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: '#F8FAFC',
   },
   content: {
     flex: 1,
@@ -368,40 +368,40 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
+    paddingHorizontal: 24,
+    paddingVertical: 20,
     backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
-    borderBottomColor: '#E9ECEF',
+    borderBottomColor: '#E2E8F0',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
   },
   hamburgerButton: {
-    padding: 8,
-    borderRadius: 8,
-    backgroundColor: '#F8F9FA',
+    padding: 12,
+    borderRadius: 12,
+    backgroundColor: '#F1F5F9',
   },
   headerTitle: {
     flex: 1,
     alignItems: 'center',
   },
   headerTitleText: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#212529',
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#1E293B',
   },
   backButton: {
-    backgroundColor: '#DC3545',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 20,
+    backgroundColor: '#EF4444',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 12,
   },
   backButtonText: {
     color: 'white',
-    fontWeight: '600',
+    fontWeight: '700',
     fontSize: 14,
   },
   scrollContent: {
