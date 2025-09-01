@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert, Image, Modal } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import ReportService, { Report } from '../services/ReportService';
+import { colors, typography, spacing, borderRadius, shadows, baseStyles } from '../styles/theme';
 
 interface Props {
   reportId: string;
@@ -77,11 +78,11 @@ export const ReportDetailScreen: React.FC<Props> = ({ reportId, onBack, canEdit 
 
   const getStatusColor = (status: Report['status']) => {
     switch (status) {
-      case 'pending': return '#FFA500';
-      case 'in_review': return '#007BFF';
-      case 'approved': return '#28A745';
-      case 'rejected': return '#DC3545';
-      default: return '#6C757D';
+      case 'pending': return colors.warning;
+      case 'in_review': return colors.primary;
+      case 'approved': return colors.success;
+      case 'rejected': return colors.error;
+      default: return colors.gray500;
     }
   };
 
@@ -137,12 +138,12 @@ export const ReportDetailScreen: React.FC<Props> = ({ reportId, onBack, canEdit 
   }
 
   return (
-    <View style={styles.container}>
+    <View style={baseStyles.container}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity style={styles.backButton} onPress={onBack}>
-            <Ionicons name="chevron-back" size={24} color="#007BFF" />
+            <Ionicons name="chevron-back" size={24} color={colors.primary} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Detalle del Informe</Text>
           <View style={styles.statusBadge}>
@@ -156,15 +157,15 @@ export const ReportDetailScreen: React.FC<Props> = ({ reportId, onBack, canEdit 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{report.title}</Text>
           <View style={styles.infoRow}>
-            <Ionicons name="person-outline" size={16} color="#6C757D" />
+            <Ionicons name="person-outline" size={16} color={colors.textSecondary} />
             <Text style={styles.infoText}>Técnico: {report.technicianName}</Text>
           </View>
           <View style={styles.infoRow}>
-            <Ionicons name="calendar-outline" size={16} color="#6C757D" />
+            <Ionicons name="calendar-outline" size={16} color={colors.textSecondary} />
             <Text style={styles.infoText}>Creado: {formatDate(report.createdAt)}</Text>
           </View>
           <View style={styles.infoRow}>
-            <Ionicons name="time-outline" size={16} color="#6C757D" />
+            <Ionicons name="time-outline" size={16} color={colors.textSecondary} />
             <Text style={styles.infoText}>Actualizado: {formatDate(report.updatedAt)}</Text>
           </View>
         </View>
@@ -178,7 +179,7 @@ export const ReportDetailScreen: React.FC<Props> = ({ reportId, onBack, canEdit 
               <Text style={styles.timeValue}>{formatTime(report.checkInTime)}</Text>
             </View>
             <View style={styles.timeSeparator}>
-              <Ionicons name="arrow-forward" size={20} color="#6C757D" />
+              <Ionicons name="arrow-forward" size={20} color={colors.textSecondary} />
             </View>
             <View style={styles.timeItem}>
               <Text style={styles.timeLabel}>Salida</Text>
@@ -203,28 +204,28 @@ export const ReportDetailScreen: React.FC<Props> = ({ reportId, onBack, canEdit 
             <Text style={styles.sectionTitle}>Gestionar Estado</Text>
             <View style={styles.statusActions}>
               <TouchableOpacity
-                style={[styles.statusButton, { backgroundColor: '#FFA500' }]}
+                style={[styles.statusButton, { backgroundColor: colors.warning }]}
                 onPress={() => handleUpdateStatus('pending')}
                 activeOpacity={0.8}
               >
                 <Text style={styles.statusButtonText}>Pendiente</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.statusButton, { backgroundColor: '#007BFF' }]}
+                style={[styles.statusButton, { backgroundColor: colors.primary }]}
                 onPress={() => handleUpdateStatus('in_review')}
                 activeOpacity={0.8}
               >
                 <Text style={styles.statusButtonText}>En Revisión</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.statusButton, { backgroundColor: '#28A745' }]}
+                style={[styles.statusButton, { backgroundColor: colors.success }]}
                 onPress={() => handleUpdateStatus('approved')}
                 activeOpacity={0.8}
               >
                 <Text style={styles.statusButtonText}>Aprobar</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.statusButton, { backgroundColor: '#DC3545' }]}
+                style={[styles.statusButton, { backgroundColor: colors.error }]}
                 onPress={() => handleUpdateStatus('rejected')}
                 activeOpacity={0.8}
               >
@@ -242,7 +243,7 @@ export const ReportDetailScreen: React.FC<Props> = ({ reportId, onBack, canEdit 
         animationType="fade"
         onRequestClose={() => setShowImagePreview(false)}
       >
-        <View style={styles.modalOverlay}>
+        <View style={baseStyles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Vista previa</Text>
@@ -251,7 +252,7 @@ export const ReportDetailScreen: React.FC<Props> = ({ reportId, onBack, canEdit 
                 onPress={() => setShowImagePreview(false)}
                 activeOpacity={0.8}
               >
-                <Ionicons name="close" size={24} color="#fff" />
+                <Ionicons name="close" size={24} color={colors.textInverse} />
               </TouchableOpacity>
             </View>
             <View style={styles.modalImageContainer}>
@@ -265,30 +266,6 @@ export const ReportDetailScreen: React.FC<Props> = ({ reportId, onBack, canEdit 
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F8F9FA',
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loadingText: {
-    fontSize: 16,
-    color: '#6C757D',
-  },
-  errorContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  errorText: {
-    fontSize: 16,
-    color: '#DC3545',
-    marginBottom: 20,
-  },
   scrollView: {
     flex: 1,
   },
@@ -296,52 +273,47 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 20,
-    backgroundColor: '#FFFFFF',
+    padding: spacing.lg,
+    backgroundColor: colors.surface,
     borderBottomWidth: 1,
-    borderBottomColor: '#E9ECEF',
+    borderBottomColor: colors.border,
+    ...shadows.sm,
   },
   headerTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#212529',
+    ...typography.h5,
+    color: colors.textPrimary,
   },
   statusBadge: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-    backgroundColor: '#F8F9FA',
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderRadius: borderRadius.lg,
+    backgroundColor: colors.gray50,
   },
   statusText: {
-    fontSize: 12,
+    ...typography.labelSmall,
     fontWeight: '600',
   },
   section: {
-    backgroundColor: '#FFFFFF',
-    margin: 16,
-    padding: 20,
-    borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
+    backgroundColor: colors.surface,
+    margin: spacing.md,
+    padding: spacing.lg,
+    borderRadius: borderRadius.lg,
+    ...shadows.sm,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#212529',
-    marginBottom: 16,
+    ...typography.h5,
+    color: colors.textPrimary,
+    marginBottom: spacing.md,
   },
   infoRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: spacing.sm,
   },
   infoText: {
-    fontSize: 14,
-    color: '#6C757D',
-    marginLeft: 8,
+    ...typography.bodySmall,
+    color: colors.textSecondary,
+    marginLeft: spacing.sm,
   },
   timeContainer: {
     flexDirection: 'row',
@@ -353,54 +325,48 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   timeLabel: {
-    fontSize: 12,
-    color: '#6C757D',
-    marginBottom: 4,
+    ...typography.labelSmall,
+    color: colors.textSecondary,
+    marginBottom: spacing.xs,
   },
   timeValue: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#212529',
+    ...typography.h6,
+    color: colors.textPrimary,
   },
   timeSeparator: {
-    paddingHorizontal: 20,
+    paddingHorizontal: spacing.lg,
   },
   descriptionText: {
-    fontSize: 14,
-    color: '#495057',
+    ...typography.body,
+    color: colors.textPrimary,
     lineHeight: 20,
   },
   photoSection: {
-    backgroundColor: '#FFFFFF',
-    margin: 16,
-    padding: 20,
-    borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
+    backgroundColor: colors.surface,
+    margin: spacing.md,
+    padding: spacing.lg,
+    borderRadius: borderRadius.lg,
+    ...shadows.sm,
   },
   photoSectionTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#212529',
-    marginBottom: 12,
+    ...typography.h6,
+    color: colors.textPrimary,
+    marginBottom: spacing.md,
   },
   noPhotosText: {
-    fontSize: 14,
-    color: '#6C757D',
+    ...typography.bodySmall,
+    color: colors.textSecondary,
     fontStyle: 'italic',
   },
   photoGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
+    gap: spacing.sm,
   },
   photoItem: {
     width: 80,
     height: 80,
-    borderRadius: 8,
+    borderRadius: borderRadius.md,
     overflow: 'hidden',
   },
   photoThumbnail: {
@@ -410,37 +376,31 @@ const styles = StyleSheet.create({
   statusActions: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
+    gap: spacing.sm,
   },
   statusButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderRadius: borderRadius.full,
     minWidth: 80,
     alignItems: 'center',
   },
   statusButtonText: {
-    color: '#FFFFFF',
-    fontSize: 12,
+    color: colors.textInverse,
+    ...typography.labelSmall,
     fontWeight: '600',
   },
   backButton: {
-    padding: 8,
+    padding: spacing.sm,
   },
   backButtonText: {
-    color: '#007BFF',
-    fontSize: 16,
+    color: colors.primary,
+    ...typography.body,
     fontWeight: '600',
   },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.8)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   modalContent: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
+    backgroundColor: colors.surface,
+    borderRadius: borderRadius.lg,
     width: '90%',
     height: '80%',
     overflow: 'hidden',
@@ -449,17 +409,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 20,
+    padding: spacing.lg,
     borderBottomWidth: 1,
-    borderBottomColor: '#E9ECEF',
+    borderBottomColor: colors.border,
   },
   modalTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#212529',
+    ...typography.h5,
+    color: colors.textPrimary,
   },
   modalCloseButton: {
-    padding: 8,
+    padding: spacing.sm,
   },
   modalImageContainer: {
     flex: 1,
@@ -469,5 +428,29 @@ const styles = StyleSheet.create({
   modalImage: {
     width: '100%',
     height: '100%',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: colors.background,
+  },
+  loadingText: {
+    ...typography.body,
+    color: colors.textSecondary,
+    marginTop: spacing.md,
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: colors.background,
+    padding: spacing.lg,
+  },
+  errorText: {
+    ...typography.body,
+    color: colors.error,
+    marginBottom: spacing.lg,
+    textAlign: 'center',
   },
 });

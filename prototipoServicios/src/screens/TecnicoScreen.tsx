@@ -5,6 +5,7 @@ import ReportService, { Report } from '../services/ReportService';
 import { InformeForm } from './InformeForm';
 import { ReportDetailScreen } from './ReportDetailScreen';
 import { MyReportsScreen } from './MyReportsScreen';
+import { colors, typography, spacing, borderRadius, shadows, baseStyles, componentStyles } from '../styles/theme';
 
 type Props = {
   onBack: () => void;
@@ -107,11 +108,11 @@ export const TecnicoScreen: React.FC<Props> = ({
 
   const getStatusColor = (status: Report['status']) => {
     switch (status) {
-      case 'pending': return '#FFA500';
-      case 'in_review': return '#007BFF';
-      case 'approved': return '#28A745';
-      case 'rejected': return '#DC3545';
-      default: return '#6C757D';
+      case 'pending': return colors.warning;
+      case 'in_review': return colors.primary;
+      case 'approved': return colors.success;
+      case 'rejected': return colors.error;
+      default: return colors.gray500;
     }
   };
 
@@ -130,10 +131,10 @@ export const TecnicoScreen: React.FC<Props> = ({
   };
 
   return (
-    <View style={styles.container}>
+    <View style={baseStyles.container}>
       <Animated.View 
         style={[
-          styles.content,
+          baseStyles.content,
           { opacity: fadeAnim }
         ]}
       >
@@ -144,7 +145,7 @@ export const TecnicoScreen: React.FC<Props> = ({
             onPress={() => setShowMenu(true)}
             activeOpacity={0.8}
           >
-            <Ionicons name="menu-outline" size={28} color="#374151" />
+            <Ionicons name="menu-outline" size={28} color={colors.textPrimary} />
           </TouchableOpacity>
           <View style={styles.headerTitle}>
             <Text style={styles.headerTitleText}>Panel de Técnico</Text>
@@ -159,7 +160,7 @@ export const TecnicoScreen: React.FC<Props> = ({
         </View>
 
         <ScrollView 
-          contentContainerStyle={styles.scrollContent}
+          contentContainerStyle={baseStyles.scrollContent}
           showsVerticalScrollIndicator={false}
           bounces={true}
         >
@@ -172,19 +173,23 @@ export const TecnicoScreen: React.FC<Props> = ({
             <Text style={styles.sectionTitle}>Mis Estadísticas</Text>
             <View style={styles.statsGrid}>
               <View style={styles.statCard}>
-                <Text style={styles.statNumber}>{reports.length}</Text>
+                <Ionicons name="document-text-outline" size={20} color={colors.primary} style={{ marginBottom: spacing.xs }} />
+                <Text style={styles.statValue}>{reports.length}</Text>
                 <Text style={styles.statLabel}>Total Informes</Text>
               </View>
               <View style={styles.statCard}>
-                <Text style={styles.statNumber}>{getReportsCountByStatus('pending')}</Text>
+                <Ionicons name="time-outline" size={20} color={colors.warning} style={{ marginBottom: spacing.xs }} />
+                <Text style={styles.statValue}>{getReportsCountByStatus('pending')}</Text>
                 <Text style={styles.statLabel}>Pendientes</Text>
               </View>
               <View style={styles.statCard}>
-                <Text style={styles.statNumber}>{getReportsCountByStatus('approved')}</Text>
+                <Ionicons name="checkmark-circle-outline" size={20} color={colors.success} style={{ marginBottom: spacing.xs }} />
+                <Text style={styles.statValue}>{getReportsCountByStatus('approved')}</Text>
                 <Text style={styles.statLabel}>Aprobados</Text>
               </View>
               <View style={styles.statCard}>
-                <Text style={styles.statNumber}>{getReportsCountByStatus('rejected')}</Text>
+                <Ionicons name="close-circle-outline" size={20} color={colors.error} style={{ marginBottom: spacing.xs }} />
+                <Text style={styles.statValue}>{getReportsCountByStatus('rejected')}</Text>
                 <Text style={styles.statLabel}>Rechazados</Text>
               </View>
             </View>
@@ -198,7 +203,7 @@ export const TecnicoScreen: React.FC<Props> = ({
                 onPress={() => handleQuickAction('new_report')}
                 activeOpacity={0.8}
               >
-                <Ionicons name="add-circle-outline" size={24} color="#6366F1" style={{ marginRight: 12 }} />
+                <Ionicons name="add-circle-outline" size={24} color={colors.primary} style={{ marginRight: spacing.md }} />
                 <Text style={styles.actionText}>Nuevo Informe</Text>
               </TouchableOpacity>
               
@@ -207,7 +212,7 @@ export const TecnicoScreen: React.FC<Props> = ({
                 onPress={() => handleQuickAction('reports')}
                 activeOpacity={0.8}
               >
-                <Ionicons name="document-text-outline" size={24} color="#10B981" style={{ marginRight: 12 }} />
+                <Ionicons name="document-text-outline" size={24} color={colors.success} style={{ marginRight: spacing.md }} />
                 <Text style={styles.actionText}>Mis Informes</Text>
               </TouchableOpacity>
             </View>
@@ -217,7 +222,7 @@ export const TecnicoScreen: React.FC<Props> = ({
             <Text style={styles.sectionTitle}>Actividad Reciente</Text>
             {reports.length === 0 ? (
               <View style={styles.emptyState}>
-                <Ionicons name="document-text-outline" size={48} color="#ADB5BD" />
+                <Ionicons name="document-text-outline" size={48} color={colors.gray400} />
                 <Text style={styles.emptyStateText}>No tienes informes aún</Text>
                 <TouchableOpacity 
                   style={styles.createFirstReportButton}
@@ -231,17 +236,17 @@ export const TecnicoScreen: React.FC<Props> = ({
               <View style={styles.activityList}>
                 {reports.slice(0, 3).map((report) => (
                   <View key={report.id} style={styles.activityItem}>
-                    <Ionicons name="document-text-outline" size={20} color="#0D6EFD" style={{ marginRight: 12 }} />
+                    <Ionicons name="document-text-outline" size={20} color={colors.primary} style={{ marginRight: spacing.md }} />
                     <View style={styles.activityContent}>
                       <Text style={styles.activityText}>{report.title}</Text>
                       <Text style={styles.activityTime}>{formatDate(report.createdAt)}</Text>
-                    </View>
+                </View>
                     <View style={[styles.statusBadge, { backgroundColor: getStatusColor(report.status) }]}>
                       <Text style={styles.statusText}>{getStatusText(report.status)}</Text>
-                    </View>
-                  </View>
-                ))}
+                </View>
               </View>
+                ))}
+                </View>
             )}
           </View>
         </ScrollView>
@@ -254,7 +259,7 @@ export const TecnicoScreen: React.FC<Props> = ({
         animationType="slide"
         onRequestClose={() => setShowMenu(false)}
       >
-        <View style={styles.modalOverlaySidebar}>
+        <View style={baseStyles.modalOverlay}>
           <View style={styles.menuContainer}>
             <View style={styles.menuHeader}>
               <Text style={styles.menuTitle}>Menú Técnico</Text>
@@ -263,7 +268,7 @@ export const TecnicoScreen: React.FC<Props> = ({
                 onPress={() => setShowMenu(false)}
                 activeOpacity={0.8}
               >
-                <Ionicons name="close" size={16} color="#fff" />
+                <Ionicons name="close" size={16} color={colors.textInverse} />
               </TouchableOpacity>
             </View>
             
@@ -273,7 +278,7 @@ export const TecnicoScreen: React.FC<Props> = ({
                 onPress={() => handleMenuAction('dashboard')}
                 activeOpacity={0.7}
               >
-                <Ionicons name="grid-outline" size={20} color="#495057" style={{ marginRight: 16 }} />
+                <Ionicons name="grid-outline" size={20} color={colors.textSecondary} style={{ marginRight: spacing.md }} />
                 <Text style={styles.menuItemText}>Dashboard</Text>
               </TouchableOpacity>
               
@@ -282,7 +287,7 @@ export const TecnicoScreen: React.FC<Props> = ({
                 onPress={() => handleMenuAction('new_report')}
                 activeOpacity={0.7}
               >
-                <Ionicons name="add-circle-outline" size={20} color="#495057" style={{ marginRight: 16 }} />
+                <Ionicons name="add-circle-outline" size={20} color={colors.textSecondary} style={{ marginRight: spacing.md }} />
                 <Text style={styles.menuItemText}>Nuevo Informe</Text>
               </TouchableOpacity>
               
@@ -291,7 +296,7 @@ export const TecnicoScreen: React.FC<Props> = ({
                 onPress={() => handleMenuAction('reports')}
                 activeOpacity={0.7}
               >
-                <Ionicons name="document-text-outline" size={20} color="#495057" style={{ marginRight: 16 }} />
+                <Ionicons name="document-text-outline" size={20} color={colors.textSecondary} style={{ marginRight: spacing.md }} />
                 <Text style={styles.menuItemText}>Mis Informes</Text>
               </TouchableOpacity>
             </View>
@@ -337,222 +342,180 @@ export const TecnicoScreen: React.FC<Props> = ({
 
       {/* Modal de Detalle de Informe */}
       {showReportDetail && selectedReport && (
-        <Modal
+      <Modal
           visible={showReportDetail}
-          transparent={true}
-          animationType="slide"
+        transparent={true}
+        animationType="slide"
           onRequestClose={() => setShowReportDetail(false)}
         >
-          <View style={styles.modalOverlayFull}>
-            <ReportDetailScreen
-              reportId={selectedReport.id}
-              onBack={() => setShowReportDetail(false)}
-              canEdit={selectedReport.status === 'pending'}
-            />
-          </View>
-        </Modal>
+                  <View style={styles.modalOverlayFull}>
+          <ReportDetailScreen
+            reportId={selectedReport.id}
+            onBack={() => setShowReportDetail(false)}
+            canEdit={selectedReport.status === 'pending'}
+          />
+        </View>
+      </Modal>
       )}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F8FAFC',
-  },
-  content: {
-    flex: 1,
-  },
   topHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingVertical: 20,
-    backgroundColor: '#FFFFFF',
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.md,
+    backgroundColor: colors.surface,
     borderBottomWidth: 1,
-    borderBottomColor: '#E2E8F0',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
+    borderBottomColor: colors.border,
+    ...shadows.sm,
   },
   hamburgerButton: {
-    padding: 12,
-    borderRadius: 12,
-    backgroundColor: '#F1F5F9',
+    padding: spacing.sm,
+    borderRadius: borderRadius.md,
+    backgroundColor: colors.gray100,
   },
   headerTitle: {
     flex: 1,
     alignItems: 'center',
   },
   headerTitleText: {
-    fontSize: 20,
-    fontWeight: '800',
-    color: '#1E293B',
+    ...typography.h5,
+    color: colors.textPrimary,
+    fontSize: 18,
+    fontWeight: '600',
   },
   backButton: {
-    backgroundColor: '#EF4444',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 12,
+    backgroundColor: colors.error,
+    paddingVertical: spacing.xs,
+    paddingHorizontal: spacing.md,
+    borderRadius: borderRadius.md,
   },
   backButtonText: {
-    color: 'white',
-    fontWeight: '700',
-    fontSize: 14,
-  },
-  scrollContent: {
-    padding: 20,
-    paddingBottom: 40,
+    color: colors.textInverse,
+    ...typography.buttonSmall,
+    fontSize: 12,
+    fontWeight: '500',
   },
   welcomeSection: {
     alignItems: 'center',
-    marginBottom: 30,
+    marginBottom: spacing.lg,
+    paddingHorizontal: spacing.md,
   },
   welcomeTitle: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#212529',
-    marginBottom: 8,
+    ...typography.h4,
+    color: colors.textPrimary,
+    marginBottom: spacing.xs,
+    fontSize: 20,
+    fontWeight: '600',
   },
   welcomeSubtitle: {
-    fontSize: 16,
-    color: '#6C757D',
+    ...typography.bodySmall,
+    color: colors.textSecondary,
     textAlign: 'center',
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#212529',
-    marginBottom: 16,
+    fontSize: 14,
+    lineHeight: 18,
   },
   statsContainer: {
-    marginBottom: 30,
+    marginBottom: spacing.lg,
+    paddingHorizontal: spacing.md,
   },
   statsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    gap: 12,
-  },
-  statCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 16,
-    alignItems: 'center',
-    flex: 1,
-    minWidth: '45%',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  statNumber: {
-    fontSize: 28,
-    fontWeight: '800',
-    color: '#007BFF',
-    marginBottom: 4,
-  },
-  statLabel: {
-    fontSize: 12,
-    color: '#6C757D',
-    fontWeight: '600',
-    textAlign: 'center',
+    gap: spacing.sm,
   },
   actionsContainer: {
-    marginBottom: 30,
+    marginBottom: spacing.lg,
+    paddingHorizontal: spacing.md,
   },
   actionButtons: {
-    gap: 12,
+    gap: spacing.sm,
   },
   actionButton: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 20,
+    backgroundColor: colors.surface,
+    borderRadius: borderRadius.lg,
+    padding: spacing.md,
     flexDirection: 'row',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
+    ...shadows.sm,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   actionText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#495057',
+    ...typography.bodySmall,
+    color: colors.textPrimary,
+    fontSize: 14,
+    fontWeight: '500',
   },
   recentActivity: {
-    marginBottom: 20,
+    marginBottom: spacing.lg,
+    paddingHorizontal: spacing.md,
   },
   emptyState: {
     alignItems: 'center',
-    paddingVertical: 40,
+    paddingVertical: spacing.lg,
   },
   emptyStateText: {
-    fontSize: 16,
-    color: '#6C757D',
-    marginTop: 12,
+    ...typography.bodySmall,
+    color: colors.textSecondary,
+    marginTop: spacing.sm,
     textAlign: 'center',
+    fontSize: 14,
   },
   createFirstReportButton: {
-    backgroundColor: '#007BFF',
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 25,
-    marginTop: 16,
+    backgroundColor: colors.primary,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    borderRadius: borderRadius.full,
+    marginTop: spacing.sm,
   },
   createFirstReportText: {
-    color: 'white',
-    fontSize: 14,
-    fontWeight: '600',
+    color: colors.textInverse,
+    ...typography.buttonSmall,
+    fontSize: 12,
   },
   activityList: {
-    gap: 12,
+    gap: spacing.sm,
   },
   activityItem: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 16,
+    backgroundColor: colors.surface,
+    borderRadius: borderRadius.md,
+    padding: spacing.sm,
     flexDirection: 'row',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
+    ...shadows.sm,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   activityContent: {
     flex: 1,
   },
   activityText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#495057',
-    marginBottom: 2,
+    ...typography.bodySmall,
+    color: colors.textPrimary,
+    marginBottom: spacing.xs,
+    fontSize: 13,
   },
   activityTime: {
-    fontSize: 12,
-    color: '#6C757D',
+    ...typography.bodyXSmall,
+    color: colors.textSecondary,
+    fontSize: 11,
   },
   statusBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
+    paddingHorizontal: spacing.xs,
+    paddingVertical: spacing.xs,
+    borderRadius: borderRadius.md,
     alignSelf: 'flex-start',
   },
   statusText: {
+    ...typography.labelSmall,
+    color: colors.textInverse,
     fontSize: 10,
-    fontWeight: '600',
-    color: 'white',
-  },
-  modalOverlaySidebar: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
   },
   menuContainer: {
     position: 'absolute',
@@ -560,30 +523,25 @@ const styles = StyleSheet.create({
     left: 0,
     width: '80%',
     height: '100%',
-    backgroundColor: '#FFFFFF',
-    shadowColor: '#000',
-    shadowOffset: { width: 2, height: 0 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
+    backgroundColor: colors.surface,
+    ...shadows.lg,
   },
   menuHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 20,
+    padding: spacing.lg,
     borderBottomWidth: 1,
-    borderBottomColor: '#E9ECEF',
-    backgroundColor: '#F8F9FA',
+    borderBottomColor: colors.border,
+    backgroundColor: colors.gray50,
   },
   menuTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#212529',
+    ...typography.h5,
+    color: colors.textPrimary,
   },
   closeButton: {
-    backgroundColor: '#6C757D',
-    borderRadius: 20,
+    backgroundColor: colors.secondary,
+    borderRadius: borderRadius.full,
     width: 32,
     height: 32,
     justifyContent: 'center',
@@ -591,166 +549,65 @@ const styles = StyleSheet.create({
   },
   menuItems: {
     flex: 1,
-    paddingTop: 20,
+    paddingTop: spacing.lg,
   },
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 16,
-    paddingHorizontal: 20,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.lg,
     borderBottomWidth: 1,
-    borderBottomColor: '#F1F3F4',
+    borderBottomColor: colors.border,
   },
   menuItemText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#495057',
+    ...typography.body,
+    color: colors.textPrimary,
   },
   menuFooter: {
-    padding: 20,
+    padding: spacing.lg,
     borderTopWidth: 1,
-    borderTopColor: '#E9ECEF',
-    backgroundColor: '#F8F9FA',
+    borderTopColor: colors.border,
+    backgroundColor: colors.gray50,
   },
   menuFooterText: {
-    fontSize: 12,
-    color: '#6C757D',
+    ...typography.bodySmall,
+    color: colors.textSecondary,
     textAlign: 'center',
-    fontWeight: '500',
-  },
-  modalOverlayCentered: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   modalOverlayFull: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.background,
   },
-  modalContent: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 20,
-    width: '90%',
-    maxWidth: 400,
-    maxHeight: '80%',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.3,
-    shadowRadius: 20,
-    elevation: 10,
+
+  // Estilos para títulos de sección y tarjetas de estadísticas
+  sectionTitle: {
+    ...typography.h5,
+    color: colors.textPrimary,
+    marginBottom: spacing.md,
+    fontSize: 16,
+    fontWeight: '600',
   },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  statCard: {
+    backgroundColor: colors.surface,
+    borderRadius: borderRadius.md,
+    padding: spacing.sm,
     alignItems: 'center',
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E9ECEF',
+    flex: 1,
+    minWidth: '45%',
+    ...shadows.sm,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
-  modalTitle: {
+  statValue: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#212529',
+    color: colors.textPrimary,
+    marginBottom: spacing.xs,
   },
-  modalCloseButton: {
-    backgroundColor: '#6C757D',
-    borderRadius: 20,
-    width: 32,
-    height: 32,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalBody: {
-    flex: 1,
-  },
-  reportsSection: {
-    gap: 20,
-  },
-  sectionDescription: {
-    fontSize: 16,
-    color: '#6C757D',
-    textAlign: 'center',
-    marginBottom: 20,
-    lineHeight: 22,
-  },
-  reportFilters: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginBottom: 20,
-  },
-  filterButton: {
-    backgroundColor: '#E3F2FD',
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: '#2196F3',
-  },
-  filterButtonActive: {
-    backgroundColor: '#2196F3',
-    borderColor: '#1976D2',
-  },
-  filterText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#2196F3',
-  },
-  filterTextActive: {
-    color: '#FFFFFF',
-  },
-  reportList: {
-    gap: 12,
-  },
-  reportItem: {
-    backgroundColor: '#F8F9FA',
-    borderRadius: 12,
-    padding: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#E9ECEF',
-  },
-  reportContent: {
-    flex: 1,
-  },
-  reportTitle: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#495057',
-    marginBottom: 4,
-  },
-  reportDate: {
-    fontSize: 12,
-    color: '#6C757D',
-  },
-  reportActions: {
-    alignItems: 'flex-end',
-    gap: 8,
-  },
-  reportStatusBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-    alignSelf: 'flex-start',
-  },
-  reportStatusText: {
-    fontSize: 12,
-    color: 'white',
-  },
-  viewReportButton: {
-    padding: 8,
-    borderRadius: 8,
-    backgroundColor: '#E3F2FD',
-  },
-  emptyReportsState: {
-    alignItems: 'center',
-    paddingVertical: 40,
-  },
-  emptyReportsText: {
-    fontSize: 16,
-    color: '#6C757D',
-    marginTop: 12,
+  statLabel: {
+    fontSize: 11,
+    color: colors.textSecondary,
+    fontWeight: '500',
     textAlign: 'center',
   },
 });

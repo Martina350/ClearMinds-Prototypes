@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Animated, ScrollView, Modal, Alert, TextInput } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Animated, ScrollView, Modal, Alert, TextInput, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import ReportService, { Report } from '../services/ReportService';
 import { ReportDetailScreen } from './ReportDetailScreen';
+import { colors, typography, spacing, borderRadius, shadows, baseStyles, componentStyles } from '../styles/theme';
 
 type Props = {
   onBack: () => void;
@@ -243,10 +244,10 @@ export const AdminScreen: React.FC<Props> = ({ onBack }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={baseStyles.container}>
       <Animated.View 
         style={[
-          styles.content,
+          baseStyles.content,
           { opacity: fadeAnim }
         ]}
       >
@@ -257,7 +258,7 @@ export const AdminScreen: React.FC<Props> = ({ onBack }) => {
             onPress={() => setShowMenu(true)}
             activeOpacity={0.8}
           >
-            <Ionicons name="menu-outline" size={28} color="#374151" />
+            <Ionicons name="menu-outline" size={28} color={colors.textPrimary} />
           </TouchableOpacity>
           <View style={styles.headerTitle}>
             <Text style={styles.headerTitleText}>Panel de Administración</Text>
@@ -272,33 +273,28 @@ export const AdminScreen: React.FC<Props> = ({ onBack }) => {
         </View>
 
         <ScrollView 
-          contentContainerStyle={styles.scrollContent}
+          contentContainerStyle={baseStyles.scrollContent}
           showsVerticalScrollIndicator={false}
           bounces={true}
         >
           <View style={styles.welcomeSection}>
+            <View style={styles.welcomeSpacer} />
             <Text style={styles.welcomeTitle}>Bienvenido, Administrador</Text>
-            <Text style={styles.welcomeSubtitle}>Gestiona tu sistema de mantenimiento de forma eficiente</Text>
+            <Text style={styles.welcomeSubtitle}>Gestiona tu sistema de informes de forma eficiente</Text>
           </View>
 
           <View style={styles.statsContainer}>
             <Text style={styles.sectionTitle}>Estadísticas Generales</Text>
             <View style={styles.statsGrid}>
               <View style={styles.statCard}>
-                <Text style={styles.statNumber}>24</Text>
+                <Ionicons name="people-outline" size={20} color={colors.primary} style={{ marginBottom: spacing.xs }} />
+                <Text style={styles.statValue}>24</Text>
                 <Text style={styles.statLabel}>Técnicos Activos</Text>
               </View>
               <View style={styles.statCard}>
-                <Text style={styles.statNumber}>156</Text>
+                <Ionicons name="document-text-outline" size={20} color={colors.success} style={{ marginBottom: spacing.xs }} />
+                <Text style={styles.statValue}>156</Text>
                 <Text style={styles.statLabel}>Informes Este Mes</Text>
-              </View>
-              <View style={styles.statCard}>
-                <Text style={styles.statNumber}>89%</Text>
-                <Text style={styles.statLabel}>Satisfacción</Text>
-              </View>
-              <View style={styles.statCard}>
-                <Text style={styles.statNumber}>12</Text>
-                <Text style={styles.statLabel}>Pendientes</Text>
               </View>
             </View>
           </View>
@@ -311,7 +307,7 @@ export const AdminScreen: React.FC<Props> = ({ onBack }) => {
                 onPress={() => handleQuickAction('users')}
                 activeOpacity={0.8}
               >
-                <Ionicons name="people-outline" size={24} color="#6366F1" style={{ marginRight: 12 }} />
+                <Ionicons name="people-outline" size={20} color={colors.primary} style={{ marginRight: spacing.sm }} />
                 <Text style={styles.actionText}>Gestionar Usuarios</Text>
               </TouchableOpacity>
               
@@ -320,58 +316,13 @@ export const AdminScreen: React.FC<Props> = ({ onBack }) => {
                 onPress={() => handleQuickAction('reports')}
                 activeOpacity={0.8}
               >
-                <Ionicons name="document-text-outline" size={24} color="#10B981" style={{ marginRight: 12 }} />
+                <Ionicons name="document-text-outline" size={20} color={colors.success} style={{ marginRight: spacing.sm }} />
                 <Text style={styles.actionText}>Revisar Informes</Text>
-              </TouchableOpacity>
-              
-              <TouchableOpacity 
-                style={styles.actionButton} 
-                onPress={() => handleQuickAction('analytics')}
-                activeOpacity={0.8}
-              >
-                <Ionicons name="analytics-outline" size={24} color="#F59E0B" style={{ marginRight: 12 }} />
-                <Text style={styles.actionText}>Analíticas</Text>
-              </TouchableOpacity>
-              
-              <TouchableOpacity 
-                style={styles.actionButton} 
-                onPress={() => handleQuickAction('settings')}
-                activeOpacity={0.8}
-              >
-                <Ionicons name="settings-outline" size={24} color="#EF4444" style={{ marginRight: 12 }} />
-                <Text style={styles.actionText}>Configuración</Text>
               </TouchableOpacity>
             </View>
           </View>
 
-          <View style={styles.recentActivity}>
-            <Text style={styles.sectionTitle}>Actividad Reciente</Text>
-            <View style={styles.activityList}>
-              <View style={styles.activityItem}>
-                <Ionicons name="checkmark-circle-outline" size={20} color="#0D6EFD" style={{ marginRight: 12 }} />
-                <View style={styles.activityContent}>
-                  <Text style={styles.activityText}>Informe completado por Juan Pérez</Text>
-                  <Text style={styles.activityTime}>Hace 5 minutos</Text>
-                </View>
-              </View>
-              
-              <View style={styles.activityItem}>
-                <Ionicons name="person-add-outline" size={20} color="#0D6EFD" style={{ marginRight: 12 }} />
-                <View style={styles.activityContent}>
-                  <Text style={styles.activityText}>Nuevo técnico registrado</Text>
-                  <Text style={styles.activityTime}>Hace 1 hora</Text>
-                </View>
-              </View>
-              
-              <View style={styles.activityItem}>
-                <Ionicons name="analytics-outline" size={20} color="#0D6EFD" style={{ marginRight: 12 }} />
-                <View style={styles.activityContent}>
-                  <Text style={styles.activityText}>Reporte mensual generado</Text>
-                  <Text style={styles.activityTime}>Hace 2 horas</Text>
-                </View>
-              </View>
-            </View>
-          </View>
+          
         </ScrollView>
       </Animated.View>
 
@@ -391,7 +342,7 @@ export const AdminScreen: React.FC<Props> = ({ onBack }) => {
                 onPress={() => setShowMenu(false)}
                 activeOpacity={0.8}
               >
-                <Ionicons name="close" size={16} color="#fff" />
+                <Ionicons name="close" size={16} color={colors.textInverse} />
               </TouchableOpacity>
             </View>
             
@@ -401,7 +352,7 @@ export const AdminScreen: React.FC<Props> = ({ onBack }) => {
                 onPress={() => handleMenuAction('dashboard')}
                 activeOpacity={0.7}
               >
-                <Ionicons name="grid-outline" size={20} color="#495057" style={{ marginRight: 16 }} />
+                <Ionicons name="grid-outline" size={20} color={colors.textSecondary} style={{ marginRight: spacing.md }} />
                 <Text style={styles.menuItemText}>Dashboard</Text>
               </TouchableOpacity>
               
@@ -410,7 +361,7 @@ export const AdminScreen: React.FC<Props> = ({ onBack }) => {
                 onPress={() => handleMenuAction('users')}
                 activeOpacity={0.7}
               >
-                <Ionicons name="people-outline" size={20} color="#495057" style={{ marginRight: 16 }} />
+                <Ionicons name="people-outline" size={20} color={colors.textSecondary} style={{ marginRight: spacing.md }} />
                 <Text style={styles.menuItemText}>Usuarios</Text>
               </TouchableOpacity>
               
@@ -419,7 +370,7 @@ export const AdminScreen: React.FC<Props> = ({ onBack }) => {
                 onPress={() => handleMenuAction('reports')}
                 activeOpacity={0.7}
               >
-                <Ionicons name="document-text-outline" size={20} color="#495057" style={{ marginRight: 16 }} />
+                <Ionicons name="document-text-outline" size={20} color={colors.textSecondary} style={{ marginRight: spacing.md }} />
                 <Text style={styles.menuItemText}>Informes</Text>
               </TouchableOpacity>
               
@@ -428,7 +379,7 @@ export const AdminScreen: React.FC<Props> = ({ onBack }) => {
                 onPress={() => handleMenuAction('analytics')}
                 activeOpacity={0.7}
               >
-                <Ionicons name="stats-chart-outline" size={20} color="#495057" style={{ marginRight: 16 }} />
+                <Ionicons name="stats-chart-outline" size={20} color={colors.textSecondary} style={{ marginRight: spacing.md }} />
                 <Text style={styles.menuItemText}>Reportes</Text>
               </TouchableOpacity>
               
@@ -437,7 +388,7 @@ export const AdminScreen: React.FC<Props> = ({ onBack }) => {
                 onPress={() => handleMenuAction('settings')}
                 activeOpacity={0.7}
               >
-                <Ionicons name="settings-outline" size={20} color="#495057" style={{ marginRight: 16 }} />
+                <Ionicons name="settings-outline" size={20} color={colors.textSecondary} style={{ marginRight: 16 }} />
                 <Text style={styles.menuItemText}>Configuración</Text>
               </TouchableOpacity>
               
@@ -602,7 +553,7 @@ export const AdminScreen: React.FC<Props> = ({ onBack }) => {
                         </Text>
                       </TouchableOpacity>
                     ))}
-                  </View>
+                    </View>
                 </View>
                 
                 <TouchableOpacity 
@@ -613,8 +564,8 @@ export const AdminScreen: React.FC<Props> = ({ onBack }) => {
                   <Text style={styles.saveButtonText}>
                     {editingUser ? 'Actualizar Usuario' : 'Guardar Usuario'}
                   </Text>
-                </TouchableOpacity>
-              </View>
+                    </TouchableOpacity>
+                  </View>
             </ScrollView>
           </View>
         </View>
@@ -633,7 +584,7 @@ export const AdminScreen: React.FC<Props> = ({ onBack }) => {
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <Ionicons name="people-outline" size={20} color="#212529" style={{ marginRight: 8 }} />
                 <Text style={styles.modalTitle}>Lista de Usuarios</Text>
-              </View>
+                    </View>
               <TouchableOpacity 
                 style={styles.modalCloseButton}
                 onPress={() => {
@@ -643,16 +594,16 @@ export const AdminScreen: React.FC<Props> = ({ onBack }) => {
                 activeOpacity={0.8}
               >
                 <Ionicons name="close" size={16} color="#fff" />
-              </TouchableOpacity>
-            </View>
-            
+                    </TouchableOpacity>
+                  </View>
+                  
             <ScrollView style={styles.modalBody}>
               <View style={styles.userListSection}>
                 {users.length === 0 ? (
                   <View style={styles.emptyState}>
                     <Ionicons name="people-outline" size={48} color="#ADB5BD" />
                     <Text style={styles.emptyStateText}>No hay usuarios registrados</Text>
-                  </View>
+                    </View>
                 ) : (
                   <View style={styles.userList}>
                     {users.map((user) => (
@@ -678,9 +629,9 @@ export const AdminScreen: React.FC<Props> = ({ onBack }) => {
                              activeOpacity={0.8}
                            >
                              <Ionicons name="trash-outline" size={16} color="#DC3545" />
-                           </TouchableOpacity>
-                         </View>
-                      </View>
+                    </TouchableOpacity>
+                  </View>
+                </View>
                     ))}
                   </View>
                 )}
@@ -770,14 +721,14 @@ export const AdminScreen: React.FC<Props> = ({ onBack }) => {
                         <View style={styles.reportActions}>
                           <View style={[styles.reportStatusBadge, { backgroundColor: getStatusColor(report.status) }]}>
                             <Text style={styles.reportStatusText}>{getStatusText(report.status)}</Text>
-                          </View>
-                          <TouchableOpacity 
+                  </View>
+                  <TouchableOpacity 
                             style={styles.viewReportButton}
                             onPress={() => handleViewReport(report)}
-                            activeOpacity={0.8}
-                          >
+                    activeOpacity={0.8}
+                  >
                             <Ionicons name="eye-outline" size={16} color="#007BFF" />
-                          </TouchableOpacity>
+                  </TouchableOpacity>
                         </View>
                       </View>
                     ))
@@ -788,215 +739,152 @@ export const AdminScreen: React.FC<Props> = ({ onBack }) => {
           </View>
         </View>
       </Modal>
-      {/* Modal de Configuración */}
-      <Modal
-        visible={showSettings}
-        transparent={true}
-        animationType="slide"
-        onRequestClose={() => setShowSettings(false)}
-      >
-        <View style={styles.modalOverlayCentered}>
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Ionicons name="settings-outline" size={20} color="#212529" style={{ marginRight: 8 }} />
-                <Text style={styles.modalTitle}>Configuración del Sistema</Text>
-              </View>
-              <TouchableOpacity 
-                style={styles.modalCloseButton}
-                onPress={() => setShowSettings(false)}
-                activeOpacity={0.8}
-              >
-                <Ionicons name="close" size={16} color="#fff" />
-              </TouchableOpacity>
-            </View>
-            
-            <ScrollView style={styles.modalBody}>
-              <View style={styles.settingsSection}>
-                <Text style={styles.sectionDescription}>
-                  Configura los parámetros del sistema
-                </Text>
-                
-                <View style={styles.settingItem}>
-                  <View style={styles.settingInfo}>
-                    <Text style={styles.settingTitle}>Notificaciones automáticas</Text>
-                    <Text style={styles.settingSubtitle}>Alertas para informes pendientes</Text>
-                  </View>
-                  <TouchableOpacity 
-                    style={styles.toggleButton}
-                    onPress={() => Alert.alert('Configuración', 'Notificaciones activadas')}
-                    activeOpacity={0.8}
-                  >
-                    <Text style={styles.toggleText}>ON</Text>
-                  </TouchableOpacity>
-                </View>
-                
-                <View style={styles.settingItem}>
-                  <View style={styles.settingInfo}>
-                    <Text style={styles.settingTitle}>Reportes automáticos</Text>
-                    <Text style={styles.settingSubtitle}>Envío semanal de reportes</Text>
-                  </View>
-                  <TouchableOpacity 
-                    style={styles.toggleButton}
-                    onPress={() => Alert.alert('Configuración', 'Reportes automáticos activados')}
-                    activeOpacity={0.8}
-                  >
-                    <Text style={styles.toggleText}>ON</Text>
-                  </TouchableOpacity>
-                </View>
-                
-                <View style={styles.settingItem}>
-                  <View style={styles.settingInfo}>
-                    <Text style={styles.settingTitle}>Modo de seguridad</Text>
-                    <Text style={styles.settingSubtitle}>Autenticación de dos factores</Text>
-                  </View>
-                  <TouchableOpacity 
-                    style={[styles.toggleButton, styles.toggleOff]}
-                    onPress={() => Alert.alert('Configuración', 'Modo de seguridad desactivado')}
-                    activeOpacity={0.8}
-                  >
-                    <Text style={styles.toggleTextOff}>OFF</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </ScrollView>
-          </View>
-        </View>
-      </Modal>
 
-      {/* Modal de Soporte */}
-      <Modal
-        visible={showSupport}
-        transparent={true}
-        animationType="slide"
-        onRequestClose={() => setShowSupport(false)}
-      >
-        <View style={styles.modalOverlayCentered}>
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Ionicons name="call-outline" size={20} color="#212529" style={{ marginRight: 8 }} />
-                <Text style={styles.modalTitle}>Soporte Administrativo</Text>
-              </View>
-              <TouchableOpacity 
-                style={styles.modalCloseButton}
-                onPress={() => setShowSupport(false)}
-                activeOpacity={0.8}
-              >
-                <Ionicons name="close" size={16} color="#fff" />
-              </TouchableOpacity>
-            </View>
-            
-            <ScrollView style={styles.modalBody}>
-              <View style={styles.supportSection}>
-                <Text style={styles.sectionDescription}>
-                  Soporte especializado para administradores
-                </Text>
-                
-                <View style={styles.contactMethods}>
-                  <TouchableOpacity 
-                    style={styles.contactMethod}
-                    onPress={() => Alert.alert('Soporte', 'Conectando con soporte premium...')}
-                    activeOpacity={0.8}
-                  >
-                    <Text style={styles.contactIcon}>👨‍💼</Text>
-                    <Text style={styles.contactTitle}>Soporte Premium</Text>
-                    <Text style={styles.contactSubtitle}>Línea directa 24/7</Text>
-                  </TouchableOpacity>
-                  
-                  <TouchableOpacity 
-                    style={styles.contactMethod}
-                    onPress={() => Alert.alert('Soporte', 'Abriendo documentación...')}
-                    activeOpacity={0.8}
-                  >
-                    <Text style={styles.contactIcon}>📚</Text>
-                    <Text style={styles.contactTitle}>Documentación</Text>
-                    <Text style={styles.contactSubtitle}>Guías y manuales</Text>
-                  </TouchableOpacity>
-                  
-                  <TouchableOpacity 
-                    style={styles.contactMethod}
-                    onPress={() => Alert.alert('Soporte', 'Programando capacitación...')}
-                    activeOpacity={0.8}
-                  >
-                    <Text style={styles.contactIcon}>🎓</Text>
-                    <Text style={styles.contactTitle}>Capacitación</Text>
-                    <Text style={styles.contactSubtitle}>Sesiones de entrenamiento</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </ScrollView>
-          </View>
-        </View>
-      </Modal>
 
       {/* Modal de Detalle de Informe */}
       {showReportDetail && selectedReport && (
-        <Modal
+      <Modal
           visible={showReportDetail}
-          transparent={true}
-          animationType="slide"
+        transparent={true}
+        animationType="slide"
           onRequestClose={() => setShowReportDetail(false)}
-        >
+      >
+
           <View style={styles.modalOverlayCentered}>
-            <View style={styles.modalContent}>
-              <View style={styles.modalHeader}>
+            <View style={[styles.modalContent, styles.reportDetailModal]}>
+            <View style={styles.modalHeader}>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                   <Ionicons name="document-text-outline" size={20} color="#212529" style={{ marginRight: 8 }} />
                   <Text style={styles.modalTitle}>Detalle del Informe</Text>
                 </View>
-                <TouchableOpacity 
-                  style={styles.modalCloseButton}
+              <TouchableOpacity 
+                style={styles.modalCloseButton}
                   onPress={() => setShowReportDetail(false)}
-                  activeOpacity={0.8}
-                >
+                activeOpacity={0.8}
+              >
                   <Ionicons name="close" size={16} color="#fff" />
-                </TouchableOpacity>
-              </View>
-              
-              <View style={styles.modalBody}>
-                <ReportDetailScreen
-                  reportId={selectedReport.id}
-                  onBack={() => setShowReportDetail(false)}
-                  canEdit={false}
-                />
-              </View>
+              </TouchableOpacity>
             </View>
+            
+              <ScrollView style={styles.modalBody} showsVerticalScrollIndicator={false}>
+                {/* Información básica del informe */}
+                <View style={styles.reportDetailSection}>
+                  <Text style={styles.reportDetailTitle}>{selectedReport.title}</Text>
+                  <View style={styles.reportDetailInfo}>
+                    <View style={styles.reportDetailRow}>
+                      <Ionicons name="person-outline" size={16} color="#6C757D" />
+                      <Text style={styles.reportDetailText}>Técnico: {selectedReport.technicianName}</Text>
+                    </View>
+                    <View style={styles.reportDetailRow}>
+                      <Ionicons name="calendar-outline" size={16} color="#6C757D" />
+                      <Text style={styles.reportDetailText}>Creado: {formatDate(selectedReport.createdAt)}</Text>
+                    </View>
+                    <View style={styles.reportDetailRow}>
+                      <Ionicons name="time-outline" size={16} color="#6C757D" />
+                      <Text style={styles.reportDetailText}>Entrada: {selectedReport.checkInTime}</Text>
+                    </View>
+                    <View style={styles.reportDetailRow}>
+                      <Ionicons name="time-outline" size={16} color="#6C757D" />
+                      <Text style={styles.reportDetailText}>Salida: {selectedReport.checkOutTime}</Text>
+                    </View>
+                  </View>
+                </View>
+
+                {/* Descripción */}
+                <View style={styles.reportDetailSection}>
+                  <Text style={styles.reportDetailSectionTitle}>Descripción del Trabajo</Text>
+                  <Text style={styles.reportDetailDescription}>{selectedReport.description}</Text>
+                </View>
+
+                {/* Fotos Antes */}
+                {selectedReport.photoBeforeUris.length > 0 && (
+                  <View style={styles.reportDetailSection}>
+                    <Text style={styles.reportDetailSectionTitle}>Fotos Antes</Text>
+                    <View style={styles.reportDetailPhotoGrid}>
+                      {selectedReport.photoBeforeUris.map((uri, index) => (
+                        <View key={index} style={styles.reportDetailPhotoItem}>
+                          <Image source={{ uri }} style={styles.reportDetailPhoto} resizeMode="cover" />
+                        </View>
+                      ))}
+                    </View>
+                  </View>
+                )}
+
+                {/* Fotos Después */}
+                {selectedReport.photoAfterUris.length > 0 && (
+                  <View style={styles.reportDetailSection}>
+                    <Text style={styles.reportDetailSectionTitle}>Fotos Después</Text>
+                    <View style={styles.reportDetailPhotoGrid}>
+                      {selectedReport.photoAfterUris.map((uri, index) => (
+                        <View key={index} style={styles.reportDetailPhotoItem}>
+                          <Image source={{ uri }} style={styles.reportDetailPhoto} resizeMode="cover" />
+                        </View>
+                      ))}
+                    </View>
+                  </View>
+                )}
+
+                {/* Gestión de Estado */}
+                <View style={styles.reportDetailSection}>
+                  <Text style={styles.reportDetailSectionTitle}>Gestionar Estado</Text>
+                  <View style={styles.reportDetailStatusActions}>
+                  <TouchableOpacity 
+                      style={[styles.reportDetailStatusButton, { backgroundColor: '#FFA500' }]}
+                      onPress={() => handleUpdateReportStatus(selectedReport.id, 'pending')}
+                    activeOpacity={0.8}
+                  >
+                      <Text style={styles.reportDetailStatusButtonText}>Pendiente</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity 
+                      style={[styles.reportDetailStatusButton, { backgroundColor: '#007BFF' }]}
+                      onPress={() => handleUpdateReportStatus(selectedReport.id, 'in_review')}
+                    activeOpacity={0.8}
+                  >
+                      <Text style={styles.reportDetailStatusButtonText}>En Revisión</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity 
+                      style={[styles.reportDetailStatusButton, { backgroundColor: '#28A745' }]}
+                      onPress={() => handleUpdateReportStatus(selectedReport.id, 'approved')}
+                    activeOpacity={0.8}
+                  >
+                      <Text style={styles.reportDetailStatusButtonText}>Aprobar</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[styles.reportDetailStatusButton, { backgroundColor: '#DC3545' }]}
+                      onPress={() => handleUpdateReportStatus(selectedReport.id, 'rejected')}
+                      activeOpacity={0.8}
+                    >
+                      <Text style={styles.reportDetailStatusButtonText}>Rechazar</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </ScrollView>
           </View>
-        </Modal>
+        </View>
+      </Modal>
       )}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F8FAFC',
-  },
-  content: {
-    flex: 1,
-  },
+
   // Header con botón hamburguesa
   topHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingVertical: 20,
-    backgroundColor: '#FFFFFF',
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.md,
+    backgroundColor: colors.surface,
     borderBottomWidth: 1,
-    borderBottomColor: '#E2E8F0',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
+    borderBottomColor: colors.border,
+    ...shadows.sm,
   },
   hamburgerButton: {
-    padding: 12,
-    borderRadius: 12,
-    backgroundColor: '#F1F5F9',
+    padding: spacing.sm,
+    borderRadius: borderRadius.md,
+    backgroundColor: colors.gray100,
   },
   hamburgerLine: {
     width: 24,
@@ -1010,145 +898,138 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   headerTitleText: {
-    fontSize: 20,
-    fontWeight: '800',
-    color: '#1E293B',
+    ...typography.h5,
+    color: colors.textPrimary,
+    fontSize: 18,
+    fontWeight: '600',
   },
   backButton: {
-    backgroundColor: '#EF4444',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 12,
+    backgroundColor: colors.error,
+    paddingVertical: spacing.xs,
+    paddingHorizontal: spacing.md,
+    borderRadius: borderRadius.md,
   },
   backButtonText: {
-    color: 'white',
-    fontWeight: '700',
-    fontSize: 14,
+    color: colors.textInverse,
+    ...typography.buttonSmall,
+    fontSize: 12,
+    fontWeight: '500',
   },
-  scrollContent: {
-    paddingHorizontal: 24,
-    paddingVertical: 32,
-    paddingBottom: 40,
-  },
+
   welcomeSection: {
     alignItems: 'center',
-    marginBottom: 40,
+    marginBottom: spacing.lg,
+    paddingHorizontal: spacing.md,
+  },
+  welcomeSpacer: {
+    height: spacing.md,
   },
   welcomeTitle: {
-    fontSize: 28,
-    fontWeight: '800',
-    color: '#1E293B',
-    marginBottom: 12,
+    ...typography.h4,
+    color: colors.textPrimary,
+    marginBottom: spacing.xs,
+    fontSize: 20,
+    fontWeight: '600',
   },
   welcomeSubtitle: {
-    fontSize: 17,
-    color: '#64748B',
+    ...typography.bodySmall,
+    color: colors.textSecondary,
     textAlign: 'center',
-    lineHeight: 24,
+    fontSize: 14,
+    lineHeight: 18,
+  },
+
+  statsContainer: {
+    marginBottom: spacing.lg,
+    paddingHorizontal: spacing.md,
   },
   sectionTitle: {
-    fontSize: 22,
-    fontWeight: '800',
-    color: '#1E293B',
-    marginBottom: 20,
-  },
-  statsContainer: {
-    marginBottom: 40,
+    ...typography.h5,
+    color: colors.textPrimary,
+    marginBottom: spacing.md,
+    fontSize: 16,
+    fontWeight: '600',
   },
   statsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    gap: 16,
+    gap: spacing.sm,
   },
   statCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    padding: 24,
+    backgroundColor: colors.surface,
+    borderRadius: borderRadius.md,
+    padding: spacing.sm,
     alignItems: 'center',
     flex: 1,
     minWidth: '45%',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 4,
+    ...shadows.sm,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: colors.border,
   },
-  statNumber: {
-    fontSize: 32,
-    fontWeight: '800',
-    color: '#6366F1',
-    marginBottom: 8,
+  statValue: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: colors.textPrimary,
+    marginBottom: spacing.xs,
   },
   statLabel: {
-    fontSize: 13,
-    color: '#64748B',
-    fontWeight: '600',
+    fontSize: 11,
+    color: colors.textSecondary,
+    fontWeight: '500',
     textAlign: 'center',
   },
   actionsContainer: {
-    marginBottom: 40,
+    marginBottom: spacing.lg,
+    paddingHorizontal: spacing.md,
   },
   actionButtons: {
-    gap: 16,
+    gap: spacing.sm,
   },
   actionButton: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    padding: 24,
+    backgroundColor: colors.surface,
+    borderRadius: borderRadius.lg,
+    padding: spacing.md,
     flexDirection: 'row',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  actionIcon: {
-    fontSize: 24,
-    marginRight: 16,
+    ...shadows.sm,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   actionText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#495057',
+    ...typography.bodySmall,
+    color: colors.textPrimary,
+    fontSize: 14,
+    fontWeight: '500',
   },
   recentActivity: {
-    marginBottom: 20,
+    marginBottom: spacing.lg,
   },
   activityList: {
-    gap: 12,
+    gap: spacing.md,
   },
   activityItem: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 16,
+    backgroundColor: colors.surface,
+    borderRadius: borderRadius.lg,
+    padding: spacing.md,
     flexDirection: 'row',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  activityIcon: {
-    fontSize: 20,
-    marginRight: 12,
+    ...shadows.sm,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   activityContent: {
     flex: 1,
   },
   activityText: {
-    fontSize: 14,
+    ...typography.bodySmall,
+    color: colors.textPrimary,
     fontWeight: '600',
-    color: '#495057',
     marginBottom: 2,
   },
   activityTime: {
-    fontSize: 12,
-    color: '#6C757D',
+    ...typography.bodyXSmall,
+    color: colors.textSecondary,
   },
   // Estilos del modal del menú
   modalOverlaySidebar: {
@@ -1161,70 +1042,56 @@ const styles = StyleSheet.create({
     left: 0,
     width: '80%',
     height: '100%',
-    backgroundColor: '#FFFFFF',
-    shadowColor: '#000',
-    shadowOffset: { width: 2, height: 0 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
+    backgroundColor: colors.surface,
+    ...shadows.lg,
   },
   menuHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 20,
+    padding: spacing.lg,
     borderBottomWidth: 1,
-    borderBottomColor: '#E9ECEF',
-    backgroundColor: '#F8F9FA',
+    borderBottomColor: colors.border,
+    backgroundColor: colors.gray50,
   },
   menuTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#212529',
+    ...typography.h5,
+    color: colors.textPrimary,
   },
   closeButton: {
-    backgroundColor: '#6C757D',
-    borderRadius: 20,
+    backgroundColor: colors.secondary,
+    borderRadius: borderRadius.full,
     width: 32,
     height: 32,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  closeButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
   menuItems: {
     flex: 1,
-    paddingTop: 20,
+    paddingTop: spacing.lg,
   },
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 16,
-    paddingHorizontal: 20,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.lg,
     borderBottomWidth: 1,
-    borderBottomColor: '#F1F3F4',
-  },
-  menuItemIcon: {
-    fontSize: 20,
-    marginRight: 16,
+    borderBottomColor: colors.border,
   },
   menuItemText: {
-    fontSize: 16,
+    ...typography.body,
+    color: colors.textPrimary,
     fontWeight: '600',
-    color: '#495057',
   },
   menuFooter: {
-    padding: 20,
+    padding: spacing.lg,
     borderTopWidth: 1,
-    borderTopColor: '#E9ECEF',
-    backgroundColor: '#F8F9FA',
+    borderTopColor: colors.border,
+    backgroundColor: colors.gray50,
   },
   menuFooterText: {
-    fontSize: 12,
-    color: '#6C757D',
+    ...typography.bodySmall,
+    color: colors.textSecondary,
     textAlign: 'center',
     fontWeight: '500',
   },
@@ -1697,4 +1564,82 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: '#FFEBEE',
   },
+  reportDetailModal: {
+    width: '95%',
+    maxWidth: 600,
+    maxHeight: '90%',
+  },
+
+  // Estilos para el modal de detalle del informe
+  reportDetailSection: {
+    backgroundColor: '#F8F9FA',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#E9ECEF',
+  },
+  reportDetailTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#495057',
+    marginBottom: 12,
+  },
+  reportDetailInfo: {
+    gap: 8,
+  },
+  reportDetailRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  reportDetailText: {
+    fontSize: 14,
+    color: '#6C757D',
+    marginLeft: 8,
+  },
+  reportDetailSectionTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#495057',
+    marginBottom: 12,
+  },
+  reportDetailDescription: {
+    fontSize: 14,
+    color: '#495057',
+    lineHeight: 20,
+  },
+  reportDetailPhotoGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  reportDetailPhotoItem: {
+    width: 80,
+    height: 80,
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
+  reportDetailPhoto: {
+    width: '100%',
+    height: '100%',
+  },
+  reportDetailStatusActions: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  reportDetailStatusButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
+    minWidth: 80,
+    alignItems: 'center',
+  },
+  reportDetailStatusButtonText: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+
+
 });

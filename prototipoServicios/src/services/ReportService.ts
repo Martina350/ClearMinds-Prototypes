@@ -23,6 +23,25 @@ class ReportService {
 
   private constructor() {
     this.loadReportsFromStorage();
+    
+    // Agregar un informe de prueba si no hay informes
+    setTimeout(async () => {
+      if (this.reports.length === 0) {
+        const testReport = {
+          technicianId: '1',
+          technicianName: 'Juan Pérez',
+          title: 'Mantenimiento A/C - Edificio A',
+          checkInTime: '08:00',
+          checkOutTime: '10:00',
+          description: 'Se realizó mantenimiento preventivo al sistema de aire acondicionado del edificio A. Se limpiaron filtros, se verificó el funcionamiento del compresor y se ajustaron los controles de temperatura.',
+          photoBeforeUris: ['https://via.placeholder.com/300x200/FF6B6B/FFFFFF?text=Antes'],
+          photoAfterUris: ['https://via.placeholder.com/300x200/4ECDC4/FFFFFF?text=Después'],
+          status: 'pending' as const,
+        };
+        
+        await this.createReport(testReport);
+      }
+    }, 1000);
   }
 
   public static getInstance(): ReportService {

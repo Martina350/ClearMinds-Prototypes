@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 // @ts-ignore
 import * as ImagePicker from 'expo-image-picker';
 import ReportService, { Report } from '../services/ReportService';
+import { colors, typography, spacing, borderRadius, shadows, baseStyles } from '../styles/theme';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -25,6 +26,10 @@ export const InformeForm: React.FC<Props> = ({ onBack, technicianId = '1', techn
   const [imageLoading, setImageLoading] = useState(false);
   const [showImagePreview, setShowImagePreview] = useState(false);
   const [previewImage, setPreviewImage] = useState<string>('');
+  
+  // Estados para visualizar el informe generado
+  const [showReportDetails, setShowReportDetails] = useState(false);
+  const [generatedReport, setGeneratedReport] = useState<Report | null>(null);
   
   // Estados para el picker de hora
   const [showTimePicker, setShowTimePicker] = useState(false);
@@ -94,6 +99,27 @@ export const InformeForm: React.FC<Props> = ({ onBack, technicianId = '1', techn
       setPhotoBeforeUris(photoBeforeUris.filter((_, i) => i !== index));
     } else {
       setPhotoAfterUris(photoAfterUris.filter((_, i) => i !== index));
+    }
+  };
+
+  // Funciones auxiliares para el estado del informe
+  const getStatusColor = (status: Report['status']) => {
+    switch (status) {
+      case 'pending': return colors.warning;
+      case 'in_review': return colors.primary;
+      case 'approved': return colors.success;
+      case 'rejected': return colors.error;
+      default: return colors.gray500;
+    }
+  };
+
+  const getStatusText = (status: Report['status']) => {
+    switch (status) {
+      case 'pending': return 'Pendiente';
+      case 'in_review': return 'En Revisión';
+      case 'approved': return 'Aprobado';
+      case 'rejected': return 'Rechazado';
+      default: return 'Desconocido';
     }
   };
 
@@ -173,18 +199,11 @@ export const InformeForm: React.FC<Props> = ({ onBack, technicianId = '1', techn
         status: 'pending' as const,
       };
 
-      await reportService.createReport(reportData);
+      const savedReport = await reportService.createReport(reportData);
       
-      Alert.alert(
-        '¡Éxito!', 
-        'Informe guardado correctamente en caché local. Será revisado por el administrador.',
-        [
-          {
-            text: 'OK',
-            onPress: () => onBack()
-          }
-        ]
-      );
+      // Guardar el informe generado y mostrar los detalles
+      setGeneratedReport(savedReport);
+      setShowReportDetails(true);
     } catch (error) {
       console.error('Error al guardar informe:', error);
       Alert.alert('Error', 'No se pudo guardar el informe. Inténtalo de nuevo.');
@@ -211,7 +230,7 @@ export const InformeForm: React.FC<Props> = ({ onBack, technicianId = '1', techn
           activeOpacity={0.8}
         >
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Ionicons name="camera-outline" size={16} color="#fff" style={{ marginRight: 6 }} />
+            <Ionicons name="camera-outline" size={16} color={colors.textInverse} style={{ marginRight: spacing.sm }} />
             <Text style={styles.photoButtonText}>Cámara</Text>
           </View>
         </TouchableOpacity>
@@ -221,7 +240,7 @@ export const InformeForm: React.FC<Props> = ({ onBack, technicianId = '1', techn
           activeOpacity={0.8}
         >
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Ionicons name="image-outline" size={16} color="#fff" style={{ marginRight: 6 }} />
+            <Ionicons name="image-outline" size={16} color={colors.textInverse} style={{ marginRight: spacing.sm }} />
             <Text style={styles.photoButtonText}>Galería</Text>
           </View>
         </TouchableOpacity>
@@ -248,7 +267,7 @@ export const InformeForm: React.FC<Props> = ({ onBack, technicianId = '1', techn
                 />
                 {imageLoading && (
                   <View style={styles.imageOverlay}>
-                    <Ionicons name="hourglass-outline" size={20} color="#fff" />
+                    <Ionicons name="hourglass-outline" size={20} color={colors.textInverse} />
                   </View>
                 )}
               </TouchableOpacity>
@@ -257,7 +276,7 @@ export const InformeForm: React.FC<Props> = ({ onBack, technicianId = '1', techn
                 onPress={() => removePhoto(type, index)}
                 activeOpacity={0.7}
               >
-                <Ionicons name="close" size={14} color="#fff" />
+                <Ionicons name="close" size={14} color={colors.textInverse} />
               </TouchableOpacity>
             </View>
           ))}
@@ -267,10 +286,10 @@ export const InformeForm: React.FC<Props> = ({ onBack, technicianId = '1', techn
   );
 
   return (
-    <View style={styles.container}>
+    <View style={baseStyles.container}>
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={onBack} activeOpacity={0.8}>
-          <Ionicons name="chevron-back" size={18} color="#000" style={{ marginRight: 4 }} />
+          <Ionicons name="chevron-back" size={18} color={colors.textPrimary} style={{ marginRight: spacing.xs }} />
         </TouchableOpacity>
         <View style={styles.titleContainer}>
           <Text style={styles.title}>Informe de Mantenimiento</Text>
@@ -280,12 +299,12 @@ export const InformeForm: React.FC<Props> = ({ onBack, technicianId = '1', techn
       </View>
 
       <ScrollView 
-        contentContainerStyle={styles.formContainer}
+        contentContainerStyle={baseStyles.scrollContent}
         showsVerticalScrollIndicator={false}
         bounces={true}
       >
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Horarios</Text>
+          <Text style={baseStyles.sectionTitle}>Horarios</Text>
           <View style={styles.timeContainer}>
             <TouchableOpacity
               style={[styles.timeButton, styles.halfInput]}
@@ -298,7 +317,7 @@ export const InformeForm: React.FC<Props> = ({ onBack, technicianId = '1', techn
                   {formatTimeForDisplay(checkInTime)}
                 </Text>
               </View>
-              <Ionicons name="time-outline" size={20} color="#6B7280" />
+              <Ionicons name="time-outline" size={20} color={colors.textSecondary} />
             </TouchableOpacity>
 
             <View style={styles.timeSeparatorContainer}>
@@ -316,24 +335,24 @@ export const InformeForm: React.FC<Props> = ({ onBack, technicianId = '1', techn
                   {formatTimeForDisplay(checkOutTime)}
                 </Text>
               </View>
-              <Ionicons name="time-outline" size={20} color="#6B7280" />
+              <Ionicons name="time-outline" size={20} color={colors.textSecondary} />
             </TouchableOpacity>
           </View>
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Título del informe</Text>
+          <Text style={baseStyles.sectionTitle}>Título del informe</Text>
           <TextInput
             style={styles.titleInput}
             value={title}
             onChangeText={setTitle}
             placeholder="Ej: Mantenimiento A/C - Edificio A"
-            placeholderTextColor="#999"
+            placeholderTextColor={colors.textTertiary}
           />
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Descripción del trabajo</Text>
+          <Text style={baseStyles.sectionTitle}>Descripción del trabajo</Text>
           <TextInput
             style={styles.descriptionInput}
             value={description}
@@ -342,19 +361,17 @@ export const InformeForm: React.FC<Props> = ({ onBack, technicianId = '1', techn
             multiline
             numberOfLines={6}
             textAlignVertical="top"
-            placeholderTextColor="#999"
+            placeholderTextColor={colors.textTertiary}
           />
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Evidencia fotográfica</Text>
+          <Text style={baseStyles.sectionTitle}>Evidencia fotográfica</Text>
           <View style={styles.photoContainer}>
             {renderPhotoSection('before', photoBeforeUris)}
             {renderPhotoSection('after', photoAfterUris)}
           </View>
         </View>
-
-
 
         <TouchableOpacity 
           style={[styles.submitButton, isSubmitting && styles.submitButtonDisabled]} 
@@ -374,7 +391,7 @@ export const InformeForm: React.FC<Props> = ({ onBack, technicianId = '1', techn
         animationType="fade"
         onRequestClose={() => setShowImagePreview(false)}
       >
-        <View style={styles.modalOverlay}>
+        <View style={baseStyles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Vista previa de imagen</Text>
@@ -383,7 +400,7 @@ export const InformeForm: React.FC<Props> = ({ onBack, technicianId = '1', techn
                 onPress={() => setShowImagePreview(false)}
                 activeOpacity={0.8}
               >
-                <Ionicons name="close" size={18} color="#fff" />
+                <Ionicons name="close" size={18} color={colors.textInverse} />
               </TouchableOpacity>
             </View>
             <View style={styles.modalImageContainer}>
@@ -392,6 +409,116 @@ export const InformeForm: React.FC<Props> = ({ onBack, technicianId = '1', techn
                 style={styles.modalImage}
                 resizeMode="contain"
               />
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Modal de detalles del informe generado */}
+      <Modal
+        visible={showReportDetails}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setShowReportDetails(false)}
+      >
+        <View style={baseStyles.modalOverlay}>
+          <View style={[styles.modalContent, styles.reportDetailsModal]}>
+            <View style={styles.modalHeader}>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Ionicons name="checkmark-circle-outline" size={20} color={colors.success} style={{ marginRight: spacing.sm }} />
+                <Text style={styles.modalTitle}>Informe Generado Exitosamente</Text>
+              </View>
+              <TouchableOpacity
+                style={styles.modalCloseButton}
+                onPress={() => setShowReportDetails(false)}
+                activeOpacity={0.8}
+              >
+                <Ionicons name="close" size={18} color={colors.textInverse} />
+              </TouchableOpacity>
+            </View>
+            
+            <ScrollView style={styles.modalBody} showsVerticalScrollIndicator={false}>
+              {generatedReport && (
+                <View style={styles.reportDetailsContainer}>
+                  {/* Información básica */}
+                  <View style={styles.detailSection}>
+                    <Text style={styles.detailSectionTitle}>Información General</Text>
+                    <View style={styles.detailRow}>
+                      <Text style={styles.detailLabel}>Título:</Text>
+                      <Text style={styles.detailValue}>{generatedReport.title}</Text>
+                    </View>
+                    <View style={styles.detailRow}>
+                      <Text style={styles.detailLabel}>Técnico:</Text>
+                      <Text style={styles.detailValue}>{generatedReport.technicianName}</Text>
+                    </View>
+                    <View style={styles.detailRow}>
+                      <Text style={styles.detailLabel}>Estado:</Text>
+                      <View style={[styles.statusBadge, { backgroundColor: getStatusColor(generatedReport.status) }]}>
+                        <Text style={styles.statusText}>{getStatusText(generatedReport.status)}</Text>
+                      </View>
+                    </View>
+                  </View>
+
+                  {/* Horarios */}
+                  <View style={styles.detailSection}>
+                    <Text style={styles.detailSectionTitle}>Horarios del Servicio</Text>
+                    <View style={styles.detailRow}>
+                      <Text style={styles.detailLabel}>Entrada:</Text>
+                      <Text style={styles.detailValue}>{formatTimeForDisplay(generatedReport.checkInTime)}</Text>
+                    </View>
+                    <View style={styles.detailRow}>
+                      <Text style={styles.detailLabel}>Salida:</Text>
+                      <Text style={styles.detailValue}>{formatTimeForDisplay(generatedReport.checkOutTime)}</Text>
+                    </View>
+                  </View>
+
+                  {/* Descripción */}
+                  <View style={styles.detailSection}>
+                    <Text style={styles.detailSectionTitle}>Descripción del Trabajo</Text>
+                    <Text style={styles.descriptionText}>{generatedReport.description}</Text>
+                  </View>
+
+                  {/* Fotos */}
+                  <View style={styles.detailSection}>
+                    <Text style={styles.detailSectionTitle}>Evidencia Fotográfica</Text>
+                    <View style={styles.photoSummary}>
+                      <View style={styles.photoSummaryItem}>
+                        <Ionicons name="camera-outline" size={20} color={colors.primary} />
+                        <Text style={styles.photoSummaryText}>
+                          Fotos "Antes": {generatedReport.photoBeforeUris.length}
+                        </Text>
+                      </View>
+                      <View style={styles.photoSummaryItem}>
+                        <Ionicons name="camera-outline" size={20} color={colors.success} />
+                        <Text style={styles.photoSummaryText}>
+                          Fotos "Después": {generatedReport.photoAfterUris.length}
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+
+                  {/* Mensaje de confirmación */}
+                  <View style={styles.confirmationMessage}>
+                    <Ionicons name="information-circle-outline" size={24} color={colors.primary} />
+                    <Text style={styles.confirmationText}>
+                      Tu informe ha sido guardado correctamente y será revisado por el administrador.
+                    </Text>
+                  </View>
+                </View>
+              )}
+            </ScrollView>
+
+            <View style={styles.modalFooter}>
+              <TouchableOpacity 
+                style={styles.finishButton}
+                onPress={() => {
+                  setShowReportDetails(false);
+                  onBack();
+                }}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.finishButtonText}>Finalizar</Text>
+              </TouchableOpacity>
             </View>
           </View>
         </View>
@@ -530,207 +657,168 @@ export const InformeForm: React.FC<Props> = ({ onBack, technicianId = '1', techn
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F8F9FA',
-  },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 20,
-    backgroundColor: '#FFFFFF',
+    padding: spacing.lg,
+    backgroundColor: colors.surface,
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E9F0',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 6,
-    elevation: 3,
+    borderBottomColor: colors.border,
+    ...shadows.sm,
   },
   backButton: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: 'transparent',
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-  },
-  backIcon: {
-    color: 'white',
-    fontSize: 18,
-    marginRight: 4,
-  },
-  backText: {
-    color: 'white',
-    fontWeight: '600',
-    fontSize: 14,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
   },
   titleContainer: {
     alignItems: 'center',
   },
   title: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: '#1F2937',
+    ...typography.h4,
+    color: colors.textPrimary,
     textAlign: 'center',
   },
   subtitle: {
-    fontSize: 12,
-    color: '#6B7280',
-    marginTop: 2,
-  },
-  formContainer: {
-    padding: 20,
-    paddingBottom: 40,
+    ...typography.bodySmall,
+    color: colors.textSecondary,
+    marginTop: spacing.xs,
   },
   section: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 10,
-    elevation: 2,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#1F2937',
-    marginBottom: 16,
+    backgroundColor: colors.surface,
+    borderRadius: borderRadius.xl,
+    padding: spacing.lg,
+    marginBottom: spacing.md,
+    ...shadows.sm,
   },
   timeContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  timeInput: {
+  timeButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.md,
+    borderRadius: borderRadius.lg,
+    backgroundColor: colors.gray50,
+    marginHorizontal: spacing.xs,
+  },
+  halfInput: {
     flex: 1,
   },
-  timeLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#374151',
-    marginBottom: 8,
+  timeButtonContent: {
+    flex: 1,
+    marginRight: spacing.md,
   },
-  timeField: {
-    borderWidth: 2,
-    borderColor: '#E5E9F0',
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: '#F5F7FA',
-    fontSize: 16,
-    fontWeight: '600',
-    textAlign: 'center',
+  timeButtonLabel: {
+    ...typography.labelSmall,
+    color: colors.textSecondary,
+    marginBottom: spacing.xs,
   },
-  timeSeparator: {
-    paddingHorizontal: 20,
+  timeButtonValue: {
+    ...typography.h5,
+    color: colors.textPrimary,
+  },
+  timeSeparatorContainer: {
+    paddingHorizontal: spacing.lg,
   },
   separatorText: {
     fontSize: 20,
-    color: '#6C757D',
+    color: colors.textSecondary,
     fontWeight: '600',
   },
   titleInput: {
-    borderWidth: 2,
-    borderColor: '#E5E9F0',
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    backgroundColor: '#F5F7FA',
-    fontSize: 16,
+    ...baseStyles.input,
+    backgroundColor: colors.gray50,
   },
   descriptionInput: {
-    borderWidth: 2,
-    borderColor: '#E5E9F0',
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    backgroundColor: '#F5F7FA',
-    fontSize: 16,
+    ...baseStyles.input,
+    backgroundColor: colors.gray50,
     minHeight: 120,
     textAlignVertical: 'top',
   },
   photoContainer: {
-    gap: 20,
+    gap: spacing.lg,
   },
   photoSection: {
-    backgroundColor: '#F5F7FA',
-    borderRadius: 12,
-    padding: 16,
+    backgroundColor: colors.gray50,
+    borderRadius: borderRadius.lg,
+    padding: spacing.md,
   },
   photoHeader: {
-    marginBottom: 12,
+    marginBottom: spacing.md,
   },
   photoLabel: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#374151',
-    marginBottom: 8,
+    ...typography.body,
+    color: colors.textPrimary,
+    marginBottom: spacing.sm,
   },
   photoProgress: {
     height: 4,
-    backgroundColor: '#E5E9F0',
-    borderRadius: 2,
+    backgroundColor: colors.border,
+    borderRadius: borderRadius.sm,
     overflow: 'hidden',
   },
   progressBar: {
     height: '100%',
-    backgroundColor: '#0D6EFD',
-    borderRadius: 2,
+    backgroundColor: colors.primary,
+    borderRadius: borderRadius.sm,
   },
   photoButtons: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    marginBottom: 16,
+    marginBottom: spacing.md,
   },
   photoButton: {
     flex: 1,
-    marginHorizontal: 4,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 25,
+    marginHorizontal: spacing.xs,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.md,
+    borderRadius: borderRadius.full,
     alignItems: 'center',
   },
   primaryButton: {
-    backgroundColor: '#0D6EFD',
+    backgroundColor: colors.primary,
   },
   secondaryButton: {
-    backgroundColor: '#6C757D',
+    backgroundColor: colors.secondary,
   },
   photoButtonText: {
-    color: 'white',
-    fontWeight: '600',
-    fontSize: 14,
+    color: colors.textInverse,
+    ...typography.buttonSmall,
   },
   photoPlaceholder: {
     height: 110,
-    borderRadius: 12,
-    backgroundColor: '#EFF2F6',
+    borderRadius: borderRadius.lg,
+    backgroundColor: colors.gray100,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: '#E1E6EC',
+    borderColor: colors.border,
     borderStyle: 'dashed',
   },
   placeholderText: {
-    color: '#6B7280',
-    fontSize: 14,
-    fontWeight: '500',
+    color: colors.textSecondary,
+    ...typography.bodySmall,
   },
   photoGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-around',
-    gap: 8,
+    gap: spacing.sm,
   },
   photoGridItem: {
     position: 'relative',
     width: 100,
     height: 75,
-    borderRadius: 12,
+    borderRadius: borderRadius.lg,
     overflow: 'hidden',
   },
   imageWrapper: {
@@ -740,7 +828,7 @@ const styles = StyleSheet.create({
   photoPreview: {
     width: '100%',
     height: '100%',
-    borderRadius: 12,
+    borderRadius: borderRadius.lg,
   },
   imageOverlay: {
     position: 'absolute',
@@ -749,102 +837,53 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     backgroundColor: 'rgba(0,0,0,0.6)',
-    borderRadius: 12,
+    borderRadius: borderRadius.lg,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  overlayText: {
-    color: 'white',
-    fontSize: 20,
-  },
   removePhotoButton: {
     position: 'absolute',
-    top: 4,
-    right: 4,
-    backgroundColor: '#C53030',
-    borderRadius: 12,
+    top: spacing.xs,
+    right: spacing.xs,
+    backgroundColor: colors.error,
+    borderRadius: borderRadius.lg,
     width: 24,
     height: 24,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 3,
+    ...shadows.md,
   },
-  removePhotoText: {
-    color: 'white',
-    fontSize: 12,
-    fontWeight: 'bold',
-  },
-
   submitButton: {
-    backgroundColor: '#0D6EFD',
-    paddingVertical: 18,
-    borderRadius: 25,
-    marginTop: 20,
-    shadowColor: '#0D6EFD',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.25,
-    shadowRadius: 10,
-    elevation: 5,
+    ...baseStyles.button,
+    ...baseStyles.buttonPrimary,
+    paddingVertical: spacing.lg,
+    borderRadius: borderRadius.full,
+    marginTop: spacing.lg,
   },
   submitButtonDisabled: {
-    backgroundColor: '#6C757D',
+    backgroundColor: colors.gray500,
     shadowOpacity: 0.1,
   },
   submitButtonText: {
-    color: 'white',
+    ...baseStyles.buttonText,
     textAlign: 'center',
-    fontWeight: '700',
-    fontSize: 18,
-  },
-  modalOverlay: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.8)',
   },
   modalContent: {
-    backgroundColor: 'white',
-    borderRadius: 20,
+    ...baseStyles.modalContent,
     width: '100%',
     height: '100%',
-    overflow: 'hidden',
   },
   modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 20,
-    paddingTop: 40,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E9F0',
-    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    ...baseStyles.modalHeader,
+    paddingTop: spacing.xl,
   },
   modalTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#1F2937',
+    ...baseStyles.modalTitle,
   },
   modalCloseButton: {
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    borderRadius: 25,
+    ...baseStyles.modalCloseButton,
     width: 40,
     height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  modalCloseText: {
-    color: 'white',
-    fontSize: 18,
-    fontWeight: 'bold',
   },
   modalImageContainer: {
     flex: 1,
@@ -857,40 +896,6 @@ const styles = StyleSheet.create({
     height: '100%',
     borderRadius: 0,
   },
-  timeButton: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 12,
-    backgroundColor: '#EFF2F6',
-    marginHorizontal: 4,
-  },
-  halfInput: {
-    flex: 1,
-  },
-  timeButtonContent: {
-    flex: 1,
-    marginRight: 10,
-  },
-  timeButtonLabel: {
-    fontSize: 12,
-    color: '#6B7280',
-    marginBottom: 4,
-  },
-  timeButtonValue: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#1F2937',
-  },
-  timeButtonIcon: {
-    fontSize: 24,
-  },
-  timeSeparatorContainer: {
-    paddingHorizontal: 20,
-  },
   // Estilos para el Picker de hora personalizado
   timePickerModalOverlay: {
     flex: 1,
@@ -898,26 +903,25 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   timePickerModalContent: {
-    backgroundColor: '#FFFFFF',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    paddingBottom: 20,
+    backgroundColor: colors.surface,
+    borderTopLeftRadius: borderRadius.xl,
+    borderTopRightRadius: borderRadius.xl,
+    paddingBottom: spacing.lg,
   },
   timePickerHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 20,
+    padding: spacing.lg,
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E9F0',
+    borderBottomColor: colors.border,
   },
   timePickerTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#1F2937',
+    ...typography.h5,
+    color: colors.textPrimary,
   },
   timePickerBody: {
-    padding: 20,
+    padding: spacing.lg,
   },
   timePickerRow: {
     flexDirection: 'row',
@@ -929,99 +933,193 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   timePickerLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#6B7280',
-    marginBottom: 10,
+    ...typography.label,
+    color: colors.textSecondary,
+    marginBottom: spacing.md,
   },
   timePickerScroll: {
     height: 200,
     width: '100%',
   },
   timePickerOption: {
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    marginVertical: 2,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.md,
+    borderRadius: borderRadius.sm,
+    marginVertical: spacing.xs,
     alignItems: 'center',
   },
   timePickerOptionSelected: {
-    backgroundColor: '#0D6EFD',
+    backgroundColor: colors.primary,
   },
   timePickerOptionText: {
-    fontSize: 16,
-    color: '#374151',
-    fontWeight: '500',
+    ...typography.body,
+    color: colors.textPrimary,
   },
   timePickerOptionTextSelected: {
-    color: 'white',
+    color: colors.textInverse,
     fontWeight: '700',
   },
   timePickerSeparator: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#374151',
-    marginHorizontal: 10,
+    color: colors.textPrimary,
+    marginHorizontal: spacing.md,
   },
   periodContainer: {
     flexDirection: 'row',
-    gap: 8,
+    gap: spacing.sm,
   },
   periodOption: {
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 8,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.lg,
+    borderRadius: borderRadius.sm,
     borderWidth: 1,
-    borderColor: '#E5E9F0',
-    backgroundColor: '#F5F7FA',
+    borderColor: colors.border,
+    backgroundColor: colors.gray50,
   },
   periodOptionSelected: {
-    backgroundColor: '#0D6EFD',
-    borderColor: '#0D6EFD',
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
   },
   periodOptionText: {
-    fontSize: 16,
-    color: '#374151',
-    fontWeight: '600',
+    ...typography.body,
+    color: colors.textPrimary,
   },
   periodOptionTextSelected: {
-    color: 'white',
+    color: colors.textInverse,
   },
   timePickerFooter: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    padding: 20,
+    padding: spacing.lg,
     borderTopWidth: 1,
-    borderTopColor: '#E5E9F0',
+    borderTopColor: colors.border,
   },
   timePickerCancelButton: {
+    ...baseStyles.button,
     flex: 1,
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 8,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.lg,
+    borderRadius: borderRadius.sm,
     borderWidth: 1,
-    borderColor: '#6B7280',
+    borderColor: colors.gray500,
     backgroundColor: 'transparent',
-    marginRight: 10,
-    alignItems: 'center',
+    marginRight: spacing.md,
   },
   timePickerCancelText: {
-    color: '#6B7280',
-    fontSize: 16,
-    fontWeight: '600',
+    color: colors.gray500,
+    ...typography.body,
   },
   timePickerConfirmButton: {
+    ...baseStyles.button,
+    ...baseStyles.buttonPrimary,
     flex: 1,
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-    backgroundColor: '#0D6EFD',
-    marginLeft: 10,
-    alignItems: 'center',
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.lg,
+    borderRadius: borderRadius.sm,
+    marginLeft: spacing.md,
   },
   timePickerConfirmText: {
-    color: 'white',
-    fontSize: 16,
+    ...baseStyles.buttonText,
+  },
+
+  // Estilos para el modal de detalles del informe
+  reportDetailsModal: {
+    width: '90%',
+    maxHeight: '80%',
+  },
+  modalBody: {
+    flex: 1,
+    padding: spacing.lg,
+  },
+  reportDetailsContainer: {
+    gap: spacing.lg,
+  },
+  detailSection: {
+    backgroundColor: colors.gray50,
+    borderRadius: borderRadius.lg,
+    padding: spacing.lg,
+  },
+  detailSectionTitle: {
+    ...typography.h6,
+    color: colors.textPrimary,
+    marginBottom: spacing.md,
     fontWeight: '600',
+  },
+  detailRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: spacing.sm,
+  },
+  detailLabel: {
+    ...typography.label,
+    color: colors.textSecondary,
+    fontWeight: '500',
+  },
+  detailValue: {
+    ...typography.body,
+    color: colors.textPrimary,
+    fontWeight: '600',
+    flex: 1,
+    textAlign: 'right',
+    marginLeft: spacing.md,
+  },
+  statusBadge: {
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+    borderRadius: borderRadius.full,
+  },
+  statusText: {
+    ...typography.labelSmall,
+    color: colors.textInverse,
+    fontWeight: '600',
+  },
+  descriptionText: {
+    ...typography.body,
+    color: colors.textPrimary,
+    lineHeight: 22,
+  },
+  photoSummary: {
+    gap: spacing.md,
+  },
+  photoSummaryItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
+  photoSummaryText: {
+    ...typography.body,
+    color: colors.textPrimary,
+  },
+  confirmationMessage: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.primary,
+    borderRadius: borderRadius.lg,
+    padding: spacing.lg,
+    gap: spacing.sm,
+  },
+  confirmationText: {
+    ...typography.body,
+    color: colors.textInverse,
+    flex: 1,
+    lineHeight: 22,
+  },
+  modalFooter: {
+    padding: spacing.lg,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+  },
+  finishButton: {
+    backgroundColor: colors.success,
+    paddingVertical: spacing.md,
+    borderRadius: borderRadius.lg,
+    alignItems: 'center',
+    ...shadows.md,
+  },
+  finishButtonText: {
+    ...baseStyles.buttonText,
+    color: colors.textInverse,
   },
 });
