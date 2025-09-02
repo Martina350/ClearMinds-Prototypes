@@ -108,7 +108,7 @@ export const AdminScreen: React.FC<Props> = ({ onBack }) => {
     return report.status === reportsFilter;
   });
 
-
+    
 
   const handleQuickAction = (action: string) => {
     switch (action) {
@@ -210,9 +210,9 @@ export const AdminScreen: React.FC<Props> = ({ onBack }) => {
 
     try {
       const authService = AuthService.getInstance();
-      
-      if (editingUser) {
-        // Editar usuario existente
+
+    if (editingUser) {
+      // Editar usuario existente
         const updatedUser = authService.updateUser(editingUser.id, {
           name: formData.name.trim(),
           email: formData.email.trim()
@@ -222,7 +222,7 @@ export const AdminScreen: React.FC<Props> = ({ onBack }) => {
           setUsers(authService.getAllUsers());
           Alert.alert('Éxito', 'Usuario actualizado correctamente');
         }
-      } else {
+    } else {
         // Solo permitir crear técnicos
         if (formData.role !== 'Técnico') {
           Alert.alert('Error', 'Solo puedes crear usuarios técnicos');
@@ -253,12 +253,12 @@ export const AdminScreen: React.FC<Props> = ({ onBack }) => {
           'Usuario creado exitosamente', 
           `Usuario: ${username}\nContraseña: ${password}\n\nGuarda estas credenciales.`
         );
-      }
-      
-      setShowAddUser(false);
+    }
+
+    setShowAddUser(false);
       setShowUserManagement(true);
-      setEditingUser(null);
-      setFormData({ name: '', email: '', role: 'Técnico' });
+    setEditingUser(null);
+    setFormData({ name: '', email: '', role: 'Técnico' });
     } catch (error) {
       Alert.alert('Error', 'No se pudo guardar el usuario');
     }
@@ -603,13 +603,13 @@ export const AdminScreen: React.FC<Props> = ({ onBack }) => {
             <View style={styles.modalContent}>
               <View style={styles.modalHeader}>
                 <Text style={styles.modalTitle}>Informes de {showLocalReports.localName}</Text>
-                <TouchableOpacity 
+              <TouchableOpacity 
                   style={styles.modalCloseButton}
                   onPress={() => setShowLocalReports(null)}
                   activeOpacity={0.8}
                 >
                   <Ionicons name="close" size={16} color="#fff" />
-                </TouchableOpacity>
+              </TouchableOpacity>
               </View>
               <ScrollView style={styles.modalBody}>
                 <View style={styles.reportList}>
@@ -629,32 +629,32 @@ export const AdminScreen: React.FC<Props> = ({ onBack }) => {
                         </View>
                         <View style={styles.reportActions}>
                           <View style={styles.reportActionButtons}>
-                            <TouchableOpacity 
+              <TouchableOpacity 
                               style={styles.viewReportButton}
                               onPress={() => { setShowLocalReports(null); handleViewReport(report); }}
                               activeOpacity={0.8}
                               hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
                             >
                               <Ionicons name="eye-outline" size={16} color="#007BFF" />
-                            </TouchableOpacity>
-                            <TouchableOpacity 
+              </TouchableOpacity>
+              <TouchableOpacity 
                               style={styles.deleteReportButton}
                               onPress={() => handleDeleteReport(report.id)}
                               activeOpacity={0.8}
                               hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
                             >
                               <Ionicons name="trash-outline" size={16} color="#DC3545" />
-                            </TouchableOpacity>
-                          </View>
-                        </View>
+              </TouchableOpacity>
+            </View>
+            </View>
                       </View>
                     ))
                   )}
                 </View>
               </ScrollView>
-            </View>
           </View>
-        </Modal>
+        </View>
+      </Modal>
       )}
       {/* Modal de Gestión de Usuarios */}
       <Modal
@@ -782,21 +782,21 @@ export const AdminScreen: React.FC<Props> = ({ onBack }) => {
                 <View style={styles.formInputGroup}>
                   <Text style={styles.inputLabel}>Rol</Text>
                   <View style={styles.roleSelector}>
-                    <TouchableOpacity
-                      style={[
-                        styles.roleOption,
+                      <TouchableOpacity
+                        style={[
+                          styles.roleOption,
                         styles.roleOptionSelected
-                      ]}
-                      activeOpacity={0.8}
-                    >
-                      <Text style={[
-                        styles.roleOptionText,
+                        ]}
+                        activeOpacity={0.8}
+                      >
+                        <Text style={[
+                          styles.roleOptionText,
                         styles.roleOptionTextSelected
-                      ]}>
+                        ]}>
                         Técnico
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
                   <Text style={styles.roleNote}>Solo puedes crear usuarios técnicos</Text>
                 </View>
                 
@@ -968,15 +968,15 @@ export const AdminScreen: React.FC<Props> = ({ onBack }) => {
                         <View style={styles.reportActions}>
                           <View style={[styles.reportStatusBadge, { backgroundColor: getStatusColor(report.status) }]}>
                             <Text style={styles.reportStatusText}>{getStatusText(report.status)}</Text>
-                          </View>
+                  </View>
                           <View style={styles.reportActionButtons}>
-                            <TouchableOpacity 
-                              style={styles.viewReportButton}
-                              onPress={() => handleViewReport(report)}
-                              activeOpacity={0.8}
-                            >
-                              <Ionicons name="eye-outline" size={16} color="#007BFF" />
-                            </TouchableOpacity>
+                  <TouchableOpacity 
+                            style={styles.viewReportButton}
+                            onPress={() => handleViewReport(report)}
+                    activeOpacity={0.8}
+                  >
+                            <Ionicons name="eye-outline" size={16} color="#007BFF" />
+                  </TouchableOpacity>
                             <TouchableOpacity 
                               style={styles.deleteReportButton}
                               onPress={() => handleDeleteReport(report.id)}

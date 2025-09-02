@@ -1,75 +1,41 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Animated, Alert, Modal } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, typography, spacing, borderRadius, shadows, baseStyles } from '../styles/theme';
-import AuthService, { User } from '../services/AuthService';
+import AuthService from '../services/AuthService';
+import { colors, spacing, borderRadius, shadows, baseStyles } from '../styles/theme';
 
 type Props = {
   onLoginSuccess: (role: 'admin' | 'tecnico') => void;
 };
 
 export const UnifiedLoginScreen: React.FC<Props> = ({ onLoginSuccess }) => {
-  const [selectedRole, setSelectedRole] = useState<'admin' | 'tecnico' | undefined>(undefined);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [selectedRole, setSelectedRole] = useState<'admin' | 'tecnico' | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [fadeAnim] = useState(new Animated.Value(0));
-  const [slideAnim] = useState(new Animated.Value(50));
-  const [showForgotPassword, setShowForgotPassword] = useState(false);
-  const [recoveryEmail, setRecoveryEmail] = useState('');
-
-  React.useEffect(() => {
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 800,
-        useNativeDriver: true,
-      }),
-      Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 800,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  }, []);
-
-  const handleRoleSelect = (role: 'admin' | 'tecnico') => {
-    setSelectedRole(role);
-    // Limpiar campos al cambiar rol
-    setUsername('');
-    setPassword('');
-  };
+  const [showCredentials, setShowCredentials] = useState(false);
 
   const handleLogin = async () => {
     if (!selectedRole) {
       Alert.alert('Rol requerido', 'Por favor selecciona tu rol');
       return;
     }
-
     if (!username.trim() || !password.trim()) {
       Alert.alert('Campos requeridos', 'Por favor completa todos los campos');
       return;
     }
-
     setIsLoading(true);
-    
     try {
       const authService = AuthService.getInstance();
       const user = authService.authenticate(username.trim(), password.trim());
-      
       if (user && user.role === selectedRole) {
-        // Login exitoso
         setTimeout(() => {
           setIsLoading(false);
           onLoginSuccess(user.role);
         }, 1000);
       } else {
-        // Credenciales incorrectas o rol no coincide
         setIsLoading(false);
-        Alert.alert(
-          'Error de autenticación', 
-          'Usuario, contraseña o rol incorrecto. Por favor verifica tus credenciales.'
-        );
+        Alert.alert('Error de autenticación', 'Usuario, contraseña o rol incorrecto. Por favor verifica tus credenciales.');
       }
     } catch (error) {
       setIsLoading(false);
@@ -77,395 +43,362 @@ export const UnifiedLoginScreen: React.FC<Props> = ({ onLoginSuccess }) => {
     }
   };
 
-  const handleForgotPassword = () => {
-    setShowForgotPassword(true);
-  };
-
-  const handleRecoverySubmit = () => {
-    if (!recoveryEmail.trim()) {
-      Alert.alert('Error', 'Por favor ingresa tu correo electrónico');
-      return;
-    }
-    
-    // Simular envío de correo de recuperación
-    Alert.alert(
-      'Correo enviado',
-      'Se ha enviado un enlace de recuperación a tu correo electrónico',
-      [
-        {
-          text: 'OK',
-          onPress: () => {
-            setShowForgotPassword(false);
-            setRecoveryEmail('');
-          }
-        }
-      ]
-    );
-  };
-
-  const isFormValid = selectedRole && username.trim() && password.trim();
-
-  // Mostrar credenciales de ejemplo
-  const showCredentials = () => {
-    if (selectedRole === 'admin') {
-      Alert.alert(
-        'Credenciales de Administrador',
-        'Usuario: admin\nContraseña: admin123',
-        [{ text: 'OK' }]
-      );
-    } else if (selectedRole === 'tecnico') {
-      Alert.alert(
-        'Credenciales de Técnico',
-        'Usuario: tecnico1\nContraseña: tecnico123\n\nOtras opciones:\nUsuario: tecnico2\nUsuario: tecnico3',
-        [{ text: 'OK' }]
-      );
-    }
+  const toggleCredentials = () => {
+    setShowCredentials(!showCredentials);
   };
 
   return (
     <View style={baseStyles.container}>
-      <Animated.View 
-        style={[
-          baseStyles.content,
-          { 
-            opacity: fadeAnim,
-            transform: [{ translateY: slideAnim }]
-          }
-        ]}
-      >
-        <View style={styles.mainContainer}>
-          {/* Header Section */}
-          <View style={styles.header}>
-            <View style={styles.headerSpacer} />
-            <Text style={styles.title}>Bienvenido de nuevo!</Text>
-            <Text style={styles.subtitle}>Por favor ingresa tus credenciales</Text>
-          </View>
-
-        {/* Role Selection - Two Small Buttons */}
-        <View style={styles.roleSection}>
-          <Text style={styles.roleLabel}>Selecciona tu rol</Text>
-          <View style={styles.roleButtons}>
-            <TouchableOpacity 
-              style={[
-                styles.roleButton,
-                selectedRole === 'admin' && styles.roleButtonSelected
-              ]}
-              onPress={() => handleRoleSelect('admin')}
-              activeOpacity={0.8}
-            >
-              <Ionicons 
-                name="briefcase-outline" 
-                size={20} 
-                color={selectedRole === 'admin' ? colors.textInverse : colors.textSecondary} 
-              />
-              <Text style={[
-                styles.roleButtonText,
-                selectedRole === 'admin' && styles.roleButtonTextSelected
-              ]}>Admin</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity 
-              style={[
-                styles.roleButton,
-                selectedRole === 'tecnico' && styles.roleButtonSelected
-              ]}
-              onPress={() => handleRoleSelect('tecnico')}
-              activeOpacity={0.8}
-            >
-              <Ionicons 
-                name="construct-outline" 
-                size={20} 
-                color={selectedRole === 'tecnico' ? colors.textInverse : colors.textSecondary} 
-              />
-              <Text style={[
-                styles.roleButtonText,
-                selectedRole === 'tecnico' && styles.roleButtonTextSelected
-              ]}>Técnico</Text>
-            </TouchableOpacity>
-          </View>
+      {/* Header con gradiente */}
+      <View style={styles.header}>
+        <View style={styles.logoContainer}>
+          <Ionicons name="shield-checkmark" size={64} color={colors.textInverse} />
         </View>
+        <Text style={styles.appTitle}>ClearMinds</Text>
+        <Text style={styles.appSubtitle}>Sistema de Gestión de Servicios</Text>
+      </View>
 
-        {/* Login Form */}
-        <View style={styles.formSection}>
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Usuario</Text>
-            <TextInput
-              placeholder="Tu nombre de usuario"
-              style={styles.input}
-              value={username}
-              onChangeText={setUsername}
-              autoCapitalize="none"
-              placeholderTextColor={colors.textTertiary}
-            />
+      {/* Formulario de login */}
+      <View style={styles.formContainer}>
+        <View style={styles.formCard}>
+          <Text style={styles.formTitle}>Iniciar Sesión</Text>
+          <Text style={styles.formSubtitle}>Accede a tu cuenta para continuar</Text>
+
+          {/* Selector de rol */}
+          <View style={styles.roleSelector}>
+            <Text style={styles.inputLabel}>Selecciona tu rol</Text>
+            <View style={styles.roleButtons}>
+              <TouchableOpacity
+                style={[
+                  styles.roleButton,
+                  selectedRole === 'admin' && styles.roleButtonActive
+                ]}
+                onPress={() => setSelectedRole('admin')}
+                activeOpacity={0.8}
+              >
+                <Ionicons 
+                  name="person-circle" 
+                  size={24} 
+                  color={selectedRole === 'admin' ? colors.textInverse : colors.primary} 
+                />
+                <Text style={[
+                  styles.roleButtonText,
+                  selectedRole === 'admin' && styles.roleButtonTextActive
+                ]}>
+                  Administrador
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[
+                  styles.roleButton,
+                  selectedRole === 'tecnico' && styles.roleButtonActive
+                ]}
+                onPress={() => setSelectedRole('tecnico')}
+                activeOpacity={0.8}
+              >
+                <Ionicons 
+                  name="construct" 
+                  size={24} 
+                  color={selectedRole === 'tecnico' ? colors.textInverse : colors.primary} 
+                />
+                <Text style={[
+                  styles.roleButtonText,
+                  selectedRole === 'tecnico' && styles.roleButtonTextActive
+                ]}>
+                  Técnico
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
 
+          {/* Campo de usuario */}
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Contraseña</Text>
-            <TextInput
-              placeholder="Tu contraseña"
-              style={styles.input}
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-              placeholderTextColor={colors.textTertiary}
-            />
+            <Text style={styles.inputLabel}>Usuario</Text>
+            <View style={styles.inputContainer}>
+              <Ionicons name="person-outline" size={20} color={colors.textSecondary} style={styles.inputIcon} />
+              <TextInput
+                style={styles.textInput}
+                placeholder="Ingresa tu usuario"
+                placeholderTextColor={colors.textTertiary}
+                value={username}
+                onChangeText={setUsername}
+                autoCapitalize="none"
+                autoCorrect={false}
+              />
+            </View>
           </View>
 
-          {/* Botón para mostrar credenciales */}
-          {selectedRole && (
-            <TouchableOpacity 
-              style={styles.credentialsButton} 
-              onPress={showCredentials}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.credentialsText}>Ver credenciales de ejemplo</Text>
-            </TouchableOpacity>
-          )}
+          {/* Campo de contraseña */}
+          <View style={styles.inputGroup}>
+            <Text style={styles.inputLabel}>Contraseña</Text>
+            <View style={styles.inputContainer}>
+              <Ionicons name="lock-closed-outline" size={20} color={colors.textSecondary} style={styles.inputIcon} />
+              <TextInput
+                style={styles.textInput}
+                placeholder="Ingresa tu contraseña"
+                placeholderTextColor={colors.textTertiary}
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry
+                autoCapitalize="none"
+              />
+            </View>
+          </View>
 
-          <TouchableOpacity 
-            style={[
-              styles.loginButton, 
-              (!isFormValid || isLoading) && styles.loginButtonDisabled
-            ]} 
+          {/* Botón de login */}
+          <TouchableOpacity
+            style={[styles.loginButton, isLoading && styles.loginButtonDisabled]}
             onPress={handleLogin}
-            disabled={!isFormValid || isLoading}
+            disabled={isLoading}
             activeOpacity={0.8}
           >
-            <Text style={styles.loginButtonText}>
-              {isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
-            </Text>
+            {isLoading ? (
+              <ActivityIndicator color={colors.textInverse} size="small" />
+            ) : (
+              <>
+                <Ionicons name="log-in-outline" size={20} color={colors.textInverse} />
+                <Text style={styles.loginButtonText}>Iniciar Sesión</Text>
+              </>
+            )}
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.forgotPasswordButton} onPress={handleForgotPassword} activeOpacity={0.7}>
-            <Text style={styles.forgotPasswordText}>¿Olvidaste tu contraseña?</Text>
+          {/* Botón para ver credenciales */}
+          <TouchableOpacity
+            style={styles.credentialsButton}
+            onPress={toggleCredentials}
+            activeOpacity={0.8}
+          >
+            <Ionicons name="information-circle-outline" size={20} color={colors.primary} />
+            <Text style={styles.credentialsButtonText}>Ver credenciales de ejemplo</Text>
           </TouchableOpacity>
-        </View>
 
-        
-        </View>
-      </Animated.View>
-
-      {/* Forgot Password Modal */}
-      <Modal
-        visible={showForgotPassword}
-        transparent={true}
-        animationType="slide"
-        onRequestClose={() => setShowForgotPassword(false)}
-      >
-        <View style={baseStyles.modalOverlay}>
-          <View style={baseStyles.modalContent}>
-            <View style={baseStyles.modalHeader}>
-              <Text style={baseStyles.modalTitle}>Reset Password</Text>
-              <TouchableOpacity 
-                style={baseStyles.modalCloseButton}
-                onPress={() => setShowForgotPassword(false)}
-                activeOpacity={0.8}
-              >
-                <Ionicons name="close" size={16} color={colors.textInverse} />
-              </TouchableOpacity>
-            </View>
-            
-            <View style={baseStyles.modalBody}>
-              <Text style={styles.modalDescription}>
-                Ingresa tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña.
-              </Text>
+          {/* Credenciales de ejemplo */}
+          {showCredentials && (
+            <View style={styles.credentialsCard}>
+              <Text style={styles.credentialsTitle}>Credenciales de Prueba</Text>
               
-              <View style={styles.modalInputGroup}>
-                <Text style={styles.modalLabel}>Email</Text>
-                <TextInput
-                  placeholder="Your email"
-                  style={styles.modalInput}
-                  value={recoveryEmail}
-                  onChangeText={setRecoveryEmail}
-                  autoCapitalize="none"
-                  keyboardType="email-address"
-                  placeholderTextColor={colors.textTertiary}
-                />
+              <View style={styles.credentialItem}>
+                <Text style={styles.credentialRole}>👑 Administrador:</Text>
+                <Text style={styles.credentialText}>Usuario: admin | Contraseña: admin123</Text>
               </View>
               
-              <TouchableOpacity 
-                style={styles.modalSubmitButton} 
-                onPress={handleRecoverySubmit}
-                activeOpacity={0.8}
-              >
-                <Text style={styles.modalSubmitText}>Enviar enlace de recuperación</Text>
-              </TouchableOpacity>
+              <View style={styles.credentialItem}>
+                <Text style={styles.credentialRole}>🔧 Técnico:</Text>
+                <Text style={styles.credentialText}>Usuario: tecnico1 | Contraseña: tecnico123</Text>
+              </View>
             </View>
-          </View>
+          )}
         </View>
-      </Modal>
+      </View>
+
+      {/* Footer */}
+      <View style={styles.footer}>
+        <Text style={styles.footerText}>© 2024 ClearMinds. Todos los derechos reservados.</Text>
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  mainContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: spacing.lg,
-    maxWidth: 600,
-    alignSelf: 'center',
-    width: '85%',
-  },
   header: {
-    alignItems: 'center',
-    marginBottom: spacing.lg,
+    backgroundColor: colors.primary,
     paddingTop: spacing.xxl,
-    marginTop: spacing.xl,
+    paddingBottom: spacing.xl,
+    alignItems: 'center',
+    ...shadows.lg,
   },
-  headerSpacer: {
-    height: spacing.md,
+  logoContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: borderRadius.full,
+    backgroundColor: colors.surfaceSecondary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: spacing.lg,
+    ...shadows.md,
   },
-  title: {
-    ...typography.h2,
+  appTitle: {
+    fontSize: 32,
+    fontWeight: '700',
+    lineHeight: 40,
+    color: colors.textInverse,
+    marginBottom: spacing.xs,
+  },
+  appSubtitle: {
+    fontSize: 16,
+    fontWeight: '400',
+    lineHeight: 22,
+    color: colors.textInverse,
+    opacity: 0.9,
+  },
+  formContainer: {
+    flex: 1,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.xl,
+  },
+  formCard: {
+    backgroundColor: colors.surface,
+    borderRadius: borderRadius.xl,
+    padding: spacing.xl,
+    ...shadows.lg,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  formTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+    lineHeight: 32,
     color: colors.textPrimary,
     textAlign: 'center',
     marginBottom: spacing.xs,
-    fontWeight: '800',
   },
-  subtitle: {
-    ...typography.body,
+  formSubtitle: {
+    fontSize: 16,
+    fontWeight: '400',
+    lineHeight: 22,
     color: colors.textSecondary,
     textAlign: 'center',
+    marginBottom: spacing.xl,
   },
-  roleSection: {
+  roleSelector: {
     marginBottom: spacing.lg,
   },
-  roleLabel: {
-    ...typography.label,
+  inputLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    lineHeight: 20,
     color: colors.textSecondary,
     marginBottom: spacing.sm,
-    textAlign: 'center',
   },
   roleButtons: {
     flexDirection: 'row',
-    justifyContent: 'center',
     gap: spacing.md,
   },
   roleButton: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.gray100,
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.lg,
-    borderRadius: borderRadius.full,
+    justifyContent: 'center',
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.md,
+    borderRadius: borderRadius.lg,
+    backgroundColor: colors.surfaceSecondary,
     borderWidth: 2,
     borderColor: colors.border,
-    gap: spacing.xs,
-    minWidth: 100,
-    justifyContent: 'center',
+    gap: spacing.sm,
   },
-  roleButtonSelected: {
+  roleButtonActive: {
     backgroundColor: colors.primary,
     borderColor: colors.primary,
-    ...shadows.sm,
   },
   roleButtonText: {
-    ...typography.label,
-    color: colors.textSecondary,
+    fontSize: 14,
     fontWeight: '600',
+    lineHeight: 20,
+    color: colors.textSecondary,
   },
-  roleButtonTextSelected: {
+  roleButtonTextActive: {
     color: colors.textInverse,
   },
-  formSection: {
-    marginBottom: spacing.lg,
-    width: '100%',
-  },
   inputGroup: {
-    marginBottom: spacing.md,
-    width: '100%',
+    marginBottom: spacing.lg,
   },
-  label: {
-    ...typography.label,
-    color: colors.textPrimary,
-    marginBottom: spacing.xs,
-    fontWeight: '600',
-  },
-  input: {
-    ...baseStyles.input,
-    backgroundColor: colors.gray50,
-    borderColor: colors.border,
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.surfaceSecondary,
+    borderRadius: borderRadius.lg,
     borderWidth: 1,
-    width: '100%',
-    minHeight: 50,
-    paddingHorizontal: spacing.lg,
+    borderColor: colors.border,
+    paddingHorizontal: spacing.md,
+  },
+  inputIcon: {
+    marginRight: spacing.sm,
+  },
+  textInput: {
+    flex: 1,
     paddingVertical: spacing.md,
+    fontSize: 16,
+    fontWeight: '400',
+    lineHeight: 24,
+    color: colors.textPrimary,
   },
   loginButton: {
-    backgroundColor: colors.textPrimary,
+    backgroundColor: colors.primary,
+    borderRadius: borderRadius.full,
     paddingVertical: spacing.md,
-    borderRadius: borderRadius.lg,
-    marginTop: spacing.md,
+    paddingHorizontal: spacing.lg,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: spacing.lg,
+    gap: spacing.sm,
     ...shadows.md,
   },
   loginButtonDisabled: {
-    backgroundColor: colors.gray500,
-    shadowOpacity: 0.1,
+    opacity: 0.7,
   },
   loginButtonText: {
-    color: colors.textInverse,
-    textAlign: 'center',
-    fontWeight: '700',
     fontSize: 16,
-  },
-  forgotPasswordButton: {
-    alignItems: 'center',
-    marginTop: spacing.md,
-    paddingVertical: spacing.sm,
-  },
-  forgotPasswordText: {
-    color: colors.primary,
-    ...typography.bodySmall,
     fontWeight: '600',
+    lineHeight: 24,
+    color: colors.textInverse,
   },
   credentialsButton: {
+    flexDirection: 'row',
     alignItems: 'center',
-    marginTop: spacing.sm,
+    justifyContent: 'center',
     paddingVertical: spacing.sm,
+    gap: spacing.sm,
   },
-  credentialsText: {
-    color: colors.warning,
-    ...typography.bodySmall,
+  credentialsButtonText: {
+    fontSize: 14,
+    fontWeight: '500',
+    lineHeight: 20,
+    color: colors.primary,
+  },
+  credentialsCard: {
+    backgroundColor: colors.surfaceSecondary,
+    borderRadius: borderRadius.lg,
+    padding: spacing.lg,
+    marginTop: spacing.lg,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  credentialsTitle: {
+    fontSize: 16,
     fontWeight: '600',
-    textDecorationLine: 'underline',
+    lineHeight: 22,
+    color: colors.textPrimary,
+    marginBottom: spacing.md,
+    textAlign: 'center',
+  },
+  credentialItem: {
+    marginBottom: spacing.sm,
+  },
+  credentialRole: {
+    fontSize: 14,
+    fontWeight: '600',
+    lineHeight: 20,
+    color: colors.accent,
+    marginBottom: spacing.xs,
+  },
+  credentialText: {
+    fontSize: 14,
+    fontWeight: '400',
+    lineHeight: 20,
+    color: colors.textSecondary,
   },
   footer: {
+    padding: spacing.lg,
     alignItems: 'center',
-    marginTop: spacing.lg,
   },
   footerText: {
-    ...typography.body,
-    color: colors.textSecondary,
+    fontSize: 12,
+    fontWeight: '400',
+    lineHeight: 16,
+    color: colors.textTertiary,
     textAlign: 'center',
-  },
-  createAccountText: {
-    color: colors.primary,
-    fontWeight: '600',
-  },
-  // Modal styles
-  modalDescription: {
-    ...typography.body,
-    color: colors.textSecondary,
-    textAlign: 'center',
-    marginBottom: spacing.lg,
-    lineHeight: 22,
-  },
-  modalInputGroup: {
-    marginBottom: spacing.lg,
-  },
-  modalLabel: {
-    ...baseStyles.inputLabel,
-  },
-  modalInput: {
-    ...baseStyles.input,
-  },
-  modalSubmitButton: {
-    ...baseStyles.button,
-    ...baseStyles.buttonPrimary,
-  },
-  modalSubmitText: {
-    ...baseStyles.buttonText,
   },
 });

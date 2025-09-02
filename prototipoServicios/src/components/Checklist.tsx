@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, TouchableOpacity, StyleSheet } from 'react-native';
+import { TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, spacing, borderRadius, shadows } from '../styles/theme';
 
@@ -10,39 +10,46 @@ type Props = {
 
 export const Checklist: React.FC<Props> = ({ checked, onChange }) => {
   return (
-    <View style={styles.container}>
-      <TouchableOpacity
-        style={[styles.iconBtn, checked && styles.iconBtnActive]}
-        onPress={() => onChange(!checked)}
-        activeOpacity={0.8}
-        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-      >
-        <Ionicons
-          name={checked ? 'checkmark-circle' : 'checkmark-circle-outline'}
-          size={24}
-          color={checked ? colors.textInverse : colors.success}
+    <TouchableOpacity
+      style={[styles.checkbox, checked && styles.checkboxChecked]}
+      onPress={() => onChange(!checked)}
+      activeOpacity={0.7}
+      hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+    >
+      {checked ? (
+        <Ionicons 
+          name="checkmark-circle" 
+          size={28} 
+          color={colors.textInverse} 
         />
-      </TouchableOpacity>
-    </View>
+      ) : (
+        <Ionicons 
+          name="checkmark-circle-outline" 
+          size={28} 
+          color={colors.primary} 
+        />
+      )}
+    </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  iconBtn: {
-    width: 36,
-    height: 36,
+  checkbox: {
+    width: 40,
+    height: 40,
     borderRadius: borderRadius.full,
+    backgroundColor: colors.surfaceSecondary,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.gray100,
+    borderWidth: 2,
+    borderColor: colors.primary,
     ...shadows.sm,
   },
-  iconBtnActive: {
-    backgroundColor: colors.success,
+  checkboxChecked: {
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
+    ...shadows.md,
+    transform: [{ scale: 1.05 }],
   },
 });
 

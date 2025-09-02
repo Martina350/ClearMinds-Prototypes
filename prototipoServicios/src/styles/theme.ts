@@ -1,79 +1,96 @@
 import { StyleSheet } from 'react-native';
 
-// Paleta de colores moderna y profesional
+// Paleta de colores moderna y profesional basada en las imágenes de referencia
 export const colors = {
-  // Colores principales
-  primary: '#4F46E5', // Indigo moderno
-  primaryLight: '#6366F1',
-  primaryDark: '#3730A3',
+  // Colores principales - Tema oscuro con acentos vibrantes
+  primary: '#8B5CF6', // Violeta vibrante como en las imágenes
+  secondary: '#06B6D4', // Cyan azulado
+  accent: '#F59E0B', // Ámbar dorado
   
-  // Colores secundarios
-  secondary: '#06B6D4', // Cyan vibrante
-  secondaryLight: '#22D3EE',
-  secondaryDark: '#0891B2',
+  // Colores de fondo - Tema oscuro elegante
+  background: '#0F0F23', // Fondo principal muy oscuro
+  surface: '#1A1A2E', // Superficies de tarjetas
+  surfaceSecondary: '#16213E', // Superficies secundarias
+  surfaceTertiary: '#0F3460', // Superficies terciarias
   
-  // Colores de éxito
-  success: '#10B981', // Emerald
-  successLight: '#34D399',
-  successDark: '#059669',
-  
-  // Colores de advertencia
-  warning: '#F59E0B', // Amber
-  warningLight: '#FBBF24',
-  warningDark: '#D97706',
-  
-  // Colores de error
-  error: '#EF4444', // Red
-  errorLight: '#F87171',
-  errorDark: '#DC2626',
-  
-  // Colores de información
-  info: '#3B82F6', // Blue
-  infoLight: '#60A5FA',
-  infoDark: '#2563EB',
-  
-  // Colores de superficie
-  surface: '#FFFFFF',
-  surfaceSecondary: '#F8FAFC',
-  surfaceTertiary: '#F1F5F9',
-  
-  // Colores de fondo
-  background: '#FAFAFA',
-  backgroundSecondary: '#F5F5F5',
-  
-  // Colores de texto
-  textPrimary: '#1E293B',
-  textSecondary: '#475569',
-  textTertiary: '#64748B',
-  textInverse: '#FFFFFF',
-  
-  // Colores de borde
-  border: '#E2E8F0',
-  borderLight: '#F1F5F9',
-  borderDark: '#CBD5E1',
+  // Colores de texto - Alta legibilidad
+  textPrimary: '#FFFFFF', // Texto principal blanco
+  textSecondary: '#E2E8F0', // Texto secundario gris claro
+  textTertiary: '#94A3B8', // Texto terciario gris medio
+  textInverse: '#FFFFFF', // Texto sobre colores oscuros
   
   // Colores de estado
-  pending: '#F59E0B',
-  inReview: '#3B82F6',
-  approved: '#10B981',
-  rejected: '#EF4444',
+  success: '#10B981', // Verde esmeralda
+  warning: '#F59E0B', // Ámbar
+  error: '#EF4444', // Rojo vibrante
+  info: '#3B82F6', // Azul
   
-  // Colores de gradiente
-  gradientStart: '#4F46E5',
-  gradientEnd: '#06B6D4',
+  // Colores de borde y separadores
+  border: '#2D3748', // Bordes sutiles
+  divider: '#374151', // Divisores
   
-  // Colores de sombra
-  shadowLight: '#E2E8F0',
-  shadowMedium: '#CBD5E1',
-  shadowDark: '#94A3B8',
+  // Colores de sombra y profundidad
+  shadow: '#000000',
+  overlay: 'rgba(0, 0, 0, 0.8)',
 };
 
-// Tipografía moderna y jerárquica
+// Espaciado consistente
+export const spacing = {
+  xs: 4,
+  sm: 8,
+  md: 16,
+  lg: 24,
+  xl: 32,
+  xxl: 48,
+};
+
+// Bordes redondeados modernos
+export const borderRadius = {
+  xs: 4,
+  sm: 8,
+  md: 12,
+  lg: 16,
+  xl: 20,
+  full: 9999,
+};
+
+// Sistema de sombras elegante
+export const shadows = {
+  sm: {
+    shadowColor: colors.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  md: {
+    shadowColor: colors.shadow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  lg: {
+    shadowColor: colors.shadow,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.2,
+    shadowRadius: 16,
+    elevation: 8,
+  },
+  xl: {
+    shadowColor: colors.shadow,
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.25,
+    shadowRadius: 24,
+    elevation: 12,
+  },
+};
+
+// Tipografía moderna y legible
 export const typography = {
-  // Títulos principales
   h1: {
     fontSize: 32,
-    fontWeight: '800',
+    fontWeight: '700',
     lineHeight: 40,
     letterSpacing: -0.5,
   },
@@ -85,7 +102,7 @@ export const typography = {
   },
   h3: {
     fontSize: 24,
-    fontWeight: '700',
+    fontWeight: '600',
     lineHeight: 32,
     letterSpacing: -0.2,
   },
@@ -107,8 +124,6 @@ export const typography = {
     lineHeight: 22,
     letterSpacing: 0,
   },
-  
-  // Texto del cuerpo
   body: {
     fontSize: 16,
     fontWeight: '400',
@@ -124,11 +139,9 @@ export const typography = {
   bodyLarge: {
     fontSize: 18,
     fontWeight: '400',
-    lineHeight: 26,
+    lineHeight: 28,
     letterSpacing: 0,
   },
-  
-  // Etiquetas
   label: {
     fontSize: 14,
     fontWeight: '500',
@@ -141,14 +154,6 @@ export const typography = {
     lineHeight: 16,
     letterSpacing: 0.1,
   },
-  labelLarge: {
-    fontSize: 16,
-    fontWeight: '500',
-    lineHeight: 22,
-    letterSpacing: 0.1,
-  },
-  
-  // Botones
   button: {
     fontSize: 16,
     fontWeight: '600',
@@ -161,150 +166,82 @@ export const typography = {
     lineHeight: 20,
     letterSpacing: 0.1,
   },
-  buttonLarge: {
-    fontSize: 18,
-    fontWeight: '600',
-    lineHeight: 26,
-    letterSpacing: 0.1,
-  },
-  
-  // Texto extra pequeño
-  bodyXSmall: {
+  caption: {
     fontSize: 12,
     fontWeight: '400',
     lineHeight: 16,
-    letterSpacing: 0,
+    letterSpacing: 0.2,
   },
 };
 
-// Espaciado consistente y moderno
-export const spacing = {
-  xs: 4,
-  sm: 8,
-  md: 16,
-  lg: 24,
-  xl: 32,
-  xxl: 48,
-  xxxl: 64,
-};
-
-// Bordes redondeados modernos
-export const borderRadius = {
-  xs: 4,
-  sm: 8,
-  md: 12,
-  lg: 16,
-  xl: 20,
-  xxl: 24,
-  full: 9999,
-};
-
-// Sombras suaves y modernas
-export const shadows = {
-  xs: {
-    shadowColor: colors.shadowLight,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 1,
-  },
-  sm: {
-    shadowColor: colors.shadowLight,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  md: {
-    shadowColor: colors.shadowMedium,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  lg: {
-    shadowColor: colors.shadowMedium,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.2,
-    shadowRadius: 16,
-    elevation: 8,
-  },
-  xl: {
-    shadowColor: colors.shadowDark,
-    shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.25,
-    shadowRadius: 24,
-    elevation: 12,
-  },
-};
-
-// Estilos base modernos
-export const baseStyles = {
+// Estilos base reutilizables
+export const baseStyles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
   },
-  content: {
+  safeArea: {
     flex: 1,
+    backgroundColor: colors.background,
   },
-  scrollContent: {
-    paddingBottom: spacing.xl,
-  },
-  
-  // Inputs modernos
-  input: {
+  card: {
     backgroundColor: colors.surface,
-    borderWidth: 2,
+    borderRadius: borderRadius.lg,
+    padding: spacing.lg,
+    ...shadows.md,
+    borderWidth: 1,
     borderColor: colors.border,
+  },
+  cardElevated: {
+    backgroundColor: colors.surface,
     borderRadius: borderRadius.lg,
+    padding: spacing.lg,
+    ...shadows.lg,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  input: {
+    backgroundColor: colors.surfaceSecondary,
+    borderRadius: borderRadius.md,
     paddingHorizontal: spacing.md,
-    paddingVertical: spacing.md,
-    fontSize: 16,
+    paddingVertical: spacing.sm,
+    borderWidth: 1,
+    borderColor: colors.border,
     color: colors.textPrimary,
-    ...shadows.xs,
-  },
-  inputLabel: {
     fontSize: 16,
-    fontWeight: '600',
-    color: colors.textPrimary,
-    marginBottom: spacing.sm,
   },
-  
-  // Botones base
   button: {
-    borderRadius: borderRadius.lg,
+    backgroundColor: colors.primary,
+    borderRadius: borderRadius.full,
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.lg,
     alignItems: 'center',
     justifyContent: 'center',
-    flexDirection: 'row',
     ...shadows.sm,
   },
-  buttonPrimary: {
-    backgroundColor: colors.primary,
-  },
   buttonSecondary: {
-    backgroundColor: colors.secondary,
+    backgroundColor: colors.surfaceSecondary,
+    borderRadius: borderRadius.full,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.lg,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: colors.primary,
   },
-  buttonSuccess: {
-    backgroundColor: colors.success,
+  buttonOutline: {
+    backgroundColor: 'transparent',
+    borderRadius: borderRadius.full,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.lg,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: colors.primary,
   },
-  buttonWarning: {
-    backgroundColor: colors.warning,
-  },
-  buttonError: {
-    backgroundColor: colors.error,
-  },
-  buttonText: {
-    color: colors.textInverse,
-    fontWeight: '600',
-    fontSize: 16,
-  },
-  
-  // Modales modernos
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    backgroundColor: colors.overlay,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -312,119 +249,209 @@ export const baseStyles = {
     backgroundColor: colors.surface,
     borderRadius: borderRadius.xl,
     padding: spacing.lg,
-    margin: spacing.md,
-    maxWidth: 400,
-    width: '90%',
+    margin: spacing.lg,
     ...shadows.xl,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
-  modalHeader: {
+  sectionHeader: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: spacing.lg,
-    paddingBottom: spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.borderLight,
+    justifyContent: 'space-between',
+    marginBottom: spacing.md,
+    paddingHorizontal: spacing.md,
   },
-  modalTitle: {
+  sectionTitle: {
     fontSize: 20,
-    fontWeight: '700',
+    fontWeight: '600',
+    lineHeight: 28,
     color: colors.textPrimary,
   },
-  modalCloseButton: {
-    backgroundColor: colors.error,
+  divider: {
+    height: 1,
+    backgroundColor: colors.divider,
+    marginVertical: spacing.md,
+  },
+  statusBadge: {
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
     borderRadius: borderRadius.full,
-    width: 32,
-    height: 32,
-    justifyContent: 'center',
+    alignSelf: 'flex-start',
+  },
+  avatar: {
+    width: 48,
+    height: 48,
+    borderRadius: borderRadius.full,
+    backgroundColor: colors.surfaceSecondary,
+  },
+  iconButton: {
+    padding: spacing.sm,
+    borderRadius: borderRadius.full,
+    backgroundColor: colors.surfaceSecondary,
     alignItems: 'center',
-    ...shadows.sm,
+    justifyContent: 'center',
   },
-  modalBody: {
-    flex: 1,
+  floatingActionButton: {
+    position: 'absolute',
+    bottom: spacing.xl,
+    right: spacing.lg,
+    width: 56,
+    height: 56,
+    borderRadius: borderRadius.full,
+    backgroundColor: colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    ...shadows.lg,
   },
-};
+});
 
 // Estilos de componentes específicos
-export const componentStyles = {
-  // Cards modernas
-  card: {
+export const componentStyles = StyleSheet.create({
+  // Estilos para botones de acción
+  actionButton: {
+    backgroundColor: colors.primary,
+    borderRadius: borderRadius.full,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.lg,
+    alignItems: 'center',
+    justifyContent: 'center',
+    ...shadows.md,
+  },
+  actionButtonSecondary: {
+    backgroundColor: colors.surfaceSecondary,
+    borderRadius: borderRadius.full,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.lg,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: colors.primary,
+  },
+  actionButtonDanger: {
+    backgroundColor: colors.error,
+    borderRadius: borderRadius.full,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.lg,
+    alignItems: 'center',
+    justifyContent: 'center',
+    ...shadows.md,
+  },
+  
+  // Estilos para formularios
+  formGroup: {
+    marginBottom: spacing.lg,
+  },
+  formLabel: {
+    fontSize: 14,
+    fontWeight: '500',
+    lineHeight: 20,
+    color: colors.textSecondary,
+    marginBottom: spacing.sm,
+  },
+  formInput: {
+    backgroundColor: colors.surfaceSecondary,
+    borderRadius: borderRadius.md,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderWidth: 1,
+    borderColor: colors.border,
+    color: colors.textPrimary,
+    fontSize: 16,
+  },
+  formInputFocused: {
+    backgroundColor: colors.surfaceSecondary,
+    borderRadius: borderRadius.md,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderWidth: 2,
+    borderColor: colors.primary,
+    color: colors.textPrimary,
+    fontSize: 16,
+  },
+  
+  // Estilos para listas
+  listItem: {
     backgroundColor: colors.surface,
+    borderRadius: borderRadius.lg,
+    padding: spacing.lg,
+    marginBottom: spacing.md,
+    ...shadows.sm,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  listItemPressed: {
+    backgroundColor: colors.surfaceSecondary,
     borderRadius: borderRadius.lg,
     padding: spacing.lg,
     marginBottom: spacing.md,
     ...shadows.md,
     borderWidth: 1,
-    borderColor: colors.borderLight,
+    borderColor: colors.primary,
   },
   
-  // Botones de acción
-  actionButton: {
+  // Estilos para navegación
+  tabBar: {
     backgroundColor: colors.surface,
-    borderRadius: borderRadius.lg,
-    padding: spacing.md,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    ...shadows.sm,
-    borderWidth: 1,
-    borderColor: colors.borderLight,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+    ...shadows.lg,
   },
-  
-  // Badges de estado
-  statusBadge: {
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
-    borderRadius: borderRadius.full,
+  tabBarItem: {
     alignItems: 'center',
     justifyContent: 'center',
+    paddingVertical: spacing.sm,
   },
-  
-  // Inputs de formulario
-  formInput: {
-    backgroundColor: colors.surface,
-    borderWidth: 2,
-    borderColor: colors.border,
-    borderRadius: borderRadius.lg,
+  tabBarActive: {
+    backgroundColor: colors.primary,
+    borderRadius: borderRadius.full,
     paddingHorizontal: spacing.md,
-    paddingVertical: spacing.md,
-    fontSize: 16,
-    color: colors.textPrimary,
-    marginBottom: spacing.md,
-    ...shadows.xs,
+    paddingVertical: spacing.xs,
   },
-};
-
-// Función helper para crear estilos dinámicos
-export const createDynamicStyles = (isDark: boolean = false) => {
-  const themeColors = isDark ? {
-    ...colors,
-    background: colors.backgroundSecondary,
-    surface: colors.surfaceSecondary,
-    textPrimary: colors.textPrimary,
-    textSecondary: colors.textSecondary,
-    textTertiary: colors.textTertiary,
-    border: colors.borderDark,
-  } : colors;
   
-  return {
-    colors: themeColors,
-    typography,
-    spacing,
-    borderRadius,
-    shadows,
-    baseStyles,
-    componentStyles,
-  };
-};
+  // Estilos para headers
+  header: {
+    backgroundColor: colors.surface,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    ...shadows.sm,
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    lineHeight: 28,
+    color: colors.textPrimary,
+    textAlign: 'center',
+  },
+  
+  // Estilos para estados
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: colors.background,
+  },
+  emptyState: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: spacing.xl,
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: spacing.lg,
+  },
+});
 
 export default {
   colors,
-  typography,
   spacing,
   borderRadius,
   shadows,
+  typography,
   baseStyles,
   componentStyles,
-  createDynamicStyles,
 };

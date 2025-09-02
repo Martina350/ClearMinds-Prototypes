@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, StatusBar } from 'react-native';
-import { UnifiedLoginScreen } from './src/screens/UnifiedLoginScreen';
-import { AdminScreen } from './src/screens/AdminScreen';
-import { TecnicoScreen } from './src/screens/TecnicoScreen';
-import { colors } from './src/styles/theme';
+import { UnifiedLoginScreen } from './screens/UnifiedLoginScreen';
+import { AdminScreen } from './screens/AdminScreen';
+import { TecnicoScreen } from './screens/TecnicoScreen';
+import { colors } from './styles/theme';
 
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState<'login' | 'admin' | 'tecnico'>('login');
@@ -23,9 +23,9 @@ export default function App() {
   const renderScreen = () => {
     switch (currentScreen) {
       case 'admin':
-        return <AdminScreen onBack={handleLogout} />;
+        return <AdminScreen onLogout={handleLogout} />;
       case 'tecnico':
-        return <TecnicoScreen onBack={handleLogout} technicianId="1" technicianName="Juan Pérez" />;
+        return <TecnicoScreen onLogout={handleLogout} />;
       default:
         return <UnifiedLoginScreen onLoginSuccess={handleLoginSuccess} />;
     }
