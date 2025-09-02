@@ -143,7 +143,9 @@ const styles = StyleSheet.create({
     borderTopRightRadius: borderRadius.lg,
   },
   heroYear: {
-    ...typography.h6,
+    fontSize: 16,
+    fontWeight: '600',
+    lineHeight: 22,
     color: colors.textInverse,
     opacity: 0.9,
   },
@@ -162,7 +164,9 @@ const styles = StyleSheet.create({
     paddingTop: spacing.md,
   },
   header: {
-    ...typography.h6,
+    fontSize: 16,
+    fontWeight: '600',
+    lineHeight: 22,
     color: colors.textPrimary,
     textAlign: 'center',
     textTransform: 'capitalize',
@@ -171,12 +175,14 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: borderRadius.full,
-    backgroundColor: colors.gray100,
+    backgroundColor: colors.surfaceSecondary,
     alignItems: 'center',
     justifyContent: 'center',
   },
   navBtnText: {
-    ...typography.h6,
+    fontSize: 16,
+    fontWeight: '600',
+    lineHeight: 22,
     color: colors.textPrimary,
   },
   weekRow: {
@@ -189,7 +195,9 @@ const styles = StyleSheet.create({
     width: `${100 / 7}%`,
     textAlign: 'center',
     color: colors.textSecondary,
-    ...typography.labelSmall,
+    fontSize: 12,
+    fontWeight: '500',
+    lineHeight: 16,
   },
   grid: {
     flexDirection: 'row',
@@ -209,11 +217,13 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.full,
   },
   cellText: {
-    ...typography.bodySmall,
+    fontSize: 14,
+    fontWeight: '400',
+    lineHeight: 20,
     color: colors.textPrimary,
   },
   cellTextOutside: {
-    color: colors.gray400,
+    color: colors.textTertiary,
   },
   sundayText: {
     color: colors.error,
@@ -235,7 +245,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
   },
   actionText: {
-    ...typography.buttonSmall,
+    fontSize: 14,
+    fontWeight: '600',
+    lineHeight: 20,
     color: colors.primary,
     letterSpacing: 1,
   },

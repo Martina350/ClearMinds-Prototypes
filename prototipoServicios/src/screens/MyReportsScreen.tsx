@@ -86,7 +86,7 @@ export const MyReportsScreen: React.FC<Props> = ({
       case 'in_review': return colors.primary;
       case 'approved': return colors.success;
       case 'rejected': return colors.error;
-      default: return colors.gray500;
+      default: return colors.textTertiary;
     }
   };
 
@@ -121,11 +121,11 @@ export const MyReportsScreen: React.FC<Props> = ({
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.reportsSection}>
-          <Text style={baseStyles.sectionTitle}>Informes Recientes</Text>
+          <Text style={styles.sectionTitle}>Informes Recientes</Text>
           
           {reports.length === 0 ? (
             <View style={styles.emptyState}>
-              <Ionicons name="document-text-outline" size={48} color={colors.gray400} />
+              <Ionicons name="document-text-outline" size={48} color={colors.textTertiary} />
               <Text style={styles.emptyStateText}>No tienes informes aún</Text>
               <TouchableOpacity 
                 style={styles.createFirstReportButton}
@@ -185,7 +185,7 @@ export const MyReportsScreen: React.FC<Props> = ({
           animationType="slide"
           onRequestClose={() => setShowReportDetail(false)}
         >
-          <View style={baseStyles.modalOverlay}>
+          <View style={styles.modalOverlay}>
             <View style={styles.modalContent}>
               <ReportDetailScreen
                 reportId={selectedReport.id}
@@ -208,7 +208,7 @@ export const MyReportsScreen: React.FC<Props> = ({
           animationType="slide"
           onRequestClose={() => setShowNewReport(false)}
         >
-          <View style={baseStyles.modalOverlay}>
+          <View style={styles.modalOverlay}>
             <View style={styles.modalContent}>
               <InformeForm
                 onBack={() => setShowNewReport(false)}
@@ -246,11 +246,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   title: {
-    ...typography.h4,
+    fontSize: 20,
+    fontWeight: '600',
+    lineHeight: 26,
     color: colors.textPrimary,
   },
   subtitle: {
-    ...typography.bodyXSmall,
+    fontSize: 12,
+    fontWeight: '400',
+    lineHeight: 16,
     color: colors.textSecondary,
     marginTop: spacing.xs,
   },
@@ -277,7 +281,9 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.xl,
   },
   emptyStateText: {
-    ...typography.body,
+    fontSize: 16,
+    fontWeight: '400',
+    lineHeight: 24,
     color: colors.textSecondary,
     marginTop: spacing.md,
     textAlign: 'center',
@@ -292,7 +298,9 @@ const styles = StyleSheet.create({
   },
   createFirstReportText: {
     color: colors.textInverse,
-    ...typography.buttonSmall,
+    fontSize: 14,
+    fontWeight: '600',
+    lineHeight: 20,
   },
   reportsList: {
     gap: spacing.md,
@@ -314,12 +322,16 @@ const styles = StyleSheet.create({
     marginRight: spacing.md,
   },
   reportTitle: {
-    ...typography.h6,
+    fontSize: 16,
+    fontWeight: '600',
+    lineHeight: 22,
     color: colors.textPrimary,
     marginBottom: spacing.xs,
   },
   reportDate: {
-    ...typography.bodyXSmall,
+    fontSize: 12,
+    fontWeight: '400',
+    lineHeight: 16,
     color: colors.textSecondary,
   },
   statusBadge: {
@@ -343,7 +355,7 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.md,
     borderRadius: borderRadius.md,
-    backgroundColor: colors.gray50,
+    backgroundColor: colors.surfaceSecondary,
     gap: spacing.xs,
   },
   actionButtonText: {
@@ -354,5 +366,18 @@ const styles = StyleSheet.create({
   modalContent: {
     flex: 1,
     backgroundColor: colors.surface,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    lineHeight: 26,
+    color: colors.textPrimary,
+    marginBottom: spacing.md,
   },
 });

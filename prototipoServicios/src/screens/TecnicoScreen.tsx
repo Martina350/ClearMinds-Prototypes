@@ -113,7 +113,7 @@ export const TecnicoScreen: React.FC<Props> = ({
       case 'in_review': return colors.primary;
       case 'approved': return colors.success;
       case 'rejected': return colors.error;
-      default: return colors.gray500;
+      default: return colors.textTertiary;
     }
   };
 
@@ -176,7 +176,7 @@ export const TecnicoScreen: React.FC<Props> = ({
             <Text style={styles.sectionTitle}>Cronograma de {selectedDate}</Text>
             {daySchedules.length === 0 ? (
               <View style={styles.emptyState}>
-                <Ionicons name="calendar-outline" size={48} color={colors.gray400} />
+                <Ionicons name="calendar-outline" size={48} color={colors.textTertiary} />
                 <Text style={styles.emptyStateText}>Sin asignaciones para este día</Text>
               </View>
             ) : (
@@ -245,7 +245,7 @@ export const TecnicoScreen: React.FC<Props> = ({
             <Text style={styles.sectionTitle}>Actividad Reciente</Text>
             {reports.length === 0 ? (
               <View style={styles.emptyState}>
-                <Ionicons name="document-text-outline" size={48} color={colors.gray400} />
+                <Ionicons name="document-text-outline" size={48} color={colors.textTertiary} />
                 <Text style={styles.emptyStateText}>No tienes informes aún</Text>
                 <TouchableOpacity 
                   style={styles.createFirstReportButton}
@@ -380,11 +380,11 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   welcomeSubtitle: {
-    ...typography.bodySmall,
+    fontSize: 14,
+    fontWeight: '400',
+    lineHeight: 18,
     color: colors.textSecondary,
     textAlign: 'center',
-    fontSize: 14,
-    lineHeight: 18,
   },
   statsContainer: {
     marginBottom: spacing.lg,
@@ -429,7 +429,9 @@ const styles = StyleSheet.create({
   },
   smallButtonText: {
     color: colors.textInverse,
-    ...typography.buttonSmall,
+    fontSize: 14,
+    fontWeight: '600',
+    lineHeight: 20,
   },
   recentActivity: {
     marginBottom: spacing.lg,
@@ -440,11 +442,12 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.lg,
   },
   emptyStateText: {
-    ...typography.bodySmall,
+    fontSize: 14,
+    fontWeight: '400',
+    lineHeight: 20,
     color: colors.textSecondary,
     marginTop: spacing.sm,
     textAlign: 'center',
-    fontSize: 14,
   },
   createFirstReportButton: {
     backgroundColor: colors.primary,
@@ -455,8 +458,9 @@ const styles = StyleSheet.create({
   },
   createFirstReportText: {
     color: colors.textInverse,
-    ...typography.buttonSmall,
     fontSize: 12,
+    fontWeight: '600',
+    lineHeight: 16,
   },
   activityList: {
     gap: spacing.sm,
@@ -475,15 +479,17 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   activityText: {
-    ...typography.bodySmall,
+    fontSize: 13,
+    fontWeight: '500',
+    lineHeight: 18,
     color: colors.textPrimary,
     marginBottom: spacing.xs,
-    fontSize: 13,
   },
   activityTime: {
-    ...typography.bodyXSmall,
-    color: colors.textSecondary,
     fontSize: 11,
+    fontWeight: '400',
+    lineHeight: 16,
+    color: colors.textSecondary,
   },
   statusBadge: {
     paddingHorizontal: spacing.xs,
@@ -492,9 +498,10 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
   },
   statusText: {
-    ...typography.labelSmall,
-    color: colors.textInverse,
     fontSize: 10,
+    fontWeight: '500',
+    lineHeight: 14,
+    color: colors.textInverse,
   },
 
   modalOverlayFull: {

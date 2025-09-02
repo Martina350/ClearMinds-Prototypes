@@ -2,147 +2,182 @@ import { StyleSheet } from 'react-native';
 
 // Paleta de colores moderna y profesional
 export const colors = {
-  // Colores primarios
-  primary: '#2563EB',
-  primaryLight: '#3B82F6',
-  primaryDark: '#1D4ED8',
+  // Colores principales
+  primary: '#4F46E5', // Indigo moderno
+  primaryLight: '#6366F1',
+  primaryDark: '#3730A3',
   
   // Colores secundarios
-  secondary: '#64748B',
-  secondaryLight: '#94A3B8',
-  secondaryDark: '#475569',
+  secondary: '#06B6D4', // Cyan vibrante
+  secondaryLight: '#22D3EE',
+  secondaryDark: '#0891B2',
   
   // Colores de éxito
-  success: '#10B981',
+  success: '#10B981', // Emerald
   successLight: '#34D399',
   successDark: '#059669',
   
   // Colores de advertencia
-  warning: '#F59E0B',
+  warning: '#F59E0B', // Amber
   warningLight: '#FBBF24',
   warningDark: '#D97706',
   
   // Colores de error
-  error: '#EF4444',
+  error: '#EF4444', // Red
   errorLight: '#F87171',
   errorDark: '#DC2626',
   
-  // Colores neutros
-  white: '#FFFFFF',
-  gray50: '#F8FAFC',
-  gray100: '#F1F5F9',
-  gray200: '#E2E8F0',
-  gray300: '#CBD5E1',
-  gray400: '#94A3B8',
-  gray500: '#64748B',
-  gray600: '#475569',
-  gray700: '#334155',
-  gray800: '#1E293B',
-  gray900: '#0F172A',
+  // Colores de información
+  info: '#3B82F6', // Blue
+  infoLight: '#60A5FA',
+  infoDark: '#2563EB',
+  
+  // Colores de superficie
+  surface: '#FFFFFF',
+  surfaceSecondary: '#F8FAFC',
+  surfaceTertiary: '#F1F5F9',
   
   // Colores de fondo
-  background: '#F8FAFC',
-  surface: '#FFFFFF',
-  surfaceHover: '#F1F5F9',
+  background: '#FAFAFA',
+  backgroundSecondary: '#F5F5F5',
   
   // Colores de texto
-  textPrimary: '#0F172A',
+  textPrimary: '#1E293B',
   textSecondary: '#475569',
   textTertiary: '#64748B',
   textInverse: '#FFFFFF',
   
   // Colores de borde
   border: '#E2E8F0',
-  borderHover: '#CBD5E1',
-  borderFocus: '#3B82F6',
+  borderLight: '#F1F5F9',
+  borderDark: '#CBD5E1',
+  
+  // Colores de estado
+  pending: '#F59E0B',
+  inReview: '#3B82F6',
+  approved: '#10B981',
+  rejected: '#EF4444',
+  
+  // Colores de gradiente
+  gradientStart: '#4F46E5',
+  gradientEnd: '#06B6D4',
+  
+  // Colores de sombra
+  shadowLight: '#E2E8F0',
+  shadowMedium: '#CBD5E1',
+  shadowDark: '#94A3B8',
 };
 
-// Tipografías consistentes
+// Tipografía moderna y jerárquica
 export const typography = {
-  // Títulos
+  // Títulos principales
   h1: {
     fontSize: 32,
-    fontWeight: '800' as const,
+    fontWeight: '800',
     lineHeight: 40,
     letterSpacing: -0.5,
   },
   h2: {
     fontSize: 28,
-    fontWeight: '700' as const,
+    fontWeight: '700',
     lineHeight: 36,
     letterSpacing: -0.3,
   },
   h3: {
     fontSize: 24,
-    fontWeight: '700' as const,
+    fontWeight: '700',
     lineHeight: 32,
     letterSpacing: -0.2,
   },
   h4: {
     fontSize: 20,
-    fontWeight: '600' as const,
+    fontWeight: '600',
     lineHeight: 28,
     letterSpacing: -0.1,
   },
   h5: {
     fontSize: 18,
-    fontWeight: '600' as const,
+    fontWeight: '600',
     lineHeight: 24,
+    letterSpacing: 0,
   },
   h6: {
     fontSize: 16,
-    fontWeight: '600' as const,
-    lineHeight: 20,
+    fontWeight: '600',
+    lineHeight: 22,
+    letterSpacing: 0,
   },
   
   // Texto del cuerpo
-  bodyLarge: {
-    fontSize: 18,
-    fontWeight: '400' as const,
-    lineHeight: 28,
-  },
   body: {
     fontSize: 16,
-    fontWeight: '400' as const,
+    fontWeight: '400',
     lineHeight: 24,
+    letterSpacing: 0,
   },
   bodySmall: {
     fontSize: 14,
-    fontWeight: '400' as const,
+    fontWeight: '400',
     lineHeight: 20,
+    letterSpacing: 0,
   },
-  bodyXSmall: {
-    fontSize: 12,
-    fontWeight: '400' as const,
-    lineHeight: 16,
+  bodyLarge: {
+    fontSize: 18,
+    fontWeight: '400',
+    lineHeight: 26,
+    letterSpacing: 0,
   },
   
   // Etiquetas
   label: {
     fontSize: 14,
-    fontWeight: '500' as const,
+    fontWeight: '500',
     lineHeight: 20,
+    letterSpacing: 0.1,
   },
   labelSmall: {
     fontSize: 12,
-    fontWeight: '500' as const,
+    fontWeight: '500',
     lineHeight: 16,
+    letterSpacing: 0.1,
+  },
+  labelLarge: {
+    fontSize: 16,
+    fontWeight: '500',
+    lineHeight: 22,
+    letterSpacing: 0.1,
   },
   
   // Botones
   button: {
     fontSize: 16,
-    fontWeight: '600' as const,
-    lineHeight: 20,
+    fontWeight: '600',
+    lineHeight: 24,
+    letterSpacing: 0.1,
   },
   buttonSmall: {
     fontSize: 14,
-    fontWeight: '600' as const,
-    lineHeight: 18,
+    fontWeight: '600',
+    lineHeight: 20,
+    letterSpacing: 0.1,
+  },
+  buttonLarge: {
+    fontSize: 18,
+    fontWeight: '600',
+    lineHeight: 26,
+    letterSpacing: 0.1,
+  },
+  
+  // Texto extra pequeño
+  bodyXSmall: {
+    fontSize: 12,
+    fontWeight: '400',
+    lineHeight: 16,
+    letterSpacing: 0,
   },
 };
 
-// Espaciado consistente
+// Espaciado consistente y moderno
 export const spacing = {
   xs: 4,
   sm: 8,
@@ -153,52 +188,58 @@ export const spacing = {
   xxxl: 64,
 };
 
-// Bordes y radios
+// Bordes redondeados modernos
 export const borderRadius = {
-  none: 0,
-  sm: 4,
-  md: 8,
-  lg: 12,
-  xl: 16,
-  xxl: 20,
+  xs: 4,
+  sm: 8,
+  md: 12,
+  lg: 16,
+  xl: 20,
+  xxl: 24,
   full: 9999,
 };
 
-// Sombras
+// Sombras suaves y modernas
 export const shadows = {
-  sm: {
-    shadowColor: '#000',
+  xs: {
+    shadowColor: colors.shadowLight,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 2,
     elevation: 1,
   },
-  md: {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
+  sm: {
+    shadowColor: colors.shadowLight,
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 3,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  md: {
+    shadowColor: colors.shadowMedium,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 4,
   },
   lg: {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.15,
-    shadowRadius: 15,
+    shadowColor: colors.shadowMedium,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.2,
+    shadowRadius: 16,
     elevation: 8,
   },
   xl: {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 20 },
+    shadowColor: colors.shadowDark,
+    shadowOffset: { width: 0, height: 12 },
     shadowOpacity: 0.25,
-    shadowRadius: 25,
-    elevation: 15,
+    shadowRadius: 24,
+    elevation: 12,
   },
 };
 
-// Estilos base reutilizables
-export const baseStyles = StyleSheet.create({
-  // Contenedores
+// Estilos base modernos
+export const baseStyles = {
   container: {
     flex: 1,
     backgroundColor: colors.background,
@@ -207,57 +248,36 @@ export const baseStyles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    flexGrow: 1,
     paddingBottom: spacing.xl,
   },
   
-  // Headers
-  header: {
+  // Inputs modernos
+  input: {
     backgroundColor: colors.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-    ...shadows.sm,
-  },
-  headerTitle: {
-    ...typography.h4,
-    color: colors.textPrimary,
-    textAlign: 'center',
-  },
-  
-  // Secciones
-  section: {
-    marginBottom: spacing.lg,
-  },
-  sectionTitle: {
-    ...typography.h5,
-    color: colors.textPrimary,
-    marginBottom: spacing.md,
-    paddingHorizontal: spacing.lg,
-  },
-  
-  // Tarjetas
-  card: {
-    backgroundColor: colors.surface,
+    borderWidth: 2,
+    borderColor: colors.border,
     borderRadius: borderRadius.lg,
-    padding: spacing.lg,
-    marginHorizontal: spacing.lg,
-    marginBottom: spacing.md,
-    ...shadows.md,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.md,
+    fontSize: 16,
+    color: colors.textPrimary,
+    ...shadows.xs,
   },
-  cardHover: {
-    ...shadows.lg,
-    transform: [{ translateY: -2 }],
+  inputLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.textPrimary,
+    marginBottom: spacing.sm,
   },
   
-  // Botones
+  // Botones base
   button: {
     borderRadius: borderRadius.lg,
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.lg,
     alignItems: 'center',
     justifyContent: 'center',
+    flexDirection: 'row',
     ...shadows.sm,
   },
   buttonPrimary: {
@@ -275,200 +295,116 @@ export const baseStyles = StyleSheet.create({
   buttonError: {
     backgroundColor: colors.error,
   },
-  buttonOutline: {
-    backgroundColor: 'transparent',
-    borderWidth: 2,
-    borderColor: colors.primary,
-  },
   buttonText: {
-    ...typography.button,
     color: colors.textInverse,
-  },
-  buttonTextOutline: {
-    ...typography.button,
-    color: colors.primary,
+    fontWeight: '600',
+    fontSize: 16,
   },
   
-  // Inputs
-  input: {
-    backgroundColor: colors.surface,
-    borderWidth: 2,
-    borderColor: colors.border,
-    borderRadius: borderRadius.lg,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.md,
-    ...typography.body,
-    color: colors.textPrimary,
-    ...shadows.sm,
-  },
-  inputFocus: {
-    borderColor: colors.borderFocus,
-    ...shadows.md,
-  },
-  inputLabel: {
-    ...typography.label,
-    color: colors.textSecondary,
-    marginBottom: spacing.sm,
-  },
-  
-  // Modales
+  // Modales modernos
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   modalContent: {
     backgroundColor: colors.surface,
     borderRadius: borderRadius.xl,
-    width: '90%',
+    padding: spacing.lg,
+    margin: spacing.md,
     maxWidth: 400,
+    width: '90%',
     ...shadows.xl,
   },
   modalHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: spacing.lg,
+    marginBottom: spacing.lg,
+    paddingBottom: spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    borderBottomColor: colors.borderLight,
   },
   modalTitle: {
-    ...typography.h5,
+    fontSize: 20,
+    fontWeight: '700',
     color: colors.textPrimary,
   },
-  modalBody: {
-    padding: spacing.lg,
-  },
   modalCloseButton: {
-    backgroundColor: colors.secondary,
+    backgroundColor: colors.error,
     borderRadius: borderRadius.full,
     width: 32,
     height: 32,
     justifyContent: 'center',
     alignItems: 'center',
+    ...shadows.sm,
   },
-  
-  // Listas
-  listItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.lg,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  listItemText: {
-    ...typography.body,
-    color: colors.textPrimary,
+  modalBody: {
     flex: 1,
   },
-  
-  // Estados
-  disabled: {
-    opacity: 0.5,
-  },
-  loading: {
-    opacity: 0.7,
-  },
-});
+};
 
-// Estilos específicos para componentes
-export const componentStyles = StyleSheet.create({
-  // Badges
-  badge: {
+// Estilos de componentes específicos
+export const componentStyles = {
+  // Cards modernas
+  card: {
+    backgroundColor: colors.surface,
+    borderRadius: borderRadius.lg,
+    padding: spacing.lg,
+    marginBottom: spacing.md,
+    ...shadows.md,
+    borderWidth: 1,
+    borderColor: colors.borderLight,
+  },
+  
+  // Botones de acción
+  actionButton: {
+    backgroundColor: colors.surface,
+    borderRadius: borderRadius.lg,
+    padding: spacing.md,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    ...shadows.sm,
+    borderWidth: 1,
+    borderColor: colors.borderLight,
+  },
+  
+  // Badges de estado
+  statusBadge: {
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.xs,
     borderRadius: borderRadius.full,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  badgePrimary: {
-    backgroundColor: colors.primary,
-  },
-  badgeSuccess: {
-    backgroundColor: colors.success,
-  },
-  badgeWarning: {
-    backgroundColor: colors.warning,
-  },
-  badgeError: {
-    backgroundColor: colors.error,
-  },
-  badgeText: {
-    ...typography.labelSmall,
-    color: colors.textInverse,
-  },
   
-  // Iconos
-  iconContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: 48,
-    height: 48,
-    borderRadius: borderRadius.lg,
-    backgroundColor: colors.gray100,
-  },
-  iconLarge: {
-    width: 64,
-    height: 64,
-  },
-  
-  // Estadísticas
-  statCard: {
+  // Inputs de formulario
+  formInput: {
     backgroundColor: colors.surface,
+    borderWidth: 2,
+    borderColor: colors.border,
     borderRadius: borderRadius.lg,
-    padding: spacing.lg,
-    alignItems: 'center',
-    ...shadows.md,
-  },
-  statValue: {
-    ...typography.h3,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.md,
+    fontSize: 16,
     color: colors.textPrimary,
-    marginBottom: spacing.xs,
+    marginBottom: spacing.md,
+    ...shadows.xs,
   },
-  statLabel: {
-    ...typography.bodySmall,
-    color: colors.textSecondary,
-    textAlign: 'center',
-  },
-  
-  // Navegación
-  tabBar: {
-    backgroundColor: colors.surface,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-    paddingBottom: spacing.sm,
-    paddingTop: spacing.sm,
-    ...shadows.lg,
-  },
-  tabItem: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    flex: 1,
-  },
-  tabIcon: {
-    marginBottom: spacing.xs,
-  },
-  tabLabel: {
-    ...typography.labelSmall,
-    color: colors.textSecondary,
-  },
-  tabLabelActive: {
-    color: colors.primary,
-  },
-});
+};
 
 // Función helper para crear estilos dinámicos
 export const createDynamicStyles = (isDark: boolean = false) => {
   const themeColors = isDark ? {
     ...colors,
-    background: colors.gray900,
-    surface: colors.gray800,
-    textPrimary: colors.gray100,
-    textSecondary: colors.gray300,
-    textTertiary: colors.gray400,
-    border: colors.gray700,
+    background: colors.backgroundSecondary,
+    surface: colors.surfaceSecondary,
+    textPrimary: colors.textPrimary,
+    textSecondary: colors.textSecondary,
+    textTertiary: colors.textTertiary,
+    border: colors.borderDark,
   } : colors;
   
   return {

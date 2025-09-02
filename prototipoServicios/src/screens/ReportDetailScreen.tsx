@@ -82,7 +82,7 @@ export const ReportDetailScreen: React.FC<Props> = ({ reportId, onBack, showStat
       case 'in_review': return colors.primary;
       case 'approved': return colors.success;
       case 'rejected': return colors.error;
-      default: return colors.gray500;
+      default: return colors.textTertiary;
     }
   };
 
@@ -243,7 +243,7 @@ export const ReportDetailScreen: React.FC<Props> = ({ reportId, onBack, showStat
         animationType="fade"
         onRequestClose={() => setShowImagePreview(false)}
       >
-        <View style={baseStyles.modalOverlay}>
+        <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Vista previa</Text>
@@ -280,18 +280,21 @@ const styles = StyleSheet.create({
     ...shadows.sm,
   },
   headerTitle: {
-    ...typography.h5,
+    fontSize: 18,
+    fontWeight: '600',
+    lineHeight: 24,
     color: colors.textPrimary,
   },
   statusBadge: {
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     borderRadius: borderRadius.lg,
-    backgroundColor: colors.gray50,
+    backgroundColor: colors.surfaceSecondary,
   },
   statusText: {
-    ...typography.labelSmall,
+    fontSize: 12,
     fontWeight: '600',
+    lineHeight: 16,
   },
   section: {
     backgroundColor: colors.surface,
@@ -301,7 +304,9 @@ const styles = StyleSheet.create({
     ...shadows.sm,
   },
   sectionTitle: {
-    ...typography.h5,
+    fontSize: 18,
+    fontWeight: '600',
+    lineHeight: 24,
     color: colors.textPrimary,
     marginBottom: spacing.md,
   },
@@ -311,7 +316,9 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   infoText: {
-    ...typography.bodySmall,
+    fontSize: 14,
+    fontWeight: '400',
+    lineHeight: 20,
     color: colors.textSecondary,
     marginLeft: spacing.sm,
   },
@@ -325,21 +332,26 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   timeLabel: {
-    ...typography.labelSmall,
+    fontSize: 12,
+    fontWeight: '500',
+    lineHeight: 16,
     color: colors.textSecondary,
     marginBottom: spacing.xs,
   },
   timeValue: {
-    ...typography.h6,
+    fontSize: 16,
+    fontWeight: '600',
+    lineHeight: 22,
     color: colors.textPrimary,
   },
   timeSeparator: {
     paddingHorizontal: spacing.lg,
   },
   descriptionText: {
-    ...typography.body,
-    color: colors.textPrimary,
+    fontSize: 16,
+    fontWeight: '400',
     lineHeight: 20,
+    color: colors.textPrimary,
   },
   photoSection: {
     backgroundColor: colors.surface,
@@ -349,12 +361,16 @@ const styles = StyleSheet.create({
     ...shadows.sm,
   },
   photoSectionTitle: {
-    ...typography.h6,
+    fontSize: 16,
+    fontWeight: '600',
+    lineHeight: 22,
     color: colors.textPrimary,
     marginBottom: spacing.md,
   },
   noPhotosText: {
-    ...typography.bodySmall,
+    fontSize: 14,
+    fontWeight: '400',
+    lineHeight: 20,
     color: colors.textSecondary,
     fontStyle: 'italic',
   },
@@ -367,7 +383,6 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: borderRadius.md,
-    overflow: 'hidden',
   },
   photoThumbnail: {
     width: '100%',
@@ -387,23 +402,24 @@ const styles = StyleSheet.create({
   },
   statusButtonText: {
     color: colors.textInverse,
-    ...typography.labelSmall,
+    fontSize: 12,
     fontWeight: '600',
+    lineHeight: 16,
   },
   backButton: {
     padding: spacing.sm,
   },
   backButtonText: {
     color: colors.primary,
-    ...typography.body,
+    fontSize: 16,
     fontWeight: '600',
+    lineHeight: 24,
   },
   modalContent: {
     backgroundColor: colors.surface,
     borderRadius: borderRadius.lg,
     width: '90%',
     height: '80%',
-    overflow: 'hidden',
   },
   modalHeader: {
     flexDirection: 'row',
@@ -414,7 +430,9 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.border,
   },
   modalTitle: {
-    ...typography.h5,
+    fontSize: 18,
+    fontWeight: '600',
+    lineHeight: 24,
     color: colors.textPrimary,
   },
   modalCloseButton: {
@@ -436,7 +454,9 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   loadingText: {
-    ...typography.body,
+    fontSize: 16,
+    fontWeight: '400',
+    lineHeight: 24,
     color: colors.textSecondary,
     marginTop: spacing.md,
   },
@@ -448,9 +468,17 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
   },
   errorText: {
-    ...typography.body,
+    fontSize: 16,
+    fontWeight: '400',
+    lineHeight: 24,
     color: colors.error,
     marginBottom: spacing.lg,
     textAlign: 'center',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
