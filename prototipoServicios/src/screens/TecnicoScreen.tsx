@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Animated, ScrollView, Modal, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import ReportService, { Report } from '../services/ReportService';
+import ScheduleService, { ScheduleItem } from '../services/ScheduleService';
+import Calendar from '../components/Calendar';
+import Checklist from '../components/Checklist';
 import { InformeForm } from './InformeForm';
 import { ReportDetailScreen } from './ReportDetailScreen';
 import { MyReportsScreen } from './MyReportsScreen';
@@ -19,11 +22,14 @@ export const TecnicoScreen: React.FC<Props> = ({
   technicianName = 'Técnico' 
 }) => {
   const [fadeAnim] = useState(new Animated.Value(0));
-  const [showMenu, setShowMenu] = useState(false);
+
   const [showMyReports, setShowMyReports] = useState(false);
   const [showNewReport, setShowNewReport] = useState(false);
   const [showReportDetail, setShowReportDetail] = useState(false);
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
+  const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().slice(0,10));
+  const [daySchedules, setDaySchedules] = useState<ScheduleItem[]>([]);
+  const [selectedSchedule, setSelectedSchedule] = useState<ScheduleItem | null>(null);
   
   // Estados para gestión de informes
   const [reports, setReports] = useState<Report[]>([]);
@@ -57,27 +63,22 @@ export const TecnicoScreen: React.FC<Props> = ({
     return unsubscribe;
   }, [technicianId]);
 
+  // Suscripción a cronogramas para el técnico y fecha
+  useEffect(() => {
+    const svc = ScheduleService.getInstance();
+    const load = () => setDaySchedules(svc.getSchedulesByTechnicianAndDate(technicianId, selectedDate));
+    load();
+    const unsub = svc.subscribe(() => load());
+    return unsub;
+  }, [technicianId, selectedDate]);
+
   // Filtrar informes según el filtro seleccionado
   const filteredReports = reports.filter(report => {
     if (reportsFilter === 'all') return true;
     return report.status === reportsFilter;
   });
 
-  const handleMenuAction = (action: string) => {
-    setShowMenu(false);
-    
-    switch (action) {
-      case 'dashboard':
-        // Ya estamos en el dashboard
-        break;
-      case 'reports':
-        setShowMyReports(true);
-        break;
-      case 'new_report':
-        setShowNewReport(true);
-        break;
-    }
-  };
+
 
   const handleQuickAction = (action: string) => {
     switch (action) {
@@ -138,15 +139,8 @@ export const TecnicoScreen: React.FC<Props> = ({
           { opacity: fadeAnim }
         ]}
       >
-        {/* Header con botón hamburguesa */}
+        {/* Header simplificado */}
         <View style={styles.topHeader}>
-          <TouchableOpacity 
-            style={styles.hamburgerButton}
-            onPress={() => setShowMenu(true)}
-            activeOpacity={0.8}
-          >
-            <Ionicons name="menu-outline" size={28} color={colors.textPrimary} />
-          </TouchableOpacity>
           <View style={styles.headerTitle}>
             <Text style={styles.headerTitleText}>Panel de Técnico</Text>
           </View>
@@ -169,44 +163,73 @@ export const TecnicoScreen: React.FC<Props> = ({
             <Text style={styles.welcomeSubtitle}>Gestiona tus informes de mantenimiento de forma eficiente</Text>
           </View>
 
-          <View style={styles.statsContainer}>
-            <Text style={styles.sectionTitle}>Mis Estadísticas</Text>
-            <View style={styles.statsGrid}>
-              <View style={styles.statCard}>
-                <Ionicons name="document-text-outline" size={20} color={colors.primary} style={{ marginBottom: spacing.xs }} />
-                <Text style={styles.statValue}>{reports.length}</Text>
-                <Text style={styles.statLabel}>Total Informes</Text>
+          {/* Estadísticas movidas al menú hamburguesa */}
+
+          {/* Calendario del técnico */}
+          <View style={styles.actionsContainer}>
+            <Text style={styles.sectionTitle}>Calendario</Text>
+            <Calendar selectedDate={selectedDate} onSelectDate={setSelectedDate} />
+          </View>
+
+          {/* Cronograma del día */}
+          <View style={styles.actionsContainer}>
+            <Text style={styles.sectionTitle}>Cronograma de {selectedDate}</Text>
+            {daySchedules.length === 0 ? (
+              <View style={styles.emptyState}>
+                <Ionicons name="calendar-outline" size={48} color={colors.gray400} />
+                <Text style={styles.emptyStateText}>Sin asignaciones para este día</Text>
               </View>
-              <View style={styles.statCard}>
-                <Ionicons name="time-outline" size={20} color={colors.warning} style={{ marginBottom: spacing.xs }} />
-                <Text style={styles.statValue}>{getReportsCountByStatus('pending')}</Text>
-                <Text style={styles.statLabel}>Pendientes</Text>
+            ) : (
+              <View style={styles.activityList}>
+                {daySchedules.map((s) => (
+                  <View key={s.id} style={styles.activityItem}>
+                    <Ionicons name="business-outline" size={20} color={colors.primary} style={{ marginRight: spacing.md }} />
+                    <View style={styles.activityContent}>
+                      <Text style={styles.activityText}>{s.location.name}</Text>
+                      <Text style={styles.activityTime}>{s.location.address} · Cliente: {s.location.clientName}</Text>
+                      <View style={{ marginTop: spacing.xs }}>
+                        <Text style={styles.activityTime}>Tareas:</Text>
+                        {s.tasks.map(t => (
+                          <Text key={t.id} style={styles.activityTime}>• {t.description}</Text>
+                        ))}
+                      </View>
+                      <View style={{ marginTop: spacing.sm }}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                          <Checklist
+                            checked={ScheduleService.getInstance().getChecklistStatus(s.id, technicianId) === 'done'}
+                            onChange={async (checked) => {
+                              await ScheduleService.getInstance().setChecklistStatus(s.id, technicianId, checked ? 'done' : 'pending');
+                              if (checked) {
+                                setSelectedSchedule(s);
+                              } else {
+                                if (selectedSchedule?.id === s.id) setSelectedSchedule(null);
+                              }
+                            }}
+                          />
+                        </View>
+                        {selectedSchedule?.id === s.id && (
+                          <View style={{ marginTop: spacing.xs, alignItems: 'center' }}>
+                            <TouchableOpacity 
+                              style={styles.smallPrimaryButton}
+                              onPress={() => setShowNewReport(true)}
+                              activeOpacity={0.8}
+                            >
+                              <Ionicons name="add-circle-outline" size={16} color={colors.textInverse} style={{ marginRight: spacing.xs }} />
+                              <Text style={styles.smallButtonText}>Crear informe</Text>
+                            </TouchableOpacity>
+                          </View>
+                        )}
+                      </View>
               </View>
-              <View style={styles.statCard}>
-                <Ionicons name="checkmark-circle-outline" size={20} color={colors.success} style={{ marginBottom: spacing.xs }} />
-                <Text style={styles.statValue}>{getReportsCountByStatus('approved')}</Text>
-                <Text style={styles.statLabel}>Aprobados</Text>
               </View>
-              <View style={styles.statCard}>
-                <Ionicons name="close-circle-outline" size={20} color={colors.error} style={{ marginBottom: spacing.xs }} />
-                <Text style={styles.statValue}>{getReportsCountByStatus('rejected')}</Text>
-                <Text style={styles.statLabel}>Rechazados</Text>
+                ))}
               </View>
-            </View>
+            )}
           </View>
 
           <View style={styles.actionsContainer}>
             <Text style={styles.sectionTitle}>Acciones Rápidas</Text>
             <View style={styles.actionButtons}>
-              <TouchableOpacity 
-                style={styles.actionButton} 
-                onPress={() => handleQuickAction('new_report')}
-                activeOpacity={0.8}
-              >
-                <Ionicons name="add-circle-outline" size={24} color={colors.primary} style={{ marginRight: spacing.md }} />
-                <Text style={styles.actionText}>Nuevo Informe</Text>
-              </TouchableOpacity>
-              
               <TouchableOpacity 
                 style={styles.actionButton} 
                 onPress={() => handleQuickAction('reports')}
@@ -252,61 +275,7 @@ export const TecnicoScreen: React.FC<Props> = ({
         </ScrollView>
       </Animated.View>
 
-      {/* Modal del menú hamburguesa */}
-      <Modal
-        visible={showMenu}
-        transparent={true}
-        animationType="slide"
-        onRequestClose={() => setShowMenu(false)}
-      >
-        <View style={baseStyles.modalOverlay}>
-          <View style={styles.menuContainer}>
-            <View style={styles.menuHeader}>
-              <Text style={styles.menuTitle}>Menú Técnico</Text>
-              <TouchableOpacity 
-                style={styles.closeButton}
-                onPress={() => setShowMenu(false)}
-                activeOpacity={0.8}
-              >
-                <Ionicons name="close" size={16} color={colors.textInverse} />
-              </TouchableOpacity>
-            </View>
-            
-            <View style={styles.menuItems}>
-              <TouchableOpacity 
-                style={styles.menuItem} 
-                onPress={() => handleMenuAction('dashboard')}
-                activeOpacity={0.7}
-              >
-                <Ionicons name="grid-outline" size={20} color={colors.textSecondary} style={{ marginRight: spacing.md }} />
-                <Text style={styles.menuItemText}>Dashboard</Text>
-              </TouchableOpacity>
-              
-              <TouchableOpacity 
-                style={styles.menuItem} 
-                onPress={() => handleMenuAction('new_report')}
-                activeOpacity={0.7}
-              >
-                <Ionicons name="add-circle-outline" size={20} color={colors.textSecondary} style={{ marginRight: spacing.md }} />
-                <Text style={styles.menuItemText}>Nuevo Informe</Text>
-              </TouchableOpacity>
-              
-              <TouchableOpacity 
-                style={styles.menuItem} 
-                onPress={() => handleMenuAction('reports')}
-                activeOpacity={0.7}
-              >
-                <Ionicons name="document-text-outline" size={20} color={colors.textSecondary} style={{ marginRight: spacing.md }} />
-                <Text style={styles.menuItemText}>Mis Informes</Text>
-              </TouchableOpacity>
-            </View>
-            
-            <View style={styles.menuFooter}>
-              <Text style={styles.menuFooterText}>Técnico Panel v1.0.0</Text>
-            </View>
-          </View>
-        </View>
-      </Modal>
+
 
       {/* Modal de Mis Informes */}
       <Modal
@@ -336,6 +305,8 @@ export const TecnicoScreen: React.FC<Props> = ({
             onBack={() => setShowNewReport(false)}
             technicianId={technicianId}
             technicianName={technicianName}
+            localId={selectedSchedule?.location.id}
+            localName={selectedSchedule?.location.name}
           />
         </View>
       </Modal>
@@ -352,7 +323,7 @@ export const TecnicoScreen: React.FC<Props> = ({
           <ReportDetailScreen
             reportId={selectedReport.id}
             onBack={() => setShowReportDetail(false)}
-            canEdit={selectedReport.status === 'pending'}
+            showStatusActions={false}
           />
         </View>
       </Modal>
@@ -373,11 +344,7 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.border,
     ...shadows.sm,
   },
-  hamburgerButton: {
-    padding: spacing.sm,
-    borderRadius: borderRadius.md,
-    backgroundColor: colors.gray100,
-  },
+
   headerTitle: {
     flex: 1,
     alignItems: 'center',
@@ -452,6 +419,18 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '500',
   },
+  smallPrimaryButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.primary,
+    paddingVertical: spacing.xs,
+    paddingHorizontal: spacing.md,
+    borderRadius: borderRadius.full,
+  },
+  smallButtonText: {
+    color: colors.textInverse,
+    ...typography.buttonSmall,
+  },
   recentActivity: {
     marginBottom: spacing.lg,
     paddingHorizontal: spacing.md,
@@ -517,63 +496,7 @@ const styles = StyleSheet.create({
     color: colors.textInverse,
     fontSize: 10,
   },
-  menuContainer: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    width: '80%',
-    height: '100%',
-    backgroundColor: colors.surface,
-    ...shadows.lg,
-  },
-  menuHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: spacing.lg,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-    backgroundColor: colors.gray50,
-  },
-  menuTitle: {
-    ...typography.h5,
-    color: colors.textPrimary,
-  },
-  closeButton: {
-    backgroundColor: colors.secondary,
-    borderRadius: borderRadius.full,
-    width: 32,
-    height: 32,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  menuItems: {
-    flex: 1,
-    paddingTop: spacing.lg,
-  },
-  menuItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.lg,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  menuItemText: {
-    ...typography.body,
-    color: colors.textPrimary,
-  },
-  menuFooter: {
-    padding: spacing.lg,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-    backgroundColor: colors.gray50,
-  },
-  menuFooterText: {
-    ...typography.bodySmall,
-    color: colors.textSecondary,
-    textAlign: 'center',
-  },
+
   modalOverlayFull: {
     flex: 1,
     backgroundColor: colors.background,

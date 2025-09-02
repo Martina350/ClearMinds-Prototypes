@@ -7,11 +7,11 @@ import { colors, typography, spacing, borderRadius, shadows, baseStyles } from '
 interface Props {
   reportId: string;
   onBack: () => void;
-  canEdit?: boolean;
+  showStatusActions?: boolean;
   onEdit?: () => void;
 }
 
-export const ReportDetailScreen: React.FC<Props> = ({ reportId, onBack, canEdit = false, onEdit }) => {
+export const ReportDetailScreen: React.FC<Props> = ({ reportId, onBack, showStatusActions = false, onEdit }) => {
   const [report, setReport] = useState<Report | null>(null);
   const [loading, setLoading] = useState(true);
   const [showImagePreview, setShowImagePreview] = useState(false);
@@ -199,7 +199,7 @@ export const ReportDetailScreen: React.FC<Props> = ({ reportId, onBack, canEdit 
         {renderPhotoSection('Fotos Después', report.photoAfterUris)}
 
         {/* Acciones del administrador */}
-        {!canEdit && (
+        {showStatusActions && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Gestionar Estado</Text>
             <View style={styles.statusActions}>

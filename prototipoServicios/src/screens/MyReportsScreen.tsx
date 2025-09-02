@@ -120,28 +120,6 @@ export const MyReportsScreen: React.FC<Props> = ({
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        <View style={styles.statsSection}>
-          <View style={componentStyles.statCard}>
-            <Ionicons name="document-text-outline" size={24} color={colors.primary} style={{ marginBottom: spacing.sm }} />
-            <Text style={componentStyles.statValue}>{reports.length}</Text>
-            <Text style={componentStyles.statLabel}>Total</Text>
-          </View>
-          <View style={componentStyles.statCard}>
-            <Ionicons name="time-outline" size={24} color={colors.warning} style={{ marginBottom: spacing.sm }} />
-            <Text style={componentStyles.statValue}>
-              {reports.filter(r => r.status === 'pending').length}
-            </Text>
-            <Text style={componentStyles.statLabel}>Pendientes</Text>
-          </View>
-          <View style={componentStyles.statCard}>
-            <Ionicons name="checkmark-circle-outline" size={24} color={colors.success} style={{ marginBottom: spacing.sm }} />
-            <Text style={componentStyles.statValue}>
-              {reports.filter(r => r.status === 'approved').length}
-            </Text>
-            <Text style={componentStyles.statLabel}>Aprobados</Text>
-          </View>
-        </View>
-
         <View style={styles.reportsSection}>
           <Text style={baseStyles.sectionTitle}>Informes Recientes</Text>
           
@@ -212,7 +190,6 @@ export const MyReportsScreen: React.FC<Props> = ({
               <ReportDetailScreen
                 reportId={selectedReport.id}
                 onBack={() => setShowReportDetail(false)}
-                canEdit={canEditReport(selectedReport)}
                 onEdit={() => {
                   setShowReportDetail(false);
                   handleEditReport(selectedReport);

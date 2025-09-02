@@ -12,15 +12,17 @@ type Props = {
   onBack: () => void;
   technicianId?: string;
   technicianName?: string;
+  localId?: string;
+  localName?: string;
 };
 
-export const InformeForm: React.FC<Props> = ({ onBack, technicianId = '1', technicianName = 'Técnico' }) => {
+export const InformeForm: React.FC<Props> = ({ onBack, technicianId = '1', technicianName = 'Técnico', localId, localName }) => {
   const [checkInTime, setCheckInTime] = useState('08:00');
   const [checkOutTime, setCheckOutTime] = useState('10:00');
   const [description, setDescription] = useState('');
   const [photoBeforeUris, setPhotoBeforeUris] = useState<string[]>([]);
   const [photoAfterUris, setPhotoAfterUris] = useState<string[]>([]);
-  const [title, setTitle] = useState('');
+  const [title, setTitle] = useState(localName ? `Informe - ${localName}` : '');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [imageLoading, setImageLoading] = useState(false);
@@ -190,6 +192,8 @@ export const InformeForm: React.FC<Props> = ({ onBack, technicianId = '1', techn
       const reportData = {
         technicianId,
         technicianName,
+        localId,
+        localName,
         title: title.trim(),
         checkInTime,
         checkOutTime,

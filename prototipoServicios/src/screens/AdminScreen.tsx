@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Animated, ScrollView, Modal, Alert, TextInput, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import ReportService, { Report } from '../services/ReportService';
+import ScheduleService, { ScheduleItem, LocalSite } from '../services/ScheduleService';
+import AuthService, { User as AuthUser } from '../services/AuthService';
+import Calendar from '../components/Calendar';
 import { ReportDetailScreen } from './ReportDetailScreen';
 import { colors, typography, spacing, borderRadius, shadows, baseStyles, componentStyles } from '../styles/theme';
 
@@ -9,21 +12,31 @@ type Props = {
   onBack: () => void;
 };
 
-interface User {
-  id: number;
-  name: string;
-  email: string;
-  role: string;
-}
+// Usar la interfaz de AuthService
+type User = AuthUser;
 
 export const AdminScreen: React.FC<Props> = ({ onBack }) => {
   const [fadeAnim] = useState(new Animated.Value(0));
-  const [showMenu, setShowMenu] = useState(false);
+
   const [showUserManagement, setShowUserManagement] = useState(false);
   const [showReports, setShowReports] = useState(false);
   const [showAnalytics, setShowAnalytics] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [showSupport, setShowSupport] = useState(false);
+  // Estado calendario/cronograma
+  const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().slice(0,10));
+  const [schedules, setSchedules] = useState<ScheduleItem[]>([]);
+  const [showScheduleForm, setShowScheduleForm] = useState(false);
+  const [editingSchedule, setEditingSchedule] = useState<ScheduleItem | null>(null);
+  const [formSchedule, setFormSchedule] = useState({
+    teamName: '',
+    localName: '',
+    address: '',
+    clientName: '',
+    technicianIds: '' as string,
+    tasks: '' as string,
+  });
+  const [showLocalReports, setShowLocalReports] = useState<null | { localId: string; localName: string }>(null);
   
   // Estados para gestión de informes
   const [reports, setReports] = useState<Report[]>([]);
@@ -32,11 +45,7 @@ export const AdminScreen: React.FC<Props> = ({ onBack }) => {
   const [reportsFilter, setReportsFilter] = useState<'all' | 'pending' | 'in_review' | 'approved' | 'rejected'>('all');
   
   // Estados para gestión de usuarios
-  const [users, setUsers] = useState<User[]>([
-    { id: 1, name: 'Juan Pérez', email: 'juan.perez@empresa.com', role: 'Técnico' },
-    { id: 2, name: 'María García', email: 'maria.garcia@empresa.com', role: 'Administrador' },
-    { id: 3, name: 'Carlos López', email: 'carlos.lopez@empresa.com', role: 'Técnico' },
-  ]);
+  const [users, setUsers] = useState<AuthUser[]>([]);
   const [showAddUser, setShowAddUser] = useState(false);
   const [showUserList, setShowUserList] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
@@ -75,36 +84,31 @@ export const AdminScreen: React.FC<Props> = ({ onBack }) => {
     return unsubscribe;
   }, []);
 
+  // Cargar cronogramas por fecha
+  useEffect(() => {
+    const svc = ScheduleService.getInstance();
+    const load = () => {
+      setSchedules(svc.getSchedulesByDate(selectedDate));
+    };
+    load();
+    const unsub = svc.subscribe(() => load());
+    return unsub;
+  }, [selectedDate]);
+
+  // Cargar usuarios del AuthService
+  useEffect(() => {
+    const authService = AuthService.getInstance();
+    const allUsers = authService.getAllUsers();
+    setUsers(allUsers);
+  }, []);
+
   // Filtrar informes según el filtro seleccionado
   const filteredReports = reports.filter(report => {
     if (reportsFilter === 'all') return true;
     return report.status === reportsFilter;
   });
 
-  const handleMenuAction = (action: string) => {
-    setShowMenu(false);
-    
-    switch (action) {
-      case 'dashboard':
-        // Ya estamos en el dashboard
-        break;
-      case 'users':
-        setShowUserManagement(true);
-        break;
-      case 'reports':
-        setShowReports(true);
-        break;
-      case 'analytics':
-        setShowAnalytics(true);
-        break;
-      case 'settings':
-        setShowSettings(true);
-        break;
-      case 'support':
-        setShowSupport(true);
-        break;
-    }
-  };
+
 
   const handleQuickAction = (action: string) => {
     switch (action) {
@@ -121,6 +125,68 @@ export const AdminScreen: React.FC<Props> = ({ onBack }) => {
         setShowSettings(true);
         break;
     }
+  };
+
+  // CRUD Cronograma
+  const openNewSchedule = () => {
+    setEditingSchedule(null);
+    setFormSchedule({ teamName: '', localName: '', address: '', clientName: '', technicianIds: '', tasks: '' });
+    setShowScheduleForm(true);
+  };
+
+  const openEditSchedule = (item: ScheduleItem) => {
+    setEditingSchedule(item);
+    setFormSchedule({
+      teamName: item.teamName,
+      localName: item.location.name,
+      address: item.location.address,
+      clientName: item.location.clientName,
+      technicianIds: item.technicianIds.join(','),
+      tasks: item.tasks.map(t => t.description).join(','),
+    });
+    setShowScheduleForm(true);
+  };
+
+  const saveSchedule = async () => {
+    try {
+      const svc = ScheduleService.getInstance();
+      const local: LocalSite = {
+        id: `${formSchedule.localName}-${formSchedule.address}`,
+        name: formSchedule.localName.trim(),
+        address: formSchedule.address.trim(),
+        clientName: formSchedule.clientName.trim(),
+      };
+      const technicianIds = formSchedule.technicianIds.split(',').map(s => s.trim()).filter(Boolean);
+      const tasks = formSchedule.tasks.split(',').map(s => s.trim()).filter(Boolean).map((d, i) => ({ id: `${Date.now()}-${i}` , description: d }));
+      if (!local.name || !local.address || !local.clientName || technicianIds.length === 0 || tasks.length === 0) {
+        Alert.alert('Error', 'Completa todos los campos y al menos 1 técnico y 1 tarea');
+        return;
+      }
+      if (editingSchedule) {
+        await svc.updateSchedule(editingSchedule.id, { teamName: formSchedule.teamName, location: local, technicianIds, tasks });
+      } else {
+        await svc.addSchedule({ date: selectedDate, teamName: formSchedule.teamName, location: local, technicianIds, tasks });
+      }
+      setShowScheduleForm(false);
+      setEditingSchedule(null);
+    } catch (e: any) {
+      Alert.alert('Error', e?.message || 'No se pudo guardar el cronograma');
+    }
+  };
+
+  const deleteSchedule = async (id: string) => {
+    Alert.alert('Eliminar', '¿Deseas eliminar este cronograma?', [
+      { text: 'Cancelar', style: 'cancel' },
+      { text: 'Eliminar', style: 'destructive', onPress: async () => { await ScheduleService.getInstance().deleteSchedule(id); } },
+    ]);
+  };
+
+  const sendSchedulesToTechnicians = () => {
+    Alert.alert('Enviado', 'Cronograma enviado a los técnicos para la fecha seleccionada.');
+  };
+
+  const openLocalReports = (localId: string, localName: string) => {
+    setShowLocalReports({ localId, localName });
   };
 
   // Funciones para gestión de usuarios
@@ -142,26 +208,60 @@ export const AdminScreen: React.FC<Props> = ({ onBack }) => {
       return;
     }
 
-    if (editingUser) {
-      // Editar usuario existente
-      setUsers(users.map(user => 
-        user.id === editingUser.id 
-          ? { ...user, ...formData }
-          : user
-      ));
-    } else {
-      // Agregar nuevo usuario
-      const newUser = {
-        id: Date.now(),
-        ...formData
-      };
-      setUsers([...users, newUser]);
+    try {
+      const authService = AuthService.getInstance();
+      
+      if (editingUser) {
+        // Editar usuario existente
+        const updatedUser = authService.updateUser(editingUser.id, {
+          name: formData.name.trim(),
+          email: formData.email.trim()
+        });
+        
+        if (updatedUser) {
+          setUsers(authService.getAllUsers());
+          Alert.alert('Éxito', 'Usuario actualizado correctamente');
+        }
+      } else {
+        // Solo permitir crear técnicos
+        if (formData.role !== 'Técnico') {
+          Alert.alert('Error', 'Solo puedes crear usuarios técnicos');
+          return;
+        }
+        
+        // Generar username y password únicos
+        const baseUsername = formData.name.toLowerCase().replace(/\s+/g, '');
+        let username = baseUsername;
+        let counter = 1;
+        
+        while (authService.isUsernameTaken(username)) {
+          username = `${baseUsername}${counter}`;
+          counter++;
+        }
+        
+        const password = 'tecnico123'; // Contraseña por defecto
+        
+        const newUser = authService.createTechnician(
+          username,
+          password,
+          formData.name.trim(),
+          formData.email.trim()
+        );
+        
+        setUsers(authService.getAllUsers());
+        Alert.alert(
+          'Usuario creado exitosamente', 
+          `Usuario: ${username}\nContraseña: ${password}\n\nGuarda estas credenciales.`
+        );
+      }
+      
+      setShowAddUser(false);
+      setShowUserManagement(true);
+      setEditingUser(null);
+      setFormData({ name: '', email: '', role: 'Técnico' });
+    } catch (error) {
+      Alert.alert('Error', 'No se pudo guardar el usuario');
     }
-
-    setShowAddUser(false);
-    setShowUserManagement(true); // Volver al modal de gestión
-    setEditingUser(null);
-    setFormData({ name: '', email: '', role: 'Técnico' });
   };
 
   const handleEditUser = (user: User) => {
@@ -174,7 +274,7 @@ export const AdminScreen: React.FC<Props> = ({ onBack }) => {
     setShowAddUser(true);
   };
 
-  const handleDeleteUser = (userId: number) => {
+  const handleDeleteUser = (userId: string) => {
     Alert.alert(
       'Confirmar eliminación',
       '¿Estás seguro de que quieres eliminar este usuario?',
@@ -184,15 +284,28 @@ export const AdminScreen: React.FC<Props> = ({ onBack }) => {
           text: 'Eliminar', 
           style: 'destructive',
           onPress: () => {
-            setUsers(users.filter(user => user.id !== userId));
+            try {
+              const authService = AuthService.getInstance();
+              const success = authService.deleteUser(userId);
+              
+              if (success) {
+                setUsers(authService.getAllUsers());
+                Alert.alert('Éxito', 'Usuario eliminado correctamente');
+              } else {
+                Alert.alert('Error', 'No se pudo eliminar el usuario');
+              }
+            } catch (error) {
+              Alert.alert('Error', 'No se pudo eliminar el usuario');
+            }
           }
         }
       ]
     );
   };
 
-  const getUsersByRole = (role: string) => {
-    return users.filter(user => user.role === role).length;
+  const getUsersByRole = (role: 'admin' | 'tecnico') => {
+    const authService = AuthService.getInstance();
+    return authService.getUsersByRole(role).length;
   };
 
   // Funciones para gestión de informes
@@ -210,6 +323,38 @@ export const AdminScreen: React.FC<Props> = ({ onBack }) => {
       console.error('Error al actualizar estado:', error);
       Alert.alert('Error', 'No se pudo actualizar el estado del informe');
     }
+  };
+
+  const handleDeleteReport = async (reportId: string) => {
+    Alert.alert(
+      'Confirmar eliminación',
+      '¿Estás seguro de que quieres eliminar este informe? Esta acción no se puede deshacer.',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        { 
+          text: 'Eliminar', 
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              const reportService = ReportService.getInstance();
+              const success = await reportService.deleteReport(reportId);
+              
+              if (success) {
+                Alert.alert('Éxito', 'Informe eliminado correctamente');
+                // Recargar informes
+                const allReports = await reportService.getAllReports();
+                setReports(allReports);
+              } else {
+                Alert.alert('Error', 'No se pudo eliminar el informe');
+              }
+            } catch (error) {
+              console.error('Error al eliminar informe:', error);
+              Alert.alert('Error', 'No se pudo eliminar el informe');
+            }
+          }
+        }
+      ]
+    );
   };
 
   const formatDate = (dateString: string) => {
@@ -251,15 +396,8 @@ export const AdminScreen: React.FC<Props> = ({ onBack }) => {
           { opacity: fadeAnim }
         ]}
       >
-        {/* Header con botón hamburguesa */}
+        {/* Header simplificado */}
         <View style={styles.topHeader}>
-          <TouchableOpacity 
-            style={styles.hamburgerButton}
-            onPress={() => setShowMenu(true)}
-            activeOpacity={0.8}
-          >
-            <Ionicons name="menu-outline" size={28} color={colors.textPrimary} />
-          </TouchableOpacity>
           <View style={styles.headerTitle}>
             <Text style={styles.headerTitleText}>Panel de Administración</Text>
           </View>
@@ -283,21 +421,7 @@ export const AdminScreen: React.FC<Props> = ({ onBack }) => {
             <Text style={styles.welcomeSubtitle}>Gestiona tu sistema de informes de forma eficiente</Text>
           </View>
 
-          <View style={styles.statsContainer}>
-            <Text style={styles.sectionTitle}>Estadísticas Generales</Text>
-            <View style={styles.statsGrid}>
-              <View style={styles.statCard}>
-                <Ionicons name="people-outline" size={20} color={colors.primary} style={{ marginBottom: spacing.xs }} />
-                <Text style={styles.statValue}>24</Text>
-                <Text style={styles.statLabel}>Técnicos Activos</Text>
-              </View>
-              <View style={styles.statCard}>
-                <Ionicons name="document-text-outline" size={20} color={colors.success} style={{ marginBottom: spacing.xs }} />
-                <Text style={styles.statValue}>156</Text>
-                <Text style={styles.statLabel}>Informes Este Mes</Text>
-              </View>
-            </View>
-          </View>
+          {/* Estadísticas movidas al menú hamburguesa */}
 
           <View style={styles.actionsContainer}>
             <Text style={styles.sectionTitle}>Acciones Rápidas</Text>
@@ -322,93 +446,216 @@ export const AdminScreen: React.FC<Props> = ({ onBack }) => {
             </View>
           </View>
 
+          {/* Calendario */}
+          <View style={styles.actionsContainer}>
+            <Text style={styles.sectionTitle}>Calendario</Text>
+            <Calendar selectedDate={selectedDate} onSelectDate={setSelectedDate} />
+          </View>
+
+          {/* Cronograma del día */}
+          <View style={styles.actionsContainer}>
+            <Text style={styles.sectionTitle}>Cronograma de {selectedDate}</Text>
+            <View style={{ gap: spacing.sm }}>
+              <TouchableOpacity style={styles.actionButton} onPress={() => openNewSchedule()} activeOpacity={0.8}>
+                <Ionicons name="add-circle-outline" size={20} color={colors.primary} style={{ marginRight: spacing.sm }} />
+                <Text style={styles.actionText}>Agregar cronograma</Text>
+              </TouchableOpacity>
+              {schedules.length === 0 ? (
+                <View style={styles.emptyReportsState}>
+                  <Ionicons name="calendar-outline" size={48} color={colors.gray400} />
+                  <Text style={styles.emptyReportsText}>No hay locales programados</Text>
+                </View>
+              ) : (
+                schedules.map((s) => (
+                  <View key={s.id} style={styles.reportItem}>
+                    <Ionicons name="business-outline" size={20} color={colors.primary} style={{ marginRight: spacing.md }} />
+                    <View style={styles.reportContent}>
+                      <Text style={styles.reportTitle}>{s.location.name} · {s.teamName}</Text>
+                      <Text style={styles.reportAuthor}>{s.location.address} · Cliente: {s.location.clientName}</Text>
+                      <Text style={styles.reportDate}>Técnicos: {s.technicianIds.join(', ')}</Text>
+                    </View>
+                    <View style={styles.reportActions}>
+                      <TouchableOpacity style={styles.viewReportButton} onPress={() => openLocalReports(s.location.id, s.location.name)} activeOpacity={0.8}>
+                        <Ionicons name="folder-open-outline" size={16} color={colors.primary} />
+                      </TouchableOpacity>
+                      <TouchableOpacity style={styles.viewReportButton} onPress={() => openEditSchedule(s)} activeOpacity={0.8}>
+                        <Ionicons name="create-outline" size={16} color={colors.warning} />
+                      </TouchableOpacity>
+                      <TouchableOpacity style={styles.viewReportButton} onPress={() => deleteSchedule(s.id)} activeOpacity={0.8}>
+                        <Ionicons name="trash-outline" size={16} color={colors.error} />
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                ))
+              )}
+              <TouchableOpacity style={[styles.actionButton, { backgroundColor: colors.success }]} onPress={sendSchedulesToTechnicians} activeOpacity={0.8}>
+                <Ionicons name="send-outline" size={20} color={colors.textInverse} style={{ marginRight: spacing.sm }} />
+                <Text style={[styles.actionText, { color: colors.textInverse }]}>Enviar cronograma a técnicos</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
           
         </ScrollView>
       </Animated.View>
 
-      {/* Modal del menú hamburguesa */}
+      {/* Modal para agregar/editar cronograma */}
       <Modal
-        visible={showMenu}
+        visible={showScheduleForm}
         transparent={true}
         animationType="slide"
-        onRequestClose={() => setShowMenu(false)}
+        onRequestClose={() => setShowScheduleForm(false)}
       >
-        <View style={styles.modalOverlaySidebar}>
-          <View style={styles.menuContainer}>
-            <View style={styles.menuHeader}>
-              <Text style={styles.menuTitle}>Menú Admin</Text>
+        <View style={styles.modalOverlayCentered}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>{editingSchedule ? 'Editar Cronograma' : 'Agregar Cronograma'}</Text>
               <TouchableOpacity 
-                style={styles.closeButton}
-                onPress={() => setShowMenu(false)}
+                style={styles.modalCloseButton}
+                onPress={() => setShowScheduleForm(false)}
                 activeOpacity={0.8}
               >
-                <Ionicons name="close" size={16} color={colors.textInverse} />
+                <Ionicons name="close" size={16} color="#fff" />
               </TouchableOpacity>
             </View>
-            
-            <View style={styles.menuItems}>
+            <ScrollView style={styles.modalBody}>
+              <View style={styles.formInputGroup}>
+                <Text style={styles.inputLabel}>Nombre del Local</Text>
+                <TextInput
+                  style={styles.textInput}
+                  placeholder="Local ABC"
+                  placeholderTextColor="#ADB5BD"
+                  value={formSchedule.localName}
+                  onChangeText={(t) => setFormSchedule({ ...formSchedule, localName: t })}
+                />
+              </View>
+              <View style={styles.formInputGroup}>
+                <Text style={styles.inputLabel}>Dirección</Text>
+                <TextInput
+                  style={styles.textInput}
+                  placeholder="Calle 123, Ciudad"
+                  placeholderTextColor="#ADB5BD"
+                  value={formSchedule.address}
+                  onChangeText={(t) => setFormSchedule({ ...formSchedule, address: t })}
+                />
+              </View>
+              <View style={styles.formInputGroup}>
+                <Text style={styles.inputLabel}>Cliente</Text>
+                <TextInput
+                  style={styles.textInput}
+                  placeholder="Empresa XYZ"
+                  placeholderTextColor="#ADB5BD"
+                  value={formSchedule.clientName}
+                  onChangeText={(t) => setFormSchedule({ ...formSchedule, clientName: t })}
+                />
+              </View>
+              <View style={styles.formInputGroup}>
+                <Text style={styles.inputLabel}>Equipo</Text>
+                <TextInput
+                  style={styles.textInput}
+                  placeholder="Equipo Norte"
+                  placeholderTextColor="#ADB5BD"
+                  value={formSchedule.teamName}
+                  onChangeText={(t) => setFormSchedule({ ...formSchedule, teamName: t })}
+                />
+              </View>
+              <View style={styles.formInputGroup}>
+                <Text style={styles.inputLabel}>IDs Técnicos (coma-separado)</Text>
+                <TextInput
+                  style={styles.textInput}
+                  placeholder="1,2,3"
+                  placeholderTextColor="#ADB5BD"
+                  value={formSchedule.technicianIds}
+                  onChangeText={(t) => setFormSchedule({ ...formSchedule, technicianIds: t })}
+                />
+              </View>
+              <View style={styles.formInputGroup}>
+                <Text style={styles.inputLabel}>Tareas (coma-separado)</Text>
+                <TextInput
+                  style={styles.textInput}
+                  placeholder="Revisión A/C, Cambio filtros, Limpieza"
+                  placeholderTextColor="#ADB5BD"
+                  value={formSchedule.tasks}
+                  onChangeText={(t) => setFormSchedule({ ...formSchedule, tasks: t })}
+                />
+              </View>
               <TouchableOpacity 
-                style={styles.menuItem} 
-                onPress={() => handleMenuAction('dashboard')}
-                activeOpacity={0.7}
+                style={styles.saveButton}
+                onPress={saveSchedule}
+                activeOpacity={0.8}
               >
-                <Ionicons name="grid-outline" size={20} color={colors.textSecondary} style={{ marginRight: spacing.md }} />
-                <Text style={styles.menuItemText}>Dashboard</Text>
+                <Text style={styles.saveButtonText}>{editingSchedule ? 'Actualizar' : 'Guardar'}</Text>
               </TouchableOpacity>
-              
-              <TouchableOpacity 
-                style={styles.menuItem} 
-                onPress={() => handleMenuAction('users')}
-                activeOpacity={0.7}
-              >
-                <Ionicons name="people-outline" size={20} color={colors.textSecondary} style={{ marginRight: spacing.md }} />
-                <Text style={styles.menuItemText}>Usuarios</Text>
-              </TouchableOpacity>
-              
-              <TouchableOpacity 
-                style={styles.menuItem} 
-                onPress={() => handleMenuAction('reports')}
-                activeOpacity={0.7}
-              >
-                <Ionicons name="document-text-outline" size={20} color={colors.textSecondary} style={{ marginRight: spacing.md }} />
-                <Text style={styles.menuItemText}>Informes</Text>
-              </TouchableOpacity>
-              
-              <TouchableOpacity 
-                style={styles.menuItem} 
-                onPress={() => handleMenuAction('analytics')}
-                activeOpacity={0.7}
-              >
-                <Ionicons name="stats-chart-outline" size={20} color={colors.textSecondary} style={{ marginRight: spacing.md }} />
-                <Text style={styles.menuItemText}>Reportes</Text>
-              </TouchableOpacity>
-              
-              <TouchableOpacity 
-                style={styles.menuItem} 
-                onPress={() => handleMenuAction('settings')}
-                activeOpacity={0.7}
-              >
-                <Ionicons name="settings-outline" size={20} color={colors.textSecondary} style={{ marginRight: 16 }} />
-                <Text style={styles.menuItemText}>Configuración</Text>
-              </TouchableOpacity>
-              
-              <TouchableOpacity 
-                style={styles.menuItem} 
-                onPress={() => handleMenuAction('support')}
-                activeOpacity={0.7}
-              >
-                <Ionicons name="call-outline" size={20} color="#495057" style={{ marginRight: 16 }} />
-                <Text style={styles.menuItemText}>Soporte</Text>
-              </TouchableOpacity>
-            </View>
-            
-            <View style={styles.menuFooter}>
-              <Text style={styles.menuFooterText}>Admin Panel v1.0.0</Text>
-            </View>
+            </ScrollView>
           </View>
         </View>
       </Modal>
 
+      {/* Modal de informes por local */}
+      {showLocalReports && (
+        <Modal
+          visible={!!showLocalReports}
+          transparent={true}
+          animationType="slide"
+          onRequestClose={() => setShowLocalReports(null)}
+        >
+          <View style={styles.modalOverlayCentered}>
+            <View style={styles.modalContent}>
+              <View style={styles.modalHeader}>
+                <Text style={styles.modalTitle}>Informes de {showLocalReports.localName}</Text>
+                <TouchableOpacity 
+                  style={styles.modalCloseButton}
+                  onPress={() => setShowLocalReports(null)}
+                  activeOpacity={0.8}
+                >
+                  <Ionicons name="close" size={16} color="#fff" />
+                </TouchableOpacity>
+              </View>
+              <ScrollView style={styles.modalBody}>
+                <View style={styles.reportList}>
+                  {reports.filter(r => r.localId === showLocalReports.localId).length === 0 ? (
+                    <View style={styles.emptyReportsState}>
+                      <Ionicons name="document-text-outline" size={48} color="#ADB5BD" />
+                      <Text style={styles.emptyReportsText}>No hay informes para este local</Text>
+                    </View>
+                  ) : (
+                    reports.filter(r => r.localId === showLocalReports.localId).map((report) => (
+                      <View key={report.id} style={styles.reportItem}>
+                        <Ionicons name="document-text-outline" size={20} color="#007BFF" style={{ marginRight: 12 }} />
+                        <View style={styles.reportContent}>
+                          <Text style={styles.reportTitle}>{report.title}</Text>
+                          <Text style={styles.reportAuthor}>Por: {report.technicianName}</Text>
+                          <Text style={styles.reportDate}>{formatDate(report.createdAt)}</Text>
+                        </View>
+                        <View style={styles.reportActions}>
+                          <View style={styles.reportActionButtons}>
+                            <TouchableOpacity 
+                              style={styles.viewReportButton}
+                              onPress={() => { setShowLocalReports(null); handleViewReport(report); }}
+                              activeOpacity={0.8}
+                              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+                            >
+                              <Ionicons name="eye-outline" size={16} color="#007BFF" />
+                            </TouchableOpacity>
+                            <TouchableOpacity 
+                              style={styles.deleteReportButton}
+                              onPress={() => handleDeleteReport(report.id)}
+                              activeOpacity={0.8}
+                              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+                            >
+                              <Ionicons name="trash-outline" size={16} color="#DC3545" />
+                            </TouchableOpacity>
+                          </View>
+                        </View>
+                      </View>
+                    ))
+                  )}
+                </View>
+              </ScrollView>
+            </View>
+          </View>
+        </Modal>
+      )}
       {/* Modal de Gestión de Usuarios */}
       <Modal
         visible={showUserManagement}
@@ -440,11 +687,11 @@ export const AdminScreen: React.FC<Props> = ({ onBack }) => {
                 
                 <View style={styles.userStats}>
                   <View style={styles.userStat}>
-                    <Text style={styles.userStatNumber}>{getUsersByRole('Técnico')}</Text>
+                    <Text style={styles.userStatNumber}>{getUsersByRole('tecnico')}</Text>
                     <Text style={styles.userStatLabel}>Técnicos</Text>
                   </View>
                   <View style={styles.userStat}>
-                    <Text style={styles.userStatNumber}>{getUsersByRole('Administrador')}</Text>
+                    <Text style={styles.userStatNumber}>{getUsersByRole('admin')}</Text>
                     <Text style={styles.userStatLabel}>Administradores</Text>
                   </View>
                   <View style={styles.userStat}>
@@ -535,25 +782,22 @@ export const AdminScreen: React.FC<Props> = ({ onBack }) => {
                 <View style={styles.formInputGroup}>
                   <Text style={styles.inputLabel}>Rol</Text>
                   <View style={styles.roleSelector}>
-                    {['Técnico', 'Administrador'].map((role) => (
-                      <TouchableOpacity
-                        key={role}
-                        style={[
-                          styles.roleOption,
-                          formData.role === role && styles.roleOptionSelected
-                        ]}
-                        onPress={() => setFormData({...formData, role})}
-                        activeOpacity={0.8}
-                      >
-                        <Text style={[
-                          styles.roleOptionText,
-                          formData.role === role && styles.roleOptionTextSelected
-                        ]}>
-                          {role}
-                        </Text>
-                      </TouchableOpacity>
-                    ))}
-                    </View>
+                    <TouchableOpacity
+                      style={[
+                        styles.roleOption,
+                        styles.roleOptionSelected
+                      ]}
+                      activeOpacity={0.8}
+                    >
+                      <Text style={[
+                        styles.roleOptionText,
+                        styles.roleOptionTextSelected
+                      ]}>
+                        Técnico
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                  <Text style={styles.roleNote}>Solo puedes crear usuarios técnicos</Text>
                 </View>
                 
                 <TouchableOpacity 
@@ -611,8 +855,11 @@ export const AdminScreen: React.FC<Props> = ({ onBack }) => {
                         <View style={styles.userInfo}>
                           <Text style={styles.userName}>{user.name}</Text>
                           <Text style={styles.userEmail}>{user.email}</Text>
+                          <Text style={styles.userUsername}>Usuario: {user.username}</Text>
                           <View style={styles.userRoleBadge}>
-                            <Text style={styles.userRoleText}>{user.role}</Text>
+                            <Text style={styles.userRoleText}>
+                              {user.role === 'admin' ? 'Administrador' : 'Técnico'}
+                            </Text>
                           </View>
                         </View>
                                                  <View style={styles.userItemActions}>
@@ -721,14 +968,23 @@ export const AdminScreen: React.FC<Props> = ({ onBack }) => {
                         <View style={styles.reportActions}>
                           <View style={[styles.reportStatusBadge, { backgroundColor: getStatusColor(report.status) }]}>
                             <Text style={styles.reportStatusText}>{getStatusText(report.status)}</Text>
-                  </View>
-                  <TouchableOpacity 
-                            style={styles.viewReportButton}
-                            onPress={() => handleViewReport(report)}
-                    activeOpacity={0.8}
-                  >
-                            <Ionicons name="eye-outline" size={16} color="#007BFF" />
-                  </TouchableOpacity>
+                          </View>
+                          <View style={styles.reportActionButtons}>
+                            <TouchableOpacity 
+                              style={styles.viewReportButton}
+                              onPress={() => handleViewReport(report)}
+                              activeOpacity={0.8}
+                            >
+                              <Ionicons name="eye-outline" size={16} color="#007BFF" />
+                            </TouchableOpacity>
+                            <TouchableOpacity 
+                              style={styles.deleteReportButton}
+                              onPress={() => handleDeleteReport(report.id)}
+                              activeOpacity={0.8}
+                            >
+                              <Ionicons name="trash-outline" size={16} color="#DC3545" />
+                            </TouchableOpacity>
+                          </View>
                         </View>
                       </View>
                     ))
@@ -857,6 +1113,21 @@ export const AdminScreen: React.FC<Props> = ({ onBack }) => {
                       <Text style={styles.reportDetailStatusButtonText}>Rechazar</Text>
                   </TouchableOpacity>
                 </View>
+                
+                {/* Botón de Eliminar */}
+                <View style={styles.reportDetailSection}>
+                  <TouchableOpacity 
+                    style={[styles.reportDetailDeleteButton]}
+                    onPress={() => {
+                      setShowReportDetail(false);
+                      handleDeleteReport(selectedReport.id);
+                    }}
+                    activeOpacity={0.8}
+                  >
+                    <Ionicons name="trash-outline" size={20} color="#FFFFFF" style={{ marginRight: 8 }} />
+                    <Text style={styles.reportDetailDeleteButtonText}>Eliminar Informe</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             </ScrollView>
           </View>
@@ -881,11 +1152,7 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.border,
     ...shadows.sm,
   },
-  hamburgerButton: {
-    padding: spacing.sm,
-    borderRadius: borderRadius.md,
-    backgroundColor: colors.gray100,
-  },
+
   hamburgerLine: {
     width: 24,
     height: 3,
@@ -1031,70 +1298,7 @@ const styles = StyleSheet.create({
     ...typography.bodyXSmall,
     color: colors.textSecondary,
   },
-  // Estilos del modal del menú
-  modalOverlaySidebar: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-  },
-  menuContainer: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    width: '80%',
-    height: '100%',
-    backgroundColor: colors.surface,
-    ...shadows.lg,
-  },
-  menuHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: spacing.lg,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-    backgroundColor: colors.gray50,
-  },
-  menuTitle: {
-    ...typography.h5,
-    color: colors.textPrimary,
-  },
-  closeButton: {
-    backgroundColor: colors.secondary,
-    borderRadius: borderRadius.full,
-    width: 32,
-    height: 32,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  menuItems: {
-    flex: 1,
-    paddingTop: spacing.lg,
-  },
-  menuItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.lg,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  menuItemText: {
-    ...typography.body,
-    color: colors.textPrimary,
-    fontWeight: '600',
-  },
-  menuFooter: {
-    padding: spacing.lg,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-    backgroundColor: colors.gray50,
-  },
-  menuFooterText: {
-    ...typography.bodySmall,
-    color: colors.textSecondary,
-    textAlign: 'center',
-    fontWeight: '500',
-  },
+
   // Estilos para los modales adicionales
   modalOverlay: {
     flex: 1,
@@ -1297,6 +1501,15 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: '#E3F2FD',
   },
+  reportActionButtons: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  deleteReportButton: {
+    padding: 8,
+    borderRadius: 8,
+    backgroundColor: '#FFEBEE',
+  },
   // Estilos para Analytics
   analyticsSection: {
     gap: 20,
@@ -1481,6 +1694,13 @@ const styles = StyleSheet.create({
   roleOptionTextSelected: {
     color: '#007BFF',
   },
+  roleNote: {
+    fontSize: 12,
+    color: '#6C757D',
+    fontStyle: 'italic',
+    marginTop: spacing.xs,
+    textAlign: 'center',
+  },
   saveButton: {
     backgroundColor: '#007BFF',
     paddingVertical: 16,
@@ -1537,6 +1757,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#6C757D',
     marginBottom: 8,
+  },
+  userUsername: {
+    fontSize: 12,
+    color: '#007BFF',
+    marginBottom: 8,
+    fontFamily: 'monospace',
   },
   userRoleBadge: {
     backgroundColor: '#E3F2FD',
@@ -1638,6 +1864,21 @@ const styles = StyleSheet.create({
   reportDetailStatusButtonText: {
     color: 'white',
     fontSize: 12,
+    fontWeight: '600',
+  },
+  reportDetailDeleteButton: {
+    backgroundColor: '#DC3545',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 8,
+  },
+  reportDetailDeleteButtonText: {
+    color: 'white',
+    fontSize: 16,
     fontWeight: '600',
   },
 

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Animated, Alert, Modal } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, typography, spacing, borderRadius, shadows, baseStyles } from '../styles/theme';
+import AuthService, { User } from '../services/AuthService';
 
 type Props = {
   onLoginSuccess: (role: 'admin' | 'tecnico') => void;
@@ -9,7 +10,7 @@ type Props = {
 
 export const UnifiedLoginScreen: React.FC<Props> = ({ onLoginSuccess }) => {
   const [selectedRole, setSelectedRole] = useState<'admin' | 'tecnico' | undefined>(undefined);
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [fadeAnim] = useState(new Animated.Value(0));
@@ -34,6 +35,9 @@ export const UnifiedLoginScreen: React.FC<Props> = ({ onLoginSuccess }) => {
 
   const handleRoleSelect = (role: 'admin' | 'tecnico') => {
     setSelectedRole(role);
+    // Limpiar campos al cambiar rol
+    setUsername('');
+    setPassword('');
   };
 
   const handleLogin = async () => {
@@ -42,18 +46,35 @@ export const UnifiedLoginScreen: React.FC<Props> = ({ onLoginSuccess }) => {
       return;
     }
 
-    if (!email.trim() || !password.trim()) {
+    if (!username.trim() || !password.trim()) {
       Alert.alert('Campos requeridos', 'Por favor completa todos los campos');
       return;
     }
 
     setIsLoading(true);
     
-    // Simular proceso de login
-    setTimeout(() => {
+    try {
+      const authService = AuthService.getInstance();
+      const user = authService.authenticate(username.trim(), password.trim());
+      
+      if (user && user.role === selectedRole) {
+        // Login exitoso
+        setTimeout(() => {
+          setIsLoading(false);
+          onLoginSuccess(user.role);
+        }, 1000);
+      } else {
+        // Credenciales incorrectas o rol no coincide
+        setIsLoading(false);
+        Alert.alert(
+          'Error de autenticación', 
+          'Usuario, contraseña o rol incorrecto. Por favor verifica tus credenciales.'
+        );
+      }
+    } catch (error) {
       setIsLoading(false);
-      onLoginSuccess(selectedRole);
-    }, 1500);
+      Alert.alert('Error', 'Ocurrió un error durante el inicio de sesión');
+    }
   };
 
   const handleForgotPassword = () => {
@@ -82,7 +103,24 @@ export const UnifiedLoginScreen: React.FC<Props> = ({ onLoginSuccess }) => {
     );
   };
 
-  const isFormValid = selectedRole && email.trim() && password.trim();
+  const isFormValid = selectedRole && username.trim() && password.trim();
+
+  // Mostrar credenciales de ejemplo
+  const showCredentials = () => {
+    if (selectedRole === 'admin') {
+      Alert.alert(
+        'Credenciales de Administrador',
+        'Usuario: admin\nContraseña: admin123',
+        [{ text: 'OK' }]
+      );
+    } else if (selectedRole === 'tecnico') {
+      Alert.alert(
+        'Credenciales de Técnico',
+        'Usuario: tecnico1\nContraseña: tecnico123\n\nOtras opciones:\nUsuario: tecnico2\nUsuario: tecnico3',
+        [{ text: 'OK' }]
+      );
+    }
+  };
 
   return (
     <View style={baseStyles.container}>
@@ -150,14 +188,13 @@ export const UnifiedLoginScreen: React.FC<Props> = ({ onLoginSuccess }) => {
         {/* Login Form */}
         <View style={styles.formSection}>
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Email</Text>
+            <Text style={styles.label}>Usuario</Text>
             <TextInput
-              placeholder="Your email"
+              placeholder="Tu nombre de usuario"
               style={styles.input}
-              value={email}
-              onChangeText={setEmail}
+              value={username}
+              onChangeText={setUsername}
               autoCapitalize="none"
-              keyboardType="email-address"
               placeholderTextColor={colors.textTertiary}
             />
           </View>
@@ -165,7 +202,7 @@ export const UnifiedLoginScreen: React.FC<Props> = ({ onLoginSuccess }) => {
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Contraseña</Text>
             <TextInput
-              placeholder="Your password"
+              placeholder="Tu contraseña"
               style={styles.input}
               value={password}
               onChangeText={setPassword}
@@ -173,6 +210,17 @@ export const UnifiedLoginScreen: React.FC<Props> = ({ onLoginSuccess }) => {
               placeholderTextColor={colors.textTertiary}
             />
           </View>
+
+          {/* Botón para mostrar credenciales */}
+          {selectedRole && (
+            <TouchableOpacity 
+              style={styles.credentialsButton} 
+              onPress={showCredentials}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.credentialsText}>Ver credenciales de ejemplo</Text>
+            </TouchableOpacity>
+          )}
 
           <TouchableOpacity 
             style={[
@@ -184,7 +232,7 @@ export const UnifiedLoginScreen: React.FC<Props> = ({ onLoginSuccess }) => {
             activeOpacity={0.8}
           >
             <Text style={styles.loginButtonText}>
-              {isLoading ? 'Logging in...' : 'Login'}
+              {isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
             </Text>
           </TouchableOpacity>
 
@@ -371,6 +419,17 @@ const styles = StyleSheet.create({
     color: colors.primary,
     ...typography.bodySmall,
     fontWeight: '600',
+  },
+  credentialsButton: {
+    alignItems: 'center',
+    marginTop: spacing.sm,
+    paddingVertical: spacing.sm,
+  },
+  credentialsText: {
+    color: colors.warning,
+    ...typography.bodySmall,
+    fontWeight: '600',
+    textDecorationLine: 'underline',
   },
   footer: {
     alignItems: 'center',

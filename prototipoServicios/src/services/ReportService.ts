@@ -4,6 +4,9 @@ export interface Report {
   id: string;
   technicianId: string;
   technicianName: string;
+  // Asociación con Local (opcional para compatibilidad retro)
+  localId?: string;
+  localName?: string;
   title: string;
   checkInTime: string;
   checkOutTime: string;
