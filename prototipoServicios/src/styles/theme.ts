@@ -179,6 +179,7 @@ export const baseStyles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
+    paddingTop: spacing.xxl,
   },
   safeArea: {
     flex: 1,

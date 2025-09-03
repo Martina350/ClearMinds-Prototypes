@@ -49,15 +49,6 @@ export const UnifiedLoginScreen: React.FC<Props> = ({ onLoginSuccess }) => {
 
   return (
     <View style={baseStyles.container}>
-      {/* Header con gradiente */}
-      <View style={styles.header}>
-        <View style={styles.logoContainer}>
-          <Ionicons name="shield-checkmark" size={64} color={colors.textInverse} />
-        </View>
-        <Text style={styles.appTitle}>ClearMinds</Text>
-        <Text style={styles.appSubtitle}>Sistema de Gestión de Servicios</Text>
-      </View>
-
       {/* Formulario de login */}
       <View style={styles.formContainer}>
         <View style={styles.formCard}>
@@ -85,7 +76,7 @@ export const UnifiedLoginScreen: React.FC<Props> = ({ onLoginSuccess }) => {
                   styles.roleButtonText,
                   selectedRole === 'admin' && styles.roleButtonTextActive
                 ]}>
-                  Administrador
+                  Admin
                 </Text>
               </TouchableOpacity>
 
@@ -194,7 +185,7 @@ export const UnifiedLoginScreen: React.FC<Props> = ({ onLoginSuccess }) => {
 
       {/* Footer */}
       <View style={styles.footer}>
-        <Text style={styles.footerText}>© 2024 ClearMinds. Todos los derechos reservados.</Text>
+        <Text style={styles.footerText}>© 2025 Todos los derechos reservados.</Text>
       </View>
     </View>
   );

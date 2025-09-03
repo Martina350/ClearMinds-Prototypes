@@ -159,11 +159,10 @@ export const TecnicoScreen: React.FC<Props> = ({
           bounces={true}
         >
           <View style={styles.welcomeSection}>
+            <View style={styles.welcomeSpacer} />
             <Text style={styles.welcomeTitle}>Bienvenido, {technicianName}</Text>
             <Text style={styles.welcomeSubtitle}>Gestiona tus informes de mantenimiento de forma eficiente</Text>
           </View>
-
-          {/* Estadísticas movidas al menú hamburguesa */}
 
           {/* Calendario del técnico */}
           <View style={styles.actionsContainer}>
@@ -343,6 +342,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
     ...shadows.sm,
+
   },
 
   headerTitle: {
@@ -369,32 +369,78 @@ const styles = StyleSheet.create({
   },
   welcomeSection: {
     alignItems: 'center',
-    marginBottom: spacing.lg,
-    paddingHorizontal: spacing.md,
+    marginBottom: spacing.xl,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.lg,
+    backgroundColor: colors.surface,
+    borderRadius: borderRadius.xl,
+    marginHorizontal: spacing.md,
+    ...shadows.md,
+    borderWidth: 1,
+    borderColor: colors.borderLight,
+  },
+  welcomeSpacer: {
+    height: spacing.md,
   },
   welcomeTitle: {
-    ...typography.h4,
-    color: colors.textPrimary,
-    marginBottom: spacing.xs,
-    fontSize: 20,
-    fontWeight: '600',
+    fontSize: 28,
+    fontWeight: '700',
+    color: colors.primary,
+    marginBottom: spacing.sm,
+    textAlign: 'center',
+    letterSpacing: -0.5,
+    lineHeight: 34,
   },
   welcomeSubtitle: {
-    fontSize: 14,
+    fontSize: 18,
     fontWeight: '400',
-    lineHeight: 18,
     color: colors.textSecondary,
     textAlign: 'center',
+    lineHeight: 24,
+    paddingHorizontal: spacing.md,
   },
+
   statsContainer: {
     marginBottom: spacing.lg,
     paddingHorizontal: spacing.md,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    lineHeight: 26,
+    color: colors.textPrimary,
+    marginBottom: spacing.md,
   },
   statsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
     gap: spacing.sm,
+  },
+  statCard: {
+    backgroundColor: colors.surface,
+    borderRadius: borderRadius.md,
+    padding: spacing.sm,
+    alignItems: 'center',
+    flex: 1,
+    minWidth: '45%',
+    ...shadows.sm,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  statValue: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: colors.textPrimary,
+    marginBottom: spacing.xs,
+    lineHeight: 30,
+  },
+  statLabel: {
+    fontSize: 13,
+    color: colors.textSecondary,
+    fontWeight: '500',
+    textAlign: 'center',
+    lineHeight: 16,
   },
   actionsContainer: {
     marginBottom: spacing.lg,

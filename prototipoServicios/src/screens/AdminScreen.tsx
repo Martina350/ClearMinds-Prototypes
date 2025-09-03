@@ -421,31 +421,6 @@ export const AdminScreen: React.FC<Props> = ({ onBack }) => {
             <Text style={styles.welcomeSubtitle}>Gestiona tu sistema de informes de forma eficiente</Text>
           </View>
 
-          {/* Estadísticas movidas al menú hamburguesa */}
-
-          <View style={styles.actionsContainer}>
-            <Text style={styles.sectionTitle}>Acciones Rápidas</Text>
-            <View style={styles.actionButtons}>
-              <TouchableOpacity 
-                style={styles.actionButton} 
-                onPress={() => handleQuickAction('users')}
-                activeOpacity={0.8}
-              >
-                <Ionicons name="people-outline" size={20} color={colors.primary} style={{ marginRight: spacing.sm }} />
-                <Text style={styles.actionText}>Gestionar Usuarios</Text>
-              </TouchableOpacity>
-              
-              <TouchableOpacity 
-                style={styles.actionButton} 
-                onPress={() => handleQuickAction('reports')}
-                activeOpacity={0.8}
-              >
-                <Ionicons name="document-text-outline" size={20} color={colors.success} style={{ marginRight: spacing.sm }} />
-                <Text style={styles.actionText}>Revisar Informes</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-
           {/* Calendario */}
           <View style={styles.actionsContainer}>
             <Text style={styles.sectionTitle}>Calendario</Text>

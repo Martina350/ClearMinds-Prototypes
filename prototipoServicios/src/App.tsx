@@ -23,9 +23,9 @@ export default function App() {
   const renderScreen = () => {
     switch (currentScreen) {
       case 'admin':
-        return <AdminScreen onLogout={handleLogout} />;
+        return <AdminScreen onBack={handleLogout} />;
       case 'tecnico':
-        return <TecnicoScreen onLogout={handleLogout} />;
+        return <TecnicoScreen onBack={handleLogout} />;
       default:
         return <UnifiedLoginScreen onLoginSuccess={handleLoginSuccess} />;
     }
