@@ -199,20 +199,6 @@ export const ReportDetailScreen: React.FC<ReportDetailProps> = ({ navigation, ro
             <Text style={styles.sectionTitle}>Gestionar Estado</Text>
             <View style={styles.statusActions}>
               <TouchableOpacity
-                style={[styles.statusButton, { backgroundColor: colors.warning }]}
-                onPress={() => handleUpdateStatus('pending')}
-                activeOpacity={0.8}
-              >
-                <Text style={styles.statusButtonText}>Pendiente</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.statusButton, { backgroundColor: colors.primary }]}
-                onPress={() => handleUpdateStatus('in_review')}
-                activeOpacity={0.8}
-              >
-                <Text style={styles.statusButtonText}>En Revisión</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
                 style={[styles.statusButton, { backgroundColor: colors.success }]}
                 onPress={() => handleUpdateStatus('approved')}
                 activeOpacity={0.8}

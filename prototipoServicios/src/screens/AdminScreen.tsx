@@ -4,6 +4,8 @@ import { Ionicons } from '@expo/vector-icons';
 import ReportService, { Report } from '../services/ReportService';
 import ScheduleService, { ScheduleItem, LocalSite } from '../services/ScheduleService';
 import AuthService, { User as AuthUser } from '../services/AuthService';
+import ClientService, { Client } from '../services/ClientService';
+import TeamService, { Team } from '../services/TeamService';
 import Calendar from '../components/Calendar';
 import { ReportDetailScreen } from './ReportDetailScreen';
 import { colors, typography, spacing, borderRadius, shadows, baseStyles, componentStyles } from '../styles/theme';
@@ -27,10 +29,8 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
   const [editingSchedule, setEditingSchedule] = useState<ScheduleItem | null>(null);
   const [formSchedule, setFormSchedule] = useState({
     teamName: '',
-    localName: '',
+    clientId: '',
     address: '',
-    clientName: '',
-    technicianIds: '' as string,
     tasks: '' as string,
   });
   const [showLocalReports, setShowLocalReports] = useState<null | { localId: string; localName: string }>(null);
@@ -47,12 +47,45 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
   const [showUserList, setShowUserList] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   
-  // Estados para el formulario
+  // Estados para gestión de clientes
+  const [clients, setClients] = useState<Client[]>([]);
+  const [showAddClient, setShowAddClient] = useState(false);
+  const [showClientList, setShowClientList] = useState(false);
+  const [editingClient, setEditingClient] = useState<Client | null>(null);
+  
+  // Estados para gestión de equipos
+  const [teams, setTeams] = useState<Team[]>([]);
+  const [showAddTeam, setShowAddTeam] = useState(false);
+  const [showTeamList, setShowTeamList] = useState(false);
+  const [editingTeam, setEditingTeam] = useState<Team | null>(null);
+  
+  // Estados para el formulario de usuario
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     role: 'Técnico'
   });
+  
+  // Estados para el formulario de cliente
+  const [formClient, setFormClient] = useState({
+    name: '',
+    cedulaRuc: '',
+    address: '',
+    local: '',
+    parroquia: ''
+  });
+  
+  // Estados para el formulario de equipo
+  const [formTeam, setFormTeam] = useState({
+    name: '',
+    description: '',
+    technicianIds: [] as string[]
+  });
+
+  // Estados para los selectores desplegables
+  const [showClientSelector, setShowClientSelector] = useState(false);
+  const [showTeamSelector, setShowTeamSelector] = useState(false);
+  const [showTechnicianSelector, setShowTechnicianSelector] = useState(false);
 
   React.useEffect(() => {
     Animated.timing(fadeAnim, {
@@ -99,6 +132,32 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
     setUsers(allUsers);
   }, []);
 
+  // Cargar clientes del ClientService
+  useEffect(() => {
+    const clientService = ClientService.getInstance();
+    const allClients = clientService.getAllClients();
+    setClients(allClients);
+    
+    const unsubscribe = clientService.subscribe((updatedClients) => {
+      setClients(updatedClients);
+    });
+    
+    return unsubscribe;
+  }, []);
+
+  // Cargar equipos del TeamService
+  useEffect(() => {
+    const teamService = TeamService.getInstance();
+    const allTeams = teamService.getAllTeams();
+    setTeams(allTeams);
+    
+    const unsubscribe = teamService.subscribe((updatedTeams) => {
+      setTeams(updatedTeams);
+    });
+    
+    return unsubscribe;
+  }, []);
+
   // Filtrar informes según el filtro seleccionado
   const filteredReports = reports.filter(report => {
     if (reportsFilter === 'all') return true;
@@ -127,18 +186,18 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
   // CRUD Cronograma
   const openNewSchedule = () => {
     setEditingSchedule(null);
-    setFormSchedule({ teamName: '', localName: '', address: '', clientName: '', technicianIds: '', tasks: '' });
+    setFormSchedule({ teamName: '', clientId: '', address: '', tasks: '' });
     setShowScheduleForm(true);
   };
 
   const openEditSchedule = (item: ScheduleItem) => {
     setEditingSchedule(item);
+    // Buscar el cliente por nombre para obtener el ID
+    const client = clients.find(c => c.name === item.location.clientName);
     setFormSchedule({
       teamName: item.teamName,
-      localName: item.location.name,
+      clientId: client?.id || '',
       address: item.location.address,
-      clientName: item.location.clientName,
-      technicianIds: item.technicianIds.join(','),
       tasks: item.tasks.map(t => t.description).join(','),
     });
     setShowScheduleForm(true);
@@ -147,23 +206,58 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
   const saveSchedule = async () => {
     try {
       const svc = ScheduleService.getInstance();
-      const local: LocalSite = {
-        id: `${formSchedule.localName}-${formSchedule.address}`,
-        name: formSchedule.localName.trim(),
-        address: formSchedule.address.trim(),
-        clientName: formSchedule.clientName.trim(),
-      };
-      const technicianIds = formSchedule.technicianIds.split(',').map(s => s.trim()).filter(Boolean);
-      const tasks = formSchedule.tasks.split(',').map(s => s.trim()).filter(Boolean).map((d, i) => ({ id: `${Date.now()}-${i}` , description: d }));
-      if (!local.name || !local.address || !local.clientName || technicianIds.length === 0 || tasks.length === 0) {
-        Alert.alert('Error', 'Completa todos los campos y al menos 1 técnico y 1 tarea');
+      
+      // Validar campos requeridos
+      if (!formSchedule.teamName.trim() || !formSchedule.clientId || !formSchedule.address.trim() || !formSchedule.tasks.trim()) {
+        Alert.alert('Error', 'Completa todos los campos requeridos');
         return;
       }
-      if (editingSchedule) {
-        await svc.updateSchedule(editingSchedule.id, { teamName: formSchedule.teamName, location: local, technicianIds, tasks });
-      } else {
-        await svc.addSchedule({ date: selectedDate, teamName: formSchedule.teamName, location: local, technicianIds, tasks });
+
+      // Obtener el cliente seleccionado
+      const client = clients.find(c => c.id === formSchedule.clientId);
+      if (!client) {
+        Alert.alert('Error', 'Cliente no encontrado');
+        return;
       }
+
+      // Obtener el equipo seleccionado
+      const team = teams.find(t => t.name === formSchedule.teamName);
+      if (!team) {
+        Alert.alert('Error', 'Equipo no encontrado');
+        return;
+      }
+
+      const local: LocalSite = {
+        id: `${client.local}-${formSchedule.address}`,
+        name: client.local,
+        address: formSchedule.address.trim(),
+        clientName: client.name,
+      };
+
+      const tasks = formSchedule.tasks.split(',').map(s => s.trim()).filter(Boolean).map((d, i) => ({ id: `${Date.now()}-${i}` , description: d }));
+      
+      if (tasks.length === 0) {
+        Alert.alert('Error', 'Debe haber al menos 1 tarea');
+        return;
+      }
+
+      if (editingSchedule) {
+        await svc.updateSchedule(editingSchedule.id, { 
+          teamName: formSchedule.teamName, 
+          location: local, 
+          technicianIds: team.technicianIds, 
+          tasks 
+        });
+      } else {
+        await svc.addSchedule({ 
+          date: selectedDate, 
+          teamName: formSchedule.teamName, 
+          location: local, 
+          technicianIds: team.technicianIds, 
+          tasks 
+        });
+      }
+      
       setShowScheduleForm(false);
       setEditingSchedule(null);
     } catch (e: any) {
@@ -300,6 +394,197 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
     );
   };
 
+  // Funciones para gestión de clientes
+  const handleAddClient = () => {
+    setShowUserManagement(false);
+    setShowAddClient(true);
+    setEditingClient(null);
+    setFormClient({ name: '', cedulaRuc: '', address: '', local: '', parroquia: '' });
+  };
+
+  const handleViewClientList = () => {
+    setShowUserManagement(false);
+    setShowClientList(true);
+  };
+
+  const handleSaveClient = async () => {
+    if (!formClient.name.trim() || !formClient.cedulaRuc.trim() || !formClient.address.trim() || !formClient.local.trim() || !formClient.parroquia.trim()) {
+      Alert.alert('Error', 'Por favor completa todos los campos');
+      return;
+    }
+
+    try {
+      const clientService = ClientService.getInstance();
+
+      if (editingClient) {
+        // Editar cliente existente
+        const updatedClient = await clientService.updateClient(editingClient.id, {
+          name: formClient.name.trim(),
+          cedulaRuc: formClient.cedulaRuc.trim(),
+          address: formClient.address.trim(),
+          local: formClient.local.trim(),
+          parroquia: formClient.parroquia.trim()
+        });
+        
+        if (updatedClient) {
+          Alert.alert('Éxito', 'Cliente actualizado correctamente');
+        }
+      } else {
+        // Crear nuevo cliente
+        const newClient = await clientService.createClient({
+          name: formClient.name.trim(),
+          cedulaRuc: formClient.cedulaRuc.trim(),
+          address: formClient.address.trim(),
+          local: formClient.local.trim(),
+          parroquia: formClient.parroquia.trim()
+        });
+        
+        Alert.alert('Éxito', 'Cliente creado correctamente');
+      }
+
+      setShowAddClient(false);
+      setShowUserManagement(true);
+      setEditingClient(null);
+      setFormClient({ name: '', cedulaRuc: '', address: '', local: '', parroquia: '' });
+    } catch (error: any) {
+      Alert.alert('Error', error.message || 'No se pudo guardar el cliente');
+    }
+  };
+
+  const handleEditClient = (client: Client) => {
+    setEditingClient(client);
+    setFormClient({
+      name: client.name,
+      cedulaRuc: client.cedulaRuc,
+      address: client.address,
+      local: client.local,
+      parroquia: client.parroquia
+    });
+    setShowAddClient(true);
+  };
+
+  const handleDeleteClient = (clientId: string) => {
+    Alert.alert(
+      'Confirmar eliminación',
+      '¿Estás seguro de que quieres eliminar este cliente?',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        { 
+          text: 'Eliminar', 
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              const clientService = ClientService.getInstance();
+              const success = await clientService.deleteClient(clientId);
+              
+              if (success) {
+                Alert.alert('Éxito', 'Cliente eliminado correctamente');
+              } else {
+                Alert.alert('Error', 'No se pudo eliminar el cliente');
+              }
+            } catch (error) {
+              Alert.alert('Error', 'No se pudo eliminar el cliente');
+            }
+          }
+        }
+      ]
+    );
+  };
+
+  // Funciones para gestión de equipos
+  const handleAddTeam = () => {
+    setShowUserManagement(false);
+    setShowAddTeam(true);
+    setEditingTeam(null);
+    setFormTeam({ name: '', description: '', technicianIds: [] });
+  };
+
+  const handleViewTeamList = () => {
+    setShowUserManagement(false);
+    setShowTeamList(true);
+  };
+
+  const handleSaveTeam = async () => {
+    if (!formTeam.name.trim()) {
+      Alert.alert('Error', 'Por favor ingresa el nombre del equipo');
+      return;
+    }
+
+    if (formTeam.technicianIds.length === 0) {
+      Alert.alert('Error', 'Por favor selecciona al menos un técnico para el equipo');
+      return;
+    }
+
+    try {
+      const teamService = TeamService.getInstance();
+
+      if (editingTeam) {
+        // Editar equipo existente
+        const updatedTeam = await teamService.updateTeam(editingTeam.id, {
+          name: formTeam.name.trim(),
+          technicianIds: formTeam.technicianIds
+        });
+        
+        if (updatedTeam) {
+          Alert.alert('Éxito', 'Equipo actualizado correctamente');
+        }
+      } else {
+        // Crear nuevo equipo
+        const newTeam = await teamService.createTeam({
+          name: formTeam.name.trim(),
+          technicianIds: formTeam.technicianIds
+        });
+        
+        Alert.alert('Éxito', 'Equipo creado correctamente');
+      }
+
+      setShowAddTeam(false);
+      setShowUserManagement(true);
+      setEditingTeam(null);
+      setFormTeam({ name: '', description: '', technicianIds: [] });
+    } catch (error: any) {
+      Alert.alert('Error', error.message || 'No se pudo guardar el equipo');
+    }
+  };
+
+  const handleEditTeam = (team: Team) => {
+    setEditingTeam(team);
+    setFormTeam({
+      name: team.name,
+      description: team.description || '',
+      technicianIds: team.technicianIds
+    });
+    setShowAddTeam(true);
+  };
+
+  const handleDeleteTeam = (teamId: string) => {
+    Alert.alert(
+      'Confirmar eliminación',
+      '¿Estás seguro de que quieres eliminar este equipo?',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        { 
+          text: 'Eliminar', 
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              const teamService = TeamService.getInstance();
+              const success = await teamService.deleteTeam(teamId);
+              
+              if (success) {
+                Alert.alert('Éxito', 'Equipo eliminado correctamente');
+              } else {
+                Alert.alert('Error', 'No se pudo eliminar el equipo');
+              }
+            } catch (error) {
+              Alert.alert('Error', 'No se pudo eliminar el equipo');
+            }
+          }
+        }
+      ]
+    );
+  };
+
   const getUsersByRole = (role: 'admin' | 'tecnico') => {
     const authService = AuthService.getInstance();
     return authService.getUsersByRole(role).length;
@@ -402,6 +687,16 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
             <View style={styles.welcomeSpacer} />
             <Text style={styles.welcomeTitle}>Bienvenido, Administrador</Text>
             <Text style={styles.welcomeSubtitle}>Gestiona tu sistema de informes de forma eficiente</Text>
+            
+            {/* Botón de gestión de usuarios */}
+            <TouchableOpacity 
+              style={styles.managementButton}
+              onPress={() => setShowUserManagement(true)}
+              activeOpacity={0.8}
+            >
+              <Ionicons name="people-outline" size={24} color={colors.textInverse} style={{ marginRight: spacing.sm }} />
+              <Text style={styles.managementButtonText}>Gestionar Usuarios, Clientes y Equipos</Text>
+            </TouchableOpacity>
           </View>
 
           {/* Calendario */}
@@ -446,10 +741,7 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
                   </View>
                 ))
               )}
-              <TouchableOpacity style={[styles.actionButton, { backgroundColor: colors.success }]} onPress={sendSchedulesToTechnicians} activeOpacity={0.8}>
-                <Ionicons name="send-outline" size={20} color={colors.textInverse} style={{ marginRight: spacing.sm }} />
-                <Text style={[styles.actionText, { color: colors.textInverse }]}>Enviar cronograma a técnicos</Text>
-              </TouchableOpacity>
+
             </View>
           </View>
 
@@ -478,15 +770,30 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
             </View>
             <ScrollView style={styles.modalBody}>
               <View style={styles.formInputGroup}>
-                <Text style={styles.inputLabel}>Nombre del Local</Text>
-                <TextInput
-                  style={styles.textInput}
-                  placeholder="Local ABC"
-                  placeholderTextColor="#ADB5BD"
-                  value={formSchedule.localName}
-                  onChangeText={(t) => setFormSchedule({ ...formSchedule, localName: t })}
-                />
+                <Text style={styles.inputLabel}>Cliente</Text>
+                <View style={styles.pickerContainer}>
+                  <TouchableOpacity 
+                    style={styles.pickerButton}
+                    onPress={() => {
+                      if (clients.length === 0) {
+                        Alert.alert('Info', 'No hay clientes registrados. Primero debes crear un cliente.');
+                        return;
+                      }
+                      setShowClientSelector(true);
+                    }}
+                    activeOpacity={0.8}
+                  >
+                    <Text style={styles.pickerButtonText}>
+                      {formSchedule.clientId ? 
+                        clients.find(c => c.id === formSchedule.clientId)?.name || 'Seleccionar Cliente' : 
+                        'Seleccionar Cliente'
+                      }
+                    </Text>
+                    <Ionicons name="chevron-down" size={16} color={colors.textSecondary} />
+                  </TouchableOpacity>
+                </View>
               </View>
+              
               <View style={styles.formInputGroup}>
                 <Text style={styles.inputLabel}>Dirección</Text>
                 <TextInput
@@ -497,38 +804,31 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
                   onChangeText={(t) => setFormSchedule({ ...formSchedule, address: t })}
                 />
               </View>
-              <View style={styles.formInputGroup}>
-                <Text style={styles.inputLabel}>Cliente</Text>
-                <TextInput
-                  style={styles.textInput}
-                  placeholder="Empresa XYZ"
-                  placeholderTextColor="#ADB5BD"
-                  value={formSchedule.clientName}
-                  onChangeText={(t) => setFormSchedule({ ...formSchedule, clientName: t })}
-                />
-              </View>
+              
               <View style={styles.formInputGroup}>
                 <Text style={styles.inputLabel}>Equipo</Text>
-                <TextInput
-                  style={styles.textInput}
-                  placeholder="Equipo Norte"
-                  placeholderTextColor="#ADB5BD"
-                  value={formSchedule.teamName}
-                  onChangeText={(t) => setFormSchedule({ ...formSchedule, teamName: t })}
-                />
+                <View style={styles.pickerContainer}>
+                  <TouchableOpacity 
+                    style={styles.pickerButton}
+                    onPress={() => {
+                      if (teams.length === 0) {
+                        Alert.alert('Info', 'No hay equipos registrados. Primero debes crear un equipo.');
+                        return;
+                      }
+                      setShowTeamSelector(true);
+                    }}
+                    activeOpacity={0.8}
+                  >
+                    <Text style={styles.pickerButtonText}>
+                      {formSchedule.teamName || 'Seleccionar Equipo'}
+                    </Text>
+                    <Ionicons name="chevron-down" size={16} color={colors.textSecondary} />
+                  </TouchableOpacity>
+                </View>
               </View>
+              
               <View style={styles.formInputGroup}>
-                <Text style={styles.inputLabel}>IDs Técnicos (coma-separado)</Text>
-                <TextInput
-                  style={styles.textInput}
-                  placeholder="1,2,3"
-                  placeholderTextColor="#ADB5BD"
-                  value={formSchedule.technicianIds}
-                  onChangeText={(t) => setFormSchedule({ ...formSchedule, technicianIds: t })}
-                />
-              </View>
-              <View style={styles.formInputGroup}>
-                <Text style={styles.inputLabel}>Tareas (coma-separado)</Text>
+                <Text style={styles.inputLabel}>Actividades por realizar</Text>
                 <TextInput
                   style={styles.textInput}
                   placeholder="Revisión A/C, Cambio filtros, Limpieza"
@@ -544,6 +844,114 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
               >
                 <Text style={styles.saveButtonText}>{editingSchedule ? 'Actualizar' : 'Guardar'}</Text>
               </TouchableOpacity>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Modal Selector de Clientes */}
+      <Modal
+        visible={showClientSelector}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setShowClientSelector(false)}
+      >
+        <View style={styles.modalOverlayCentered}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Seleccionar Cliente</Text>
+              <TouchableOpacity 
+                style={styles.modalCloseButton}
+                onPress={() => setShowClientSelector(false)}
+                activeOpacity={0.8}
+              >
+                <Ionicons name="close" size={16} color="#fff" />
+              </TouchableOpacity>
+            </View>
+            <ScrollView style={styles.modalBody}>
+              {clients.length === 0 ? (
+                <View style={styles.emptyState}>
+                  <Ionicons name="business-outline" size={48} color="#ADB5BD" />
+                  <Text style={styles.emptyStateText}>No hay clientes registrados</Text>
+                </View>
+              ) : (
+                <View style={styles.selectorList}>
+                  {clients.map((client) => (
+                    <TouchableOpacity
+                      key={client.id}
+                      style={styles.selectorItem}
+                      onPress={() => {
+                        setFormSchedule({ ...formSchedule, clientId: client.id });
+                        setShowClientSelector(false);
+                      }}
+                      activeOpacity={0.8}
+                    >
+                      <View style={styles.selectorItemContent}>
+                        <Text style={styles.selectorItemTitle}>{client.name}</Text>
+                        <Text style={styles.selectorItemSubtitle}>Local: {client.local}</Text>
+                        <Text style={styles.selectorItemDetail}>Cédula/RUC: {client.cedulaRuc}</Text>
+                      </View>
+                      <Ionicons name="chevron-forward" size={16} color={colors.textSecondary} />
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              )}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Modal Selector de Equipos */}
+      <Modal
+        visible={showTeamSelector}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setShowTeamSelector(false)}
+      >
+        <View style={styles.modalOverlayCentered}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Seleccionar Equipo</Text>
+              <TouchableOpacity 
+                style={styles.modalCloseButton}
+                onPress={() => setShowTeamSelector(false)}
+                activeOpacity={0.8}
+              >
+                <Ionicons name="close" size={16} color="#fff" />
+              </TouchableOpacity>
+            </View>
+            <ScrollView style={styles.modalBody}>
+              {teams.length === 0 ? (
+                <View style={styles.emptyState}>
+                  <Ionicons name="people-outline" size={48} color="#ADB5BD" />
+                  <Text style={styles.emptyStateText}>No hay equipos registrados</Text>
+                </View>
+              ) : (
+                <View style={styles.selectorList}>
+                  {teams.map((team) => (
+                    <TouchableOpacity
+                      key={team.id}
+                      style={styles.selectorItem}
+                      onPress={() => {
+                        setFormSchedule({ ...formSchedule, teamName: team.name });
+                        setShowTeamSelector(false);
+                      }}
+                      activeOpacity={0.8}
+                    >
+                      <View style={styles.selectorItemContent}>
+                        <Text style={styles.selectorItemTitle}>{team.name}</Text>
+                        <Text style={styles.selectorItemSubtitle}>
+                          {team.description || 'Sin descripción'}
+                        </Text>
+                        <Text style={styles.selectorItemDetail}>
+                          Técnicos: {team.technicianIds.length}
+                        </Text>
+                      </View>
+                      <Ionicons name="chevron-forward" size={16} color={colors.textSecondary} />
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              )}
             </ScrollView>
           </View>
         </View>
@@ -675,6 +1083,46 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
                   >
                     <Ionicons name="list-outline" size={20} color="#495057" style={{ marginRight: 12 }} />
                     <Text style={styles.userActionText}>Ver Lista</Text>
+                  </TouchableOpacity>
+                </View>
+                
+                <View style={styles.userActions}>
+                  <TouchableOpacity 
+                    style={styles.userAction}
+                    onPress={handleAddClient}
+                    activeOpacity={0.8}
+                  >
+                    <Ionicons name="business-outline" size={20} color="#495057" style={{ marginRight: 12 }} />
+                    <Text style={styles.userActionText}>Agregar Cliente</Text>
+                  </TouchableOpacity>
+                  
+                  <TouchableOpacity 
+                    style={styles.userAction}
+                    onPress={handleViewClientList}
+                    activeOpacity={0.8}
+                  >
+                    <Ionicons name="list-outline" size={20} color="#495057" style={{ marginRight: 12 }} />
+                    <Text style={styles.userActionText}>Ver Clientes</Text>
+                  </TouchableOpacity>
+                </View>
+                
+                <View style={styles.userActions}>
+                  <TouchableOpacity 
+                    style={styles.userAction}
+                    onPress={handleAddTeam}
+                    activeOpacity={0.8}
+                  >
+                    <Ionicons name="people-outline" size={20} color="#495057" style={{ marginRight: 12 }} />
+                    <Text style={styles.userActionText}>Agregar Equipo</Text>
+                  </TouchableOpacity>
+                  
+                  <TouchableOpacity 
+                    style={styles.userAction}
+                    onPress={handleViewTeamList}
+                    activeOpacity={0.8}
+                  >
+                    <Ionicons name="list-outline" size={20} color="#495057" style={{ marginRight: 12 }} />
+                    <Text style={styles.userActionText}>Ver Equipos</Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -841,6 +1289,428 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
                   </View>
                 )}
               </View>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Modal de Agregar/Editar Cliente */}
+      <Modal
+        visible={showAddClient}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setShowAddClient(false)}
+      >
+        <View style={styles.modalOverlayCentered}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Ionicons name="business-outline" size={20} color="#212529" style={{ marginRight: 8 }} />
+                <Text style={styles.modalTitle}>
+                  {editingClient ? 'Editar Cliente' : 'Agregar Cliente'}
+                </Text>
+              </View>
+              <TouchableOpacity 
+                style={styles.modalCloseButton}
+                onPress={() => {
+                  setShowAddClient(false);
+                  setShowUserManagement(true);
+                }}
+                activeOpacity={0.8}
+              >
+                <Ionicons name="close" size={16} color="#fff" />
+              </TouchableOpacity>
+            </View>
+            
+            <ScrollView style={styles.modalBody}>
+              <View style={styles.formSection}>
+                <View style={styles.formInputGroup}>
+                  <Text style={styles.inputLabel}>Nombre de la Empresa</Text>
+                  <TextInput
+                    style={styles.textInput}
+                    value={formClient.name}
+                    onChangeText={(text) => setFormClient({...formClient, name: text})}
+                    placeholder="Empresa XYZ S.A."
+                    placeholderTextColor="#ADB5BD"
+                  />
+                </View>
+                
+                <View style={styles.formInputGroup}>
+                  <Text style={styles.inputLabel}>Cédula/RUC</Text>
+                  <TextInput
+                    style={styles.textInput}
+                    value={formClient.cedulaRuc}
+                    onChangeText={(text) => setFormClient({...formClient, cedulaRuc: text})}
+                    placeholder="1234567890001"
+                    placeholderTextColor="#ADB5BD"
+                    keyboardType="numeric"
+                  />
+                </View>
+                
+                <View style={styles.formInputGroup}>
+                  <Text style={styles.inputLabel}>Dirección</Text>
+                  <TextInput
+                    style={styles.textInput}
+                    value={formClient.address}
+                    onChangeText={(text) => setFormClient({...formClient, address: text})}
+                    placeholder="Av. Principal 123, Ciudad"
+                    placeholderTextColor="#ADB5BD"
+                  />
+                </View>
+                
+                <View style={styles.formInputGroup}>
+                  <Text style={styles.inputLabel}>Local</Text>
+                  <TextInput
+                    style={styles.textInput}
+                    value={formClient.local}
+                    onChangeText={(text) => setFormClient({...formClient, local: text})}
+                    placeholder="Sucursal Centro"
+                    placeholderTextColor="#ADB5BD"
+                  />
+                </View>
+                
+                <View style={styles.formInputGroup}>
+                  <Text style={styles.inputLabel}>Parroquia</Text>
+                  <TextInput
+                    style={styles.textInput}
+                    value={formClient.parroquia}
+                    onChangeText={(text) => setFormClient({...formClient, parroquia: text})}
+                    placeholder="San Blas"
+                    placeholderTextColor="#ADB5BD"
+                  />
+                </View>
+                
+                <TouchableOpacity 
+                  style={styles.saveButton}
+                  onPress={handleSaveClient}
+                  activeOpacity={0.8}
+                >
+                  <Text style={styles.saveButtonText}>
+                    {editingClient ? 'Actualizar Cliente' : 'Guardar Cliente'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Modal de Lista de Clientes */}
+      <Modal
+        visible={showClientList}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setShowClientList(false)}
+      >
+        <View style={styles.modalOverlayCentered}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Ionicons name="business-outline" size={20} color="#212529" style={{ marginRight: 8 }} />
+                <Text style={styles.modalTitle}>Lista de Clientes</Text>
+              </View>
+              <TouchableOpacity 
+                style={styles.modalCloseButton}
+                onPress={() => {
+                  setShowClientList(false);
+                  setShowUserManagement(true);
+                }}
+                activeOpacity={0.8}
+              >
+                <Ionicons name="close" size={16} color="#fff" />
+              </TouchableOpacity>
+            </View>
+            
+            <ScrollView style={styles.modalBody}>
+              <View style={styles.userListSection}>
+                {clients.length === 0 ? (
+                  <View style={styles.emptyState}>
+                    <Ionicons name="business-outline" size={48} color="#ADB5BD" />
+                    <Text style={styles.emptyStateText}>No hay clientes registrados</Text>
+                  </View>
+                ) : (
+                  <View style={styles.userList}>
+                    {clients.map((client) => (
+                      <View key={client.id} style={styles.userListItem}>
+                        <View style={styles.userInfo}>
+                          <Text style={styles.userName}>{client.name}</Text>
+                          <Text style={styles.userEmail}>Cédula/RUC: {client.cedulaRuc}</Text>
+                          <Text style={styles.userUsername}>Local: {client.local}</Text>
+                          <View style={styles.userRoleBadge}>
+                            <Text style={styles.userRoleText}>
+                              {client.parroquia}
+                            </Text>
+                          </View>
+                        </View>
+                        <View style={styles.userItemActions}>
+                          <TouchableOpacity 
+                            style={styles.editButton}
+                            onPress={() => handleEditClient(client)}
+                            activeOpacity={0.8}
+                          >
+                            <Ionicons name="create-outline" size={16} color="#007BFF" />
+                          </TouchableOpacity>
+                          <TouchableOpacity 
+                            style={styles.deleteButton}
+                            onPress={() => handleDeleteClient(client.id)}
+                            activeOpacity={0.8}
+                          >
+                            <Ionicons name="trash-outline" size={16} color="#DC3545" />
+                          </TouchableOpacity>
+                        </View>
+                      </View>
+                    ))}
+                  </View>
+                )}
+              </View>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Modal de Agregar/Editar Equipo */}
+      <Modal
+        visible={showAddTeam}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setShowAddTeam(false)}
+      >
+        <View style={styles.modalOverlayCentered}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Ionicons name="people-outline" size={20} color="#212529" style={{ marginRight: 8 }} />
+                <Text style={styles.modalTitle}>
+                  {editingTeam ? 'Editar Equipo' : 'Agregar Equipo'}
+                </Text>
+              </View>
+              <TouchableOpacity 
+                style={styles.modalCloseButton}
+                onPress={() => {
+                  setShowAddTeam(false);
+                  setShowUserManagement(true);
+                }}
+                activeOpacity={0.8}
+              >
+                <Ionicons name="close" size={16} color="#fff" />
+              </TouchableOpacity>
+            </View>
+            
+            <ScrollView style={styles.modalBody}>
+              <View style={styles.formSection}>
+                <View style={styles.formInputGroup}>
+                  <Text style={styles.inputLabel}>Nombre del Equipo</Text>
+                  <TextInput
+                    style={styles.textInput}
+                    value={formTeam.name}
+                    onChangeText={(text) => setFormTeam({...formTeam, name: text})}
+                    placeholder="Equipo Norte"
+                    placeholderTextColor="#ADB5BD"
+                  />
+                </View>
+                
+                <View style={styles.formInputGroup}>
+                  <Text style={styles.inputLabel}>Técnicos del Equipo</Text>
+                  <View style={styles.pickerContainer}>
+                    <TouchableOpacity 
+                      style={styles.pickerButton}
+                      onPress={() => {
+                        if (users.filter(u => u.role === 'tecnico').length === 0) {
+                          Alert.alert('Info', 'No hay técnicos registrados. Primero debes crear técnicos.');
+                          return;
+                        }
+                        setShowTechnicianSelector(true);
+                      }}
+                      activeOpacity={0.8}
+                    >
+                      <Text style={styles.pickerButtonText}>
+                        {formTeam.technicianIds.length > 0 ? 
+                          `${formTeam.technicianIds.length} técnico(s) seleccionado(s)` : 
+                          'Seleccionar Técnicos'
+                        }
+                      </Text>
+                      <Ionicons name="chevron-down" size={16} color={colors.textSecondary} />
+                    </TouchableOpacity>
+                  </View>
+                  
+                  {/* Lista de técnicos seleccionados */}
+                  {formTeam.technicianIds.length > 0 && (
+                    <View style={styles.selectedTechniciansList}>
+                      {formTeam.technicianIds.map((technicianId) => {
+                        const technician = users.find(u => u.id === technicianId);
+                        return technician ? (
+                          <View key={technicianId} style={styles.selectedTechnicianItem}>
+                            <Text style={styles.selectedTechnicianText}>{technician.name}</Text>
+                            <TouchableOpacity
+                              style={styles.removeTechnicianButton}
+                              onPress={() => {
+                                setFormTeam({
+                                  ...formTeam,
+                                  technicianIds: formTeam.technicianIds.filter(id => id !== technicianId)
+                                });
+                              }}
+                              activeOpacity={0.8}
+                            >
+                              <Ionicons name="close" size={16} color={colors.error} />
+                            </TouchableOpacity>
+                          </View>
+                        ) : null;
+                      })}
+                    </View>
+                  )}
+                </View>
+                
+                <TouchableOpacity 
+                  style={styles.saveButton}
+                  onPress={handleSaveTeam}
+                  activeOpacity={0.8}
+                >
+                  <Text style={styles.saveButtonText}>
+                    {editingTeam ? 'Actualizar Equipo' : 'Guardar Equipo'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Modal de Lista de Equipos */}
+      <Modal
+        visible={showTeamList}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setShowTeamList(false)}
+      >
+        <View style={styles.modalOverlayCentered}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Ionicons name="people-outline" size={20} color="#212529" style={{ marginRight: 8 }} />
+                <Text style={styles.modalTitle}>Lista de Equipos</Text>
+              </View>
+              <TouchableOpacity 
+                style={styles.modalCloseButton}
+                onPress={() => {
+                  setShowTeamList(false);
+                  setShowUserManagement(true);
+                }}
+                activeOpacity={0.8}
+              >
+                <Ionicons name="close" size={16} color="#fff" />
+              </TouchableOpacity>
+            </View>
+            
+            <ScrollView style={styles.modalBody}>
+              <View style={styles.userListSection}>
+                {teams.length === 0 ? (
+                  <View style={styles.emptyState}>
+                    <Ionicons name="people-outline" size={48} color="#ADB5BD" />
+                    <Text style={styles.emptyStateText}>No hay equipos registrados</Text>
+                  </View>
+                ) : (
+                  <View style={styles.userList}>
+                    {teams.map((team) => (
+                      <View key={team.id} style={styles.userListItem}>
+                        <View style={styles.userInfo}>
+                          <Text style={styles.userName}>{team.name}</Text>
+                          <Text style={styles.userEmail}>{team.description || 'Sin descripción'}</Text>
+                          <Text style={styles.userUsername}>Técnicos: {team.technicianIds.length}</Text>
+                        </View>
+                        <View style={styles.userItemActions}>
+                          <TouchableOpacity 
+                            style={styles.editButton}
+                            onPress={() => handleEditTeam(team)}
+                            activeOpacity={0.8}
+                          >
+                            <Ionicons name="create-outline" size={16} color="#007BFF" />
+                          </TouchableOpacity>
+                          <TouchableOpacity 
+                            style={styles.deleteButton}
+                            onPress={() => handleDeleteTeam(team.id)}
+                            activeOpacity={0.8}
+                          >
+                            <Ionicons name="trash-outline" size={16} color="#DC3545" />
+                          </TouchableOpacity>
+                        </View>
+                      </View>
+                    ))}
+                  </View>
+                )}
+              </View>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Modal Selector de Técnicos */}
+      <Modal
+        visible={showTechnicianSelector}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setShowTechnicianSelector(false)}
+      >
+        <View style={styles.modalOverlayCentered}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Seleccionar Técnicos</Text>
+              <TouchableOpacity 
+                style={styles.modalCloseButton}
+                onPress={() => setShowTechnicianSelector(false)}
+                activeOpacity={0.8}
+              >
+                <Ionicons name="close" size={16} color="#fff" />
+              </TouchableOpacity>
+            </View>
+            <ScrollView style={styles.modalBody}>
+              {users.filter(u => u.role === 'tecnico').length === 0 ? (
+                <View style={styles.emptyState}>
+                  <Ionicons name="person-outline" size={48} color="#ADB5BD" />
+                  <Text style={styles.emptyStateText}>No hay técnicos registrados</Text>
+                </View>
+              ) : (
+                <View style={styles.selectorList}>
+                  {users.filter(u => u.role === 'tecnico').map((technician) => (
+                    <TouchableOpacity
+                      key={technician.id}
+                      style={[
+                        styles.selectorItem,
+                        formTeam.technicianIds.includes(technician.id) && styles.selectorItemSelected
+                      ]}
+                      onPress={() => {
+                        const isSelected = formTeam.technicianIds.includes(technician.id);
+                        if (isSelected) {
+                          // Remover técnico
+                          setFormTeam({
+                            ...formTeam,
+                            technicianIds: formTeam.technicianIds.filter(id => id !== technician.id)
+                          });
+                        } else {
+                          // Agregar técnico
+                          setFormTeam({
+                            ...formTeam,
+                            technicianIds: [...formTeam.technicianIds, technician.id]
+                          });
+                        }
+                      }}
+                      activeOpacity={0.8}
+                    >
+                      <View style={styles.selectorItemContent}>
+                        <Text style={styles.selectorItemTitle}>{technician.name}</Text>
+                        <Text style={styles.selectorItemSubtitle}>{technician.email}</Text>
+                        <Text style={styles.selectorItemDetail}>Usuario: {technician.username}</Text>
+                      </View>
+                      <View style={styles.selectorItemCheckbox}>
+                        {formTeam.technicianIds.includes(technician.id) ? (
+                          <Ionicons name="checkmark-circle" size={24} color={colors.success} />
+                        ) : (
+                          <Ionicons name="ellipse-outline" size={24} color={colors.textSecondary} />
+                        )}
+                      </View>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              )}
             </ScrollView>
           </View>
         </View>
@@ -1365,22 +2235,27 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   userAction: {
-    backgroundColor: '#F8F9FA',
+    backgroundColor: colors.surfaceSecondary,
     borderRadius: 12,
     padding: 16,
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#E9ECEF',
+    borderColor: colors.border,
+    ...shadows.sm,
+    position: 'relative',
+    overflow: 'hidden',
   },
   userActionIcon: {
     fontSize: 20,
     marginRight: 12,
+    color: colors.primary,
   },
   userActionText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#495057',
+    color: colors.textInverse,
+    letterSpacing: 0.2,
   },
   // Estilos para Informes
   reportsSection: {
@@ -1929,6 +2804,117 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     fontWeight: '600',
+  },
+
+  // Estilos para pickers
+  pickerContainer: {
+    marginBottom: spacing.sm,
+  },
+  pickerButton: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: colors.border,
+    borderRadius: borderRadius.lg,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.md,
+    backgroundColor: colors.surface,
+    ...shadows.sm,
+  },
+  pickerButtonText: {
+    fontSize: 16,
+    color: colors.textPrimary,
+    fontWeight: '500',
+  },
+
+  // Estilos para los selectores desplegables
+  selectorList: {
+    gap: spacing.sm,
+  },
+  selectorItem: {
+    backgroundColor: colors.surface,
+    borderRadius: borderRadius.lg,
+    padding: spacing.md,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderWidth: 1,
+    borderColor: colors.border,
+    ...shadows.sm,
+  },
+  selectorItemContent: {
+    flex: 1,
+  },
+  selectorItemTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.textPrimary,
+    marginBottom: spacing.xs,
+  },
+  selectorItemSubtitle: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: colors.textSecondary,
+    marginBottom: spacing.xs,
+  },
+  selectorItemDetail: {
+    fontSize: 12,
+    fontWeight: '400',
+    color: colors.textTertiary,
+  },
+  selectorItemSelected: {
+    backgroundColor: colors.primaryLight,
+    borderColor: colors.primary,
+  },
+  selectorItemCheckbox: {
+    marginLeft: spacing.sm,
+  },
+  selectedTechniciansList: {
+    marginTop: spacing.sm,
+    gap: spacing.xs,
+  },
+  selectedTechnicianItem: {
+    backgroundColor: colors.surfaceSecondary,
+    borderRadius: borderRadius.md,
+    padding: spacing.sm,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  selectedTechnicianText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: colors.textInverse,
+    flex: 1,
+  },
+  removeTechnicianButton: {
+    padding: spacing.xs,
+    borderRadius: borderRadius.sm,
+    backgroundColor: colors.errorLight,
+  },
+
+  // Estilos para el botón de gestión
+  managementButton: {
+    backgroundColor: colors.primary,
+    borderRadius: borderRadius.lg,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.lg,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: spacing.lg,
+    ...shadows.md,
+    borderWidth: 2,
+    borderColor: colors.primaryDark,
+  },
+  managementButtonText: {
+    color: colors.textInverse,
+    fontSize: 16,
+    fontWeight: '600',
+    textAlign: 'center',
   },
 
 
