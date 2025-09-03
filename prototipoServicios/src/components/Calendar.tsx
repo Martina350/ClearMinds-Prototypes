@@ -4,7 +4,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { colors, spacing, borderRadius, shadows } from '../styles/theme';
 
 interface Props {
-  selectedDate?: Date;
+  selectedDate?: string | Date;
+  onSelectDate?: (date: string) => void;
   onDateSelect?: (date: Date) => void;
   onCancel?: () => void;
   onConfirm?: () => void;
@@ -12,18 +13,25 @@ interface Props {
 
 export const Calendar: React.FC<Props> = ({ 
   selectedDate, 
+  onSelectDate,
   onDateSelect, 
   onCancel, 
   onConfirm 
 }) => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [tempSelected, setTempSelected] = useState<Date | null>(
-    selectedDate instanceof Date ? selectedDate : new Date()
+    selectedDate instanceof Date 
+      ? selectedDate 
+      : typeof selectedDate === 'string' 
+        ? new Date(selectedDate) 
+        : new Date()
   );
 
   useEffect(() => {
     if (selectedDate instanceof Date) {
       setTempSelected(selectedDate);
+    } else if (typeof selectedDate === 'string') {
+      setTempSelected(new Date(selectedDate));
     }
   }, [selectedDate]);
 
@@ -58,6 +66,7 @@ export const Calendar: React.FC<Props> = ({
     if (!isNaN(selectedDate.getTime())) {
       setTempSelected(selectedDate);
       onDateSelect?.(selectedDate);
+      onSelectDate?.(selectedDate.toISOString().slice(0, 10));
     }
   };
 

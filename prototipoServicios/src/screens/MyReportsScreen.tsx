@@ -1,27 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert, Modal } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import ReportService, { Report } from '../services/ReportService';
-import { ReportDetailScreen } from './ReportDetailScreen';
-import { InformeForm } from './InformeForm';
 import { colors, typography, spacing, borderRadius, shadows, baseStyles, componentStyles } from '../styles/theme';
+import type { MyReportsScreenProps } from '../navigation/types';
 
-type Props = {
-  technicianId: string;
-  technicianName: string;
-  onBack: () => void;
-};
-
-export const MyReportsScreen: React.FC<Props> = ({ 
-  technicianId, 
-  technicianName, 
-  onBack 
+export const MyReportsScreen: React.FC<MyReportsScreenProps> = ({ 
+  navigation,
+  route
 }) => {
+  const { technicianId, technicianName } = route.params;
   const [reports, setReports] = useState<Report[]>([]);
-  const [selectedReport, setSelectedReport] = useState<Report | null>(null);
-  const [showReportDetail, setShowReportDetail] = useState(false);
-  const [showNewReport, setShowNewReport] = useState(false);
-  const [editingReport, setEditingReport] = useState<Report | null>(null);
+
 
   useEffect(() => {
     loadReports();
@@ -48,8 +38,10 @@ export const MyReportsScreen: React.FC<Props> = ({
   };
 
   const handleViewReport = (report: Report) => {
-    setSelectedReport(report);
-    setShowReportDetail(true);
+    navigation.navigate('ReportDetail', {
+      reportId: report.id,
+      showStatusActions: false,
+    });
   };
 
   const handleEditReport = (report: Report) => {
@@ -60,13 +52,18 @@ export const MyReportsScreen: React.FC<Props> = ({
       );
       return;
     }
-    setEditingReport(report);
-    setShowNewReport(true);
+    navigation.navigate('InformeForm', {
+      technicianId,
+      technicianName,
+      // TODO: Agregar editingReportId si es necesario implementar edición
+    });
   };
 
   const handleNewReport = () => {
-    setEditingReport(null);
-    setShowNewReport(true);
+    navigation.navigate('InformeForm', {
+      technicianId,
+      technicianName,
+    });
   };
 
   const formatDate = (dateString: string) => {
@@ -107,7 +104,7 @@ export const MyReportsScreen: React.FC<Props> = ({
   return (
     <View style={baseStyles.container}>
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={onBack} activeOpacity={0.8}>
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()} activeOpacity={0.8}>
           <Ionicons name="chevron-back" size={18} color={colors.textPrimary} style={{ marginRight: spacing.xs }} />
         </TouchableOpacity>
         <View style={styles.titleContainer}>
@@ -177,48 +174,7 @@ export const MyReportsScreen: React.FC<Props> = ({
         </View>
       </ScrollView>
 
-      {/* Modal de Detalle de Informe */}
-      {showReportDetail && selectedReport && (
-        <Modal
-          visible={showReportDetail}
-          transparent={true}
-          animationType="slide"
-          onRequestClose={() => setShowReportDetail(false)}
-        >
-          <View style={styles.modalOverlay}>
-            <View style={styles.modalContent}>
-              <ReportDetailScreen
-                reportId={selectedReport.id}
-                onBack={() => setShowReportDetail(false)}
-                onEdit={() => {
-                  setShowReportDetail(false);
-                  handleEditReport(selectedReport);
-                }}
-              />
-            </View>
-          </View>
-        </Modal>
-      )}
 
-      {/* Modal de Nuevo/Editar Informe */}
-      {showNewReport && (
-        <Modal
-          visible={showNewReport}
-          transparent={true}
-          animationType="slide"
-          onRequestClose={() => setShowNewReport(false)}
-        >
-          <View style={styles.modalOverlay}>
-            <View style={styles.modalContent}>
-              <InformeForm
-                onBack={() => setShowNewReport(false)}
-                technicianId={technicianId}
-                technicianName={technicianName}
-              />
-            </View>
-          </View>
-        </Modal>
-      )}
     </View>
   );
 };
@@ -363,16 +319,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: colors.primary,
   },
-  modalContent: {
-    flex: 1,
-    backgroundColor: colors.surface,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+
   sectionTitle: {
     fontSize: 20,
     fontWeight: '600',

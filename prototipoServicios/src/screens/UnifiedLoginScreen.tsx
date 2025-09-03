@@ -3,12 +3,9 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ActivityInd
 import { Ionicons } from '@expo/vector-icons';
 import AuthService from '../services/AuthService';
 import { colors, spacing, borderRadius, shadows, baseStyles } from '../styles/theme';
+import type { LoginScreenProps } from '../navigation/types';
 
-type Props = {
-  onLoginSuccess: (role: 'admin' | 'tecnico') => void;
-};
-
-export const UnifiedLoginScreen: React.FC<Props> = ({ onLoginSuccess }) => {
+export const UnifiedLoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [selectedRole, setSelectedRole] = useState<'admin' | 'tecnico' | null>(null);
@@ -31,7 +28,14 @@ export const UnifiedLoginScreen: React.FC<Props> = ({ onLoginSuccess }) => {
       if (user && user.role === selectedRole) {
         setTimeout(() => {
           setIsLoading(false);
-          onLoginSuccess(user.role);
+          if (user.role === 'admin') {
+            navigation.replace('AdminDashboard');
+          } else {
+            navigation.replace('TecnicoDashboard', {
+              technicianId: user.id,
+              technicianName: user.name,
+            });
+          }
         }, 1000);
       } else {
         setIsLoading(false);
