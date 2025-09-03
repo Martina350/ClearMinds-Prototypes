@@ -1,32 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Animated, ScrollView, Modal, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Animated, ScrollView, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import ReportService, { Report } from '../services/ReportService';
 import ScheduleService, { ScheduleItem } from '../services/ScheduleService';
 import Calendar from '../components/Calendar';
 import Checklist from '../components/Checklist';
-import { InformeForm } from './InformeForm';
-import { ReportDetailScreen } from './ReportDetailScreen';
-import { MyReportsScreen } from './MyReportsScreen';
 import { colors, typography, spacing, borderRadius, shadows, baseStyles, componentStyles } from '../styles/theme';
+import type { TecnicoDashboardProps } from '../navigation/types';
 
-type Props = {
-  onBack: () => void;
-  technicianId?: string;
-  technicianName?: string;
-};
-
-export const TecnicoScreen: React.FC<Props> = ({ 
-  onBack, 
-  technicianId = '1', 
-  technicianName = 'Técnico' 
+export const TecnicoScreen: React.FC<TecnicoDashboardProps> = ({ 
+  navigation,
+  route
 }) => {
+  const technicianId = route.params?.technicianId || '1';
+  const technicianName = route.params?.technicianName || 'Técnico';
   const [fadeAnim] = useState(new Animated.Value(0));
 
-  const [showMyReports, setShowMyReports] = useState(false);
-  const [showNewReport, setShowNewReport] = useState(false);
-  const [showReportDetail, setShowReportDetail] = useState(false);
-  const [selectedReport, setSelectedReport] = useState<Report | null>(null);
+
   const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().slice(0,10));
   const [daySchedules, setDaySchedules] = useState<ScheduleItem[]>([]);
   const [selectedSchedule, setSelectedSchedule] = useState<ScheduleItem | null>(null);
@@ -83,17 +73,27 @@ export const TecnicoScreen: React.FC<Props> = ({
   const handleQuickAction = (action: string) => {
     switch (action) {
       case 'reports':
-        setShowMyReports(true);
+        navigation.navigate('MyReports', {
+          technicianId,
+          technicianName,
+        });
         break;
       case 'new_report':
-        setShowNewReport(true);
+        navigation.navigate('InformeForm', {
+          technicianId,
+          technicianName,
+          localId: selectedSchedule?.location.id,
+          localName: selectedSchedule?.location.name,
+        });
         break;
     }
   };
 
   const handleViewReport = (report: Report) => {
-    setSelectedReport(report);
-    setShowReportDetail(true);
+    navigation.navigate('ReportDetail', {
+      reportId: report.id,
+      showStatusActions: false,
+    });
   };
 
   const formatDate = (dateString: string) => {
@@ -146,7 +146,7 @@ export const TecnicoScreen: React.FC<Props> = ({
           </View>
           <TouchableOpacity 
             style={styles.backButton}
-            onPress={onBack}
+            onPress={() => navigation.replace('Login')}
             activeOpacity={0.8}
           >
             <Text style={styles.backButtonText}>Salir</Text>
@@ -211,7 +211,12 @@ export const TecnicoScreen: React.FC<Props> = ({
                           <View style={{ marginTop: spacing.xs, alignItems: 'center' }}>
                             <TouchableOpacity 
                               style={styles.smallPrimaryButton}
-                              onPress={() => setShowNewReport(true)}
+                              onPress={() => navigation.navigate('InformeForm', {
+                                technicianId,
+                                technicianName,
+                                localId: s.location.id,
+                                localName: s.location.name,
+                              })}
                               activeOpacity={0.8}
                             >
                               <Ionicons name="add-circle-outline" size={16} color={colors.textInverse} style={{ marginRight: spacing.xs }} />
@@ -249,7 +254,10 @@ export const TecnicoScreen: React.FC<Props> = ({
                 <Text style={styles.emptyStateText}>No tienes informes aún</Text>
                 <TouchableOpacity 
                   style={styles.createFirstReportButton}
-                  onPress={() => setShowNewReport(true)}
+                  onPress={() => navigation.navigate('InformeForm', {
+                    technicianId,
+                    technicianName,
+                  })}
                   activeOpacity={0.8}
                 >
                   <Text style={styles.createFirstReportText}>Crear mi primer informe</Text>
@@ -277,57 +285,7 @@ export const TecnicoScreen: React.FC<Props> = ({
 
 
 
-      {/* Modal de Mis Informes */}
-      <Modal
-        visible={showMyReports}
-        transparent={true}
-        animationType="slide"
-        onRequestClose={() => setShowMyReports(false)}
-      >
-        <View style={styles.modalOverlayFull}>
-          <MyReportsScreen
-            technicianId={technicianId}
-            technicianName={technicianName}
-            onBack={() => setShowMyReports(false)}
-          />
-        </View>
-      </Modal>
 
-      {/* Modal de Nuevo Informe */}
-      <Modal
-        visible={showNewReport}
-        transparent={true}
-        animationType="slide"
-        onRequestClose={() => setShowNewReport(false)}
-      >
-        <View style={styles.modalOverlayFull}>
-          <InformeForm
-            onBack={() => setShowNewReport(false)}
-            technicianId={technicianId}
-            technicianName={technicianName}
-            localId={selectedSchedule?.location.id}
-            localName={selectedSchedule?.location.name}
-          />
-        </View>
-      </Modal>
-
-      {/* Modal de Detalle de Informe */}
-      {showReportDetail && selectedReport && (
-      <Modal
-          visible={showReportDetail}
-        transparent={true}
-        animationType="slide"
-          onRequestClose={() => setShowReportDetail(false)}
-        >
-                  <View style={styles.modalOverlayFull}>
-          <ReportDetailScreen
-            reportId={selectedReport.id}
-            onBack={() => setShowReportDetail(false)}
-            showStatusActions={false}
-          />
-        </View>
-      </Modal>
-      )}
     </View>
   );
 };
@@ -504,10 +462,7 @@ const styles = StyleSheet.create({
     color: colors.textInverse,
   },
 
-  modalOverlayFull: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
+
 
   // Estilos para títulos de sección y tarjetas de estadísticas
   sectionTitle: {

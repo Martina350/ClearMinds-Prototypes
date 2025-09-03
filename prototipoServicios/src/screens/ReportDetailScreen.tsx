@@ -3,15 +3,10 @@ import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert, Image, Mod
 import { Ionicons } from '@expo/vector-icons';
 import ReportService, { Report } from '../services/ReportService';
 import { colors, typography, spacing, borderRadius, shadows, baseStyles } from '../styles/theme';
+import type { ReportDetailProps } from '../navigation/types';
 
-interface Props {
-  reportId: string;
-  onBack: () => void;
-  showStatusActions?: boolean;
-  onEdit?: () => void;
-}
-
-export const ReportDetailScreen: React.FC<Props> = ({ reportId, onBack, showStatusActions = false, onEdit }) => {
+export const ReportDetailScreen: React.FC<ReportDetailProps> = ({ navigation, route }) => {
+  const { reportId, showStatusActions = false } = route.params;
   const [report, setReport] = useState<Report | null>(null);
   const [loading, setLoading] = useState(true);
   const [showImagePreview, setShowImagePreview] = useState(false);
@@ -130,7 +125,7 @@ export const ReportDetailScreen: React.FC<Props> = ({ reportId, onBack, showStat
     return (
       <View style={styles.errorContainer}>
         <Text style={styles.errorText}>No se encontró el informe</Text>
-        <TouchableOpacity style={styles.backButton} onPress={onBack}>
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
           <Text style={styles.backButtonText}>Volver</Text>
         </TouchableOpacity>
       </View>
@@ -142,7 +137,7 @@ export const ReportDetailScreen: React.FC<Props> = ({ reportId, onBack, showStat
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity style={styles.backButton} onPress={onBack}>
+          <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
             <Ionicons name="chevron-back" size={24} color={colors.primary} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Detalle del Informe</Text>

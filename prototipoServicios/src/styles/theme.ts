@@ -25,9 +25,29 @@ export const colors = {
   error: '#EF4444', // Rojo vibrante
   info: '#3B82F6', // Azul
   
+  // Variantes de colores de estado
+  successLight: '#D1FAE5', // Verde claro
+  successDark: '#047857', // Verde oscuro
+  warningLight: '#FEF3C7', // Ámbar claro
+  warningDark: '#D97706', // Ámbar oscuro
+  errorLight: '#FEE2E2', // Rojo claro
+  errorDark: '#DC2626', // Rojo oscuro
+  infoLight: '#DBEAFE', // Azul claro
+  infoDark: '#1E40AF', // Azul oscuro
+  
+  // Variantes de colores principales
+  primaryLight: '#A855F7', // Violeta claro
+  primaryDark: '#7C3AED', // Violeta oscuro
+  
   // Colores de borde y separadores
   border: '#2D3748', // Bordes sutiles
+  borderLight: '#374151', // Bordes más claros
   divider: '#374151', // Divisores
+  
+  // Colores grises adicionales
+  gray50: '#F9FAFB',
+  gray100: '#F3F4F6',
+  gray500: '#6B7280',
   
   // Colores de sombra y profundidad
   shadow: '#000000',
@@ -51,11 +71,19 @@ export const borderRadius = {
   md: 12,
   lg: 16,
   xl: 20,
+  xxl: 24,
   full: 9999,
 };
 
 // Sistema de sombras elegante
 export const shadows = {
+  xs: {
+    shadowColor: colors.shadow,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
+  },
   sm: {
     shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 2 },
@@ -90,85 +118,85 @@ export const shadows = {
 export const typography = {
   h1: {
     fontSize: 32,
-    fontWeight: '700',
+    fontWeight: '700' as const,
     lineHeight: 40,
     letterSpacing: -0.5,
   },
   h2: {
     fontSize: 28,
-    fontWeight: '700',
+    fontWeight: '700' as const,
     lineHeight: 36,
     letterSpacing: -0.3,
   },
   h3: {
     fontSize: 24,
-    fontWeight: '600',
+    fontWeight: '600' as const,
     lineHeight: 32,
     letterSpacing: -0.2,
   },
   h4: {
     fontSize: 20,
-    fontWeight: '600',
+    fontWeight: '600' as const,
     lineHeight: 28,
     letterSpacing: -0.1,
   },
   h5: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: '600' as const,
     lineHeight: 24,
     letterSpacing: 0,
   },
   h6: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '600' as const,
     lineHeight: 22,
     letterSpacing: 0,
   },
   body: {
     fontSize: 16,
-    fontWeight: '400',
+    fontWeight: '400' as const,
     lineHeight: 24,
     letterSpacing: 0,
   },
   bodySmall: {
     fontSize: 14,
-    fontWeight: '400',
+    fontWeight: '400' as const,
     lineHeight: 20,
     letterSpacing: 0,
   },
   bodyLarge: {
     fontSize: 18,
-    fontWeight: '400',
+    fontWeight: '400' as const,
     lineHeight: 28,
     letterSpacing: 0,
   },
   label: {
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: '500' as const,
     lineHeight: 20,
     letterSpacing: 0.1,
   },
   labelSmall: {
     fontSize: 12,
-    fontWeight: '500',
+    fontWeight: '500' as const,
     lineHeight: 16,
     letterSpacing: 0.1,
   },
   button: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '600' as const,
     lineHeight: 24,
     letterSpacing: 0.1,
   },
   buttonSmall: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: '600' as const,
     lineHeight: 20,
     letterSpacing: 0.1,
   },
   caption: {
     fontSize: 12,
-    fontWeight: '400',
+    fontWeight: '400' as const,
     lineHeight: 16,
     letterSpacing: 0.2,
   },
@@ -183,6 +211,12 @@ export const baseStyles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: colors.background,
+  },
+  content: {
+    flex: 1,
+  },
+  scrollContent: {
+    padding: spacing.lg,
   },
   card: {
     backgroundColor: colors.surface,
@@ -302,6 +336,39 @@ export const baseStyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     ...shadows.lg,
+  },
+  buttonPrimary: {
+    backgroundColor: colors.primary,
+    borderRadius: borderRadius.md,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.lg,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  buttonText: {
+    color: colors.textInverse,
+    fontSize: 16,
+    fontWeight: '600' as const,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: spacing.lg,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '600' as const,
+    color: colors.textPrimary,
+  },
+  modalCloseButton: {
+    backgroundColor: colors.error,
+    borderRadius: borderRadius.full,
+    padding: spacing.sm,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
 

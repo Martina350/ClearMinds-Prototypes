@@ -7,15 +7,12 @@ import AuthService, { User as AuthUser } from '../services/AuthService';
 import Calendar from '../components/Calendar';
 import { ReportDetailScreen } from './ReportDetailScreen';
 import { colors, typography, spacing, borderRadius, shadows, baseStyles, componentStyles } from '../styles/theme';
-
-type Props = {
-  onBack: () => void;
-};
+import type { AdminDashboardProps } from '../navigation/types';
 
 // Usar la interfaz de AuthService
 type User = AuthUser;
 
-export const AdminScreen: React.FC<Props> = ({ onBack }) => {
+export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
   const [fadeAnim] = useState(new Animated.Value(0));
 
   const [showUserManagement, setShowUserManagement] = useState(false);
@@ -403,7 +400,7 @@ export const AdminScreen: React.FC<Props> = ({ onBack }) => {
           </View>
           <TouchableOpacity 
             style={styles.backButton}
-            onPress={onBack}
+            onPress={() => navigation.replace('Login')}
             activeOpacity={0.8}
           >
             <Text style={styles.backButtonText}>Salir</Text>

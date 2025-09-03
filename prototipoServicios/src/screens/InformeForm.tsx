@@ -5,18 +5,16 @@ import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import ReportService, { Report } from '../services/ReportService';
 import { colors, typography, spacing, borderRadius, shadows, baseStyles } from '../styles/theme';
+import type { InformeFormProps } from '../navigation/types';
 
 const { width: screenWidth } = Dimensions.get('window');
 
-type Props = {
-  onBack: () => void;
-  technicianId?: string;
-  technicianName?: string;
-  localId?: string;
-  localName?: string;
-};
-
-export const InformeForm: React.FC<Props> = ({ onBack, technicianId = '1', technicianName = 'Técnico', localId, localName }) => {
+export const InformeForm: React.FC<InformeFormProps> = ({ navigation, route }) => {
+  const technicianId = route.params?.technicianId || '1';
+  const technicianName = route.params?.technicianName || 'Técnico';
+  const localId = route.params?.localId;
+  const localName = route.params?.localName;
+  
   const [checkInTime, setCheckInTime] = useState('08:00');
   const [checkOutTime, setCheckOutTime] = useState('10:00');
   const [description, setDescription] = useState('');
@@ -292,7 +290,7 @@ export const InformeForm: React.FC<Props> = ({ onBack, technicianId = '1', techn
   return (
     <View style={baseStyles.container}>
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={onBack} activeOpacity={0.8}>
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()} activeOpacity={0.8}>
           <Ionicons name="chevron-back" size={18} color={colors.textPrimary} style={{ marginRight: spacing.xs }} />
         </TouchableOpacity>
         <View style={styles.titleContainer}>
@@ -517,7 +515,7 @@ export const InformeForm: React.FC<Props> = ({ onBack, technicianId = '1', techn
                 style={styles.finishButton}
                 onPress={() => {
                   setShowReportDetails(false);
-                  onBack();
+                  navigation.goBack();
                 }}
                 activeOpacity={0.8}
               >
