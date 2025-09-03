@@ -1,45 +1,19 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, StatusBar } from 'react-native';
-import { UnifiedLoginScreen } from './src/screens/UnifiedLoginScreen';
-import { AdminScreen } from './src/screens/AdminScreen';
-import { TecnicoScreen } from './src/screens/TecnicoScreen';
+import React from 'react';
+import { StatusBar, StyleSheet } from 'react-native';
+import { AppNavigator } from './src/navigation';
 import { colors } from './src/styles/theme';
+import 'react-native-gesture-handler';
 
 export default function App() {
-  const [currentScreen, setCurrentScreen] = useState<'login' | 'admin' | 'tecnico'>('login');
-
-  const handleLoginSuccess = (role: 'admin' | 'tecnico') => {
-    if (role === 'admin') {
-      setCurrentScreen('admin');
-    } else {
-      setCurrentScreen('tecnico');
-    }
-  };
-
-  const handleLogout = () => {
-    setCurrentScreen('login');
-  };
-
-  const renderScreen = () => {
-    switch (currentScreen) {
-      case 'admin':
-        return <AdminScreen onBack={handleLogout} />;
-      case 'tecnico':
-        return <TecnicoScreen onBack={handleLogout} technicianId="1" technicianName="Juan Pérez" />;
-      default:
-        return <UnifiedLoginScreen onLoginSuccess={handleLoginSuccess} />;
-    }
-  };
-
   return (
-    <View style={styles.container}>
+    <>
       <StatusBar 
         barStyle="light-content" 
-        backgroundColor={colors.background}
+        backgroundColor={colors.primary}
         translucent={false}
       />
-      {renderScreen()}
-    </View>
+      <AppNavigator />
+    </>
   );
 }
 

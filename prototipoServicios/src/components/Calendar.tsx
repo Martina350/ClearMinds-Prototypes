@@ -4,7 +4,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { colors, spacing, borderRadius, shadows } from '../styles/theme';
 
 interface Props {
-  selectedDate?: Date;
+  selectedDate?: string | Date;
+  onSelectDate?: (date: string) => void;
   onDateSelect?: (date: Date) => void;
   onCancel?: () => void;
   onConfirm?: () => void;
@@ -12,18 +13,25 @@ interface Props {
 
 export const Calendar: React.FC<Props> = ({ 
   selectedDate, 
+  onSelectDate,
   onDateSelect, 
   onCancel, 
   onConfirm 
 }) => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [tempSelected, setTempSelected] = useState<Date | null>(
-    selectedDate instanceof Date ? selectedDate : new Date()
+    selectedDate instanceof Date 
+      ? selectedDate 
+      : typeof selectedDate === 'string' 
+        ? new Date(selectedDate) 
+        : new Date()
   );
 
   useEffect(() => {
     if (selectedDate instanceof Date) {
       setTempSelected(selectedDate);
+    } else if (typeof selectedDate === 'string') {
+      setTempSelected(new Date(selectedDate));
     }
   }, [selectedDate]);
 
@@ -33,7 +41,9 @@ export const Calendar: React.FC<Props> = ({
     const firstDay = new Date(year, month, 1);
     const lastDay = new Date(year, month + 1, 0);
     const daysInMonth = lastDay.getDate();
-    const startingDay = firstDay.getDay();
+    // Ajustar el índice para que la semana comience en Lunes (0=Lun, 6=Dom)
+    const jsFirstDay = firstDay.getDay(); // 0=Dom ... 6=Sab
+    const startingDay = (jsFirstDay + 6) % 7; // 0=Lun ... 6=Dom
     
     return { daysInMonth, startingDay };
   };
@@ -58,6 +68,7 @@ export const Calendar: React.FC<Props> = ({
     if (!isNaN(selectedDate.getTime())) {
       setTempSelected(selectedDate);
       onDateSelect?.(selectedDate);
+      onSelectDate?.(selectedDate.toISOString().slice(0, 10));
     }
   };
 
@@ -83,8 +94,8 @@ export const Calendar: React.FC<Props> = ({
     const days = [];
     
     // Días del mes anterior
-    const prevMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 0);
-    const prevMonthDays = prevMonth.getDate();
+    const prevMonthLastDay = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 0);
+    const prevMonthDays = prevMonthLastDay.getDate();
     
     for (let i = startingDay - 1; i >= 0; i--) {
       const day = prevMonthDays - i;
@@ -127,7 +138,7 @@ export const Calendar: React.FC<Props> = ({
       );
     }
     
-    // Días del mes siguiente para completar 6 semanas (42 días)
+    // Días del mes siguiente para completar 6 semanas (42 celdas)
     const remainingDays = 42 - days.length;
     for (let day = 1; day <= remainingDays; day++) {
       days.push(
@@ -196,7 +207,7 @@ export const Calendar: React.FC<Props> = ({
 
       {/* Días de la semana */}
       <View style={styles.headerRow}>
-        {['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'].map((day, index) => (
+        {['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'].map((day, index) => (
           <View key={`${day}-${index}`} style={styles.headerCell}>
             <Text style={styles.headerText}>{day}</Text>
           </View>
@@ -300,7 +311,8 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
   },
   headerCell: {
-    flex: 1,
+    flexBasis: '14.2857%',
+    maxWidth: '14.2857%',
     alignItems: 'center',
     paddingVertical: spacing.sm,
   },
@@ -318,11 +330,11 @@ const styles = StyleSheet.create({
     padding: spacing.xs,
   },
   cell: {
-    width: '14.28%',
+    flexBasis: '14.2857%',
+    maxWidth: '14.2857%',
     aspectRatio: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    margin: 1,
     borderRadius: borderRadius.md,
   },
   dayText: {

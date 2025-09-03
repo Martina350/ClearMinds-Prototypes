@@ -19,13 +19,13 @@ export const Checklist: React.FC<Props> = ({ checked, onChange }) => {
       {checked ? (
         <Ionicons 
           name="checkmark-circle" 
-          size={28} 
+          size={20} 
           color={colors.textInverse} 
         />
       ) : (
         <Ionicons 
           name="checkmark-circle-outline" 
-          size={28} 
+          size={20} 
           color={colors.primary} 
         />
       )}
@@ -35,8 +35,8 @@ export const Checklist: React.FC<Props> = ({ checked, onChange }) => {
 
 const styles = StyleSheet.create({
   checkbox: {
-    width: 40,
-    height: 40,
+    width: 32,
+    height: 32,
     borderRadius: borderRadius.full,
     backgroundColor: colors.surfaceSecondary,
     alignItems: 'center',
@@ -46,8 +46,8 @@ const styles = StyleSheet.create({
     ...shadows.sm,
   },
   checkboxChecked: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
+    backgroundColor: colors.success,
+    borderColor: colors.success,
     ...shadows.md,
     transform: [{ scale: 1.05 }],
   },

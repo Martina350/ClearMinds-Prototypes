@@ -7,15 +7,12 @@ import AuthService, { User as AuthUser } from '../services/AuthService';
 import Calendar from '../components/Calendar';
 import { ReportDetailScreen } from './ReportDetailScreen';
 import { colors, typography, spacing, borderRadius, shadows, baseStyles, componentStyles } from '../styles/theme';
-
-type Props = {
-  onBack: () => void;
-};
+import type { AdminDashboardProps } from '../navigation/types';
 
 // Usar la interfaz de AuthService
 type User = AuthUser;
 
-export const AdminScreen: React.FC<Props> = ({ onBack }) => {
+export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
   const [fadeAnim] = useState(new Animated.Value(0));
 
   const [showUserManagement, setShowUserManagement] = useState(false);
@@ -396,20 +393,6 @@ export const AdminScreen: React.FC<Props> = ({ onBack }) => {
           { opacity: fadeAnim }
         ]}
       >
-        {/* Header simplificado */}
-        <View style={styles.topHeader}>
-          <View style={styles.headerTitle}>
-            <Text style={styles.headerTitleText}>Panel de Administración</Text>
-          </View>
-          <TouchableOpacity 
-            style={styles.backButton}
-            onPress={onBack}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.backButtonText}>Salir</Text>
-          </TouchableOpacity>
-        </View>
-
         <ScrollView 
           contentContainerStyle={baseStyles.scrollContent}
           showsVerticalScrollIndicator={false}
@@ -1260,7 +1243,7 @@ const styles = StyleSheet.create({
   actionText: {
     fontSize: 18,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: colors.textSecondary,
     marginLeft: spacing.md,
     flex: 1,
     lineHeight: 22,
@@ -1331,7 +1314,7 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#212529',
+    color: colors.textSecondary,
   },
   modalCloseButton: {
     backgroundColor: '#6C757D',
@@ -1510,9 +1493,9 @@ const styles = StyleSheet.create({
   viewReportButton: {
     padding: spacing.sm,
     borderRadius: borderRadius.md,
-    backgroundColor: colors.infoLight,
+    backgroundColor: colors.surfaceSecondary,
     borderWidth: 1,
-    borderColor: colors.info,
+    borderColor: colors.border,
     ...shadows.sm,
   },
   reportActionButtons: {
@@ -1520,9 +1503,12 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   deleteReportButton: {
-    padding: 8,
-    borderRadius: 8,
-    backgroundColor: '#FFEBEE',
+    padding: spacing.sm,
+    borderRadius: borderRadius.md,
+    backgroundColor: colors.surfaceSecondary,
+    borderWidth: 1,
+    borderColor: colors.border,
+    ...shadows.sm,
   },
   // Estilos para Analytics
   analyticsSection: {
@@ -1729,16 +1715,18 @@ const styles = StyleSheet.create({
   // Botón de guardar moderno y atractivo
   saveButton: {
     backgroundColor: colors.success,
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.lg,
-    borderRadius: borderRadius.xl,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    borderRadius: borderRadius.lg,
     marginTop: spacing.md,
     alignItems: 'center',
     justifyContent: 'center',
     ...shadows.md,
     borderWidth: 2,
     borderColor: colors.successDark,
-    minHeight: 50,
+    minHeight: 40,
+    alignSelf: 'center',
+    minWidth: 120,
   },
   saveButtonText: {
     color: colors.textInverse,
