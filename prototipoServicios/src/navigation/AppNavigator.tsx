@@ -47,7 +47,7 @@ export const AppNavigator: React.FC = () => {
           name="AdminDashboard"
           component={AdminScreen}
           options={{
-            title: 'Panel de Administración',
+            title: '🔧 Admin Panel (React Navigation)',
             headerLeft: () => null, // Deshabilitar botón de retroceso
             gestureEnabled: false,
           }}
@@ -56,7 +56,7 @@ export const AppNavigator: React.FC = () => {
           name="TecnicoDashboard"
           component={TecnicoScreen}
           options={{
-            title: 'Panel de Técnico',
+            title: '👷 Panel Técnico (RN)',
             headerLeft: () => null, // Deshabilitar botón de retroceso
             gestureEnabled: false,
           }}
@@ -65,21 +65,21 @@ export const AppNavigator: React.FC = () => {
           name="MyReports"
           component={MyReportsScreen}
           options={{
-            title: 'Mis Informes',
+            title: '📋 Mis Informes (Navigate)',
           }}
         />
         <Stack.Screen
           name="InformeForm"
           component={InformeForm}
           options={{
-            title: 'Crear Informe',
+            title: '📝 Crear Informe (Navigate)',
           }}
         />
         <Stack.Screen
           name="ReportDetail"
           component={ReportDetailScreen}
           options={{
-            title: 'Detalle del Informe',
+            title: '🔍 Detalle Informe (Navigate)',
           }}
         />
       </Stack.Navigator>

@@ -65,8 +65,13 @@ export const UnifiedLoginScreen: React.FC<LoginScreenProps> = ({ navigation }) =
       {/* Formulario de login */}
       <View style={styles.formContainer}>
         <View style={styles.formCard}>
-          <Text style={styles.formTitle}>Iniciar Sesión</Text>
-          <Text style={styles.formSubtitle}>Accede a tu cuenta para continuar</Text>
+          <View style={{ backgroundColor: '#10B981', padding: 8, borderRadius: 8, marginBottom: 16 }}>
+            <Text style={{ color: 'white', textAlign: 'center', fontSize: 12, fontWeight: '600' }}>
+              ✅ React Navigation Activo - Pantalla: Login
+            </Text>
+          </View>
+          <Text style={styles.formTitle}>🚀 Iniciar Sesión (React Navigation)</Text>
+          <Text style={styles.formSubtitle}>Navegación implementada exitosamente - Accede a tu cuenta para continuar</Text>
 
           {/* Selector de rol */}
           <View style={styles.roleSelector}>
@@ -162,7 +167,7 @@ export const UnifiedLoginScreen: React.FC<LoginScreenProps> = ({ navigation }) =
             ) : (
               <>
                 <Ionicons name="log-in-outline" size={20} color={colors.textInverse} />
-                <Text style={styles.loginButtonText}>Iniciar Sesión</Text>
+                <Text style={styles.loginButtonText}>🚀 Iniciar con React Navigation</Text>
               </>
             )}
           </TouchableOpacity>

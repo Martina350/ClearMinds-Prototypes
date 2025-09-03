@@ -118,6 +118,11 @@ export const MyReportsScreen: React.FC<MyReportsScreenProps> = ({
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.reportsSection}>
+          <View style={{ backgroundColor: '#10B981', padding: 8, borderRadius: 8, marginBottom: 16 }}>
+            <Text style={{ color: 'white', textAlign: 'center', fontSize: 12, fontWeight: '600' }}>
+              ✅ React Navigation Activo - Pantalla: MyReports (Técnico: {technicianName})
+            </Text>
+          </View>
           <Text style={styles.sectionTitle}>Informes Recientes</Text>
           
           {reports.length === 0 ? (

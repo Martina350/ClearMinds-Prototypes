@@ -414,6 +414,11 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
         >
           <View style={styles.welcomeSection}>
             <View style={styles.welcomeSpacer} />
+            <View style={{ backgroundColor: '#10B981', padding: 8, borderRadius: 8, marginBottom: 16 }}>
+              <Text style={{ color: 'white', textAlign: 'center', fontSize: 12, fontWeight: '600' }}>
+                ✅ React Navigation Activo - Pantalla: AdminDashboard
+              </Text>
+            </View>
             <Text style={styles.welcomeTitle}>Bienvenido, Administrador</Text>
             <Text style={styles.welcomeSubtitle}>Gestiona tu sistema de informes de forma eficiente</Text>
           </View>

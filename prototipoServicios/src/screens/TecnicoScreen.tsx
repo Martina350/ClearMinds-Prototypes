@@ -159,6 +159,11 @@ export const TecnicoScreen: React.FC<TecnicoDashboardProps> = ({
           bounces={true}
         >
           <View style={styles.welcomeSection}>
+            <View style={{ backgroundColor: '#10B981', padding: 8, borderRadius: 8, marginBottom: 16 }}>
+              <Text style={{ color: 'white', textAlign: 'center', fontSize: 12, fontWeight: '600' }}>
+                ✅ React Navigation Activo - Pantalla: TecnicoDashboard
+              </Text>
+            </View>
             <Text style={styles.welcomeTitle}>Bienvenido, {technicianName}</Text>
             <Text style={styles.welcomeSubtitle}>Gestiona tus informes de mantenimiento de forma eficiente</Text>
           </View>
