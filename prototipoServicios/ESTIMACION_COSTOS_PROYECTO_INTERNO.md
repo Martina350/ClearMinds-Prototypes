@@ -154,6 +154,54 @@
 - **Tiempo Estimado:** 14 horas
 - **Componentes:** Información detallada, lista de tareas, historial, acciones
 
+### 12. **ClientManagementScreen**
+- **Descripción:** Pantalla de gestión de clientes para administradores
+- **Funcionalidades:**
+  - Lista de clientes con filtros (nombre, cédula/RUC, local)
+  - Crear nuevo cliente
+  - Editar información de cliente
+  - Eliminar clientes
+  - Búsqueda por nombre, cédula/RUC o local
+  - Validación de cédula/RUC única
+- **Complejidad:** 🟡 **MEDIA**
+- **Tiempo Estimado:** 16 horas
+- **Componentes:** Lista, formularios, modales, filtros, búsqueda
+
+### 13. **ClientFormScreen**
+- **Descripción:** Formulario para crear/editar clientes
+- **Funcionalidades:**
+  - Formulario de datos del cliente (nombre, cédula/RUC, dirección, local, parroquia)
+  - Validación de cédula/RUC única
+  - Validaciones de campos requeridos
+  - Integración con selector de locales
+- **Complejidad:** 🟢 **BAJA**
+- **Tiempo Estimado:** 10 horas
+- **Componentes:** Formularios, validaciones, selectores
+
+### 14. **TeamManagementScreen**
+- **Descripción:** Pantalla de gestión de equipos para administradores
+- **Funcionalidades:**
+  - Lista de equipos con filtros
+  - Crear nuevo equipo
+  - Editar equipos existentes
+  - Eliminar equipos
+  - Asignar/desasignar técnicos a equipos
+  - Vista de miembros del equipo
+- **Complejidad:** 🟡 **MEDIA**
+- **Tiempo Estimado:** 18 horas
+- **Componentes:** Lista, formularios, modales, selector de técnicos, gestión de miembros
+
+### 15. **TeamFormScreen**
+- **Descripción:** Formulario para crear/editar equipos
+- **Funcionalidades:**
+  - Formulario de datos del equipo (nombre, descripción)
+  - Selector múltiple de técnicos
+  - Validación de nombre único
+  - Vista previa de miembros seleccionados
+- **Complejidad:** 🟡 **MEDIA**
+- **Tiempo Estimado:** 12 horas
+- **Componentes:** Formularios, selector múltiple, validaciones
+
 ---
 
 ## 🧩 COMPONENTES REUTILIZABLES
@@ -203,6 +251,18 @@
 ### 4. **UserService**
 - **Descripción:** Servicio para gestión completa de usuarios
 - **Funcionalidades:** CRUD usuarios, gestión de roles, sincronización LDAP/AD, permisos
+- **Complejidad:** 🟡 **MEDIA**
+- **Tiempo Estimado:** 14 horas
+
+### 5. **ClientService**
+- **Descripción:** Servicio para gestión completa de clientes
+- **Funcionalidades:** CRUD clientes, validación de cédula/RUC única, búsqueda avanzada, persistencia local
+- **Complejidad:** 🟡 **MEDIA**
+- **Tiempo Estimado:** 12 horas
+
+### 6. **TeamService**
+- **Descripción:** Servicio para gestión completa de equipos
+- **Funcionalidades:** CRUD equipos, gestión de miembros, asignación de técnicos, validaciones de unicidad
 - **Complejidad:** 🟡 **MEDIA**
 - **Tiempo Estimado:** 14 horas
 
@@ -275,26 +335,38 @@
 - **Complejidad:** 🟢 **BAJA**
 - **Tiempo Estimado:** 6 horas
 
+### 7. **Clients API**
+- **Endpoints:** `/clients`, `/clients/{id}`, `/clients/search`, `/clients/validate-cedula`
+- **Funcionalidades:** CRUD clientes, validación de cédula/RUC única, búsqueda avanzada
+- **Complejidad:** 🟡 **MEDIA**
+- **Tiempo Estimado:** 14 horas
+
+### 8. **Teams API**
+- **Endpoints:** `/teams`, `/teams/{id}`, `/teams/{id}/members`, `/teams/{id}/add-member`, `/teams/{id}/remove-member`
+- **Funcionalidades:** CRUD equipos, gestión de miembros, asignación de técnicos
+- **Complejidad:** 🟡 **MEDIA**
+- **Tiempo Estimado:** 16 horas
+
 ---
 
 ## 🗄️ BASE DE DATOS (Interna)
 
 ### 1. **Diseño de Esquema**
 - **Descripción:** Diseño de tablas y relaciones para ambiente interno
-- **Tablas:** users, user_roles, permissions, reports, schedules, schedule_tasks, locations, tasks, notifications, schedule_history
+- **Tablas:** users, user_roles, permissions, reports, schedules, schedule_tasks, locations, tasks, notifications, schedule_history, clients, teams, team_members
 - **Integración:** Sincronización con directorio empresarial
 - **Complejidad:** 🟡 **MEDIA**
-- **Tiempo Estimado:** 10 horas
+- **Tiempo Estimado:** 12 horas
 
 ### 2. **Implementación de Base de Datos**
 - **Descripción:** Creación de tablas, índices, constraints en servidor interno
 - **Complejidad:** 🟢 **BAJA**
-- **Tiempo Estimado:** 8 horas
+- **Tiempo Estimado:** 10 horas
 
 ### 3. **Migraciones y Seeders**
 - **Descripción:** Scripts de migración y datos de empleados existentes
 - **Complejidad:** 🟢 **BAJA**
-- **Tiempo Estimado:** 4 horas
+- **Tiempo Estimado:** 6 horas
 
 ---
 
@@ -327,11 +399,11 @@
 ### **FRONTEND (React Native)**
 | Componente | Complejidad | Horas |
 |------------|-------------|-------|
-| Pantallas (11) | - | 206 |
+| Pantallas (15) | - | 290 |
 | Componentes (4) | - | 30 |
-| Servicios (4) | - | 66 |
+| Servicios (6) | - | 92 |
 | Sistema de Diseño | - | 14 |
-| **SUBTOTAL FRONTEND** | - | **316 horas** |
+| **SUBTOTAL FRONTEND** | - | **426 horas** |
 
 ### **BACKEND (API REST)**
 | Componente | Complejidad | Horas |
@@ -342,22 +414,24 @@
 | Schedules API | 🔴 Alta | 28 |
 | File Upload API | 🟢 Baja | 8 |
 | Notifications API | 🟢 Baja | 6 |
-| **SUBTOTAL BACKEND** | - | **94 horas** |
+| Clients API | 🟡 Media | 14 |
+| Teams API | 🟡 Media | 16 |
+| **SUBTOTAL BACKEND** | - | **124 horas** |
 
 ### **BASE DE DATOS**
 | Componente | Complejidad | Horas |
 |------------|-------------|-------|
-| Diseño de Esquema | 🟡 Media | 10 |
-| Implementación | 🟢 Baja | 8 |
-| Migraciones | 🟢 Baja | 4 |
-| **SUBTOTAL BD** | - | **22 horas** |
+| Diseño de Esquema | 🟡 Media | 12 |
+| Implementación | 🟢 Baja | 10 |
+| Migraciones | 🟢 Baja | 6 |
+| **SUBTOTAL BD** | - | **28 horas** |
 
 ### **TESTING (Reducido para App Interna)**
 | Componente | Complejidad | Horas |
 |------------|-------------|-------|
-| Unit Tests | 🟡 Media | 16 |
-| Integration Tests | 🟢 Baja | 8 |
-| **SUBTOTAL TESTING** | - | **24 horas** |
+| Unit Tests | 🟡 Media | 20 |
+| Integration Tests | 🟢 Baja | 10 |
+| **SUBTOTAL TESTING** | - | **30 horas** |
 
 ### **DEPLOYMENT INTERNO**
 | Componente | Complejidad | Horas |
@@ -374,32 +448,35 @@
 
 | Categoría | Horas | Costo Estimado* |
 |-----------|-------|-----------------|
-| **Frontend** | 316 | $31,600 |
-| **Backend** | 94 | $9,400 |
-| **Base de Datos** | 22 | $2,200 |
-| **Testing** | 24 | $2,400 |
+| **Frontend** | 426 | $42,600 |
+| **Backend** | 124 | $12,400 |
+| **Base de Datos** | 28 | $2,800 |
+| **Testing** | 30 | $3,000 |
 | **Deployment Interno** | 22 | $2,200 |
-| **TOTAL** | **478 horas** | **$47,800** |
+| **TOTAL** | **630 horas** | **$63,000** |
 
 *Costo estimado basado en $100/hora para desarrollador senior full-stack
 
-**💡 AHORRO: $800 (1.6%) comparado con aplicación pública**
+**💡 INCREMENTO: +$15,200 (+32%) por nuevos CRUDs de Clientes y Equipos**
 
 ---
 
 ## ⏱️ CRONOGRAMA ESTIMADO (App Interna)
 
-### **Fase 1: Desarrollo Frontend (6-7 semanas)**
+### **Fase 1: Desarrollo Frontend (8-9 semanas)**
 - Semanas 1-2: Pantallas principales y navegación
 - Semanas 3-4: Formularios y componentes básicos
 - Semana 5: Gestión de usuarios y roles
 - Semana 6: CRUD de cronogramas y gestión avanzada
-- Semana 7: Integración y testing básico
+- Semana 7: CRUD de clientes y equipos
+- Semana 8: Integración y testing básico
+- Semana 9: Refinamiento y optimización
 
-### **Fase 2: Desarrollo Backend (2-3 semanas)**
+### **Fase 2: Desarrollo Backend (3-4 semanas)**
 - Semana 1: API de autenticación SSO y usuarios
 - Semana 2: API de informes y cronogramas
-- Semana 3: Testing e integración con sistemas internos
+- Semana 3: API de clientes y equipos
+- Semana 4: Testing e integración con sistemas internos
 
 ### **Fase 3: Integración y Testing (1-2 semanas)**
 - Semana 1: Integración frontend-backend
@@ -409,7 +486,7 @@
 - Deployment en infraestructura empresarial
 - Configuración de distribución interna
 
-**TOTAL: 10-13 semanas (2.5-3.5 meses)**
+**TOTAL: 13-16 semanas (3.5-4 meses)**
 
 ---
 
@@ -508,14 +585,14 @@
 4. **Escalabilidad futura:** Preparar para múltiples departamentos
 
 ### **Cronograma Optimizado**
-- **MVP en 8-10 semanas** con funcionalidades core
-- **Versión completa en 2.5-3.5 meses**
+- **MVP en 10-12 semanas** con funcionalidades core
+- **Versión completa en 3.5-4 meses**
 - **Iteraciones mensuales** basadas en feedback interno
 
-**💰 INVERSIÓN TOTAL RECOMENDADA: $47,800 - $57,400**  
+**💰 INVERSIÓN TOTAL RECOMENDADA: $63,000 - $75,600**  
 *(Incluyendo 20% de contingencia para ajustes internos)*
 
 ---
 
 *Documento adaptado para aplicación interna - Diciembre 2024*  
-*Versión: 2.0 (Interno)*
+*Versión: 2.1 (Interno + CRUDs Clientes y Equipos)*
