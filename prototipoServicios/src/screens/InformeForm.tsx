@@ -300,17 +300,7 @@ export const InformeForm: React.FC<InformeFormProps> = ({ navigation, route }) =
   );
 
   return (
-    <View style={baseStyles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()} activeOpacity={0.8}>
-          <Ionicons name="chevron-back" size={18} color={colors.textPrimary} style={{ marginRight: spacing.xs }} />
-        </TouchableOpacity>
-        <View style={styles.titleContainer}>
-          <Text style={styles.title}>Informe de Mantenimiento</Text>
-          <Text style={styles.subtitle}>Registro detallado del servicio</Text>
-        </View>
-        <View style={{ width: 80 }} />
-      </View>
+    <ScrollView style={baseStyles.container} showsVerticalScrollIndicator={false}>
 
       <ScrollView 
         contentContainerStyle={baseStyles.scrollContent}
@@ -666,7 +656,7 @@ export const InformeForm: React.FC<InformeFormProps> = ({ navigation, route }) =
           </View>
         </Modal>
       )}
-    </View>
+    </ScrollView>
   );
 };
 

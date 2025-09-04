@@ -125,7 +125,7 @@ export const TecnicoScreen: React.FC<TecnicoDashboardProps> = ({
   };
 
   return (
-    <View style={baseStyles.container}>
+    <ScrollView style={baseStyles.container} showsVerticalScrollIndicator={false}>
       <Animated.View 
         style={[
           baseStyles.content,
@@ -255,11 +255,7 @@ export const TecnicoScreen: React.FC<TecnicoDashboardProps> = ({
           </View>
         </ScrollView>
       </Animated.View>
-
-
-
-
-    </View>
+    </ScrollView>
   );
 };
 

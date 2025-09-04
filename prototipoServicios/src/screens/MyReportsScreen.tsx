@@ -102,8 +102,7 @@ export const MyReportsScreen: React.FC<MyReportsScreenProps> = ({
   };
 
   return (
-    <View style={baseStyles.container}>
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+    <ScrollView style={baseStyles.container} showsVerticalScrollIndicator={false}>
         <View style={styles.reportsSection}>
           <Text style={styles.sectionTitle}>Informes Recientes</Text>
           
@@ -152,10 +151,7 @@ export const MyReportsScreen: React.FC<MyReportsScreenProps> = ({
             </View>
           )}
         </View>
-      </ScrollView>
-
-
-    </View>
+    </ScrollView>
   );
 };
 

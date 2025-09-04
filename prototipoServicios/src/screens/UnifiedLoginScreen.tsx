@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ActivityIndicator, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import AuthService from '../services/AuthService';
 import { colors, spacing, borderRadius, shadows, baseStyles } from '../styles/theme';
@@ -52,7 +52,7 @@ export const UnifiedLoginScreen: React.FC<LoginScreenProps> = ({ navigation }) =
   };
 
   return (
-    <View style={baseStyles.container}>
+    <ScrollView style={baseStyles.container} showsVerticalScrollIndicator={false}>
       {/* Formulario de login */}
       <View style={styles.formContainer}>
         <View style={styles.formCard}>
@@ -191,7 +191,7 @@ export const UnifiedLoginScreen: React.FC<LoginScreenProps> = ({ navigation }) =
       <View style={styles.footer}>
         <Text style={styles.footerText}>© 2025 Todos los derechos reservados.</Text>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 

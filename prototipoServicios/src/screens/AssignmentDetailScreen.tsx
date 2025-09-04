@@ -11,8 +11,7 @@ export const AssignmentDetailScreen: React.FC<Props> = ({ navigation, route }) =
   const { scheduleId, technicianId, technicianName, localName, address, clientName, tasks } = route.params;
 
   return (
-    <View style={baseStyles.container}>
-      <ScrollView style={styles.container} contentContainerStyle={{ padding: spacing.lg }}>
+    <ScrollView style={baseStyles.container} contentContainerStyle={{ padding: spacing.lg }} showsVerticalScrollIndicator={false}>
         <View style={styles.card}>
           <Text style={styles.title}>{localName}</Text>
           <Text style={styles.subtitle}>{address}</Text>
@@ -43,8 +42,7 @@ export const AssignmentDetailScreen: React.FC<Props> = ({ navigation, route }) =
           <Ionicons name="document-text-outline" size={18} color={colors.textInverse} style={{ marginRight: spacing.sm }} />
           <Text style={styles.ctaText}>Crear informe</Text>
         </TouchableOpacity>
-      </ScrollView>
-    </View>
+    </ScrollView>
   );
 };
 
