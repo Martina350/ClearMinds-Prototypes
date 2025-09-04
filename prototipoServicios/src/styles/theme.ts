@@ -209,6 +209,11 @@ export const baseStyles = StyleSheet.create({
     backgroundColor: colors.background,
     paddingTop: spacing.xxl,
   },
+  flexContainer: {
+    flexGrow: 1,
+    padding: 16,
+    justifyContent: 'center',
+  },
   safeArea: {
     flex: 1,
     backgroundColor: colors.background,

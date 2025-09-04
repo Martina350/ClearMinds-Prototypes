@@ -671,7 +671,7 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
   };
 
   return (
-    <View style={baseStyles.container}>
+    <ScrollView style={baseStyles.container}>
       <Animated.View 
         style={[
           baseStyles.content,
@@ -1953,7 +1953,7 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
         </View>
       </Modal>
       )}
-    </View>
+    </ScrollView>
   );
 };
 
