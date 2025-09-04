@@ -1912,51 +1912,42 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
                 <View style={styles.reportDetailSection}>
                   <Text style={styles.reportDetailSectionTitle}>Gestionar Estado</Text>
                   <View style={styles.reportDetailStatusActions}>
-                  <TouchableOpacity 
-                      style={[styles.reportDetailStatusButton, { backgroundColor: '#FFA500' }]}
-                      onPress={() => handleUpdateReportStatus(selectedReport.id, 'pending')}
-                    activeOpacity={0.8}
-                  >
-                      <Text style={styles.reportDetailStatusButtonText}>Pendiente</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity 
-                      style={[styles.reportDetailStatusButton, { backgroundColor: '#007BFF' }]}
-                      onPress={() => handleUpdateReportStatus(selectedReport.id, 'in_review')}
-                    activeOpacity={0.8}
-                  >
-                      <Text style={styles.reportDetailStatusButtonText}>En Revisión</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity 
-                      style={[styles.reportDetailStatusButton, { backgroundColor: '#28A745' }]}
-                      onPress={() => handleUpdateReportStatus(selectedReport.id, 'approved')}
-                    activeOpacity={0.8}
-                  >
+                    <TouchableOpacity 
+                      style={[styles.reportDetailStatusButton, { backgroundColor: colors.success } ]}
+                      onPress={() => {
+                        setShowReportDetail(false);
+                        handleUpdateReportStatus(selectedReport.id, 'approved');
+                      }}
+                      activeOpacity={0.8}
+                    >
                       <Text style={styles.reportDetailStatusButtonText}>Aprobar</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
-                      style={[styles.reportDetailStatusButton, { backgroundColor: '#DC3545' }]}
-                      onPress={() => handleUpdateReportStatus(selectedReport.id, 'rejected')}
+                      style={[styles.reportDetailStatusButton, { backgroundColor: colors.error }]}
+                      onPress={() => {
+                        setShowReportDetail(false);
+                        handleDeleteReport(selectedReport.id);
+                      }}
                       activeOpacity={0.8}
                     >
                       <Text style={styles.reportDetailStatusButtonText}>Rechazar</Text>
-                  </TouchableOpacity>
+                    </TouchableOpacity>
+                  </View>
                 </View>
-                
-                {/* Botón de Eliminar */}
+
+                {/* Acción inferior: Descargar PDF */}
                 <View style={styles.reportDetailSection}>
                   <TouchableOpacity 
-                    style={[styles.reportDetailDeleteButton]}
+                    style={[styles.reportDetailDeleteButton, { backgroundColor: colors.primary }]}
                     onPress={() => {
-                      setShowReportDetail(false);
-                      handleDeleteReport(selectedReport.id);
+                      Alert.alert('PDF descargado');
                     }}
                     activeOpacity={0.8}
                   >
-                    <Ionicons name="trash-outline" size={20} color="#FFFFFF" style={{ marginRight: 8 }} />
-                    <Text style={styles.reportDetailDeleteButtonText}>Eliminar Informe</Text>
+                    <Ionicons name="download-outline" size={20} color="#FFFFFF" style={{ marginRight: 8 }} />
+                    <Text style={styles.reportDetailDeleteButtonText}>Descargar como PDF</Text>
                   </TouchableOpacity>
                 </View>
-              </View>
             </ScrollView>
           </View>
         </View>

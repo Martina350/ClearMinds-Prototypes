@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 // @ts-ignore
 import * as ImagePicker from 'expo-image-picker';
 import ReportService, { Report } from '../services/ReportService';
+import ScheduleService from '../services/ScheduleService';
 import { colors, typography, spacing, borderRadius, shadows, baseStyles } from '../styles/theme';
 import type { InformeFormProps } from '../navigation/types';
 
@@ -14,6 +15,7 @@ export const InformeForm: React.FC<InformeFormProps> = ({ navigation, route }) =
   const technicianName = route.params?.technicianName || 'Técnico';
   const localId = route.params?.localId;
   const localName = route.params?.localName;
+  const scheduleId = route.params?.scheduleId;
   
   const [checkInTime, setCheckInTime] = useState('08:00');
   const [checkOutTime, setCheckOutTime] = useState('10:00');
@@ -203,7 +205,17 @@ export const InformeForm: React.FC<InformeFormProps> = ({ navigation, route }) =
 
       const savedReport = await reportService.createReport(reportData);
       
-      // Guardar el informe generado y mostrar los detalles
+      // Si viene de una asignación, marcarla como completada para este técnico (sin borrar el cronograma)
+      if (scheduleId) {
+        try {
+          await ScheduleService.getInstance().setChecklistStatus(scheduleId, technicianId, 'done');
+        } catch {}
+        Alert.alert('Asignación completada');
+        navigation.navigate('TecnicoDashboard', { technicianId, technicianName });
+        return;
+      }
+      
+      // Flujo original: mostrar detalles del informe generado
       setGeneratedReport(savedReport);
       setShowReportDetails(true);
     } catch (error) {

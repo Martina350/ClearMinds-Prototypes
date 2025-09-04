@@ -4,7 +4,6 @@ import { Ionicons } from '@expo/vector-icons';
 import ReportService, { Report } from '../services/ReportService';
 import ScheduleService, { ScheduleItem } from '../services/ScheduleService';
 import Calendar from '../components/Calendar';
-import Checklist from '../components/Checklist';
 import { colors, typography, spacing, borderRadius, shadows, baseStyles, componentStyles } from '../styles/theme';
 import type { TecnicoDashboardProps } from '../navigation/types';
 
@@ -19,7 +18,7 @@ export const TecnicoScreen: React.FC<TecnicoDashboardProps> = ({
 
   const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().slice(0,10));
   const [daySchedules, setDaySchedules] = useState<ScheduleItem[]>([]);
-  const [selectedSchedule, setSelectedSchedule] = useState<ScheduleItem | null>(null);
+  const [expandedScheduleId, setExpandedScheduleId] = useState<string | null>(null);
   
   // Estados para gestión de informes
   const [reports, setReports] = useState<Report[]>([]);
@@ -78,13 +77,7 @@ export const TecnicoScreen: React.FC<TecnicoDashboardProps> = ({
           technicianName,
         });
         break;
-      case 'new_report':
-        navigation.navigate('InformeForm', {
-          technicianId,
-          technicianName,
-          localId: selectedSchedule?.location.id,
-          localName: selectedSchedule?.location.name,
-        });
+      default:
         break;
     }
   };
@@ -167,52 +160,56 @@ export const TecnicoScreen: React.FC<TecnicoDashboardProps> = ({
               </View>
             ) : (
               <View style={styles.activityList}>
-                {daySchedules.map((s) => (
+                {daySchedules
+                  .filter(s => ScheduleService.getInstance().getChecklistStatus(s.id, technicianId) !== 'done')
+                  .map((s) => (
                   <View key={s.id} style={styles.activityItem}>
                     <Ionicons name="business-outline" size={20} color={colors.primary} style={{ marginRight: spacing.md }} />
                     <View style={styles.activityContent}>
-                      <Text style={styles.activityText}>{s.location.name}</Text>
-                      <Text style={styles.activityTime}>{s.location.address} · Cliente: {s.location.clientName}</Text>
-                      <View style={{ marginTop: spacing.xs }}>
-                        <Text style={styles.activityTime}>Tareas:</Text>
-                        {s.tasks.map(t => (
-                          <Text key={t.id} style={styles.activityTime}>• {t.description}</Text>
-                        ))}
-                      </View>
-                      <View style={{ marginTop: spacing.sm }}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end' }}>
-                          <Checklist
-                            checked={ScheduleService.getInstance().getChecklistStatus(s.id, technicianId) === 'done'}
-                            onChange={async (checked) => {
-                              await ScheduleService.getInstance().setChecklistStatus(s.id, technicianId, checked ? 'done' : 'pending');
-                              if (checked) {
-                                setSelectedSchedule(s);
-                              } else {
-                                if (selectedSchedule?.id === s.id) setSelectedSchedule(null);
-                              }
-                            }}
-                          />
-                        </View>
-                        {selectedSchedule?.id === s.id && (
-                          <View style={{ marginTop: spacing.xs, alignItems: 'center' }}>
+                      <TouchableOpacity 
+                        onPress={() => navigation.navigate('AssignmentDetail', {
+                          scheduleId: s.id,
+                          technicianId,
+                          technicianName,
+                          localId: s.location.id,
+                          localName: s.location.name,
+                          address: s.location.address,
+                          clientName: s.location.clientName,
+                          tasks: s.tasks,
+                        })}
+                        activeOpacity={0.8}
+                      >
+                        <Text style={styles.activityText}>{s.location.name}</Text>
+                      </TouchableOpacity>
+                      {expandedScheduleId === s.id && (
+                        <View style={{ marginTop: spacing.xs }}>
+                          <Text style={styles.activityTime}>{s.location.address} · Cliente: {s.location.clientName}</Text>
+                          <View style={{ marginTop: spacing.xs }}>
+                            <Text style={styles.activityTime}>Tareas:</Text>
+                            {s.tasks.map(t => (
+                              <Text key={t.id} style={styles.activityTime}>• {t.description}</Text>
+                            ))}
+                          </View>
+                          <View style={{ marginTop: spacing.sm, alignItems: 'flex-end' }}>
                             <TouchableOpacity 
                               style={styles.smallPrimaryButton}
-                              onPress={() => navigation.navigate('InformeForm', {
+                              onPress={() => navigation.navigate('InformeForm', ({
                                 technicianId,
                                 technicianName,
                                 localId: s.location.id,
                                 localName: s.location.name,
-                              })}
+                                scheduleId: s.id,
+                              } as any))}
                               activeOpacity={0.8}
                             >
                               <Ionicons name="add-circle-outline" size={16} color={colors.textInverse} style={{ marginRight: spacing.xs }} />
                               <Text style={styles.smallButtonText}>Crear informe</Text>
                             </TouchableOpacity>
                           </View>
-                        )}
-                      </View>
-              </View>
-              </View>
+                        </View>
+                      )}
+                    </View>
+                  </View>
                 ))}
               </View>
             )}
@@ -238,16 +235,6 @@ export const TecnicoScreen: React.FC<TecnicoDashboardProps> = ({
               <View style={styles.emptyState}>
                 <Ionicons name="document-text-outline" size={48} color={colors.textTertiary} />
                 <Text style={styles.emptyStateText}>No tienes informes aún</Text>
-                <TouchableOpacity 
-                  style={styles.createFirstReportButton}
-                  onPress={() => navigation.navigate('InformeForm', {
-                    technicianId,
-                    technicianName,
-                  })}
-                  activeOpacity={0.8}
-                >
-                  <Text style={styles.createFirstReportText}>Crear mi primer informe</Text>
-                </TouchableOpacity>
               </View>
             ) : (
               <View style={styles.activityList}>
@@ -257,13 +244,13 @@ export const TecnicoScreen: React.FC<TecnicoDashboardProps> = ({
                     <View style={styles.activityContent}>
                       <Text style={styles.activityText}>{report.title}</Text>
                       <Text style={styles.activityTime}>{formatDate(report.createdAt)}</Text>
-                </View>
+                    </View>
                     <View style={[styles.statusBadge, { backgroundColor: getStatusColor(report.status) }]}>
                       <Text style={styles.statusText}>{getStatusText(report.status)}</Text>
-                </View>
-              </View>
+                    </View>
+                  </View>
                 ))}
-                </View>
+              </View>
             )}
           </View>
         </ScrollView>

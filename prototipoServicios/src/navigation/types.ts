@@ -16,6 +16,17 @@ export type RootStackParamList = {
     technicianName?: string;
     localId?: string;
     localName?: string;
+    scheduleId?: string;
+  };
+  AssignmentDetail: {
+    scheduleId: string;
+    technicianId: string;
+    technicianName: string;
+    localId: string;
+    localName: string;
+    address: string;
+    clientName: string;
+    tasks: { id: string; description: string }[];
   };
   ReportDetail: {
     reportId: string;

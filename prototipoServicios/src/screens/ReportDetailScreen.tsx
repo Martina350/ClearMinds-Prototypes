@@ -41,9 +41,27 @@ export const ReportDetailScreen: React.FC<ReportDetailProps> = ({ navigation, ro
       await loadReport();
       
       Alert.alert('Éxito', `Estado del informe actualizado a: ${getStatusText(newStatus)}`);
+      // Redirigir al panel de administrador
+      navigation.navigate('AdminDashboard');
     } catch (error) {
       console.error('Error updating report status:', error);
       Alert.alert('Error', 'No se pudo actualizar el estado del informe');
+    }
+  };
+
+  const handleRejectAndDelete = async () => {
+    try {
+      const reportService = ReportService.getInstance();
+      const success = await reportService.deleteReport(reportId);
+      if (success) {
+        Alert.alert('Éxito', 'Informe eliminado correctamente');
+        navigation.navigate('AdminDashboard');
+      } else {
+        Alert.alert('Error', 'No se pudo eliminar el informe');
+      }
+    } catch (error) {
+      console.error('Error deleting report:', error);
+      Alert.alert('Error', 'No se pudo eliminar el informe');
     }
   };
 
@@ -207,10 +225,19 @@ export const ReportDetailScreen: React.FC<ReportDetailProps> = ({ navigation, ro
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.statusButton, { backgroundColor: colors.error }]}
-                onPress={() => handleUpdateStatus('rejected')}
+                onPress={handleRejectAndDelete}
                 activeOpacity={0.8}
               >
                 <Text style={styles.statusButtonText}>Rechazar</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={{ marginTop: spacing.md }}>
+              <TouchableOpacity 
+                style={[styles.statusButton, { backgroundColor: colors.primary }]}
+                onPress={() => Alert.alert('PDF descargado')}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.statusButtonText}>Descargar como PDF</Text>
               </TouchableOpacity>
             </View>
           </View>

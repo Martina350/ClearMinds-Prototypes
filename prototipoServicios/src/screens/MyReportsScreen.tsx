@@ -103,19 +103,6 @@ export const MyReportsScreen: React.FC<MyReportsScreenProps> = ({
 
   return (
     <View style={baseStyles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()} activeOpacity={0.8}>
-          <Ionicons name="chevron-back" size={18} color={colors.textPrimary} style={{ marginRight: spacing.xs }} />
-        </TouchableOpacity>
-        <View style={styles.titleContainer}>
-          <Text style={styles.title}>Mis Informes</Text>
-          <Text style={styles.subtitle}>{technicianName}</Text>
-        </View>
-        <TouchableOpacity style={styles.newReportButton} onPress={handleNewReport} activeOpacity={0.8}>
-          <Ionicons name="add" size={20} color={colors.textInverse} />
-        </TouchableOpacity>
-      </View>
-
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.reportsSection}>
           <Text style={styles.sectionTitle}>Informes Recientes</Text>
@@ -124,13 +111,6 @@ export const MyReportsScreen: React.FC<MyReportsScreenProps> = ({
             <View style={styles.emptyState}>
               <Ionicons name="document-text-outline" size={48} color={colors.textTertiary} />
               <Text style={styles.emptyStateText}>No tienes informes aún</Text>
-              <TouchableOpacity 
-                style={styles.createFirstReportButton}
-                onPress={handleNewReport}
-                activeOpacity={0.8}
-              >
-                <Text style={styles.createFirstReportText}>Crear mi primer informe</Text>
-              </TouchableOpacity>
             </View>
           ) : (
             <View style={styles.reportsList}>

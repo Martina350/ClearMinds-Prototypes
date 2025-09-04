@@ -12,6 +12,7 @@ import { TecnicoScreen } from '../screens/TecnicoScreen';
 import { MyReportsScreen } from '../screens/MyReportsScreen';
 import { InformeForm } from '../screens/InformeForm';
 import { ReportDetailScreen } from '../screens/ReportDetailScreen';
+import AssignmentDetailScreen from '../screens/AssignmentDetailScreen';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -103,6 +104,13 @@ export const AppNavigator: React.FC = () => {
           component={ReportDetailScreen}
           options={{
             title: 'Detalle Informe',
+          }}
+        />
+        <Stack.Screen
+          name="AssignmentDetail"
+          component={AssignmentDetailScreen}
+          options={{
+            title: 'Detalle de Asignación',
           }}
         />
       </Stack.Navigator>
