@@ -23,7 +23,7 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
   const [showSettings, setShowSettings] = useState(false);
   const [showSupport, setShowSupport] = useState(false);
   // Estado calendario/cronograma
-  const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().slice(0,10));
+  const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().slice(0, 10));
   const [schedules, setSchedules] = useState<ScheduleItem[]>([]);
   const [showScheduleForm, setShowScheduleForm] = useState(false);
   const [editingSchedule, setEditingSchedule] = useState<ScheduleItem | null>(null);
@@ -34,38 +34,38 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
     tasks: '' as string,
   });
   const [showLocalReports, setShowLocalReports] = useState<null | { localId: string; localName: string }>(null);
-  
+
   // Estados para gestión de informes
   const [reports, setReports] = useState<Report[]>([]);
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
   const [showReportDetail, setShowReportDetail] = useState(false);
   const [reportsFilter, setReportsFilter] = useState<'all' | 'pending' | 'in_review' | 'approved' | 'rejected'>('all');
-  
+
   // Estados para gestión de usuarios
   const [users, setUsers] = useState<AuthUser[]>([]);
   const [showAddUser, setShowAddUser] = useState(false);
   const [showUserList, setShowUserList] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
-  
+
   // Estados para gestión de clientes
   const [clients, setClients] = useState<Client[]>([]);
   const [showAddClient, setShowAddClient] = useState(false);
   const [showClientList, setShowClientList] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
-  
+
   // Estados para gestión de equipos
   const [teams, setTeams] = useState<Team[]>([]);
   const [showAddTeam, setShowAddTeam] = useState(false);
   const [showTeamList, setShowTeamList] = useState(false);
   const [editingTeam, setEditingTeam] = useState<Team | null>(null);
-  
+
   // Estados para el formulario de usuario
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     role: 'Técnico'
   });
-  
+
   // Estados para el formulario de cliente
   const [formClient, setFormClient] = useState({
     name: '',
@@ -74,7 +74,7 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
     local: '',
     parroquia: ''
   });
-  
+
   // Estados para el formulario de equipo
   const [formTeam, setFormTeam] = useState({
     name: '',
@@ -86,6 +86,10 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
   const [showClientSelector, setShowClientSelector] = useState(false);
   const [showTeamSelector, setShowTeamSelector] = useState(false);
   const [showTechnicianSelector, setShowTechnicianSelector] = useState(false);
+
+  //
+  const [showImagePreview, setShowImagePreview] = useState(false);
+  const [previewImage, setPreviewImage] = useState<string>('');
 
   React.useEffect(() => {
     Animated.timing(fadeAnim, {
@@ -137,11 +141,11 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
     const clientService = ClientService.getInstance();
     const allClients = clientService.getAllClients();
     setClients(allClients);
-    
+
     const unsubscribe = clientService.subscribe((updatedClients) => {
       setClients(updatedClients);
     });
-    
+
     return unsubscribe;
   }, []);
 
@@ -150,11 +154,11 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
     const teamService = TeamService.getInstance();
     const allTeams = teamService.getAllTeams();
     setTeams(allTeams);
-    
+
     const unsubscribe = teamService.subscribe((updatedTeams) => {
       setTeams(updatedTeams);
     });
-    
+
     return unsubscribe;
   }, []);
 
@@ -164,7 +168,7 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
     return report.status === reportsFilter;
   });
 
-    
+
 
   const handleQuickAction = (action: string) => {
     switch (action) {
@@ -206,7 +210,7 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
   const saveSchedule = async () => {
     try {
       const svc = ScheduleService.getInstance();
-      
+
       // Validar campos requeridos
       if (!formSchedule.teamName.trim() || !formSchedule.clientId || !formSchedule.address.trim() || !formSchedule.tasks.trim()) {
         Alert.alert('Error', 'Completa todos los campos requeridos');
@@ -234,30 +238,30 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
         clientName: client.name,
       };
 
-      const tasks = formSchedule.tasks.split(',').map(s => s.trim()).filter(Boolean).map((d, i) => ({ id: `${Date.now()}-${i}` , description: d }));
-      
+      const tasks = formSchedule.tasks.split(',').map(s => s.trim()).filter(Boolean).map((d, i) => ({ id: `${Date.now()}-${i}`, description: d }));
+
       if (tasks.length === 0) {
         Alert.alert('Error', 'Debe haber al menos 1 tarea');
         return;
       }
 
       if (editingSchedule) {
-        await svc.updateSchedule(editingSchedule.id, { 
-          teamName: formSchedule.teamName, 
-          location: local, 
-          technicianIds: team.technicianIds, 
-          tasks 
+        await svc.updateSchedule(editingSchedule.id, {
+          teamName: formSchedule.teamName,
+          location: local,
+          technicianIds: team.technicianIds,
+          tasks
         });
       } else {
-        await svc.addSchedule({ 
-          date: selectedDate, 
-          teamName: formSchedule.teamName, 
-          location: local, 
-          technicianIds: team.technicianIds, 
-          tasks 
+        await svc.addSchedule({
+          date: selectedDate,
+          teamName: formSchedule.teamName,
+          location: local,
+          technicianIds: team.technicianIds,
+          tasks
         });
       }
-      
+
       setShowScheduleForm(false);
       setEditingSchedule(null);
     } catch (e: any) {
@@ -302,54 +306,54 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
     try {
       const authService = AuthService.getInstance();
 
-    if (editingUser) {
-      // Editar usuario existente
+      if (editingUser) {
+        // Editar usuario existente
         const updatedUser = authService.updateUser(editingUser.id, {
           name: formData.name.trim(),
           email: formData.email.trim()
         });
-        
+
         if (updatedUser) {
           setUsers(authService.getAllUsers());
           Alert.alert('Éxito', 'Usuario actualizado correctamente');
         }
-    } else {
+      } else {
         // Solo permitir crear técnicos
         if (formData.role !== 'Técnico') {
           Alert.alert('Error', 'Solo puedes crear usuarios técnicos');
           return;
         }
-        
+
         // Generar username y password únicos
         const baseUsername = formData.name.toLowerCase().replace(/\s+/g, '');
         let username = baseUsername;
         let counter = 1;
-        
+
         while (authService.isUsernameTaken(username)) {
           username = `${baseUsername}${counter}`;
           counter++;
         }
-        
+
         const password = 'tecnico123'; // Contraseña por defecto
-        
+
         const newUser = authService.createTechnician(
           username,
           password,
           formData.name.trim(),
           formData.email.trim()
         );
-        
+
         setUsers(authService.getAllUsers());
         Alert.alert(
-          'Usuario creado exitosamente', 
+          'Usuario creado exitosamente',
           `Usuario: ${username}\nContraseña: ${password}\n\nGuarda estas credenciales.`
         );
-    }
+      }
 
-    setShowAddUser(false);
+      setShowAddUser(false);
       setShowUserManagement(true);
-    setEditingUser(null);
-    setFormData({ name: '', email: '', role: 'Técnico' });
+      setEditingUser(null);
+      setFormData({ name: '', email: '', role: 'Técnico' });
     } catch (error) {
       Alert.alert('Error', 'No se pudo guardar el usuario');
     }
@@ -371,14 +375,14 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
       '¿Estás seguro de que quieres eliminar este usuario?',
       [
         { text: 'Cancelar', style: 'cancel' },
-        { 
-          text: 'Eliminar', 
+        {
+          text: 'Eliminar',
           style: 'destructive',
           onPress: () => {
             try {
               const authService = AuthService.getInstance();
               const success = authService.deleteUser(userId);
-              
+
               if (success) {
                 setUsers(authService.getAllUsers());
                 Alert.alert('Éxito', 'Usuario eliminado correctamente');
@@ -425,7 +429,7 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
           local: formClient.local.trim(),
           parroquia: formClient.parroquia.trim()
         });
-        
+
         if (updatedClient) {
           Alert.alert('Éxito', 'Cliente actualizado correctamente');
         }
@@ -438,7 +442,7 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
           local: formClient.local.trim(),
           parroquia: formClient.parroquia.trim()
         });
-        
+
         Alert.alert('Éxito', 'Cliente creado correctamente');
       }
 
@@ -469,14 +473,14 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
       '¿Estás seguro de que quieres eliminar este cliente?',
       [
         { text: 'Cancelar', style: 'cancel' },
-        { 
-          text: 'Eliminar', 
+        {
+          text: 'Eliminar',
           style: 'destructive',
           onPress: async () => {
             try {
               const clientService = ClientService.getInstance();
               const success = await clientService.deleteClient(clientId);
-              
+
               if (success) {
                 Alert.alert('Éxito', 'Cliente eliminado correctamente');
               } else {
@@ -524,7 +528,7 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
           name: formTeam.name.trim(),
           technicianIds: formTeam.technicianIds
         });
-        
+
         if (updatedTeam) {
           Alert.alert('Éxito', 'Equipo actualizado correctamente');
         }
@@ -534,7 +538,7 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
           name: formTeam.name.trim(),
           technicianIds: formTeam.technicianIds
         });
-        
+
         Alert.alert('Éxito', 'Equipo creado correctamente');
       }
 
@@ -563,14 +567,14 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
       '¿Estás seguro de que quieres eliminar este equipo?',
       [
         { text: 'Cancelar', style: 'cancel' },
-        { 
-          text: 'Eliminar', 
+        {
+          text: 'Eliminar',
           style: 'destructive',
           onPress: async () => {
             try {
               const teamService = TeamService.getInstance();
               const success = await teamService.deleteTeam(teamId);
-              
+
               if (success) {
                 Alert.alert('Éxito', 'Equipo eliminado correctamente');
               } else {
@@ -607,20 +611,30 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
     }
   };
 
+  const handleImagePreview = (uri: string) => {
+    if (!uri || uri.trim() === '') {
+      return;
+    }
+    setPreviewImage(uri);
+    setShowImagePreview(true);
+  };
+
+  
+
   const handleDeleteReport = async (reportId: string) => {
     Alert.alert(
       'Confirmar eliminación',
       '¿Estás seguro de que quieres eliminar este informe? Esta acción no se puede deshacer.',
       [
         { text: 'Cancelar', style: 'cancel' },
-        { 
-          text: 'Eliminar', 
+        {
+          text: 'Eliminar',
           style: 'destructive',
           onPress: async () => {
             try {
               const reportService = ReportService.getInstance();
               const success = await reportService.deleteReport(reportId);
-              
+
               if (success) {
                 Alert.alert('Éxito', 'Informe eliminado correctamente');
                 // Recargar informes
@@ -670,15 +684,48 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
     }
   };
 
+  const formatTime = (time: string) => {
+    const [hours, minutes] = time.split(':');
+    const hour = parseInt(hours);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const displayHour = hour % 12 || 12;
+    return `${displayHour}:${minutes} ${ampm}`;
+  };
+
+  const renderPhotoSection = (title: string, photos: string[]) => (
+    <View style={styles.photoSection}>
+      <Text style={styles.photoSectionTitle}>{title}</Text>
+      {photos.length === 0 ? (
+        <Text style={styles.noPhotosText}>No hay fotos</Text>
+      ) : (
+        <View style={styles.photoGrid}>
+          {photos.map((uri, index) => (
+            <TouchableOpacity
+              key={index}
+              style={styles.photoItem}
+              onPress={() => handleImagePreview(uri)}
+              activeOpacity={0.9}
+            >
+              <Image 
+                source={{ uri }} 
+                style={styles.photoThumbnail}
+              />
+            </TouchableOpacity>
+          ))}
+        </View>
+      )}
+    </View>
+  );
+
   return (
     <ScrollView style={baseStyles.container}>
-      <Animated.View 
+      <Animated.View
         style={[
           baseStyles.content,
           { opacity: fadeAnim }
         ]}
       >
-        <ScrollView 
+        <ScrollView
           contentContainerStyle={baseStyles.scrollContent}
           showsVerticalScrollIndicator={false}
           bounces={true}
@@ -687,9 +734,9 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
             <View style={styles.welcomeSpacer} />
             <Text style={styles.welcomeTitle}>Bienvenido, Administrador</Text>
             <Text style={styles.welcomeSubtitle}>Gestiona tu sistema de informes de forma eficiente</Text>
-            
+
             {/* Botón de gestión de usuarios */}
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.managementButton}
               onPress={() => setShowUserManagement(true)}
               activeOpacity={0.8}
@@ -745,7 +792,7 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
             </View>
           </View>
 
-          
+
         </ScrollView>
       </Animated.View>
 
@@ -760,7 +807,7 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>{editingSchedule ? 'Editar Cronograma' : 'Agregar Cronograma'}</Text>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.modalCloseButton}
                 onPress={() => setShowScheduleForm(false)}
                 activeOpacity={0.8}
@@ -772,7 +819,7 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
               <View style={styles.formInputGroup}>
                 <Text style={styles.inputLabel}>Cliente</Text>
                 <View style={styles.pickerContainer}>
-                  <TouchableOpacity 
+                  <TouchableOpacity
                     style={styles.pickerButton}
                     onPress={() => {
                       if (clients.length === 0) {
@@ -784,8 +831,8 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
                     activeOpacity={0.8}
                   >
                     <Text style={styles.pickerButtonText}>
-                      {formSchedule.clientId ? 
-                        clients.find(c => c.id === formSchedule.clientId)?.name || 'Seleccionar Cliente' : 
+                      {formSchedule.clientId ?
+                        clients.find(c => c.id === formSchedule.clientId)?.name || 'Seleccionar Cliente' :
                         'Seleccionar Cliente'
                       }
                     </Text>
@@ -793,22 +840,22 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
                   </TouchableOpacity>
                 </View>
               </View>
-              
+
               <View style={styles.formInputGroup}>
                 <Text style={styles.inputLabel}>Dirección</Text>
                 <TextInput
                   style={styles.textInput}
-                  placeholder="Calle 123, Ciudad"
+                  placeholder="Calle 123"
                   placeholderTextColor="#ADB5BD"
                   value={formSchedule.address}
                   onChangeText={(t) => setFormSchedule({ ...formSchedule, address: t })}
                 />
               </View>
-              
+
               <View style={styles.formInputGroup}>
                 <Text style={styles.inputLabel}>Equipo</Text>
                 <View style={styles.pickerContainer}>
-                  <TouchableOpacity 
+                  <TouchableOpacity
                     style={styles.pickerButton}
                     onPress={() => {
                       if (teams.length === 0) {
@@ -826,7 +873,7 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
                   </TouchableOpacity>
                 </View>
               </View>
-              
+
               <View style={styles.formInputGroup}>
                 <Text style={styles.inputLabel}>Actividades por realizar</Text>
                 <TextInput
@@ -837,7 +884,7 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
                   onChangeText={(t) => setFormSchedule({ ...formSchedule, tasks: t })}
                 />
               </View>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.saveButton}
                 onPress={saveSchedule}
                 activeOpacity={0.8}
@@ -860,7 +907,7 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Seleccionar Cliente</Text>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.modalCloseButton}
                 onPress={() => setShowClientSelector(false)}
                 activeOpacity={0.8}
@@ -912,7 +959,7 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Seleccionar Equipo</Text>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.modalCloseButton}
                 onPress={() => setShowTeamSelector(false)}
                 activeOpacity={0.8}
@@ -969,13 +1016,13 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
             <View style={styles.modalContent}>
               <View style={styles.modalHeader}>
                 <Text style={styles.modalTitle}>Informes de {showLocalReports.localName}</Text>
-              <TouchableOpacity 
+                <TouchableOpacity
                   style={styles.modalCloseButton}
                   onPress={() => setShowLocalReports(null)}
                   activeOpacity={0.8}
                 >
                   <Ionicons name="close" size={16} color="#fff" />
-              </TouchableOpacity>
+                </TouchableOpacity>
               </View>
               <ScrollView style={styles.modalBody}>
                 <View style={styles.reportList}>
@@ -995,32 +1042,32 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
                         </View>
                         <View style={styles.reportActions}>
                           <View style={styles.reportActionButtons}>
-              <TouchableOpacity 
+                            <TouchableOpacity
                               style={styles.viewReportButton}
                               onPress={() => { setShowLocalReports(null); handleViewReport(report); }}
                               activeOpacity={0.8}
                               hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
                             >
                               <Ionicons name="eye-outline" size={16} color="#007BFF" />
-              </TouchableOpacity>
-              <TouchableOpacity 
+                            </TouchableOpacity>
+                            <TouchableOpacity
                               style={styles.deleteReportButton}
                               onPress={() => handleDeleteReport(report.id)}
                               activeOpacity={0.8}
                               hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
                             >
                               <Ionicons name="trash-outline" size={16} color="#DC3545" />
-              </TouchableOpacity>
-            </View>
-            </View>
+                            </TouchableOpacity>
+                          </View>
+                        </View>
                       </View>
                     ))
                   )}
                 </View>
               </ScrollView>
+            </View>
           </View>
-        </View>
-      </Modal>
+        </Modal>
       )}
       {/* Modal de Gestión de Usuarios */}
       <Modal
@@ -1036,7 +1083,7 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
                 <Ionicons name="people-outline" size={20} color="#212529" style={{ marginRight: 8 }} />
                 <Text style={styles.modalTitle}>Gestión de Usuarios</Text>
               </View>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.modalCloseButton}
                 onPress={() => setShowUserManagement(false)}
                 activeOpacity={0.8}
@@ -1044,13 +1091,13 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
                 <Ionicons name="close" size={16} color="#fff" />
               </TouchableOpacity>
             </View>
-            
+
             <ScrollView style={styles.modalBody}>
               <View style={styles.userSection}>
                 <Text style={styles.sectionDescription}>
                   Administra los usuarios del sistema
                 </Text>
-                
+
                 <View style={styles.userStats}>
                   <View style={styles.userStat}>
                     <Text style={styles.userStatNumber}>{getUsersByRole('tecnico')}</Text>
@@ -1065,9 +1112,9 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
                     <Text style={styles.userStatLabel}>Total</Text>
                   </View>
                 </View>
-                
+
                 <View style={styles.userActions}>
-                  <TouchableOpacity 
+                  <TouchableOpacity
                     style={styles.userAction}
                     onPress={handleAddUser}
                     activeOpacity={0.8}
@@ -1075,19 +1122,19 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
                     <Ionicons name="person-add-outline" size={20} color="#495057" style={{ marginRight: 12 }} />
                     <Text style={styles.userActionText}>Agregar Usuario</Text>
                   </TouchableOpacity>
-                  
-                  <TouchableOpacity 
+
+                  <TouchableOpacity
                     style={styles.userAction}
                     onPress={handleViewUserList}
                     activeOpacity={0.8}
                   >
                     <Ionicons name="list-outline" size={20} color="#495057" style={{ marginRight: 12 }} />
-                    <Text style={styles.userActionText}>Ver Lista</Text>
+                    <Text style={styles.userActionText}>Ver Usuarios</Text>
                   </TouchableOpacity>
                 </View>
-                
+
                 <View style={styles.userActions}>
-                  <TouchableOpacity 
+                  <TouchableOpacity
                     style={styles.userAction}
                     onPress={handleAddClient}
                     activeOpacity={0.8}
@@ -1095,8 +1142,8 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
                     <Ionicons name="business-outline" size={20} color="#495057" style={{ marginRight: 12 }} />
                     <Text style={styles.userActionText}>Agregar Cliente</Text>
                   </TouchableOpacity>
-                  
-                  <TouchableOpacity 
+
+                  <TouchableOpacity
                     style={styles.userAction}
                     onPress={handleViewClientList}
                     activeOpacity={0.8}
@@ -1105,9 +1152,9 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
                     <Text style={styles.userActionText}>Ver Clientes</Text>
                   </TouchableOpacity>
                 </View>
-                
+
                 <View style={styles.userActions}>
-                  <TouchableOpacity 
+                  <TouchableOpacity
                     style={styles.userAction}
                     onPress={handleAddTeam}
                     activeOpacity={0.8}
@@ -1115,8 +1162,8 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
                     <Ionicons name="people-outline" size={20} color="#495057" style={{ marginRight: 12 }} />
                     <Text style={styles.userActionText}>Agregar Equipo</Text>
                   </TouchableOpacity>
-                  
-                  <TouchableOpacity 
+
+                  <TouchableOpacity
                     style={styles.userAction}
                     onPress={handleViewTeamList}
                     activeOpacity={0.8}
@@ -1147,7 +1194,7 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
                   {editingUser ? 'Editar Usuario' : 'Agregar Usuario'}
                 </Text>
               </View>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.modalCloseButton}
                 onPress={() => {
                   setShowAddUser(false);
@@ -1158,7 +1205,7 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
                 <Ionicons name="close" size={16} color="#fff" />
               </TouchableOpacity>
             </View>
-            
+
             <ScrollView style={styles.modalBody}>
               <View style={styles.formSection}>
                 <View style={styles.formInputGroup}>
@@ -1166,47 +1213,47 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
                   <TextInput
                     style={styles.textInput}
                     value={formData.name}
-                    onChangeText={(text) => setFormData({...formData, name: text})}
+                    onChangeText={(text) => setFormData({ ...formData, name: text })}
                     placeholder="Ingresa el nombre completo"
                     placeholderTextColor="#ADB5BD"
                   />
                 </View>
-                
+
                 <View style={styles.formInputGroup}>
                   <Text style={styles.inputLabel}>Correo electrónico</Text>
                   <TextInput
                     style={styles.textInput}
                     value={formData.email}
-                    onChangeText={(text) => setFormData({...formData, email: text})}
+                    onChangeText={(text) => setFormData({ ...formData, email: text })}
                     placeholder="correo@empresa.com"
                     placeholderTextColor="#ADB5BD"
                     keyboardType="email-address"
                     autoCapitalize="none"
                   />
                 </View>
-                
+
                 <View style={styles.formInputGroup}>
                   <Text style={styles.inputLabel}>Rol</Text>
                   <View style={styles.roleSelector}>
-                      <TouchableOpacity
-                        style={[
-                          styles.roleOption,
+                    <TouchableOpacity
+                      style={[
+                        styles.roleOption,
                         styles.roleOptionSelected
-                        ]}
-                        activeOpacity={0.8}
-                      >
-                        <Text style={[
-                          styles.roleOptionText,
+                      ]}
+                      activeOpacity={0.8}
+                    >
+                      <Text style={[
+                        styles.roleOptionText,
                         styles.roleOptionTextSelected
-                        ]}>
+                      ]}>
                         Técnico
-                        </Text>
-                      </TouchableOpacity>
-                    </View>
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
                   <Text style={styles.roleNote}>Solo puedes crear usuarios técnicos</Text>
                 </View>
-                
-                <TouchableOpacity 
+
+                <TouchableOpacity
                   style={styles.saveButton}
                   onPress={handleSaveUser}
                   activeOpacity={0.8}
@@ -1214,8 +1261,8 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
                   <Text style={styles.saveButtonText}>
                     {editingUser ? 'Actualizar Usuario' : 'Guardar Usuario'}
                   </Text>
-                    </TouchableOpacity>
-                  </View>
+                </TouchableOpacity>
+              </View>
             </ScrollView>
           </View>
         </View>
@@ -1234,8 +1281,8 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <Ionicons name="people-outline" size={20} color="#212529" style={{ marginRight: 8 }} />
                 <Text style={styles.modalTitle}>Lista de Usuarios</Text>
-                    </View>
-              <TouchableOpacity 
+              </View>
+              <TouchableOpacity
                 style={styles.modalCloseButton}
                 onPress={() => {
                   setShowUserList(false);
@@ -1244,16 +1291,16 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
                 activeOpacity={0.8}
               >
                 <Ionicons name="close" size={16} color="#fff" />
-                    </TouchableOpacity>
-                  </View>
-                  
+              </TouchableOpacity>
+            </View>
+
             <ScrollView style={styles.modalBody}>
               <View style={styles.userListSection}>
                 {users.length === 0 ? (
                   <View style={styles.emptyState}>
                     <Ionicons name="people-outline" size={48} color="#ADB5BD" />
                     <Text style={styles.emptyStateText}>No hay usuarios registrados</Text>
-                    </View>
+                  </View>
                 ) : (
                   <View style={styles.userList}>
                     {users.map((user) => (
@@ -1268,23 +1315,23 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
                             </Text>
                           </View>
                         </View>
-                                                 <View style={styles.userItemActions}>
-                           <TouchableOpacity 
-                             style={styles.editButton}
-                             onPress={() => handleEditUser(user)}
-                             activeOpacity={0.8}
-                           >
-                             <Ionicons name="create-outline" size={16} color="#007BFF" />
-                           </TouchableOpacity>
-                           <TouchableOpacity 
-                             style={styles.deleteButton}
-                             onPress={() => handleDeleteUser(user.id)}
-                             activeOpacity={0.8}
-                           >
-                             <Ionicons name="trash-outline" size={16} color="#DC3545" />
-                    </TouchableOpacity>
-                  </View>
-                </View>
+                        <View style={styles.userItemActions}>
+                          <TouchableOpacity
+                            style={styles.editButton}
+                            onPress={() => handleEditUser(user)}
+                            activeOpacity={0.8}
+                          >
+                            <Ionicons name="create-outline" size={16} color="#007BFF" />
+                          </TouchableOpacity>
+                          <TouchableOpacity
+                            style={styles.deleteButton}
+                            onPress={() => handleDeleteUser(user.id)}
+                            activeOpacity={0.8}
+                          >
+                            <Ionicons name="trash-outline" size={16} color="#DC3545" />
+                          </TouchableOpacity>
+                        </View>
+                      </View>
                     ))}
                   </View>
                 )}
@@ -1310,7 +1357,7 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
                   {editingClient ? 'Editar Cliente' : 'Agregar Cliente'}
                 </Text>
               </View>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.modalCloseButton}
                 onPress={() => {
                   setShowAddClient(false);
@@ -1321,7 +1368,7 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
                 <Ionicons name="close" size={16} color="#fff" />
               </TouchableOpacity>
             </View>
-            
+
             <ScrollView style={styles.modalBody}>
               <View style={styles.formSection}>
                 <View style={styles.formInputGroup}>
@@ -1329,58 +1376,58 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
                   <TextInput
                     style={styles.textInput}
                     value={formClient.name}
-                    onChangeText={(text) => setFormClient({...formClient, name: text})}
+                    onChangeText={(text) => setFormClient({ ...formClient, name: text })}
                     placeholder="Empresa XYZ S.A."
                     placeholderTextColor="#ADB5BD"
                   />
                 </View>
-                
+
                 <View style={styles.formInputGroup}>
                   <Text style={styles.inputLabel}>Cédula/RUC</Text>
                   <TextInput
                     style={styles.textInput}
                     value={formClient.cedulaRuc}
-                    onChangeText={(text) => setFormClient({...formClient, cedulaRuc: text})}
+                    onChangeText={(text) => setFormClient({ ...formClient, cedulaRuc: text })}
                     placeholder="1234567890001"
                     placeholderTextColor="#ADB5BD"
                     keyboardType="numeric"
                   />
                 </View>
-                
+
                 <View style={styles.formInputGroup}>
                   <Text style={styles.inputLabel}>Dirección</Text>
                   <TextInput
                     style={styles.textInput}
                     value={formClient.address}
-                    onChangeText={(text) => setFormClient({...formClient, address: text})}
+                    onChangeText={(text) => setFormClient({ ...formClient, address: text })}
                     placeholder="Av. Principal 123, Ciudad"
                     placeholderTextColor="#ADB5BD"
                   />
                 </View>
-                
+
                 <View style={styles.formInputGroup}>
                   <Text style={styles.inputLabel}>Local</Text>
                   <TextInput
                     style={styles.textInput}
                     value={formClient.local}
-                    onChangeText={(text) => setFormClient({...formClient, local: text})}
+                    onChangeText={(text) => setFormClient({ ...formClient, local: text })}
                     placeholder="Sucursal Centro"
                     placeholderTextColor="#ADB5BD"
                   />
                 </View>
-                
+
                 <View style={styles.formInputGroup}>
                   <Text style={styles.inputLabel}>Parroquia</Text>
                   <TextInput
                     style={styles.textInput}
                     value={formClient.parroquia}
-                    onChangeText={(text) => setFormClient({...formClient, parroquia: text})}
+                    onChangeText={(text) => setFormClient({ ...formClient, parroquia: text })}
                     placeholder="San Blas"
                     placeholderTextColor="#ADB5BD"
                   />
                 </View>
-                
-                <TouchableOpacity 
+
+                <TouchableOpacity
                   style={styles.saveButton}
                   onPress={handleSaveClient}
                   activeOpacity={0.8}
@@ -1409,7 +1456,7 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
                 <Ionicons name="business-outline" size={20} color="#212529" style={{ marginRight: 8 }} />
                 <Text style={styles.modalTitle}>Lista de Clientes</Text>
               </View>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.modalCloseButton}
                 onPress={() => {
                   setShowClientList(false);
@@ -1420,7 +1467,7 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
                 <Ionicons name="close" size={16} color="#fff" />
               </TouchableOpacity>
             </View>
-            
+
             <ScrollView style={styles.modalBody}>
               <View style={styles.userListSection}>
                 {clients.length === 0 ? (
@@ -1443,14 +1490,14 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
                           </View>
                         </View>
                         <View style={styles.userItemActions}>
-                          <TouchableOpacity 
+                          <TouchableOpacity
                             style={styles.editButton}
                             onPress={() => handleEditClient(client)}
                             activeOpacity={0.8}
                           >
                             <Ionicons name="create-outline" size={16} color="#007BFF" />
                           </TouchableOpacity>
-                          <TouchableOpacity 
+                          <TouchableOpacity
                             style={styles.deleteButton}
                             onPress={() => handleDeleteClient(client.id)}
                             activeOpacity={0.8}
@@ -1484,7 +1531,7 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
                   {editingTeam ? 'Editar Equipo' : 'Agregar Equipo'}
                 </Text>
               </View>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.modalCloseButton}
                 onPress={() => {
                   setShowAddTeam(false);
@@ -1495,7 +1542,7 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
                 <Ionicons name="close" size={16} color="#fff" />
               </TouchableOpacity>
             </View>
-            
+
             <ScrollView style={styles.modalBody}>
               <View style={styles.formSection}>
                 <View style={styles.formInputGroup}>
@@ -1503,16 +1550,16 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
                   <TextInput
                     style={styles.textInput}
                     value={formTeam.name}
-                    onChangeText={(text) => setFormTeam({...formTeam, name: text})}
+                    onChangeText={(text) => setFormTeam({ ...formTeam, name: text })}
                     placeholder="Equipo Norte"
                     placeholderTextColor="#ADB5BD"
                   />
                 </View>
-                
+
                 <View style={styles.formInputGroup}>
                   <Text style={styles.inputLabel}>Técnicos del Equipo</Text>
                   <View style={styles.pickerContainer}>
-                    <TouchableOpacity 
+                    <TouchableOpacity
                       style={styles.pickerButton}
                       onPress={() => {
                         if (users.filter(u => u.role === 'tecnico').length === 0) {
@@ -1524,15 +1571,15 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
                       activeOpacity={0.8}
                     >
                       <Text style={styles.pickerButtonText}>
-                        {formTeam.technicianIds.length > 0 ? 
-                          `${formTeam.technicianIds.length} técnico(s) seleccionado(s)` : 
+                        {formTeam.technicianIds.length > 0 ?
+                          `${formTeam.technicianIds.length} técnico(s) seleccionado(s)` :
                           'Seleccionar Técnicos'
                         }
                       </Text>
                       <Ionicons name="chevron-down" size={16} color={colors.textSecondary} />
                     </TouchableOpacity>
                   </View>
-                  
+
                   {/* Lista de técnicos seleccionados */}
                   {formTeam.technicianIds.length > 0 && (
                     <View style={styles.selectedTechniciansList}>
@@ -1559,8 +1606,8 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
                     </View>
                   )}
                 </View>
-                
-                <TouchableOpacity 
+
+                <TouchableOpacity
                   style={styles.saveButton}
                   onPress={handleSaveTeam}
                   activeOpacity={0.8}
@@ -1589,7 +1636,7 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
                 <Ionicons name="people-outline" size={20} color="#212529" style={{ marginRight: 8 }} />
                 <Text style={styles.modalTitle}>Lista de Equipos</Text>
               </View>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.modalCloseButton}
                 onPress={() => {
                   setShowTeamList(false);
@@ -1600,7 +1647,7 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
                 <Ionicons name="close" size={16} color="#fff" />
               </TouchableOpacity>
             </View>
-            
+
             <ScrollView style={styles.modalBody}>
               <View style={styles.userListSection}>
                 {teams.length === 0 ? (
@@ -1618,14 +1665,14 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
                           <Text style={styles.userUsername}>Técnicos: {team.technicianIds.length}</Text>
                         </View>
                         <View style={styles.userItemActions}>
-                          <TouchableOpacity 
+                          <TouchableOpacity
                             style={styles.editButton}
                             onPress={() => handleEditTeam(team)}
                             activeOpacity={0.8}
                           >
                             <Ionicons name="create-outline" size={16} color="#007BFF" />
                           </TouchableOpacity>
-                          <TouchableOpacity 
+                          <TouchableOpacity
                             style={styles.deleteButton}
                             onPress={() => handleDeleteTeam(team.id)}
                             activeOpacity={0.8}
@@ -1654,7 +1701,7 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Seleccionar Técnicos</Text>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.modalCloseButton}
                 onPress={() => setShowTechnicianSelector(false)}
                 activeOpacity={0.8}
@@ -1730,7 +1777,7 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
                 <Ionicons name="document-text-outline" size={20} color="#212529" style={{ marginRight: 8 }} />
                 <Text style={styles.modalTitle}>Gestión de Informes</Text>
               </View>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.modalCloseButton}
                 onPress={() => setShowReports(false)}
                 activeOpacity={0.8}
@@ -1738,44 +1785,44 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
                 <Ionicons name="close" size={16} color="#fff" />
               </TouchableOpacity>
             </View>
-            
+
             <ScrollView style={styles.modalBody}>
               <View style={styles.reportsSection}>
                 <Text style={styles.sectionDescription}>
                   Revisa y gestiona los informes de mantenimiento
                 </Text>
-                
+
                 <View style={styles.reportFilters}>
-                  <TouchableOpacity 
-                    style={[styles.filterButton, reportsFilter === 'all' && styles.filterButtonActive]} 
+                  <TouchableOpacity
+                    style={[styles.filterButton, reportsFilter === 'all' && styles.filterButtonActive]}
                     onPress={() => setReportsFilter('all')}
                     activeOpacity={0.8}
                   >
                     <Text style={[styles.filterText, reportsFilter === 'all' && styles.filterTextActive]}>Todos</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity 
-                    style={[styles.filterButton, reportsFilter === 'pending' && styles.filterButtonActive]} 
+                  <TouchableOpacity
+                    style={[styles.filterButton, reportsFilter === 'pending' && styles.filterButtonActive]}
                     onPress={() => setReportsFilter('pending')}
                     activeOpacity={0.8}
                   >
                     <Text style={[styles.filterText, reportsFilter === 'pending' && styles.filterTextActive]}>Pendientes</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity 
-                    style={[styles.filterButton, reportsFilter === 'in_review' && styles.filterButtonActive]} 
+                  <TouchableOpacity
+                    style={[styles.filterButton, reportsFilter === 'in_review' && styles.filterButtonActive]}
                     onPress={() => setReportsFilter('in_review')}
                     activeOpacity={0.8}
                   >
                     <Text style={[styles.filterText, reportsFilter === 'in_review' && styles.filterTextActive]}>En Revisión</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity 
-                    style={[styles.filterButton, reportsFilter === 'approved' && styles.filterButtonActive]} 
+                  <TouchableOpacity
+                    style={[styles.filterButton, reportsFilter === 'approved' && styles.filterButtonActive]}
                     onPress={() => setReportsFilter('approved')}
                     activeOpacity={0.8}
                   >
                     <Text style={[styles.filterText, reportsFilter === 'approved' && styles.filterTextActive]}>Aprobados</Text>
                   </TouchableOpacity>
                 </View>
-                
+
                 <View style={styles.reportList}>
                   {filteredReports.length === 0 ? (
                     <View style={styles.emptyReportsState}>
@@ -1796,16 +1843,16 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
                         <View style={styles.reportActions}>
                           <View style={[styles.reportStatusBadge, { backgroundColor: getStatusColor(report.status) }]}>
                             <Text style={styles.reportStatusText}>{getStatusText(report.status)}</Text>
-                  </View>
+                          </View>
                           <View style={styles.reportActionButtons}>
-                  <TouchableOpacity 
-                            style={styles.viewReportButton}
-                            onPress={() => handleViewReport(report)}
-                    activeOpacity={0.8}
-                  >
-                            <Ionicons name="eye-outline" size={16} color="#007BFF" />
-                  </TouchableOpacity>
-                            <TouchableOpacity 
+                            <TouchableOpacity
+                              style={styles.viewReportButton}
+                              onPress={() => handleViewReport(report)}
+                              activeOpacity={0.8}
+                            >
+                              <Ionicons name="eye-outline" size={16} color="#007BFF" />
+                            </TouchableOpacity>
+                            <TouchableOpacity
                               style={styles.deleteReportButton}
                               onPress={() => handleDeleteReport(report.id)}
                               activeOpacity={0.8}
@@ -1827,100 +1874,87 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
 
       {/* Modal de Detalle de Informe */}
       {showReportDetail && selectedReport && (
-      <Modal
+        <Modal
           visible={showReportDetail}
-        transparent={true}
-        animationType="slide"
+          transparent={true}
+          animationType="slide"
           onRequestClose={() => setShowReportDetail(false)}
-      >
+        >
 
           <View style={styles.modalOverlayCentered}>
             <View style={[styles.modalContent, styles.reportDetailModal]}>
-            <View style={styles.modalHeader}>
+              <View style={styles.modalHeader}>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                   <Ionicons name="document-text-outline" size={20} color="#212529" style={{ marginRight: 8 }} />
                   <Text style={styles.modalTitle}>Detalle del Informe</Text>
                 </View>
-              <TouchableOpacity 
-                style={styles.modalCloseButton}
+                <TouchableOpacity
+                  style={styles.modalCloseButton}
                   onPress={() => setShowReportDetail(false)}
-                activeOpacity={0.8}
-              >
+                  activeOpacity={0.8}
+                >
                   <Ionicons name="close" size={16} color="#fff" />
-              </TouchableOpacity>
-            </View>
-            
+                </TouchableOpacity>
+              </View>
+
               <ScrollView style={styles.modalBody} showsVerticalScrollIndicator={false}>
                 {/* Información básica del informe */}
-                <View style={styles.reportDetailSection}>
-                  <Text style={styles.reportDetailTitle}>{selectedReport.title}</Text>
-                  <View style={styles.reportDetailInfo}>
-                    <View style={styles.reportDetailRow}>
-                      <Ionicons name="person-outline" size={16} color="#6C757D" />
-                      <Text style={styles.reportDetailText}>Técnico: {selectedReport.technicianName}</Text>
+                <View style={styles.section}>
+                  <Text style={styles.sectionTitle}>{selectedReport.title}</Text>
+                  <View style={styles.infoRow}>
+                    <Ionicons name="person-outline" size={16} color={colors.textSecondary} />
+                    <Text style={styles.infoText}>Técnico: {selectedReport.technicianName}</Text>
+                  </View>
+                  <View style={styles.infoRow}>
+                    <Ionicons name="calendar-outline" size={16} color={colors.textSecondary} />
+                    <Text style={styles.infoText}>Creado: {formatDate(selectedReport.createdAt)}</Text>
+                  </View>
+                  <View style={styles.infoRow}>
+                    <Ionicons name="time-outline" size={16} color={colors.textSecondary} />
+                    <Text style={styles.infoText}>Actualizado: {formatDate(selectedReport.updatedAt)}</Text>
+                  </View>
+                </View>
+
+                {/* Horarios */}
+                <View style={styles.section}>
+                  <Text style={styles.sectionTitle}>Horarios de Trabajo</Text>
+                  <View style={styles.timeContainer}>
+                    <View style={styles.timeItem}>
+                      <Text style={styles.timeLabel}>Entrada</Text>
+                      <Text style={styles.timeValue}>{formatTime(selectedReport.checkInTime)}</Text>
                     </View>
-                    <View style={styles.reportDetailRow}>
-                      <Ionicons name="calendar-outline" size={16} color="#6C757D" />
-                      <Text style={styles.reportDetailText}>Creado: {formatDate(selectedReport.createdAt)}</Text>
+                    <View style={styles.timeSeparator}>
+                      <Ionicons name="arrow-forward" size={20} color={colors.textSecondary} />
                     </View>
-                    <View style={styles.reportDetailRow}>
-                      <Ionicons name="time-outline" size={16} color="#6C757D" />
-                      <Text style={styles.reportDetailText}>Entrada: {selectedReport.checkInTime}</Text>
-                    </View>
-                    <View style={styles.reportDetailRow}>
-                      <Ionicons name="time-outline" size={16} color="#6C757D" />
-                      <Text style={styles.reportDetailText}>Salida: {selectedReport.checkOutTime}</Text>
+                    <View style={styles.timeItem}>
+                      <Text style={styles.timeLabel}>Salida</Text>
+                      <Text style={styles.timeValue}>{formatTime(selectedReport.checkOutTime)}</Text>
                     </View>
                   </View>
                 </View>
 
                 {/* Descripción */}
-                <View style={styles.reportDetailSection}>
-                  <Text style={styles.reportDetailSectionTitle}>Descripción del Trabajo</Text>
-                  <Text style={styles.reportDetailDescription}>{selectedReport.description}</Text>
+                <View style={styles.section}>
+                  <Text style={styles.sectionTitle}>Descripción del Trabajo</Text>
+                  <Text style={styles.descriptionText}>{selectedReport.description}</Text>
                 </View>
 
-                {/* Fotos Antes */}
-                {selectedReport.photoBeforeUris.length > 0 && (
-                  <View style={styles.reportDetailSection}>
-                    <Text style={styles.reportDetailSectionTitle}>Fotos Antes</Text>
-                    <View style={styles.reportDetailPhotoGrid}>
-                      {selectedReport.photoBeforeUris.map((uri, index) => (
-                        <View key={index} style={styles.reportDetailPhotoItem}>
-                          <Image source={{ uri }} style={styles.reportDetailPhoto} resizeMode="cover" />
-                        </View>
-                      ))}
-                    </View>
-                  </View>
-                )}
-
-                {/* Fotos Después */}
-                {selectedReport.photoAfterUris.length > 0 && (
-                  <View style={styles.reportDetailSection}>
-                    <Text style={styles.reportDetailSectionTitle}>Fotos Después</Text>
-                    <View style={styles.reportDetailPhotoGrid}>
-                      {selectedReport.photoAfterUris.map((uri, index) => (
-                        <View key={index} style={styles.reportDetailPhotoItem}>
-                          <Image source={{ uri }} style={styles.reportDetailPhoto} resizeMode="cover" />
-                        </View>
-                      ))}
-                    </View>
-                  </View>
-                )}
+                {/* Fotos */}
+                {renderPhotoSection('Fotos Antes', selectedReport.photoBeforeUris)}
+                {renderPhotoSection('Fotos Después', selectedReport.photoAfterUris)}
 
                 {/* Gestión de Estado */}
                 <View style={styles.reportDetailSection}>
-                  <Text style={styles.reportDetailSectionTitle}>Gestionar Estado</Text>
                   <View style={styles.reportDetailStatusActions}>
-                    <TouchableOpacity 
-                      style={[styles.reportDetailStatusButton, { backgroundColor: colors.success } ]}
+                    <TouchableOpacity
+                      style={[styles.reportDetailStatusButton, { backgroundColor: colors.success }]}
                       onPress={() => {
                         setShowReportDetail(false);
                         handleUpdateReportStatus(selectedReport.id, 'approved');
                       }}
                       activeOpacity={0.8}
                     >
-                      <Text style={styles.reportDetailStatusButtonText}>Aprobar</Text>
+                      <Ionicons name="checkmark" size={24} color={colors.textInverse} />
                     </TouchableOpacity>
                     <TouchableOpacity
                       style={[styles.reportDetailStatusButton, { backgroundColor: colors.error }]}
@@ -1930,14 +1964,14 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
                       }}
                       activeOpacity={0.8}
                     >
-                      <Text style={styles.reportDetailStatusButtonText}>Rechazar</Text>
+                      <Ionicons name="close" size={24} color={colors.textInverse} />
                     </TouchableOpacity>
                   </View>
                 </View>
 
                 {/* Acción inferior: Descargar PDF */}
                 <View style={styles.reportDetailSection}>
-                  <TouchableOpacity 
+                  <TouchableOpacity
                     style={[styles.reportDetailDeleteButton, { backgroundColor: colors.primary }]}
                     onPress={() => {
                       Alert.alert('PDF descargado');
@@ -1948,11 +1982,41 @@ export const AdminScreen: React.FC<AdminDashboardProps> = ({ navigation }) => {
                     <Text style={styles.reportDetailDeleteButtonText}>Descargar como PDF</Text>
                   </TouchableOpacity>
                 </View>
-            </ScrollView>
+              </ScrollView>
+            </View>
+          </View>
+        </Modal>
+      )}
+
+      {/* Modal de vista previa de imagen */}
+      <Modal
+        visible={showImagePreview}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowImagePreview(false)}
+      >
+        <View style={styles.imagePreviewOverlay}>
+          <View style={styles.imagePreviewContainer}>
+            <View style={styles.imagePreviewHeader}>
+              <Text style={styles.imagePreviewTitle}>Vista previa</Text>
+              <TouchableOpacity
+                style={styles.imagePreviewCloseButton}
+                onPress={() => setShowImagePreview(false)}
+                activeOpacity={0.8}
+              >
+                <Ionicons name="close" size={24} color={colors.textInverse} />
+              </TouchableOpacity>
+            </View>
+            <View style={styles.imagePreviewContent}>
+              <Image 
+                source={{ uri: previewImage }} 
+                style={styles.imagePreviewImage} 
+                resizeMode="contain"
+              />
+            </View>
           </View>
         </View>
       </Modal>
-      )}
     </ScrollView>
   );
 };
@@ -2345,9 +2409,9 @@ const styles = StyleSheet.create({
   },
   // Acciones del cronograma modernas
   reportActions: {
-    alignItems: 'flex-end',
+    alignItems: 'center',
     gap: spacing.sm,
-    flexDirection: 'row',
+    flexDirection: 'column',
   },
   reportStatusBadge: {
     paddingHorizontal: spacing.sm,
@@ -2685,8 +2749,9 @@ const styles = StyleSheet.create({
     color: colors.infoDark,
   },
   userItemActions: {
-    flexDirection: 'row',
+    flexDirection: 'column',
     gap: 8,
+    alignItems: 'center',
   },
   // Botones de acción de usuario modernos
   editButton: {
@@ -2713,12 +2778,11 @@ const styles = StyleSheet.create({
 
   // Estilos para el modal de detalle del informe
   reportDetailSection: {
-    backgroundColor: '#F8F9FA',
+    backgroundColor: '',
     borderRadius: 12,
     padding: 16,
     marginBottom: 16,
-    borderWidth: 1,
-    borderColor: '#E9ECEF',
+
   },
   reportDetailTitle: {
     fontSize: 18,
@@ -2766,15 +2830,16 @@ const styles = StyleSheet.create({
   },
   reportDetailStatusActions: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
+    justifyContent: 'center',
+    gap: 16,
   },
   reportDetailStatusButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 20,
-    minWidth: 80,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
     alignItems: 'center',
+    justifyContent: 'center',
+    ...shadows.md,
   },
   reportDetailStatusButtonText: {
     color: 'white',
@@ -2886,6 +2951,109 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.sm,
     backgroundColor: colors.errorLight,
   },
+  section: {
+    backgroundColor: colors.background,
+    margin: spacing.md,
+    padding: spacing.lg,
+    borderRadius: borderRadius.lg,
+    ...shadows.sm,
+  },
+  infoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: spacing.sm,
+  },
+  infoText: {
+    fontSize: 14,
+    fontWeight: '400',
+    lineHeight: 20,
+    color: colors.textSecondary,
+    marginLeft: spacing.sm,
+  },
+  timeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  timeItem: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  timeLabel: {
+    fontSize: 12,
+    fontWeight: '500',
+    lineHeight: 16,
+    color: colors.textSecondary,
+    marginBottom: spacing.xs,
+  },
+  timeValue: {
+    fontSize: 16,
+    fontWeight: '600',
+    lineHeight: 22,
+    color: colors.textPrimary,
+  },
+  timeSeparator: {
+    paddingHorizontal: spacing.lg,
+  },
+  descriptionText: {
+    fontSize: 16,
+    fontWeight: '400',
+    lineHeight: 20,
+    color: colors.textPrimary,
+  },
+  photoSection: {
+    backgroundColor: colors.background,
+    margin: spacing.md,
+    padding: spacing.lg,
+    borderRadius: borderRadius.lg,
+    ...shadows.sm,
+  },
+  photoSectionTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    lineHeight: 22,
+    color: colors.textPrimary,
+    marginBottom: spacing.md,
+  },
+  noPhotosText: {
+    fontSize: 14,
+    fontWeight: '400',
+    lineHeight: 20,
+    color: colors.textSecondary,
+    fontStyle: 'italic',
+  },
+  photoGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.sm,
+  },
+  photoItem: {
+    width: 80,
+    height: 80,
+    borderRadius: borderRadius.md,
+  },
+  photoThumbnail: {
+    width: '100%',
+    height: '100%',
+  },
+  statusActions: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.sm,
+  },
+  statusButton: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderRadius: borderRadius.full,
+    minWidth: 80,
+    alignItems: 'center',
+  },
+  statusButtonText: {
+    color: colors.textInverse,
+    fontSize: 12,
+    fontWeight: '600',
+    lineHeight: 16,
+  },
 
   // Estilos para el botón de gestión
   managementButton: {
@@ -2908,5 +3076,49 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 
+  // Estilos para el modal de vista previa de imagen
+  imagePreviewOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  imagePreviewContainer: {
+    width: '95%',
+    height: '90%',
+    backgroundColor: colors.surface,
+    borderRadius: borderRadius.lg,
+    overflow: 'hidden',
+  },
+  imagePreviewHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: spacing.lg,
+    backgroundColor: colors.surfaceSecondary,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  imagePreviewTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: colors.textPrimary,
+  },
+  imagePreviewCloseButton: {
+    padding: spacing.sm,
+    borderRadius: borderRadius.md,
+    backgroundColor: colors.error,
+  },
+  imagePreviewContent: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: spacing.md,
+  },
+  imagePreviewImage: {
+    width: '100%',
+    height: '100%',
+    borderRadius: borderRadius.md,
+  },
 
 });

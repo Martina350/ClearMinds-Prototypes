@@ -320,8 +320,8 @@ export const InformeForm: React.FC<InformeFormProps> = ({ navigation, route }) =
                 <Text style={styles.timeButtonValue}>
                   {formatTimeForDisplay(checkInTime)}
                 </Text>
+                <Ionicons name="time-outline" size={20} color={colors.textSecondary} style={{ marginTop: spacing.xs }} />
               </View>
-              <Ionicons name="time-outline" size={20} color={colors.textSecondary} />
             </TouchableOpacity>
 
             <View style={styles.timeSeparatorContainer}>
@@ -338,8 +338,8 @@ export const InformeForm: React.FC<InformeFormProps> = ({ navigation, route }) =
                 <Text style={styles.timeButtonValue}>
                   {formatTimeForDisplay(checkOutTime)}
                 </Text>
+                <Ionicons name="time-outline" size={20} color={colors.textSecondary} style={{ marginTop: spacing.xs }} />
               </View>
-              <Ionicons name="time-outline" size={20} color={colors.textSecondary} />
             </TouchableOpacity>
           </View>
         </View>
@@ -466,13 +466,15 @@ export const InformeForm: React.FC<InformeFormProps> = ({ navigation, route }) =
                   {/* Horarios */}
                   <View style={styles.detailSection}>
                     <Text style={styles.detailSectionTitle}>Horarios del Servicio</Text>
-                    <View style={styles.detailRow}>
-                      <Text style={styles.detailLabel}>Entrada:</Text>
-                      <Text style={styles.detailValue}>{formatTimeForDisplay(generatedReport.checkInTime)}</Text>
-                    </View>
-                    <View style={styles.detailRow}>
-                      <Text style={styles.detailLabel}>Salida:</Text>
-                      <Text style={styles.detailValue}>{formatTimeForDisplay(generatedReport.checkOutTime)}</Text>
+                    <View style={styles.horariosContainer}>
+                      <View style={styles.horarioItem}>
+                        <Text style={styles.horarioLabel}>Entrada:</Text>
+                        <Text style={styles.horarioValue}>{formatTimeForDisplay(generatedReport.checkInTime)}</Text>
+                      </View>
+                      <View style={styles.horarioItem}>
+                        <Text style={styles.horarioLabel}>Salida:</Text>
+                        <Text style={styles.horarioValue}>{formatTimeForDisplay(generatedReport.checkOutTime)}</Text>
+                      </View>
                     </View>
                   </View>
 
@@ -548,12 +550,17 @@ export const InformeForm: React.FC<InformeFormProps> = ({ navigation, route }) =
                   {/* Selector de hora */}
                   <View style={styles.timePickerColumn}>
                     <Text style={styles.timePickerLabel}>Hora</Text>
-                    <ScrollView style={styles.timePickerScroll} showsVerticalScrollIndicator={false}>
+                    <ScrollView 
+                      style={styles.timePickerScrollHorizontal} 
+                      horizontal={true}
+                      showsHorizontalScrollIndicator={false}
+                      contentContainerStyle={styles.timePickerScrollContent}
+                    >
                       {Array.from({ length: 12 }, (_, i) => i + 1).map((hour) => (
                         <TouchableOpacity
                           key={hour}
                           style={[
-                            styles.timePickerOption,
+                            styles.timePickerOptionHorizontal,
                             selectedHour === hour && styles.timePickerOptionSelected
                           ]}
                           onPress={() => setSelectedHour(hour)}
@@ -575,12 +582,17 @@ export const InformeForm: React.FC<InformeFormProps> = ({ navigation, route }) =
                   {/* Selector de minutos */}
                   <View style={styles.timePickerColumn}>
                     <Text style={styles.timePickerLabel}>Minutos</Text>
-                    <ScrollView style={styles.timePickerScroll} showsVerticalScrollIndicator={false}>
+                    <ScrollView 
+                      style={styles.timePickerScrollHorizontal} 
+                      horizontal={true}
+                      showsHorizontalScrollIndicator={false}
+                      contentContainerStyle={styles.timePickerScrollContent}
+                    >
                       {Array.from({ length: 60 }, (_, i) => i).map((minute) => (
                         <TouchableOpacity
                           key={minute}
                           style={[
-                            styles.timePickerOption,
+                            styles.timePickerOptionHorizontal,
                             selectedMinute === minute && styles.timePickerOptionSelected
                           ]}
                           onPress={() => setSelectedMinute(minute)}
@@ -705,9 +717,9 @@ const styles = StyleSheet.create({
   },
   timeButton: {
     flex: 1,
-    flexDirection: 'row',
+    flexDirection: 'column',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.md,
     borderRadius: borderRadius.lg,
@@ -719,7 +731,8 @@ const styles = StyleSheet.create({
   },
   timeButtonContent: {
     flex: 1,
-    marginRight: spacing.md,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   timeButtonLabel: {
     ...typography.labelSmall,
@@ -948,6 +961,22 @@ const styles = StyleSheet.create({
     height: 200,
     width: '100%',
   },
+  timePickerScrollHorizontal: {
+    height: 60,
+    width: '100%',
+  },
+  timePickerScrollContent: {
+    alignItems: 'center',
+    paddingHorizontal: spacing.sm,
+  },
+  timePickerOptionHorizontal: {
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    borderRadius: borderRadius.sm,
+    marginHorizontal: spacing.xs,
+    alignItems: 'center',
+    minWidth: 50,
+  },
   timePickerOption: {
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.md,
@@ -1071,6 +1100,30 @@ const styles = StyleSheet.create({
     flex: 1,
     textAlign: 'right',
     marginLeft: spacing.md,
+  },
+  horariosContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    backgroundColor: colors.surfaceSecondary,
+    borderRadius: borderRadius.lg,
+    padding: spacing.md,
+    marginTop: spacing.sm,
+  },
+  horarioItem: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  horarioLabel: {
+    ...typography.label,
+    color: colors.textSecondary,
+    fontWeight: '500',
+    marginBottom: spacing.xs,
+  },
+  horarioValue: {
+    ...typography.h6,
+    color: colors.textPrimary,
+    fontWeight: '700',
   },
   statusBadge: {
     paddingHorizontal: spacing.sm,
