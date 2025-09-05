@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoSolution - Servicios Ambientales</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loading-spinner"></div>
+        <p>Cargando EcoSolution...</p>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- App Container -->
+    <div id="app" class="app-container">
+        <!-- Mobile Toggle Button -->
+        <button id="mobileToggle" class="mobile-toggle" title="Alternar vista móvil">
+            <i class="fas fa-mobile-alt"></i>
+        </button>
+        <!-- Login/Register Screen -->
+        <div id="authScreen" class="screen active">
+            <div class="auth-container">
+                <div class="logo">
+                    <i class="fas fa-leaf"></i>
+                    <h1>EcoSolution</h1>
+                    <p>Servicios de Sanidad Ambiental</p>
+                </div>
+                
+                <!-- Login Form -->
+                <div id="loginForm" class="auth-form active">
+                    <h2>Iniciar Sesión</h2>
+                    <form id="loginFormElement">
+                        <div class="input-group">
+                            <i class="fas fa-envelope"></i>
+                            <input type="email" id="loginEmail" placeholder="Correo electrónico" required>
+                        </div>
+                        <div class="input-group">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="loginPassword" placeholder="Contraseña" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
+                    </form>
+                    <p class="auth-switch">
+                        ¿No tienes cuenta? 
+                        <a href="#" id="showRegister">Regístrate aquí</a>
+                    </p>
+                    <div class="admin-link">
+                        <a href="#" id="showAdminLogin">Acceso Administrador</a>
+                    </div>
+                </div>
+
+                <!-- Register Form -->
+                <div id="registerForm" class="auth-form">
+                    <h2>Crear Cuenta</h2>
+                    <form id="registerFormElement">
+                        <div class="input-group">
+                            <i class="fas fa-globe"></i>
+                            <select id="registerCountry" required>
+                                <option value="">Seleccionar país</option>
+                                <option value="Ecuador">Ecuador</option>
+                                <option value="USA">Estados Unidos</option>
+                                <option value="Canada">Canadá</option>
+                                <option value="Peru">Perú</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <i class="fas fa-user"></i>
+                            <input type="text" id="registerName" placeholder="Nombre completo" required>
+                        </div>
+                        <div class="input-group">
+                            <i class="fas fa-envelope"></i>
+                            <input type="email" id="registerEmail" placeholder="Correo electrónico" required>
+                        </div>
+                        <div class="input-group">
+                            <i class="fas fa-phone"></i>
+                            <input type="tel" id="registerPhone" placeholder="Teléfono" required>
+                        </div>
+                        <div class="input-group">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <input type="text" id="registerAddress" placeholder="Dirección" required>
+                        </div>
+                        <div class="input-group">
+                            <i class="fas fa-city"></i>
+                            <input type="text" id="registerCity" placeholder="Ciudad" required>
+                        </div>
+                        <div class="input-group">
+                            <i class="fas fa-flag"></i>
+                            <input type="text" id="registerState" placeholder="Estado/Provincia" required>
+                        </div>
+                        <div class="input-group">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="registerPassword" placeholder="Contraseña" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Registrarse</button>
+                    </form>
+                    <p class="auth-switch">
+                        ¿Ya tienes cuenta? 
+                        <a href="#" id="showLogin">Inicia sesión aquí</a>
+                    </p>
+                </div>
+
+                <!-- Admin Login Form -->
+                <div id="adminLoginForm" class="auth-form">
+                    <h2>Acceso Administrador</h2>
+                    <form id="adminLoginFormElement">
+                        <div class="input-group">
+                            <i class="fas fa-user-shield"></i>
+                            <input type="text" id="adminUsername" placeholder="Usuario administrador" required>
+                        </div>
+                        <div class="input-group">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="adminPassword" placeholder="Contraseña" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Acceder</button>
+                    </form>
+                    <p class="auth-switch">
+                        <a href="#" id="backToClientLogin">Volver a cliente</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Client App Screen -->
+        <div id="clientScreen" class="screen">
+            <!-- Header -->
+            <header class="app-header">
+                <div class="header-content">
+                    <h1>EcoSolution</h1>
+                    <div class="header-actions">
+                        <button id="notificationsBtn" class="btn-icon">
+                            <i class="fas fa-bell"></i>
+                            <span id="notificationCount" class="badge">0</span>
+                        </button>
+                        <button id="profileBtn" class="btn-icon">
+                            <i class="fas fa-user"></i>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Navigation -->
+            <nav class="bottom-nav">
+                <button class="nav-item active" data-view="services">
+                    <i class="fas fa-list"></i>
+                    <span>Servicios</span>
+                </button>
+                <button class="nav-item" data-view="myServices">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>Mis Servicios</span>
+                </button>
+                <button class="nav-item" data-view="profile">
+                    <i class="fas fa-user"></i>
+                    <span>Perfil</span>
+                </button>
+            </nav>
+
+            <!-- Main Content -->
+            <main class="main-content">
+                <!-- Services View -->
+                <div id="servicesView" class="view active">
+                    <div class="view-header">
+                        <h2>Nuestros Servicios</h2>
+                        <div class="filter-controls">
+                            <select id="serviceFilter">
+                                <option value="all">Todos los servicios</option>
+                                <option value="Ecuador">Ecuador</option>
+                                <option value="USA">Estados Unidos</option>
+                                <option value="Canada">Canadá</option>
+                                <option value="Peru">Perú</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="servicesList" class="services-grid">
+                        <!-- Services will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- My Services View -->
+                <div id="myServicesView" class="view">
+                    <div class="view-header">
+                        <h2>Mis Servicios</h2>
+                        <div class="status-filters">
+                            <button class="filter-btn active" data-status="all">Todos</button>
+                            <button class="filter-btn" data-status="pendiente">Pendientes</button>
+                            <button class="filter-btn" data-status="confirmado">Confirmados</button>
+                            <button class="filter-btn" data-status="completado">Completados</button>
+                        </div>
+                    </div>
+                    <div id="myServicesList" class="bookings-list">
+                        <!-- User bookings will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Profile View -->
+                <div id="profileView" class="view">
+                    <div class="profile-header">
+                        <div class="profile-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <h2 id="userName">Usuario</h2>
+                        <p id="userEmail">usuario@email.com</p>
+                    </div>
+                    <div class="profile-actions">
+                        <button class="action-btn" id="editProfileBtn">
+                            <i class="fas fa-edit"></i>
+                            <span>Editar Perfil</span>
+                        </button>
+                        <button class="action-btn" id="logoutBtn">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Cerrar Sesión</span>
+                        </button>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- Admin Panel Screen -->
+        <div id="adminScreen" class="screen">
+            <!-- Admin Header -->
+            <header class="admin-header">
+                <div class="header-content">
+                    <h1><i class="fas fa-cog"></i> Panel Administrativo</h1>
+                    <div class="header-actions">
+                        <button id="adminNotificationsBtn" class="btn-icon">
+                            <i class="fas fa-bell"></i>
+                            <span id="adminNotificationCount" class="badge">0</span>
+                        </button>
+                        <button id="adminLogoutBtn" class="btn-icon">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Admin Navigation -->
+            <nav class="admin-nav">
+                <button class="admin-nav-item active" data-view="dashboard">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </button>
+                <button class="admin-nav-item" data-view="services">
+                    <i class="fas fa-list"></i>
+                    <span>Servicios</span>
+                </button>
+                <button class="admin-nav-item" data-view="payments">
+                    <i class="fas fa-credit-card"></i>
+                    <span>Pagos</span>
+                </button>
+                <button class="admin-nav-item" data-view="calendar">
+                    <i class="fas fa-calendar"></i>
+                    <span>Calendario</span>
+                </button>
+                <button class="admin-nav-item" data-view="zones">
+                    <i class="fas fa-map"></i>
+                    <span>Zonas</span>
+                </button>
+                <button class="admin-nav-item" data-view="staff">
+                    <i class="fas fa-users"></i>
+                    <span>Personal</span>
+                </button>
+                <button class="admin-nav-item" data-view="prices">
+                    <i class="fas fa-dollar-sign"></i>
+                    <span>Precios</span>
+                </button>
+            </nav>
+
+            <!-- Admin Main Content -->
+            <main class="admin-content">
+                <!-- Dashboard View -->
+                <div id="adminDashboardView" class="admin-view active">
+                    <div class="dashboard-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3 id="pendingServices">0</h3>
+                                <p>Servicios Pendientes</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-credit-card"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3 id="pendingPayments">0</h3>
+                                <p>Pagos por Validar</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-calendar-week"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3 id="weeklyBookings">0</h3>
+                                <p>Agenda Semanal</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3 id="totalStaff">0</h3>
+                                <p>Personal Activo</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="recent-activity">
+                        <h3>Actividad Reciente</h3>
+                        <div id="recentActivity" class="activity-list">
+                            <!-- Recent activity will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Other admin views will be added here -->
+                <div id="adminServicesView" class="admin-view">
+                    <h2>Gestión de Servicios</h2>
+                    <div id="adminServicesList" class="admin-list">
+                        <!-- Admin services list will be loaded here -->
+                    </div>
+                </div>
+
+                <div id="adminPaymentsView" class="admin-view">
+                    <h2>Validación de Pagos</h2>
+                    <div id="adminPaymentsList" class="admin-list">
+                        <!-- Payments list will be loaded here -->
+                    </div>
+                </div>
+
+                <div id="adminCalendarView" class="admin-view">
+                    <h2>Calendario Global</h2>
+                    <div id="calendarContainer" class="calendar-container">
+                        <!-- Calendar will be loaded here -->
+                    </div>
+                </div>
+
+                <div id="adminZonesView" class="admin-view">
+                    <h2>Gestión de Zonas</h2>
+                    <div id="zonesList" class="admin-list">
+                        <!-- Zones list will be loaded here -->
+                    </div>
+                </div>
+
+                <div id="adminStaffView" class="admin-view">
+                    <h2>Gestión de Personal</h2>
+                    <div id="staffList" class="admin-list">
+                        <!-- Staff list will be loaded here -->
+                    </div>
+                </div>
+
+                <div id="adminPricesView" class="admin-view">
+                    <h2>Gestión de Precios</h2>
+                    <div id="pricesList" class="admin-list">
+                        <!-- Prices list will be loaded here -->
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <!-- Service Detail Modal -->
+    <div id="serviceDetailModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalServiceName">Servicio</h3>
+                <button class="close-btn" id="closeServiceModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="service-detail">
+                    <img id="modalServiceImage" src="" alt="Servicio">
+                    <div class="service-info">
+                        <p id="modalServiceDescription"></p>
+                        <div class="price-info">
+                            <span class="price" id="modalServicePrice">$0</span>
+                            <span class="duration" id="modalServiceDuration">0 min</span>
+                        </div>
+                    </div>
+                </div>
+                <form id="bookingForm">
+                    <div class="form-group">
+                        <label>Tipo de Cliente:</label>
+                        <select id="clientType" required>
+                            <option value="casa">Casa</option>
+                            <option value="empresa">Empresa</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Fecha:</label>
+                        <input type="date" id="bookingDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Hora:</label>
+                        <select id="bookingTime" required>
+                            <option value="">Seleccionar hora</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Continuar al Pago</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Modal -->
+    <div id="paymentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Procesar Pago</h3>
+                <button class="close-btn" id="closePaymentModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="payment-summary">
+                    <h4>Resumen del Pedido</h4>
+                    <div class="summary-item">
+                        <span>Servicio:</span>
+                        <span id="paymentServiceName"></span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Fecha:</span>
+                        <span id="paymentDate"></span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Hora:</span>
+                        <span id="paymentTime"></span>
+                    </div>
+                    <div class="summary-item total">
+                        <span>Total:</span>
+                        <span id="paymentTotal">$0</span>
+                    </div>
+                </div>
+                
+                <div class="payment-methods">
+                    <div class="payment-tabs">
+                        <button class="payment-tab active" data-method="card">Tarjeta</button>
+                        <button class="payment-tab" data-method="transfer">Transferencia</button>
+                    </div>
+                    
+                    <!-- Card Payment -->
+                    <div id="cardPayment" class="payment-form active">
+                        <form id="cardPaymentForm">
+                            <div class="form-group">
+                                <label>Número de Tarjeta:</label>
+                                <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" required>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Fecha de Vencimiento:</label>
+                                    <input type="text" id="cardExpiry" placeholder="MM/AA" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>CVC:</label>
+                                    <input type="text" id="cardCVC" placeholder="123" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Titular de la Tarjeta:</label>
+                                <input type="text" id="cardHolder" placeholder="Nombre completo" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Confirmar Pago</button>
+                        </form>
+                    </div>
+                    
+                    <!-- Transfer Payment -->
+                    <div id="transferPayment" class="payment-form">
+                        <div class="transfer-info">
+                            <h4>Datos para Transferencia</h4>
+                            <div class="bank-info">
+                                <p><strong>Banco:</strong> Banco del Pichincha</p>
+                                <p><strong>Cuenta:</strong> 1234567890</p>
+                                <p><strong>Titular:</strong> EcoSolution S.A.</p>
+                                <p><strong>Monto:</strong> <span id="transferAmount">$0</span></p>
+                            </div>
+                        </div>
+                        <form id="transferPaymentForm">
+                            <div class="form-group">
+                                <label>Subir Comprobante:</label>
+                                <input type="file" id="transferProof" accept="image/*" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Enviar Comprobante</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="app.js"></script>
+</body>
+</html>
