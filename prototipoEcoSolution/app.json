@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "prototipoEcoSolution",
-    "slug": "prototipoEcoSolution",
+    "name": "EcoSolution",
+    "slug": "ecosolution-prototype",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "",
@@ -10,20 +10,28 @@
     "splash": {
       "image": "",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#8A70D8"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.ecosolution.prototype"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#5CB85C"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.ecosolution.prototype"
     },
     "web": {
-      "favicon": ""
+      "favicon": "",
+      "bundler": "metro"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "ecosolution-prototype"
+      }
     }
   }
 }
