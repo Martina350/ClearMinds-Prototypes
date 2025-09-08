@@ -24,7 +24,7 @@ import { authenticateUser, addUser, addBooking, updateBookingStatus } from '../d
 // Eliminamos react-navigation para evitar RNSScreenContainer en Expo Go
 
 // Client Tab Navigator
-const ClientTabNavigator = ({ user }: { user: any }) => {
+const ClientTabNavigator = ({ user, onServicePress }: { user: any, onServicePress: (service: any) => void }) => {
   // Tab inferior propia para evitar react-native-screens
   const [tab, setTab] = useState<'services' | 'myServices' | 'profile'>('services');
   const handleTabChange = (nextTab: string) => {
@@ -35,7 +35,7 @@ const ClientTabNavigator = ({ user }: { user: any }) => {
   };
   if (tab === 'services') {
     return (
-      <ServicesScreen user={user} onServicePress={() => { }} onNotificationPress={() => { }} onProfilePress={() => handleTabChange('profile')} onPhonePress={() => { }} onTabPress={handleTabChange} />
+      <ServicesScreen user={user} onServicePress={onServicePress} onNotificationPress={() => { }} onProfilePress={() => handleTabChange('profile')} onPhonePress={() => { }} onTabPress={handleTabChange} />
     );
   }
   if (tab === 'myServices') {
@@ -53,6 +53,8 @@ export const AppNavigator = () => {
   const [user, setUser] = useState<any>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [currentScreen, setCurrentScreen] = useState('login');
+  const [selectedService, setSelectedService] = useState<any | null>(null);
+  const [currentBookingData, setCurrentBookingData] = useState<any | null>(null);
 
   const handleLogin = (email: string, password: string) => {
     const authenticatedUser = authenticateUser(email, password);
@@ -94,33 +96,34 @@ export const AppNavigator = () => {
   };
 
   const handleServicePress = (service: any) => {
+    setSelectedService(service);
     setCurrentScreen('booking');
-    // Store service data for booking screen
   };
 
   const handleBookingContinue = (bookingData: any) => {
+    setCurrentBookingData(bookingData);
     setCurrentScreen('payment');
-    // Store booking data for payment screen
   };
 
   const handlePaymentComplete = (paymentData: any) => {
-    if (!user) return;
+    if (!user || !currentBookingData) return;
 
-    // Create booking in database
-    const booking = addBooking({
-      serviceId: paymentData.service.id,
+    addBooking({
+      serviceId: currentBookingData.service.id,
       userId: user.id,
-      date: paymentData.date,
-      time: paymentData.time,
+      date: currentBookingData.date,
+      time: currentBookingData.time,
       status: paymentData.status === 'approved' ? 'confirmado' : 'pendiente',
       payment: {
         method: paymentData.method,
         proof: paymentData.proof,
         status: paymentData.status
       },
-      clientType: paymentData.clientType
+      clientType: currentBookingData.clientType
     });
 
+    setSelectedService(null);
+    setCurrentBookingData(null);
     setCurrentScreen('client');
     alert('Servicio agendado exitosamente');
   };
@@ -163,7 +166,7 @@ export const AppNavigator = () => {
   if (currentScreen === 'booking') {
     return (
       <BookingScreen
-        service={{}} // Pass selected service
+        service={selectedService || {}}
         user={user}
         onBack={() => setCurrentScreen('client')}
         onContinue={handleBookingContinue}
@@ -174,7 +177,7 @@ export const AppNavigator = () => {
   if (currentScreen === 'payment') {
     return (
       <PaymentScreen
-        bookingData={{}} // Pass booking data
+        bookingData={currentBookingData || {}}
         user={user}
         onBack={() => setCurrentScreen('booking')}
         onComplete={handlePaymentComplete}
@@ -196,7 +199,7 @@ export const AppNavigator = () => {
   // Client screens - only render if user is authenticated
   if (user && !isAdmin) {
     return (
-      <ClientTabNavigator user={user} />
+      <ClientTabNavigator user={user} onServicePress={handleServicePress} />
     );
   }
 

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import React, { useMemo, useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { colors } from '../../styles/colors';
 import { typography } from '../../styles/typography';
 import { spacing, borderRadius } from '../../styles/spacing';
@@ -26,6 +26,9 @@ export const BookingScreen: React.FC<BookingScreenProps> = ({
   const [clientType, setClientType] = useState<'casa' | 'empresa'>('casa');
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedTime, setSelectedTime] = useState('');
+  const [openClientType, setOpenClientType] = useState(false);
+  const [openDate, setOpenDate] = useState(false);
+  const [openTime, setOpenTime] = useState(false);
   const [errors, setErrors] = useState<{[key: string]: string}>({});
 
   const availableDates = [
@@ -33,6 +36,16 @@ export const BookingScreen: React.FC<BookingScreenProps> = ({
   ];
 
   const availableTimes = selectedDate ? getAvailableTimeSlots(selectedDate, service.id) : [];
+
+  const formattedDate = (date: string) => new Date(date).toLocaleDateString('es-ES', {
+    day: '2-digit', month: '2-digit', year: 'numeric'
+  });
+
+  const dateOptions = useMemo(() => availableDates.map(d => ({
+    label: formattedDate(d), value: d
+  })), [availableDates]);
+
+  const timeOptions = useMemo(() => availableTimes.map(t => ({ label: t, value: t })), [availableTimes]);
 
   const validateForm = () => {
     const newErrors: {[key: string]: string} = {};
@@ -79,6 +92,55 @@ export const BookingScreen: React.FC<BookingScreenProps> = ({
     }
   };
 
+  // Dropdown simple reutilizable
+  const Dropdown = ({
+    label,
+    placeholder,
+    valueLabel,
+    open,
+    setOpen,
+    options,
+    onSelect,
+    leftIcon
+  }: {
+    label: string;
+    placeholder: string;
+    valueLabel: string;
+    open: boolean;
+    setOpen: (o: boolean) => void;
+    options: { label: string; value: string }[];
+    onSelect: (value: string) => void;
+    leftIcon?: React.ReactNode;
+  }) => (
+    <View style={styles.dropdownContainer}>
+      <Text style={styles.sectionTitleInline}>{label}</Text>
+      <TouchableOpacity
+        style={styles.selectField}
+        onPress={() => setOpen(!open)}
+        activeOpacity={0.8}
+      >
+        {leftIcon}
+        <Text style={[styles.selectText, !valueLabel && styles.selectPlaceholder]}>
+          {valueLabel || placeholder}
+        </Text>
+        <View style={styles.chevron}>{AppIcons.chevronDown(16, colors.textSecondary)}</View>
+      </TouchableOpacity>
+      {open && (
+        <View style={styles.optionsPanel}>
+          {options.map(opt => (
+            <TouchableOpacity
+              key={opt.value}
+              style={styles.optionItem}
+              onPress={() => { onSelect(opt.value); setOpen(false); }}
+            >
+              <Text style={styles.optionText}>{opt.label}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      )}
+    </View>
+  );
+
   return (
     <View style={styles.container}>
       <View style={styles.headerPlaceholder}>
@@ -105,100 +167,41 @@ export const BookingScreen: React.FC<BookingScreenProps> = ({
           </View>
         </Card>
 
-        {/* Client Type Selection */}
+        {/* Campos con desplegables */}
         <Card style={styles.sectionCard}>
-          <Text style={styles.sectionTitle}>Tipo de Cliente</Text>
-          <View style={styles.clientTypeContainer}>
-            <TouchableOpacity
-              style={[
-                styles.clientTypeButton,
-                clientType === 'casa' && styles.clientTypeButtonActive
-              ]}
-              onPress={() => setClientType('casa')}
-            >
-              <Text style={[
-                styles.clientTypeText,
-                clientType === 'casa' && styles.clientTypeTextActive
-              ]}>
-                Casa
-              </Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity
-              style={[
-                styles.clientTypeButton,
-                clientType === 'empresa' && styles.clientTypeButtonActive
-              ]}
-              onPress={() => setClientType('empresa')}
-            >
-              <Text style={[
-                styles.clientTypeText,
-                clientType === 'empresa' && styles.clientTypeTextActive
-              ]}>
-                Empresa
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </Card>
+          <Dropdown
+            label="Tipo de Cliente:"
+            placeholder="Seleccionar tipo"
+            valueLabel={clientType === 'casa' ? 'Casa' : 'Empresa'}
+            open={openClientType}
+            setOpen={setOpenClientType}
+            options={[{ label: 'Casa', value: 'casa' }, { label: 'Empresa', value: 'empresa' }]}
+            onSelect={(v) => setClientType(v as 'casa' | 'empresa')}
+          />
 
-        {/* Date Selection */}
-        <Card style={styles.sectionCard}>
-          <Text style={styles.sectionTitle}>Seleccionar Fecha</Text>
-          <View style={styles.dateContainer}>
-            {availableDates.map((date) => (
-              <TouchableOpacity
-                key={date}
-                style={[
-                  styles.dateButton,
-                  selectedDate === date && styles.dateButtonActive
-                ]}
-                onPress={() => {
-                  setSelectedDate(date);
-                  setSelectedTime(''); // Reset time when date changes
-                }}
-              >
-                <Text style={[
-                  styles.dateText,
-                  selectedDate === date && styles.dateTextActive
-                ]}>
-                  {new Date(date).toLocaleDateString('es-ES', { 
-                    weekday: 'short', 
-                    day: 'numeric', 
-                    month: 'short' 
-                  })}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
+          <Dropdown
+            label="Fecha:"
+            placeholder="dd/mm/aaaa"
+            valueLabel={selectedDate ? formattedDate(selectedDate) : ''}
+            open={openDate}
+            setOpen={(o) => { setOpenDate(o); if (o) { setOpenTime(false); } }}
+            options={dateOptions}
+            onSelect={(v) => { setSelectedDate(v); setSelectedTime(''); }}
+            leftIcon={<View style={styles.leadingIcon}>{AppIcons.calendar(16, colors.textSecondary)}</View>}
+          />
           {errors.date && <Text style={styles.errorText}>{errors.date}</Text>}
-        </Card>
 
-        {/* Time Selection */}
-        {selectedDate && (
-          <Card style={styles.sectionCard}>
-            <Text style={styles.sectionTitle}>Seleccionar Hora</Text>
-            <View style={styles.timeContainer}>
-              {availableTimes.map((time) => (
-                <TouchableOpacity
-                  key={time}
-                  style={[
-                    styles.timeButton,
-                    selectedTime === time && styles.timeButtonActive
-                  ]}
-                  onPress={() => setSelectedTime(time)}
-                >
-                  <Text style={[
-                    styles.timeText,
-                    selectedTime === time && styles.timeTextActive
-                  ]}>
-                    {time}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-            {errors.time && <Text style={styles.errorText}>{errors.time}</Text>}
-          </Card>
-        )}
+          <Dropdown
+            label="Hora:"
+            placeholder="Seleccionar hora"
+            valueLabel={selectedTime}
+            open={openTime}
+            setOpen={(o) => { setOpenTime(o); if (o) { setOpenDate(false); } }}
+            options={timeOptions}
+            onSelect={(v) => setSelectedTime(v)}
+          />
+          {errors.time && <Text style={styles.errorText}>{errors.time}</Text>}
+        </Card>
 
         {/* Continue Button */}
         <Button
@@ -260,6 +263,10 @@ const styles = StyleSheet.create({
   sectionTitle: {
     ...typography.h4,
     marginBottom: spacing.md,
+  },
+  sectionTitleInline: {
+    ...typography.label,
+    marginBottom: spacing.xs,
   },
   clientTypeContainer: {
     flexDirection: 'row',
@@ -336,6 +343,49 @@ const styles = StyleSheet.create({
   },
   timeTextActive: {
     color: colors.textWhite,
+  },
+  dropdownContainer: {
+    marginBottom: spacing.md,
+  },
+  selectField: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.background,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: borderRadius.md,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+  },
+  leadingIcon: {
+    marginRight: spacing.sm,
+  },
+  selectText: {
+    flex: 1,
+    ...typography.body,
+    color: colors.textPrimary,
+  },
+  selectPlaceholder: {
+    color: colors.textLight,
+  },
+  chevron: {
+    marginLeft: spacing.sm,
+  },
+  optionsPanel: {
+    backgroundColor: colors.background,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: borderRadius.md,
+    marginTop: spacing.xs,
+    overflow: 'hidden',
+  },
+  optionItem: {
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+  },
+  optionText: {
+    ...typography.body,
+    color: colors.textPrimary,
   },
   continueButton: {
     marginTop: spacing.lg,
