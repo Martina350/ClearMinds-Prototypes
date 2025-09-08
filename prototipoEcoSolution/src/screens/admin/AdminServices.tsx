@@ -4,6 +4,7 @@ import { colors } from '../../styles/colors';
 import { typography } from '../../styles/typography';
 import { spacing, borderRadius } from '../../styles/spacing';
 import { Card } from '../../components/Card';
+import { AdminTabs } from '../../components/AdminTabs';
 import { FinalButton as Button } from '../../components/FinalButton';
 import { AppIcons } from '../../components/Icon';
 import { getAdminBookings } from '../../data/database';
@@ -94,27 +95,7 @@ export const AdminServices: React.FC<AdminServicesProps> = ({
       </View>
 
       {/* Navigation Tabs */}
-      <View style={styles.navigation}>
-        <TouchableOpacity style={styles.tab} onPress={() => onTabPress('dashboard')}>
-          {AppIcons.dashboard(16, colors.textWhite)}
-          <Text style={styles.tabText}>Dashboard</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity style={[styles.tab, styles.activeTab]}>
-          {AppIcons.services(16, colors.textWhite)}
-          <Text style={styles.tabText}>Servicios</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity style={styles.tab} onPress={() => onTabPress('payments')}>
-          {AppIcons.creditCard(16, colors.textWhite)}
-          <Text style={styles.tabText}>Pagos</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity style={styles.tab} onPress={() => onTabPress('calendar')}>
-          {AppIcons.calendar(16, colors.textWhite)}
-          <Text style={styles.tabText}>Ca</Text>
-        </TouchableOpacity>
-      </View>
+      <AdminTabs active={'services'} onTabPress={onTabPress as any} />
 
       {/* Main Content */}
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>

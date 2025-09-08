@@ -359,6 +359,67 @@ export const updateBookingStatus = (bookingId: string, status: Booking['status']
   return booking;
 };
 
+// Admin helpers
+export const updateBookingPaymentStatus = (bookingId: string, paymentStatus: 'pending' | 'approved' | 'rejected') => {
+  const booking = db.bookings.find(b => b.id === bookingId);
+  if (!booking) return null;
+  booking.payment.status = paymentStatus;
+  if (paymentStatus === 'approved') {
+    booking.status = 'confirmado';
+  } else if (paymentStatus === 'rejected') {
+    booking.status = 'pendiente';
+  }
+  return booking;
+};
+
+export const updateServicePrice = (serviceId: string, price: number) => {
+  const service = db.services.find(s => s.id === serviceId);
+  if (!service) return null;
+  service.price = price;
+  return service;
+};
+
+export const updateStaffStatus = (staffId: number, status: 'available' | 'occupied') => {
+  const staff = db.staff.find(s => s.id === staffId);
+  if (!staff) return null;
+  staff.status = status;
+  return staff;
+};
+
+export const addStaff = (staff: Omit<Staff, 'id'>) => {
+  const newId = Math.max(...db.staff.map(s => s.id)) + 1;
+  const newStaff = { ...staff, id: newId } as Staff;
+  db.staff.push(newStaff);
+  return newStaff;
+};
+
+export const assignBookingStaff = (bookingId: string, staffId: number) => {
+  const booking = db.bookings.find(b => b.id === bookingId);
+  if (!booking) return null;
+  booking.assignedStaff = staffId;
+  booking.status = 'en_proceso';
+  return booking;
+};
+
+export const rescheduleBooking = (bookingId: string, date: string, time: string) => {
+  const booking = db.bookings.find(b => b.id === bookingId);
+  if (!booking) return null;
+  booking.date = date;
+  booking.time = time;
+  booking.status = 'pendiente';
+  return booking;
+};
+
+export const addZone = (country: string, province: string) => {
+  db.zones.push({ country, province, enabled: true });
+};
+
+export const setZoneEnabled = (country: string, province: string, enabled: boolean) => {
+  const z = db.zones.find(zz => zz.country === country && zz.province === province);
+  if (z) z.enabled = enabled;
+  return z;
+};
+
 export const addUser = (user: Omit<User, 'id'>) => {
   const newId = Math.max(...db.users.map(u => u.id)) + 1;
   const newUser = { ...user, id: newId };
@@ -368,4 +429,12 @@ export const addUser = (user: Omit<User, 'id'>) => {
 
 export const authenticateUser = (email: string, password: string) => {
   return db.users.find(user => user.email === email && user.password === password);
+};
+
+export const updateUser = (userId: number, updates: Partial<User>) => {
+  const index = db.users.findIndex(u => u.id === userId);
+  if (index === -1) return null;
+  const updated = { ...db.users[index], ...updates } as User;
+  db.users[index] = updated;
+  return updated;
 };

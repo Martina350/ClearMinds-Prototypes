@@ -17,6 +17,7 @@ interface InputProps {
   disabled?: boolean;
   multiline?: boolean;
   numberOfLines?: number;
+  maxLength?: number;
 }
 
 export const Input: React.FC<InputProps> = ({
@@ -30,7 +31,8 @@ export const Input: React.FC<InputProps> = ({
   error,
   disabled = false,
   multiline = false,
-  numberOfLines = 1
+  numberOfLines = 1,
+  maxLength
 }) => {
   const [isFocused, setIsFocused] = useState(false);
   const [isSecure, setIsSecure] = useState(secureTextEntry);
@@ -77,6 +79,7 @@ export const Input: React.FC<InputProps> = ({
           editable={!disabled}
           multiline={multiline}
           numberOfLines={numberOfLines}
+          maxLength={maxLength}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
         />

@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal } from 'react-native';
 import { colors } from '../../styles/colors';
 import { typography } from '../../styles/typography';
 import { spacing, borderRadius } from '../../styles/spacing';
@@ -8,6 +8,7 @@ import { BottomNavigation } from '../../components/BottomNavigation';
 import { Card } from '../../components/Card';
 import { FinalButton as Button } from '../../components/FinalButton';
 import { AppIcons } from '../../components/Icon';
+import { Input } from '../../components/Input';
 
 interface ProfileScreenProps {
   user: any;
@@ -15,7 +16,7 @@ interface ProfileScreenProps {
   onProfilePress: () => void;
   onPhonePress: () => void;
   onTabPress: (tab: string) => void;
-  onEditProfile: () => void;
+  onEditProfile: (updates: any) => void;
   onLogout: () => void;
 }
 
@@ -28,6 +29,8 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
   onEditProfile,
   onLogout
 }) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [form, setForm] = useState({ name: user?.name || '', email: user?.email || '', phone: user?.phone || '' });
   // Validate user exists
   if (!user) {
     return (
@@ -67,7 +70,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
         
         {/* Action Buttons */}
         <Card style={styles.actionCard}>
-          <TouchableOpacity style={styles.actionButton} onPress={onEditProfile}>
+          <TouchableOpacity style={styles.actionButton} onPress={() => setIsEditing(true)}>
             {AppIcons.edit(20, colors.primary)}
             <Text style={styles.actionText}>Editar Perfil</Text>
           </TouchableOpacity>
@@ -86,6 +89,23 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
         activeTab="profile"
         onTabPress={onTabPress}
       />
+
+      {/* Modal editar perfil */}
+      <Modal visible={isEditing} animationType="slide" transparent>
+        <View style={styles.modalBackdrop}>
+          <View style={styles.modalCard}>
+            <Text style={styles.modalTitle}>Editar Perfil</Text>
+            <Input placeholder="Nombre" value={form.name} onChangeText={(v) => setForm({ ...form, name: v })} />
+            <Input placeholder="Email" value={form.email} keyboardType="email-address" onChangeText={(v) => setForm({ ...form, email: v })} />
+            <Input placeholder="Teléfono" value={form.phone} keyboardType="phone-pad" onChangeText={(v) => setForm({ ...form, phone: v })} />
+
+            <View style={styles.modalActions}>
+              <Button title="Cancelar" onPress={() => setIsEditing(false)} style={styles.modalButtonSecondary} />
+              <Button title="Guardar" onPress={() => { onEditProfile(form); setIsEditing(false); }} />
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -149,5 +169,30 @@ const styles = StyleSheet.create({
     color: colors.error,
     textAlign: 'center',
     marginTop: 100,
+  },
+  modalBackdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: spacing.lg,
+  },
+  modalCard: {
+    width: '100%',
+    backgroundColor: colors.background,
+    borderRadius: borderRadius.lg,
+    padding: spacing.lg,
+  },
+  modalTitle: {
+    ...typography.h3,
+    marginBottom: spacing.md,
+  },
+  modalActions: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: spacing.md,
+  },
+  modalButtonSecondary: {
+    backgroundColor: colors.buttonSecondary,
   },
 });

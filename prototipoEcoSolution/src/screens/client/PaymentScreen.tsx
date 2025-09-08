@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { colors } from '../../styles/colors';
 import { typography } from '../../styles/typography';
 import { spacing, borderRadius } from '../../styles/spacing';
@@ -8,6 +8,7 @@ import { Card } from '../../components/Card';
 import { FinalButton as Button } from '../../components/FinalButton';
 import { Input } from '../../components/Input';
 import { AppIcons } from '../../components/Icon';
+import * as ImagePicker from 'expo-image-picker';
 
 interface PaymentScreenProps {
   bookingData: any;
@@ -30,8 +31,6 @@ export const PaymentScreen: React.FC<PaymentScreenProps> = ({
     holder: ''
   });
   const [transferData, setTransferData] = useState({
-    accountNumber: '',
-    bank: '',
     proof: ''
   });
   const [errors, setErrors] = useState<{[key: string]: string}>({});
@@ -68,12 +67,8 @@ export const PaymentScreen: React.FC<PaymentScreenProps> = ({
   const validateTransferForm = () => {
     const newErrors: {[key: string]: string} = {};
 
-    if (!transferData.accountNumber.trim()) {
-      newErrors.accountNumber = 'El número de cuenta es requerido';
-    }
-
-    if (!transferData.bank.trim()) {
-      newErrors.bank = 'El banco es requerido';
+    if (!transferData.proof.trim()) {
+      newErrors.proof = 'Debes subir el comprobante';
     }
 
     setErrors(newErrors);
@@ -92,6 +87,23 @@ export const PaymentScreen: React.FC<PaymentScreenProps> = ({
       };
       
       onComplete(paymentData);
+    }
+  };
+
+  const pickImage = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      setErrors({ proof: 'Permiso denegado para acceder a la galería' });
+      return;
+    }
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 0.8
+    });
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      setTransferData({ proof: result.assets[0].uri });
+      setErrors({});
     }
   };
 
@@ -212,9 +224,17 @@ export const PaymentScreen: React.FC<PaymentScreenProps> = ({
                 <Input
                   placeholder="MM/AA"
                   value={cardData.expiry}
-                  onChangeText={(value) => setCardData(prev => ({ ...prev, expiry: value }))}
+                  onChangeText={(value) => {
+                    const digits = value.replace(/[^0-9]/g, '').slice(0, 4);
+                    let formatted = digits;
+                    if (digits.length >= 3) {
+                      formatted = `${digits.slice(0,2)}/${digits.slice(2)}`;
+                    }
+                    setCardData(prev => ({ ...prev, expiry: formatted }));
+                  }}
                   keyboardType="numeric"
                   error={errors.cardExpiry}
+                  maxLength={5}
                 />
               </View>
               
@@ -239,26 +259,25 @@ export const PaymentScreen: React.FC<PaymentScreenProps> = ({
         ) : (
           <Card style={styles.formCard}>
             <Text style={styles.sectionTitle}>Datos de Transferencia</Text>
-            
-            <Input
-              placeholder="Número de cuenta"
-              value={transferData.accountNumber}
-              onChangeText={(value) => setTransferData(prev => ({ ...prev, accountNumber: value }))}
-              keyboardType="numeric"
-              error={errors.accountNumber}
-            />
-            
-            <Input
-              placeholder="Banco"
-              value={transferData.bank}
-              onChangeText={(value) => setTransferData(prev => ({ ...prev, bank: value }))}
-              error={errors.bank}
-            />
-            
-            <TouchableOpacity style={styles.uploadButton}>
+            <View style={styles.transferInfoBox}>
+              <Text style={styles.transferLine}><Text style={styles.transferLabel}>Datos para Transferencia</Text></Text>
+              <Text style={styles.transferLine}><Text style={styles.transferLabel}>Banco: </Text>Banco del Pichincha</Text>
+              <Text style={styles.transferLine}><Text style={styles.transferLabel}>Cuenta: </Text>1234567890</Text>
+              <Text style={styles.transferLine}><Text style={styles.transferLabel}>Titular: </Text>EcoSolution S.A.</Text>
+              <Text style={styles.transferLine}><Text style={styles.transferLabel}>Monto: </Text>${bookingData.service.price}</Text>
+            </View>
+
+            <TouchableOpacity style={styles.uploadButton} onPress={pickImage}>
               {AppIcons.upload(16, colors.primary)}
-              <Text style={styles.uploadText}>Subir Comprobante</Text>
+              <Text style={styles.uploadText}>{transferData.proof ? 'Cambiar Comprobante' : 'Subir Comprobante'}</Text>
             </TouchableOpacity>
+            {transferData.proof ? (
+              <View style={styles.previewBox}>
+                <Image source={{ uri: transferData.proof }} style={styles.previewImage} />
+                <Text style={styles.previewText}>Comprobante seleccionado</Text>
+              </View>
+            ) : null}
+            {errors.proof && <Text style={styles.errorText}>{errors.proof}</Text>}
           </Card>
         )}
 
@@ -383,6 +402,21 @@ const styles = StyleSheet.create({
   formCard: {
     marginBottom: spacing.lg,
   },
+  transferInfoBox: {
+    backgroundColor: '#EAF7EA',
+    borderRadius: borderRadius.md,
+    padding: spacing.md,
+    marginBottom: spacing.md,
+  },
+  transferLine: {
+    ...typography.body,
+    marginBottom: spacing.xs,
+    color: colors.textPrimary,
+  },
+  transferLabel: {
+    fontWeight: 'bold',
+    color: colors.textPrimary,
+  },
   cardRow: {
     flexDirection: 'row',
     gap: spacing.sm,
@@ -408,6 +442,20 @@ const styles = StyleSheet.create({
   uploadText: {
     ...typography.body,
     color: colors.primary,
+  },
+  previewBox: {
+    marginTop: spacing.sm,
+    alignItems: 'center',
+  },
+  previewImage: {
+    width: '100%',
+    height: 180,
+    borderRadius: borderRadius.md,
+    marginBottom: spacing.xs,
+  },
+  previewText: {
+    ...typography.bodySmall,
+    color: colors.textSecondary,
   },
   completeButton: {
     marginTop: spacing.lg,

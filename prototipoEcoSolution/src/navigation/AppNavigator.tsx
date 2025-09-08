@@ -17,14 +17,18 @@ import { PaymentScreen } from '../screens/client/PaymentScreen';
 // Admin Screens
 import { AdminDashboard } from '../screens/admin/AdminDashboard';
 import { AdminServices } from '../screens/admin/AdminServices';
+import { AdminPayments } from '../screens/admin/AdminPayments';
+import { AdminZones } from '../screens/admin/AdminZones';
+import { AdminStaff } from '../screens/admin/AdminStaff';
+import { AdminPrices } from '../screens/admin/AdminPrices';
 
 // Data
-import { authenticateUser, addUser, addBooking, updateBookingStatus } from '../data/database';
+import { authenticateUser, addUser, addBooking, updateBookingStatus, updateUser } from '../data/database';
 
 // Eliminamos react-navigation para evitar RNSScreenContainer en Expo Go
 
 // Client Tab Navigator
-const ClientTabNavigator = ({ user, onServicePress }: { user: any, onServicePress: (service: any) => void }) => {
+const ClientTabNavigator = ({ user, onServicePress, onLogout, onEditProfile }: { user: any, onServicePress: (service: any) => void, onLogout: () => void, onEditProfile: (updates: any) => void }) => {
   // Tab inferior propia para evitar react-native-screens
   const [tab, setTab] = useState<'services' | 'myServices' | 'profile'>('services');
   const handleTabChange = (nextTab: string) => {
@@ -44,7 +48,7 @@ const ClientTabNavigator = ({ user, onServicePress }: { user: any, onServicePres
     );
   }
   return (
-    <ProfileScreen user={user} onNotificationPress={() => { }} onProfilePress={() => { }} onPhonePress={() => { }} onTabPress={handleTabChange} onEditProfile={() => { }} onLogout={() => { }} />
+    <ProfileScreen user={user} onNotificationPress={() => { }} onProfilePress={() => { }} onPhonePress={() => { }} onTabPress={handleTabChange} onEditProfile={onEditProfile} onLogout={onLogout} />
   );
 };
 
@@ -93,6 +97,14 @@ export const AppNavigator = () => {
     setUser(null);
     setIsAdmin(false);
     setCurrentScreen('login');
+  };
+
+  const handleEditProfile = (updates: any) => {
+    if (!user) return;
+    const updated = updateUser(user.id, updates);
+    if (updated) {
+      setUser(updated);
+    }
   };
 
   const handleServicePress = (service: any) => {
@@ -191,6 +203,14 @@ export const AppNavigator = () => {
         return <AdminDashboard onTabPress={handleTabPress} onLogout={handleLogout} />;
       case 'services':
         return <AdminServices onTabPress={handleTabPress} onLogout={handleLogout} />;
+      case 'payments':
+        return <AdminPayments onTabPress={handleTabPress} onLogout={handleLogout} />;
+      case 'zones':
+        return <AdminZones onTabPress={handleTabPress} />;
+      case 'staff':
+        return <AdminStaff onTabPress={handleTabPress} />;
+      case 'prices':
+        return <AdminPrices onTabPress={handleTabPress} />;
       default:
         return <AdminDashboard onTabPress={handleTabPress} onLogout={handleLogout} />;
     }
@@ -199,7 +219,7 @@ export const AppNavigator = () => {
   // Client screens - only render if user is authenticated
   if (user && !isAdmin) {
     return (
-      <ClientTabNavigator user={user} onServicePress={handleServicePress} />
+      <ClientTabNavigator user={user} onServicePress={handleServicePress} onLogout={handleLogout} onEditProfile={handleEditProfile} />
     );
   }
 

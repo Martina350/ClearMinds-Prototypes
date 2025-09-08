@@ -4,8 +4,10 @@ import { colors } from '../../styles/colors';
 import { typography } from '../../styles/typography';
 import { spacing, borderRadius } from '../../styles/spacing';
 import { Card } from '../../components/Card';
+import { AdminTabs } from '../../components/AdminTabs';
 import { AppIcons } from '../../components/Icon';
 import { db } from '../../data/database';
+import { StatusBar } from 'expo-status-bar';
 
 interface AdminDashboardProps {
   onTabPress: (tab: string) => void;
@@ -64,8 +66,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   ];
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       {/* Header */}
+      <StatusBar backgroundColor={colors.adminHeader} />
       <View style={styles.header}>
         <View style={styles.headerLeft}>
           {AppIcons.gear(20, colors.textWhite)}
@@ -92,27 +95,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       </View>
 
       {/* Navigation Tabs */}
-      <View style={styles.navigation}>
-        <TouchableOpacity style={[styles.tab, styles.activeTab]}>
-          {AppIcons.dashboard(16, colors.textWhite)}
-          <Text style={styles.tabText}>Dashboard</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity style={styles.tab} onPress={() => onTabPress('services')}>
-          {AppIcons.services(16, colors.textWhite)}
-          <Text style={styles.tabText}>Servicios</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity style={styles.tab} onPress={() => onTabPress('payments')}>
-          {AppIcons.creditCard(16, colors.textWhite)}
-          <Text style={styles.tabText}>Pagos</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity style={styles.tab} onPress={() => onTabPress('calendar')}>
-          {AppIcons.calendar(16, colors.textWhite)}
-          <Text style={styles.tabText}>Ca</Text>
-        </TouchableOpacity>
-      </View>
+      <AdminTabs active={'admin'} onTabPress={onTabPress as any} />
 
       {/* Main Content */}
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
@@ -157,7 +140,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           ))}
         </View>
       </ScrollView>
-    </View>
+    </ScrollView>
   );
 };
 
@@ -239,31 +222,6 @@ const styles = StyleSheet.create({
     fontSize: 10,
     color: colors.textWhite,
     fontWeight: 'bold',
-  },
-  navigation: {
-    flexDirection: 'row',
-    backgroundColor: colors.adminHeader,
-    paddingHorizontal: spacing.lg,
-  },
-  tab: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.lg,
-    marginRight: spacing.sm,
-  },
-  activeTab: {
-    backgroundColor: colors.adminTabActive,
-    borderBottomLeftRadius: borderRadius.md,
-    borderBottomRightRadius: borderRadius.md,
-  },
-  tabIcon: {
-    fontSize: 16,
-    color: colors.textWhite,
-    marginRight: spacing.xs,
-  },
-  tabText: {
-    ...typography.adminSubtitle,
   },
   content: {
     flex: 1,
