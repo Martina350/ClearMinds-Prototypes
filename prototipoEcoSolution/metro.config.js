@@ -6,3 +6,4 @@ const config = getDefaultConfig(__dirname);
 config.resetCache = true;
 
 module.exports = config;
+
