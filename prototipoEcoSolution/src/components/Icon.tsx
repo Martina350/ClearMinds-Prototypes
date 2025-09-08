@@ -77,12 +77,12 @@ export const AppIcons = {
   eyeOff: (size = 16, color = '#7F8C8D') => <Icon name="eye-off" size={size} color={color} library="Feather" />,
   globe: (size = 16, color = '#7F8C8D') => <Icon name="globe" size={size} color={color} library="Feather" />,
   mapPin: (size = 16, color = '#7F8C8D') => <Icon name="map-pin" size={size} color={color} library="Feather" />,
-  building: (size = 16, color = '#7F8C8D') => <Icon name="building" size={size} color={color} library="Feather" />,
+  building: (size = 16, color = '#7F8C8D') => <Icon name="home" size={size} color={color} library="Feather" />,
   flag: (size = 16, color = '#7F8C8D') => <Icon name="flag" size={size} color={color} library="Feather" />,
   
   // Pagos
   creditCard: (size = 24, color = '#2C3E50') => <Icon name="credit-card" size={size} color={color} library="Feather" />,
-  bank: (size = 24, color = '#2C3E50') => <Icon name="building-2" size={size} color={color} library="Feather" />,
+  bank: (size = 24, color = '#2C3E50') => <Icon name="bank" size={size} color={color} library="MaterialCommunityIcons" />,
   upload: (size = 16, color = '#5CB85C') => <Icon name="upload" size={size} color={color} library="Feather" />,
   
   // Admin

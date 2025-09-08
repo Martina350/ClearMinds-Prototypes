@@ -2,12 +2,12 @@ export const colors = {
   // Colores principales basados en las imágenes
   primary: '#5CB85C', // Verde vibrante de EcoSolution
   primaryDark: '#4A9A4A',
-  secondary: '#8A70D8', // Púrpura del gradiente
-  secondaryDark: '#5C42A0',
+  secondary: '#134E5E', // Celeste del gradiente
+  secondaryDark: '#71B280',
   
   // Colores de fondo
   background: '#FFFFFF',
-  backgroundGradient: ['#8A70D8', '#5C42A0'],
+  backgroundGradient: ['#134E5E', '#71B280'],
   cardBackground: '#FFFFFF',
   
   // Colores de texto

@@ -1,8 +1,6 @@
-import React, { useState } from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { AppIcons } from '../components/Icon';
+import { useState } from 'react';
+import { View } from 'react-native';
+
 
 // Auth Screens
 import { LoginScreen } from '../screens/auth/LoginScreen';
@@ -23,60 +21,30 @@ import { AdminServices } from '../screens/admin/AdminServices';
 // Data
 import { authenticateUser, addUser, addBooking, updateBookingStatus } from '../data/database';
 
-const Stack = createNativeStackNavigator();
-const Tab = createBottomTabNavigator();
+// Eliminamos react-navigation para evitar RNSScreenContainer en Expo Go
 
 // Client Tab Navigator
 const ClientTabNavigator = ({ user }: { user: any }) => {
+  // Tab inferior propia para evitar react-native-screens
+  const [tab, setTab] = useState<'services' | 'myServices' | 'profile'>('services');
+  const handleTabChange = (nextTab: string) => {
+    // Asegura el tipo correcto para nuestro estado local
+    if (nextTab === 'services' || nextTab === 'myServices' || nextTab === 'profile') {
+      setTab(nextTab);
+    }
+  };
+  if (tab === 'services') {
+    return (
+      <ServicesScreen user={user} onServicePress={() => { }} onNotificationPress={() => { }} onProfilePress={() => handleTabChange('profile')} onPhonePress={() => { }} onTabPress={handleTabChange} />
+    );
+  }
+  if (tab === 'myServices') {
+    return (
+      <MyServicesScreen user={user} onNotificationPress={() => { }} onProfilePress={() => handleTabChange('profile')} onPhonePress={() => { }} onTabPress={handleTabChange} />
+    );
+  }
   return (
-    <Tab.Navigator
-      screenOptions={{
-        headerShown: false,
-        tabBarStyle: {
-          backgroundColor: '#FFFFFF',
-          borderTopWidth: 1,
-          borderTopColor: '#E5E5E5',
-          paddingVertical: 8,
-          paddingHorizontal: 16,
-        },
-        tabBarActiveTintColor: '#5CB85C',
-        tabBarInactiveTintColor: '#7F8C8D',
-        tabBarLabelStyle: {
-          fontSize: 12,
-          fontWeight: 'normal',
-        },
-      }}
-    >
-      <Tab.Screen
-        name="Services"
-        options={{
-          tabBarLabel: 'Servicios',
-          tabBarIcon: ({ color, focused }) => AppIcons.services(20, color),
-        }}
-      >
-        {() => <ServicesScreen user={user} onServicePress={() => {}} onNotificationPress={() => {}} onProfilePress={() => {}} onPhonePress={() => {}} onTabPress={() => {}} />}
-      </Tab.Screen>
-      <Tab.Screen
-        name="MyServices"
-        options={{
-          tabBarLabel: 'Mis Servicios',
-          tabBarIcon: ({ color, focused }) => 
-            focused ? AppIcons.myServicesActive(20, color) : AppIcons.myServices(20, color),
-        }}
-      >
-        {() => <MyServicesScreen user={user} onNotificationPress={() => {}} onProfilePress={() => {}} onPhonePress={() => {}} onTabPress={() => {}} />}
-      </Tab.Screen>
-      <Tab.Screen
-        name="Profile"
-        options={{
-          tabBarLabel: 'Perfil',
-          tabBarIcon: ({ color, focused }) => 
-            focused ? AppIcons.profileActive(20, color) : AppIcons.profile(20, color),
-        }}
-      >
-        {() => <ProfileScreen user={user} onNotificationPress={() => {}} onProfilePress={() => {}} onPhonePress={() => {}} onTabPress={() => {}} onEditProfile={() => {}} onLogout={() => {}} />}
-      </Tab.Screen>
-    </Tab.Navigator>
+    <ProfileScreen user={user} onNotificationPress={() => { }} onProfilePress={() => { }} onPhonePress={() => { }} onTabPress={handleTabChange} onEditProfile={() => { }} onLogout={() => { }} />
   );
 };
 
@@ -137,7 +105,7 @@ export const AppNavigator = () => {
 
   const handlePaymentComplete = (paymentData: any) => {
     if (!user) return;
-    
+
     // Create booking in database
     const booking = addBooking({
       serviceId: paymentData.service.id,
@@ -152,7 +120,7 @@ export const AppNavigator = () => {
       },
       clientType: paymentData.clientType
     });
-    
+
     setCurrentScreen('client');
     alert('Servicio agendado exitosamente');
   };
