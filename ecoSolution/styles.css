@@ -119,6 +119,44 @@ body {
     background: #da190b;
 }
 
+/* Region selector (siempre por encima) */
+.region-selector {
+    position: fixed;
+    z-index: 100000; /* por encima de loading-screen (9999) y modales */
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(4px);
+    border-radius: 10px;
+    padding: 10px 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+}
+.region-selector .region-controls label { 
+    display: inline-flex; 
+    align-items: center; 
+    gap: 6px; 
+    margin-right: 8px; 
+}
+.region-selector select { 
+    padding: 4px 6px; 
+    border-radius: 6px; 
+    border: 1px solid #ddd; 
+}
+.region-selector .btn { 
+    padding: 6px 10px; 
+    border-radius: 8px; 
+    border: 0; 
+    background: #4CAF50; 
+    color: #fff; 
+    cursor: pointer; 
+}
+.region-selector .btn:hover { background: #45a049; }
+
+/* (Se retiró el FAB global de idioma) */
+
+/* Profile Edit Modal tweaks */
+#profileEditModal .modal-content {
+    max-width: 520px;
+}
+
 /* App Container */
 .app-container {
     min-height: 100vh;
@@ -235,6 +273,7 @@ body {
     }
 }
 
+
 /* Authentication Styles */
 .auth-container {
     min-height: 100vh;
@@ -297,6 +336,7 @@ body {
     color: #333;
     font-size: 1.8rem;
 }
+
 
 .input-group {
     position: relative;
@@ -621,7 +661,9 @@ body {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease;
     cursor: pointer;
+    position: relative;
 }
+
 
 .service-card:hover {
     transform: translateY(-5px);

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EcoSolution - Servicios Ambientales</title>
+    <title data-i18n="app.title">EcoSolution</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
@@ -28,8 +28,8 @@
             <div class="auth-container">
                 <div class="logo">
                     <i class="fas fa-leaf"></i>
-                    <h1>EcoSolution</h1>
-                    <p>Servicios de Sanidad Ambiental</p>
+                    <h1 data-i18n="app.title">EcoSolution</h1>
+                    <p data-i18n="app.subtitle">Servicios de Sanidad Ambiental</p>
                 </div>
                 
                 <!-- Login Form -->
@@ -131,7 +131,7 @@
             <!-- Header -->
             <header class="app-header">
                 <div class="header-content">
-                    <h1>EcoSolution</h1>
+                    <h1 data-i18n="app.title">EcoSolution</h1>
                     <div class="header-actions">
                         <button id="notificationsBtn" class="btn-icon">
                             <i class="fas fa-bell"></i>
@@ -148,15 +148,15 @@
             <nav class="bottom-nav">
                 <button class="nav-item active" data-view="services">
                     <i class="fas fa-list"></i>
-                    <span>Servicios</span>
+                    <span data-i18n="nav.services">Servicios</span>
                 </button>
                 <button class="nav-item" data-view="myServices">
                     <i class="fas fa-calendar-check"></i>
-                    <span>Mis Servicios</span>
+                    <span data-i18n="nav.myServices">Mis Servicios</span>
                 </button>
                 <button class="nav-item" data-view="profile">
                     <i class="fas fa-user"></i>
-                    <span>Perfil</span>
+                    <span data-i18n="nav.profile">Perfil</span>
                 </button>
             </nav>
 
@@ -165,7 +165,7 @@
                 <!-- Services View -->
                 <div id="servicesView" class="view active">
                     <div class="view-header">
-                        <h2>Nuestros Servicios</h2>
+                        <h2 data-i18n="services.heading">Nuestros Servicios</h2>
                         <div class="filter-controls">
                             <select id="serviceFilter">
                                 <option value="all">Todos los servicios</option>
@@ -210,6 +210,10 @@
                         <button class="action-btn" id="editProfileBtn">
                             <i class="fas fa-edit"></i>
                             <span>Editar Perfil</span>
+                        </button>
+                        <button class="action-btn" id="profileLangBtn" title="Idioma">
+                            <i class="fas fa-globe"></i>
+                            <span data-i18n="selector.language">Idioma</span>
                         </button>
                         <button class="action-btn" id="logoutBtn">
                             <i class="fas fa-sign-out-alt"></i>
@@ -405,6 +409,47 @@
         </div>
     </div>
 
+    <!-- Profile Edit Modal -->
+    <div id="profileEditModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Editar Perfil</h3>
+                <button class="close-btn" id="closeProfileEditModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="profileEditForm">
+                    <div class="form-group">
+                        <label>Nombre:</label>
+                        <input type="text" id="editName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Correo:</label>
+                        <input type="email" id="editEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Teléfono:</label>
+                        <input type="tel" id="editPhone">
+                    </div>
+                    <div class="form-group">
+                        <label>Dirección:</label>
+                        <input type="text" id="editAddress">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group" style="flex:1">
+                            <label>Ciudad:</label>
+                            <input type="text" id="editCity">
+                        </div>
+                        <div class="form-group" style="flex:1">
+                            <label>Estado/Provincia:</label>
+                            <input type="text" id="editState">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Payment Modal -->
     <div id="paymentModal" class="modal">
         <div class="modal-content">
@@ -489,6 +534,90 @@
     </div>
 
     <!-- Scripts -->
+    <script type="module">
+        import { resolveRegion, setRegion, COUNTRY_LANGS, getRegion } from './region.js';
+        import { initI18n, applyTranslations } from './i18n.js';
+        import { applyFeatureFlags } from './helpers.js';
+
+        // UI simple para seleccionar país/idioma
+        const selector = document.createElement('div');
+        selector.className = 'region-selector';
+        selector.innerHTML = `
+            <div class="region-controls">
+                <label><span data-i18n="selector.country">País</span>
+                    <select id="regionCountry">
+                        <option value="US">US</option>
+                        <option value="CA">CA</option>
+                        <option value="PE">PE</option>
+                        <option value="EC">EC</option>
+                    </select>
+                </label>
+                <label><span data-i18n="selector.language">Idioma</span>
+                    <select id="regionLang"></select>
+                </label>
+                <button id="regionSave" class="btn btn-small" data-i18n="btn.save">Guardar</button>
+            </div>
+        `;
+        document.body.appendChild(selector);
+        selector.style.display = 'none';
+        selector.style.position = 'fixed';
+        selector.style.zIndex = '10000';
+        // Botón flotante global para idioma
+        // Nota: FAB global removido; ahora se usa el botón dentro del Perfil
+
+        function populateLangs(country, currentLang) {
+            const select = document.getElementById('regionLang');
+            select.innerHTML = '';
+            (COUNTRY_LANGS[country] || ['en-US']).forEach(code => {
+                const opt = document.createElement('option');
+                opt.value = code; opt.textContent = code;
+                if (code === currentLang) opt.selected = true;
+                select.appendChild(opt);
+            });
+        }
+
+        async function bootstrapRegion() {
+            const region = resolveRegion();
+            await initI18n();
+            applyTranslations();
+            applyFeatureFlags();
+
+            document.getElementById('regionCountry').value = region.country;
+            populateLangs(region.country, region.lang);
+
+            document.getElementById('regionCountry').addEventListener('change', (e) => {
+                populateLangs(e.target.value, (COUNTRY_LANGS[e.target.value]||[])[0]);
+            });
+
+            document.getElementById('regionSave').addEventListener('click', async () => {
+                const c = document.getElementById('regionCountry').value;
+                const l = document.getElementById('regionLang').value;
+                setRegion(c, l);
+                selector.style.display = 'none';
+            });
+
+            document.addEventListener('i18n:change', () => {
+                applyTranslations();
+            });
+
+            document.addEventListener('region:prompt', (e) => {
+                const region = getRegion();
+                document.getElementById('regionCountry').value = region.country;
+                populateLangs(region.country, region.lang);
+                selector.style.display = 'block';
+                if (e?.detail?.anchorRect) {
+                    const rect = e.detail.anchorRect;
+                    selector.style.top = Math.round((rect.bottom + 8)) + 'px';
+                    selector.style.left = Math.round((rect.left)) + 'px';
+                } else {
+                    selector.style.bottom = '16px';
+                    selector.style.right = '16px';
+                }
+            });
+        }
+
+        bootstrapRegion();
+    </script>
     <script src="app.js"></script>
 </body>
 </html>

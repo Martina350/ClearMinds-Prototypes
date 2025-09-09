@@ -13,6 +13,7 @@ class EcoSolutionApp {
                     id: 1,
                     role: 'client',
                     country: 'Ecuador',
+                    lang: 'es-EC',
                     name: 'Juan Pérez',
                     email: 'juan@test.com',
                     phone: '+593987654321',
@@ -26,6 +27,7 @@ class EcoSolutionApp {
                     id: 2,
                     role: 'client',
                     country: 'USA',
+                    lang: 'en-US',
                     name: 'John Smith',
                     email: 'john@test.com',
                     phone: '+1234567890',
@@ -39,6 +41,7 @@ class EcoSolutionApp {
                     id: 4,
                     role: 'client',
                     country: 'Canada',
+                    lang: 'fr-CA',
                     name: 'Marie Dubois',
                     email: 'marie@test.com',
                     phone: '+14165551234',
@@ -52,6 +55,7 @@ class EcoSolutionApp {
                     id: 5,
                     role: 'client',
                     country: 'Peru',
+                    lang: 'es-PE',
                     name: 'Carlos Mendoza',
                     email: 'carlos@test.com',
                     phone: '+51987654321',
@@ -67,7 +71,8 @@ class EcoSolutionApp {
                     username: 'admin',
                     password: 'admin123',
                     name: 'Administrador',
-                    email: 'admin@ecosolution.com'
+                    email: 'admin@ecosolution.com',
+                    lang: 'en-US'
                 }
             ],
             services: [
@@ -470,6 +475,41 @@ class EcoSolutionApp {
             this.logout();
         });
 
+        // Profile language button
+        document.getElementById('profileLangBtn')?.addEventListener('click', (e) => {
+            try {
+                const r = e.currentTarget.getBoundingClientRect();
+                document.dispatchEvent(new CustomEvent('region:prompt', { detail: { anchorRect: { top: r.top, left: r.left, right: r.right, bottom: r.bottom } } }));
+            } catch (_) {}
+        });
+
+        // Edit profile open/close
+        document.getElementById('editProfileBtn')?.addEventListener('click', () => {
+            this.openProfileEdit();
+        });
+        document.getElementById('closeProfileEditModal')?.addEventListener('click', () => {
+            this.closeModal('profileEditModal');
+        });
+
+        document.getElementById('profileEditForm')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.saveProfileEdit();
+        });
+
+        // Language toggle buttons (cliente/admin)
+        document.getElementById('langToggleBtn')?.addEventListener('click', (e) => {
+            try {
+                const r = e.currentTarget.getBoundingClientRect();
+                document.dispatchEvent(new CustomEvent('region:prompt', { detail: { anchorRect: { top: r.top, left: r.left, right: r.right, bottom: r.bottom } } }));
+            } catch (_) {}
+        });
+        document.getElementById('adminLangToggleBtn')?.addEventListener('click', (e) => {
+            try {
+                const r = e.currentTarget.getBoundingClientRect();
+                document.dispatchEvent(new CustomEvent('region:prompt', { detail: { anchorRect: { top: r.top, left: r.left, right: r.right, bottom: r.bottom } } }));
+            } catch (_) {}
+        });
+
         // Modal controls
         document.getElementById('closeServiceModal')?.addEventListener('click', () => {
             this.closeModal('serviceDetailModal');
@@ -533,6 +573,8 @@ class EcoSolutionApp {
         );
 
         if (user) {
+            // Establecer región al idioma del usuario de prueba
+            try { window.Region?.setRegion(this.mapCountryCode(user.country), user.lang); } catch (_) {}
             this.currentUser = user;
             this.showScreen('client');
             this.loadUserData();
@@ -577,6 +619,7 @@ class EcoSolutionApp {
         };
 
         this.database.users.push(newUser);
+        try { window.Region?.setRegion(this.mapCountryCode(newUser.country), this.defaultLangForCountry(this.mapCountryCode(newUser.country))); } catch (_) {}
         this.currentUser = newUser;
         this.showScreen('client');
         this.loadUserData();
@@ -593,6 +636,7 @@ class EcoSolutionApp {
         );
 
         if (admin) {
+            try { window.Region?.setRegion('US', admin.lang || 'en-US'); } catch (_) {}
             this.currentUser = admin;
             this.showScreen('admin');
             this.loadAdminData();
@@ -615,6 +659,7 @@ class EcoSolutionApp {
             document.getElementById('authScreen').classList.add('active');
         }
     }
+
 
     switchView(viewName) {
         // Update navigation
@@ -1104,7 +1149,50 @@ class EcoSolutionApp {
     }
 
     loadProfile() {
-        // Profile is already loaded in loadUserData()
+        // Profile is already loaded in loadUserData(); ensure buttons exist
+    }
+
+    openProfileEdit() {
+        if (!this.currentUser) {
+            this.showToast('Inicia sesión para editar tu perfil', 'warning');
+            return;
+        }
+        // Prefill
+        document.getElementById('editName').value = this.currentUser.name || '';
+        document.getElementById('editEmail').value = this.currentUser.email || '';
+        document.getElementById('editPhone').value = this.currentUser.phone || '';
+        document.getElementById('editAddress').value = this.currentUser.address || '';
+        document.getElementById('editCity').value = this.currentUser.city || '';
+        document.getElementById('editState').value = this.currentUser.state || '';
+        this.showModal('profileEditModal');
+    }
+
+    saveProfileEdit() {
+        if (!this.currentUser) return;
+        const name = document.getElementById('editName').value.trim();
+        const email = document.getElementById('editEmail').value.trim();
+        const phone = document.getElementById('editPhone').value.trim();
+        const address = document.getElementById('editAddress').value.trim();
+        const city = document.getElementById('editCity').value.trim();
+        const state = document.getElementById('editState').value.trim();
+
+        if (!name || !email) {
+            this.showToast('Nombre y correo son obligatorios', 'error');
+            return;
+        }
+
+        // Update user object in DB
+        this.currentUser.name = name;
+        this.currentUser.email = email;
+        this.currentUser.phone = phone;
+        this.currentUser.address = address;
+        this.currentUser.city = city;
+        this.currentUser.state = state;
+
+        // Reflect on UI
+        this.loadUserData();
+        this.closeModal('profileEditModal');
+        this.showToast('Perfil actualizado', 'success');
     }
 
     // Admin functions
@@ -1617,6 +1705,32 @@ class EcoSolutionApp {
         this.showScreen('auth');
         this.showAuthForm('login');
         this.showToast('Sesión cerrada', 'info');
+    }
+
+    // --- Región/Idioma helpers ---
+    toggleLanguage() {
+        try {
+            const region = window.Region?.getRegion();
+            if (!region) return;
+            const { COUNTRY_LANGS } = window.Region;
+            const langs = COUNTRY_LANGS[region.country] || ['en-US'];
+            const idx = langs.indexOf(region.lang);
+            const next = langs[(idx + 1) % langs.length];
+            window.Region.setRegion(region.country, next);
+        } catch (_) {}
+    }
+
+    mapCountryCode(countryName) {
+        // Mapear nombres usados en base a los 4 códigos
+        const map = { 'Ecuador': 'EC', 'USA': 'US', 'Canada': 'CA', 'Peru': 'PE' };
+        return map[countryName] || 'US';
+    }
+
+    defaultLangForCountry(code) {
+        if (code === 'EC') return 'es-EC';
+        if (code === 'PE') return 'es-PE';
+        if (code === 'CA') return 'en-CA';
+        return 'en-US';
     }
 }
 
