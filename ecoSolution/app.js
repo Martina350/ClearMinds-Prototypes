@@ -718,7 +718,7 @@ class EcoSolutionApp {
         servicesList.innerHTML = services.map(service => `
             <div class="service-card" onclick="app.showServiceDetail('${service.id}')">
                 <div class="service-image">
-                    <span style="font-size: 3rem;">${service.image}</span>
+                    <img src="${this.getServiceImagePath(service)}" alt="${service.name}">
                 </div>
                 <div class="service-content">
                     <h3 class="service-name">${service.name}</h3>
@@ -770,7 +770,7 @@ class EcoSolutionApp {
         servicesList.innerHTML = services.map(service => `
             <div class="service-card" onclick="app.showServiceDetail('${service.id}')">
                 <div class="service-image">
-                    <span style="font-size: 3rem;">${service.image}</span>
+                    <img src="${this.getServiceImagePath(service)}" alt="${service.name}">
                 </div>
                 <div class="service-content">
                     <h3 class="service-name">${service.name}</h3>
@@ -796,6 +796,12 @@ class EcoSolutionApp {
         document.getElementById('modalServicePrice').textContent = `$${service.price}`;
         document.getElementById('modalServiceDuration').textContent = `${service.duration} min`;
 
+        const modalImg = document.getElementById('modalServiceImage');
+        if (modalImg) {
+            modalImg.src = this.getServiceImagePath(service);
+            modalImg.alt = service.name;
+        }
+
         // Set minimum date to today
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('bookingDate').min = today;
@@ -805,6 +811,35 @@ class EcoSolutionApp {
 
         // Show modal
         this.showModal('serviceDetailModal');
+    }
+
+    getServiceImagePath(service) {
+        const name = (service?.name || '').toLowerCase();
+        // Mapeo por tipo de servicio
+        if (name.includes('baños')) {
+            return 'images/baños_portatiles.jpg';
+        }
+        if (name.includes('pozos') || name.includes('séptico') || name.includes('septico')) {
+            return 'images/pozo_septico.jpg';
+        }
+        if (name.includes('trampas') || name.includes('trampa')) {
+            return 'images/trampas_grasas.jpg';
+        }
+        if (name.includes('basureros')) {
+            // Si no existe una imagen específica de basureros, reutiliza contenedores
+            return 'images/limpieza_contenedores.jpg';
+        }
+        if (name.includes('contenedores')) {
+            return 'images/limpieza_contenedores.jpg';
+        }
+        if (name.includes('escombros')) {
+            return 'images/recoleccion_escombros.jpg';
+        }
+        if (name.includes('residuos')) {
+            return 'images/recoleccion_residuos.jpg';
+        }
+        // Fallback genérico
+        return 'images/recoleccion_residuos.jpg';
     }
 
     updateAvailableTimes(date) {
