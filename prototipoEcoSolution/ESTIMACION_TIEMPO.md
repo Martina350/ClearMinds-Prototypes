@@ -45,7 +45,8 @@ Basado en la estructura actual del proyecto (`src/screens`):
 | AdminPayments | Media | 20 | Listado y detalle de pagos |
 | Testing | Alta | 72 | Unit, integración y E2E de flujos críticos |
 | Deployment | Media | 56 | API en cloud + mobile builds (EAS) |
-| APIs REST | Alta | 324 | BD, endpoints, lógica, pagos+webhook, seguridad, notificaciones, observabilidad |
+| APIs REST | Alta | 324 | Endpoints CRUD, autenticación/roles y webhooks de pago |
+| Base de Datos | Media | — | Modelado, migraciones e índices básicos en PostgreSQL (incluido en APIs REST) |
 
 > Total horas de la tabla: 720 h (coherente con el total estimado general).
 
