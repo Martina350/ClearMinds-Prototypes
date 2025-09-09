@@ -502,11 +502,6 @@ class EcoSolutionApp {
             this.handleTransferPayment();
         });
 
-        // Date change handler
-        document.getElementById('bookingDate')?.addEventListener('change', (e) => {
-            this.updateAvailableTimes(e.target.value);
-        });
-
         // Client type change handler
         document.getElementById('clientType')?.addEventListener('change', (e) => {
             this.updateServiceDuration();
@@ -802,12 +797,8 @@ class EcoSolutionApp {
             modalImg.alt = service.name;
         }
 
-        // Set minimum date to today
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementById('bookingDate').min = today;
-
-        // Update available times
-        this.updateAvailableTimes(today);
+        // Poblar slots disponibles de fecha y hora en un único select
+        this.populateAvailableDateTimes();
 
         // Show modal
         this.showModal('serviceDetailModal');
@@ -842,29 +833,58 @@ class EcoSolutionApp {
         return 'images/recoleccion_residuos.jpg';
     }
 
-    updateAvailableTimes(date) {
-        const timeSelect = document.getElementById('bookingTime');
-        if (!timeSelect) return;
+    populateAvailableDateTimes(daysAhead = 14) {
+        const select = document.getElementById('bookingDateTime');
+        if (!select || !this.currentService) return;
 
-        // Get existing bookings for this date and service
-        const existingBookings = this.database.bookings.filter(booking => 
-            booking.service_id === this.currentService.id && 
-            booking.date === date &&
-            booking.status !== 'cancelado'
-        );
+        const slots = this.generateAvailableSlots(this.currentService, daysAhead);
+        if (slots.length === 0) {
+            select.innerHTML = '<option value="" disabled>No hay horarios disponibles</option>';
+            return;
+        }
 
-        // Available time slots (9 AM to 5 PM)
-        const timeSlots = [];
-        for (let hour = 9; hour <= 17; hour++) {
-            const time = `${hour.toString().padStart(2, '0')}:00`;
-            const isBooked = existingBookings.some(booking => booking.time === time);
-            if (!isBooked) {
-                timeSlots.push(time);
+        select.innerHTML = '<option value="">Seleccionar fecha y hora</option>' +
+            slots.map(({ date, time }) => {
+                const label = `${this.formatDateDisplay(date)} - ${time}`;
+                const value = `${date}|${time}`;
+                return `<option value="${value}">${label}</option>`;
+            }).join('');
+    }
+
+    generateAvailableSlots(service, daysAhead) {
+        const slots = [];
+        const now = new Date();
+
+        for (let dayOffset = 0; dayOffset < daysAhead; dayOffset++) {
+            const dateObj = new Date(now.getFullYear(), now.getMonth(), now.getDate() + dayOffset);
+            const dateStr = `${dateObj.getFullYear()}-${(dateObj.getMonth() + 1).toString().padStart(2, '0')}-${dateObj.getDate().toString().padStart(2, '0')}`;
+
+            const existingBookings = this.database.bookings.filter(booking =>
+                booking.service_id === service.id &&
+                booking.date === dateStr &&
+                booking.status !== 'cancelado'
+            );
+
+            for (let hour = 9; hour <= 17; hour++) {
+                const timeStr = `${hour.toString().padStart(2, '0')}:00`;
+                // Evitar horas pasadas del día actual
+                if (dayOffset === 0) {
+                    const slotDateTime = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate(), hour, 0, 0);
+                    if (slotDateTime <= now) continue;
+                }
+                const isBooked = existingBookings.some(b => b.time === timeStr);
+                if (!isBooked) {
+                    slots.push({ date: dateStr, time: timeStr });
+                }
             }
         }
 
-        timeSelect.innerHTML = '<option value="">Seleccionar hora</option>' +
-            timeSlots.map(time => `<option value="${time}">${time}</option>`).join('');
+        return slots;
+    }
+
+    formatDateDisplay(isoDate) {
+        const [y, m, d] = isoDate.split('-');
+        return `${d}/${m}/${y}`;
     }
 
     updateServiceDuration() {
@@ -881,19 +901,19 @@ class EcoSolutionApp {
     }
 
     handleBooking() {
-        const formData = {
-            clientType: document.getElementById('clientType').value,
-            date: document.getElementById('bookingDate').value,
-            time: document.getElementById('bookingTime').value
-        };
+        const clientType = document.getElementById('clientType').value;
+        const combined = document.getElementById('bookingDateTime').value;
+        const [date, time] = combined ? combined.split('|') : ['', ''];
 
-        if (!formData.date || !formData.time) {
+        if (!date || !time) {
             this.showToast('Por favor selecciona fecha y hora', 'error');
             return;
         }
 
         this.bookingData = {
-            ...formData,
+            clientType,
+            date,
+            time,
             service: this.currentService
         };
 

@@ -26,6 +26,29 @@ Basado en la estructura actual del proyecto (`src/screens`):
   - `AdminStaff`: Gestión de personal/asignaciones (opcional v1: listado simple).
   - `AdminPayments`: Visor de pagos/conciliación.
 
+### Tabla de estimación por pantalla
+
+| Característica de la Pantalla | Complejidad Estimada | Tiempo de Desarrollo (horas) | Notas del desarrollador |
+| --- | --- | --- | --- |
+| LoginScreen | Media | 10 | Autenticación con validación y manejo de errores |
+| RegisterScreen | Media | 12 | Formulario con validaciones y alta de usuario |
+| AdminLoginScreen | Media | 8 | Flujo de login con rol admin |
+| ServicesScreen | Media | 16 | Listado/filtrado, detalle básico y estados de carga |
+| BookingScreen | Alta | 40 | Selección servicio/fecha/hora/zona, reglas y validaciones |
+| PaymentScreen | Alta | 20 | UI de checkout, estados, confirmación |
+| ProfileScreen | Baja | 14 | Edición de datos y validaciones simples |
+| AdminDashboard | Media | 28 | KPIs básicos y gráficas simples |
+| AdminServices | Media | 32 | CRUD completo con formularios y listado |
+| AdminZones | Baja | 20 | CRUD sencillo |
+| AdminPrices | Alta | 32 | Reglas de precios por zona/servicio/promos |
+| AdminStaff | Baja | 16 | Listado/asignaciones simples (v1) |
+| AdminPayments | Media | 20 | Listado y detalle de pagos |
+| Testing | Alta | 72 | Unit, integración y E2E de flujos críticos |
+| Deployment | Media | 56 | API en cloud + mobile builds (EAS) |
+| APIs REST | Alta | 324 | BD, endpoints, lógica, pagos+webhook, seguridad, notificaciones, observabilidad |
+
+> Total horas de la tabla: 720 h (coherente con el total estimado general).
+
 ### APIs y Base de Datos (resumen)
 - **Entidades**: `users`, `roles`, `services`, `zones`, `prices`, `bookings`, `payments`, `staff` (opcional), `promotions` (opcional).
 - **Endpoints principales** (REST):
