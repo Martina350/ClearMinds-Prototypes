@@ -14,13 +14,6 @@ import { ProfileScreen } from '../screens/client/ProfileScreen';
 import { BookingScreen } from '../screens/client/BookingScreen';
 import { PaymentScreen } from '../screens/client/PaymentScreen';
 
-// Admin Screens
-import { AdminDashboard } from '../screens/admin/AdminDashboard';
-import { AdminServices } from '../screens/admin/AdminServices';
-import { AdminPayments } from '../screens/admin/AdminPayments';
-import { AdminZones } from '../screens/admin/AdminZones';
-import { AdminStaff } from '../screens/admin/AdminStaff';
-import { AdminPrices } from '../screens/admin/AdminPrices';
 
 // Data
 import { authenticateUser, addUser, addBooking, updateBookingStatus, updateUser } from '../data/database';
@@ -197,24 +190,7 @@ export const AppNavigator = () => {
     );
   }
 
-  if (isAdmin) {
-    switch (currentScreen) {
-      case 'admin':
-        return <AdminDashboard onTabPress={handleTabPress} onLogout={handleLogout} />;
-      case 'services':
-        return <AdminServices onTabPress={handleTabPress} onLogout={handleLogout} />;
-      case 'payments':
-        return <AdminPayments onTabPress={handleTabPress} onLogout={handleLogout} />;
-      case 'zones':
-        return <AdminZones onTabPress={handleTabPress} />;
-      case 'staff':
-        return <AdminStaff onTabPress={handleTabPress} />;
-      case 'prices':
-        return <AdminPrices onTabPress={handleTabPress} />;
-      default:
-        return <AdminDashboard onTabPress={handleTabPress} onLogout={handleLogout} />;
-    }
-  }
+  
 
   // Client screens - only render if user is authenticated
   if (user && !isAdmin) {
