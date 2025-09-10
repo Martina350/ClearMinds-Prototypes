@@ -172,7 +172,7 @@ body {
 /* Sección Derecha - Formulario */
 .login-right {
     flex: 2;
-    background: #f8f9fa;
+    background: #f8f9fa url('images/background login.png') center/cover no-repeat;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -275,12 +275,16 @@ body {
 
 .form-group label {
     display: block;
-    margin-bottom: var(--spacing-sm);
+    margin-bottom: var(--spacing-xs);
     font-family: var(--font-secondary);
     font-weight: 500;
     color: #4524aa;
     font-size: 0.9rem;
     letter-spacing: 0.025em;
+}
+
+.form-vertical .form-group label {
+    margin-bottom: var(--spacing-xs);
 }
 
 .form-group input,
@@ -296,6 +300,13 @@ body {
     color: #333;
     min-height: 44px;
     box-shadow: var(--shadow-xs);
+}
+
+.form-vertical .form-group input,
+.form-vertical .form-group select {
+    padding: var(--spacing-sm) var(--spacing-md);
+    min-height: 40px;
+    font-size: 0.9rem;
 }
 
 .form-group input:focus,
@@ -322,6 +333,17 @@ body {
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: var(--spacing-xl);
     margin-bottom: var(--spacing-xl);
+}
+
+/* Formulario vertical */
+.form-vertical {
+    max-width: 320px;
+    margin: 0 auto;
+    padding: 0 var(--spacing-sm);
+}
+
+.form-vertical .form-group {
+    margin-bottom: var(--spacing-sm);
 }
 
 /* ========================================
@@ -439,29 +461,6 @@ body {
    CREDENCIALES DE DEMO
    ======================================== */
 
-.demo-credentials {
-    margin-top: 30px;
-    background: linear-gradient(135deg, #636363 0%, #495057 100%);
-    padding: 20px;
-    border-radius: 8px;
-    color: white;
-    text-align: center;
-    border: 1px solid #636363;
-}
-
-.demo-credentials h4 {
-    margin-bottom: 12px;
-    font-weight: var(--font-weight-semibold);
-    font-size: 1rem;
-    color: #ffa617;
-}
-
-.demo-credentials p {
-    margin: 6px 0;
-    font-size: 0.9rem;
-    color: white;
-    opacity: 0.9;
-}
 
 /* ========================================
    HEADER DEL DASHBOARD
@@ -623,6 +622,13 @@ body {
     position: relative;
     overflow: hidden;
     transition: all var(--transition-normal);
+}
+
+/* Tarjeta del formulario de referido */
+.card:has(.form-vertical) {
+    max-width: 380px;
+    margin: 0 auto var(--spacing-2xl) auto;
+    padding: var(--spacing-lg);
 }
 
 .card::before {
