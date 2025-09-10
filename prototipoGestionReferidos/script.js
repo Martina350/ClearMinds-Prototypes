@@ -586,38 +586,6 @@ function showNotification(message, type = 'info') {
 }
 
 // Funciones adicionales para funcionalidad completa
-function exportData() {
-    const data = getData();
-    const dataStr = JSON.stringify(data, null, 2);
-    const dataBlob = new Blob([dataStr], {type: 'application/json'});
-    
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(dataBlob);
-    link.download = 'referidos_data.json';
-    link.click();
-}
-
-function importData(event) {
-    const file = event.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            try {
-                const data = JSON.parse(e.target.result);
-                saveData(data);
-                showNotification('Datos importados correctamente', 'success');
-                if (currentRole === 'admin') {
-                    loadAdminDashboard();
-                } else if (currentRole === 'docente') {
-                    loadDocenteDashboard();
-                }
-            } catch (error) {
-                showNotification('Error al importar datos', 'error');
-            }
-        };
-        reader.readAsText(file);
-    }
-}
 
 // Funciones de reportes
 function generarReporteMensual() {
@@ -644,30 +612,5 @@ function generarReporteMensual() {
 
 // Inicializar funcionalidades adicionales
 document.addEventListener('DOMContentLoaded', function() {
-    // Agregar funcionalidad de exportar/importar datos
-    const exportBtn = document.createElement('button');
-    exportBtn.textContent = 'Exportar Datos';
-    exportBtn.className = 'btn btn-secondary';
-    exportBtn.onclick = exportData;
-    
-    const importInput = document.createElement('input');
-    importInput.type = 'file';
-    importInput.accept = '.json';
-    importInput.style.display = 'none';
-    importInput.onchange = importData;
-    
-    const importBtn = document.createElement('button');
-    importBtn.textContent = 'Importar Datos';
-    importBtn.className = 'btn btn-secondary';
-    importBtn.onclick = () => importInput.click();
-    
-    // Agregar botones a los dashboards
-    setTimeout(() => {
-        const adminHeader = document.querySelector('#adminDashboard .header-content');
-        if (adminHeader) {
-            adminHeader.appendChild(exportBtn);
-            adminHeader.appendChild(importBtn);
-            adminHeader.appendChild(importInput);
-        }
-    }, 100);
+    // Funcionalidades adicionales se pueden agregar aquí
 });
