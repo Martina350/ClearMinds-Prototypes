@@ -6,6 +6,8 @@
 
 /* Importar fuentes */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fredoka+One:wght@400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap');
 
 /* Variables CSS para consistencia */
 :root {
@@ -26,7 +28,8 @@
     --gradient-background: linear-gradient(135deg, #4524aa 0%, #6c5ce7 50%, #a29bfe 100%);
     
     /* Tipografías */
-    --font-primary: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --font-primary: 'Fredoka One', 'Arial Black', 'Arial', sans-serif; /* MOON GET! Heavy equivalent */
+    --font-secondary: 'Open Sans', 'Arial', sans-serif; /* Berlin Sans FB equivalent */
     --font-weight-light: 300;
     --font-weight-regular: 400;
     --font-weight-medium: 500;
@@ -77,7 +80,7 @@ html {
 }
 
 body {
-    font-family: var(--font-primary);
+    font-family: var(--font-secondary);
     font-weight: var(--font-weight-regular);
     line-height: 1.6;
     color: var(--color-dark-gray);
@@ -165,7 +168,7 @@ body {
 /* Sección Derecha - Formulario */
 .login-right {
     flex: 2;
-    background: white;
+    background: #f8f9fa;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -178,12 +181,13 @@ body {
 }
 
 .login-title {
+    font-family: var(--font-primary);
     font-size: 2rem;
-    font-weight: var(--font-weight-bold);
-    color: #333;
+    font-weight: 400;
+    color: #4524aa;
     margin-bottom: 40px;
     text-align: center;
-    letter-spacing: -0.01em;
+    letter-spacing: 0.02em;
 }
 
 /* Pestañas de login */
@@ -197,14 +201,15 @@ body {
 
 .tab-btn {
     flex: 1;
-    background: #f8f9fa;
+    background: #636363;
     border: none;
-    color: #6c757d;
+    color: white;
     padding: 16px 20px;
     cursor: pointer;
     transition: all 0.3s ease;
+    font-family: var(--font-secondary);
     font-size: 1rem;
-    font-weight: var(--font-weight-medium);
+    font-weight: 400;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -223,8 +228,8 @@ body {
 }
 
 .tab-btn:not(.active):hover {
-    background: #e9ecef;
-    color: #495057;
+    background: #ffa617;
+    color: white;
 }
 
 /* Formularios de login */
@@ -260,8 +265,9 @@ body {
 .form-group label {
     display: block;
     margin-bottom: 8px;
-    font-weight: var(--font-weight-medium);
-    color: #333;
+    font-family: var(--font-secondary);
+    font-weight: 400;
+    color: #4524aa;
     font-size: 0.95rem;
 }
 
@@ -269,10 +275,10 @@ body {
 .form-group select {
     width: 100%;
     padding: 12px 16px;
-    border: 1px solid #e1e5e9;
+    border: 2px solid #636363;
     border-radius: 6px;
     font-size: 1rem;
-    font-family: var(--font-primary);
+    font-family: var(--font-secondary);
     transition: all 0.3s ease;
     background: white;
     color: #333;
@@ -281,12 +287,12 @@ body {
 .form-group input:focus,
 .form-group select:focus {
     outline: none;
-    border-color: #4524aa;
-    box-shadow: 0 0 0 2px rgba(69, 36, 170, 0.1);
+    border-color: #ffa617;
+    box-shadow: 0 0 0 3px rgba(255, 166, 23, 0.2);
 }
 
 .form-group input::placeholder {
-    color: #6c757d;
+    color: #636363;
     opacity: 0.7;
 }
 
@@ -308,8 +314,9 @@ body {
     padding: var(--spacing-md) var(--spacing-xl);
     border-radius: var(--border-radius-lg);
     cursor: pointer;
+    font-family: var(--font-secondary);
     font-size: 1rem;
-    font-weight: var(--font-weight-semibold);
+    font-weight: 600;
     transition: all var(--transition-normal);
     display: inline-flex;
     align-items: center;
@@ -364,14 +371,15 @@ body {
 /* Botón de login específico */
 .btn-login {
     width: 100%;
-    background: #4524aa;
+    background: linear-gradient(135deg, #4524aa 0%, #6c5ce7 100%);
     color: white;
     border: none;
     padding: 16px 24px;
     border-radius: 8px;
     cursor: pointer;
+    font-family: var(--font-secondary);
     font-size: 1.1rem;
-    font-weight: var(--font-weight-semibold);
+    font-weight: 600;
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
@@ -382,9 +390,9 @@ body {
 }
 
 .btn-login:hover {
-    background: #3a1f8f;
+    background: linear-gradient(135deg, #ffa617 0%, #f78c00 100%);
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(69, 36, 170, 0.4);
+    box-shadow: 0 6px 20px rgba(255, 166, 23, 0.4);
 }
 
 .btn-login:active {
@@ -402,25 +410,26 @@ body {
 
 .demo-credentials {
     margin-top: 30px;
-    background: #f8f9fa;
+    background: linear-gradient(135deg, #636363 0%, #495057 100%);
     padding: 20px;
     border-radius: 8px;
-    color: #333;
+    color: white;
     text-align: center;
-    border: 1px solid #e9ecef;
+    border: 1px solid #636363;
 }
 
 .demo-credentials h4 {
     margin-bottom: 12px;
     font-weight: var(--font-weight-semibold);
     font-size: 1rem;
-    color: #495057;
+    color: #ffa617;
 }
 
 .demo-credentials p {
     margin: 6px 0;
     font-size: 0.9rem;
-    color: #6c757d;
+    color: white;
+    opacity: 0.9;
 }
 
 /* ========================================
@@ -428,11 +437,11 @@ body {
    ======================================== */
 
 .dashboard-header {
-    background: rgba(255, 255, 255, 0.98);
+    background: linear-gradient(135deg, #4524aa 0%, #6c5ce7 100%);
     padding: var(--spacing-lg) 0;
     box-shadow: var(--shadow-lg);
     backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(69, 36, 170, 0.1);
+    border-bottom: 1px solid rgba(255, 166, 23, 0.2);
     position: sticky;
     top: 0;
     z-index: 100;
@@ -462,13 +471,14 @@ body {
 }
 
 .header-content h1 {
-    color: var(--color-primary);
+    color: white;
     display: flex;
     align-items: center;
     gap: var(--spacing-md);
+    font-family: var(--font-primary);
     font-size: 2rem;
-    font-weight: var(--font-weight-bold);
-    letter-spacing: -0.01em;
+    font-weight: 400;
+    letter-spacing: 0.02em;
 }
 
 .user-info {
@@ -478,8 +488,9 @@ body {
 }
 
 .user-info span {
-    font-weight: var(--font-weight-semibold);
-    color: var(--color-dark-gray);
+    font-family: var(--font-secondary);
+    font-weight: 400;
+    color: white;
     font-size: 1.1rem;
 }
 
@@ -491,6 +502,8 @@ body {
     max-width: 1400px;
     margin: 0 auto;
     padding: var(--spacing-2xl) var(--spacing-xl);
+    background: #f8f9fa;
+    min-height: calc(100vh - 80px);
 }
 
 /* ========================================
@@ -548,14 +561,16 @@ body {
 }
 
 .metric-info h3 {
+    font-family: var(--font-primary);
     font-size: 2.5rem;
     color: var(--color-primary);
     margin-bottom: var(--spacing-xs);
-    font-weight: var(--font-weight-black);
-    letter-spacing: -0.02em;
+    font-weight: 400;
+    letter-spacing: 0.02em;
 }
 
 .metric-info p {
+    font-family: var(--font-secondary);
     color: var(--color-neutral);
     font-size: 1rem;
     font-weight: var(--font-weight-medium);
@@ -567,12 +582,12 @@ body {
    ======================================== */
 
 .card {
-    background: var(--color-white);
+    background: white;
     padding: var(--spacing-2xl);
     border-radius: var(--border-radius-2xl);
-    box-shadow: var(--shadow-lg);
+    box-shadow: 0 8px 32px rgba(69, 36, 170, 0.1);
     margin-bottom: var(--spacing-2xl);
-    border: 1px solid rgba(69, 36, 170, 0.1);
+    border: 2px solid #636363;
     position: relative;
     overflow: hidden;
 }
@@ -584,18 +599,19 @@ body {
     left: 0;
     right: 0;
     height: 4px;
-    background: var(--gradient-secondary);
+    background: linear-gradient(135deg, #ffa617 0%, #f78c00 100%);
 }
 
 .card h2 {
-    color: var(--color-primary);
+    color: #4524aa;
     margin-bottom: var(--spacing-xl);
     display: flex;
     align-items: center;
     gap: var(--spacing-md);
+    font-family: var(--font-primary);
     font-size: 1.75rem;
-    font-weight: var(--font-weight-bold);
-    letter-spacing: -0.01em;
+    font-weight: 400;
+    letter-spacing: 0.02em;
 }
 
 /* ========================================
@@ -619,19 +635,21 @@ th, td {
     padding: var(--spacing-lg);
     text-align: left;
     border-bottom: 1px solid var(--color-medium-gray);
+    font-family: var(--font-secondary);
 }
 
 th {
-    background: var(--color-light-gray);
-    font-weight: var(--font-weight-semibold);
-    color: var(--color-primary);
+    background: linear-gradient(135deg, #636363 0%, #495057 100%);
+    font-family: var(--font-secondary);
+    font-weight: 600;
+    color: white;
     font-size: 0.95rem;
     letter-spacing: 0.01em;
     text-transform: uppercase;
 }
 
 tr:hover {
-    background: rgba(69, 36, 170, 0.02);
+    background: rgba(255, 166, 23, 0.1);
 }
 
 tr:last-child td {
@@ -652,20 +670,21 @@ tr:last-child td {
 
 .filters select {
     padding: var(--spacing-md) var(--spacing-lg);
-    border: 2px solid var(--color-medium-gray);
+    border: 2px solid #636363;
     border-radius: var(--border-radius-lg);
     font-size: 0.95rem;
     min-width: 180px;
-    background: var(--color-white);
-    color: var(--color-dark-gray);
-    font-weight: var(--font-weight-medium);
+    background: white;
+    color: #333;
+    font-family: var(--font-secondary);
+    font-weight: 400;
     transition: all var(--transition-normal);
 }
 
 .filters select:focus {
     outline: none;
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(69, 36, 170, 0.1);
+    border-color: #ffa617;
+    box-shadow: 0 0 0 3px rgba(255, 166, 23, 0.2);
 }
 
 /* ========================================
@@ -675,8 +694,9 @@ tr:last-child td {
 .status {
     padding: var(--spacing-sm) var(--spacing-md);
     border-radius: var(--border-radius-xl);
+    font-family: var(--font-secondary);
     font-size: 0.8rem;
-    font-weight: var(--font-weight-semibold);
+    font-weight: 400;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     display: inline-block;
@@ -748,7 +768,8 @@ tr:last-child td {
     padding: var(--spacing-lg) var(--spacing-xl);
     border-radius: var(--border-radius-lg);
     color: var(--color-white);
-    font-weight: var(--font-weight-semibold);
+    font-family: var(--font-secondary);
+    font-weight: 400;
     z-index: 1000;
     animation: slideInRight 0.4s ease-out;
     box-shadow: var(--shadow-xl);
