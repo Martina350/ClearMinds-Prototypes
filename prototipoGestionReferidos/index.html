@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestión de Referidos</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Pantalla de Login -->
+    <div id="loginScreen" class="screen active">
+        <div class="login-layout">
+            <!-- Sección Izquierda - Logo -->
+            <div class="login-left">
+                <div class="logo-main">
+                    <img src="images/logo.png" alt="Logo" class="logo-large">
+                </div>
+            </div>
+
+            <!-- Sección Derecha - Formulario -->
+            <div class="login-right">
+                <div class="login-form-container">
+                    <h1 class="login-title">Iniciar Sesión</h1>
+                    
+                    <div class="login-tabs">
+                        <button class="tab-btn active" onclick="switchLoginTab('docente')">
+                            <i class="fas fa-chalkboard-teacher"></i>
+                            <span>Docente</span>
+                        </button>
+                        <button class="tab-btn" onclick="switchLoginTab('admin')">
+                            <i class="fas fa-user-shield"></i>
+                            <span>Administrador</span>
+                        </button>
+                    </div>
+
+                    <!-- Formulario Login Docente -->
+                    <form id="docenteLogin" class="login-form active">
+                        <div class="form-group">
+                            <label for="docenteUsuario">Usuario:</label>
+                            <input type="text" id="docenteUsuario" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="docentePassword">Contraseña:</label>
+                            <input type="password" id="docentePassword" required>
+                        </div>
+                        <button type="submit" class="btn-login">
+                            <i class="fas fa-arrow-right"></i>
+                            Iniciar Sesión
+                        </button>
+                    </form>
+
+                    <!-- Formulario Login Administrador -->
+                    <form id="adminLogin" class="login-form">
+                        <div class="form-group">
+                            <label for="adminUsuario">Usuario:</label>
+                            <input type="text" id="adminUsuario" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="adminPassword">Contraseña:</label>
+                            <input type="password" id="adminPassword" required>
+                        </div>
+                        <button type="submit" class="btn-login">
+                            <i class="fas fa-arrow-right"></i>
+                            Iniciar Sesión
+                        </button>
+                    </form>
+
+                    <div class="demo-credentials">
+                        <h4>Credenciales de Prueba:</h4>
+                        <p><strong>Docente:</strong> usuario: docente1, contraseña: 123</p>
+                        <p><strong>Admin:</strong> usuario: admin, contraseña: admin123</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Docente -->
+    <div id="docenteDashboard" class="screen">
+        <header class="dashboard-header">
+            <div class="header-content">
+                <div class="header-left">
+                    <img src="images/logoSecundario.png" alt="Logo" class="header-logo">
+                    <h1><i class="fas fa-chalkboard-teacher"></i> Panel Docente</h1>
+                </div>
+                <div class="user-info">
+                    <span id="docenteNombre">Docente</span>
+                    <button onclick="logout()" class="btn btn-secondary">
+                        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <div class="dashboard-content">
+            <!-- Métricas -->
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-icon" style="background: var(--gradient-primary);">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <div class="metric-info">
+                        <h3 id="totalReferidos">0</h3>
+                        <p>Estudiantes Referidos</p>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon" style="background: var(--gradient-secondary);">
+                        <i class="fas fa-user-check"></i>
+                    </div>
+                    <div class="metric-info">
+                        <h3 id="totalInscritos">0</h3>
+                        <p>Estudiantes Inscritos</p>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon" style="background: linear-gradient(135deg, #ffa617 0%, #fdcb6e 100%);">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="metric-info">
+                        <h3 id="comisionPendiente">$0</h3>
+                        <p>Comisión Pendiente</p>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">
+                        <i class="fas fa-wallet"></i>
+                    </div>
+                    <div class="metric-info">
+                        <h3 id="comisionPagada">$0</h3>
+                        <p>Comisión Pagada</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulario de Referido -->
+            <div class="card">
+                <h2><i class="fas fa-user-plus"></i> Registrar Estudiante Referido</h2>
+                <form id="referidoForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="estudianteNombre">Nombre Completo:</label>
+                            <input type="text" id="estudianteNombre" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="estudianteCedula">Cédula:</label>
+                            <input type="text" id="estudianteCedula" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="estudianteAsignatura">Asignatura:</label>
+                            <select id="estudianteAsignatura" required>
+                                <option value="">Seleccionar asignatura</option>
+                                <option value="ingles">Inglés</option>
+                                <option value="matematicas">Matemáticas</option>
+                                <option value="robotica">Robótica</option>
+                                <option value="programacion">Programación</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="estudianteFecha">Fecha de Registro:</label>
+                            <input type="date" id="estudianteFecha" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Registrar Referido
+                    </button>
+                </form>
+            </div>
+
+            <!-- Lista de Referidos -->
+            <div class="card">
+                <h2><i class="fas fa-list"></i> Mis Estudiantes Referidos</h2>
+                <div class="table-container">
+                    <table id="referidosTable">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Cédula</th>
+                                <th>Asignatura</th>
+                                <th>Fecha</th>
+                                <th>Estado</th>
+                                <th>Comisión</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="referidosTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Historial de Pagos -->
+            <div class="card">
+                <h2><i class="fas fa-history"></i> Historial de Pagos</h2>
+                <div class="table-container">
+                    <table id="pagosTable">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Monto</th>
+                                <th>Estudiantes</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pagosTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Administrador -->
+    <div id="adminDashboard" class="screen">
+        <header class="dashboard-header">
+            <div class="header-content">
+                <div class="header-left">
+                    <img src="images/logoSecundario.png" alt="Logo" class="header-logo">
+                    <h1><i class="fas fa-user-shield"></i> Panel Administrador</h1>
+                </div>
+                <div class="user-info">
+                    <span>Administrador</span>
+                    <button onclick="logout()" class="btn btn-secondary">
+                        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <div class="dashboard-content">
+            <!-- Métricas Generales -->
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-icon" style="background: var(--gradient-primary);">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                    </div>
+                    <div class="metric-info">
+                        <h3 id="totalDocentes">0</h3>
+                        <p>Docentes Registrados</p>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon" style="background: var(--gradient-secondary);">
+                        <i class="fas fa-user-check"></i>
+                    </div>
+                    <div class="metric-info">
+                        <h3 id="docentesActivos">0</h3>
+                        <p>Docentes Activos</p>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon" style="background: linear-gradient(135deg, #ffa617 0%, #fdcb6e 100%);">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="metric-info">
+                        <h3 id="totalReferidosAdmin">0</h3>
+                        <p>Total Referidos</p>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                    <div class="metric-info">
+                        <h3 id="totalComisiones">$0</h3>
+                        <p>Comisiones Totales</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gestión de Comisiones -->
+            <div class="card">
+                <h2><i class="fas fa-calculator"></i> Gestión de Comisiones</h2>
+                <div class="filters">
+                    <select id="filtroDocente">
+                        <option value="">Todos los docentes</option>
+                    </select>
+                    <select id="filtroEstado">
+                        <option value="">Todos los estados</option>
+                        <option value="pendiente">Pendiente</option>
+                        <option value="pagado">Pagado</option>
+                    </select>
+                    <button onclick="filtrarComisiones()" class="btn btn-secondary">
+                        <i class="fas fa-filter"></i> Filtrar
+                    </button>
+                    <button onclick="limpiarFiltrosComisiones()" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Limpiar
+                    </button>
+                </div>
+                <div class="table-container">
+                    <table id="comisionesTable">
+                        <thead>
+                            <tr>
+                                <th>Docente</th>
+                                <th>Referidos</th>
+                                <th>Inscritos</th>
+                                <th>Comisión</th>
+                                <th>Estado</th>
+                                <th>Fecha Pago</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="comisionesTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Registrar Pago -->
+            <div class="card">
+                <h2><i class="fas fa-money-bill-wave"></i> Registrar Pago</h2>
+                <form id="pagoForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="pagoDocente">Docente:</label>
+                            <select id="pagoDocente" required>
+                                <option value="">Seleccionar docente</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="pagoMonto">Monto:</label>
+                            <input type="number" id="pagoMonto" step="0.01" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="pagoFecha">Fecha de Pago:</label>
+                            <input type="date" id="pagoFecha" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="pagoComprobante">Comprobante:</label>
+                            <input type="file" id="pagoComprobante" accept=".pdf,.jpg,.jpeg,.png">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-check"></i> Registrar Pago
+                    </button>
+                </form>
+            </div>
+
+            <!-- Lista de Estudiantes -->
+            <div class="card">
+                <h2><i class="fas fa-graduation-cap"></i> Todos los Estudiantes</h2>
+                <div class="filters">
+                    <select id="filtroAsignatura">
+                        <option value="">Todas las asignaturas</option>
+                        <option value="ingles">Inglés</option>
+                        <option value="matematicas">Matemáticas</option>
+                        <option value="robotica">Robótica</option>
+                        <option value="programacion">Programación</option>
+                    </select>
+                    <button onclick="filtrarEstudiantes()" class="btn btn-secondary">
+                        <i class="fas fa-filter"></i> Filtrar
+                    </button>
+                    <button onclick="limpiarFiltrosEstudiantes()" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Limpiar
+                    </button>
+                </div>
+                <div class="table-container">
+                    <table id="estudiantesTable">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Cédula</th>
+                                <th>Asignatura</th>
+                                <th>Fecha Registro</th>
+                                <th>Docente</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="estudiantesTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
