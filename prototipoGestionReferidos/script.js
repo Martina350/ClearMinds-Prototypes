@@ -438,19 +438,36 @@ function handleDocenteLogin(e) {
 function handleAdminLogin(e) {
     e.preventDefault();
     
-    const usuario = document.getElementById('adminUsuario').value;
-    const password = document.getElementById('adminPassword').value;
-    
-    const data = getData();
-    
-    if (data.admin.usuario === usuario && data.admin.password === password) {
-        currentUser = data.admin;
-        currentRole = 'admin';
-        showScreen('adminDashboard');
-        loadAdminDashboard();
-        showNotification('Bienvenido, Administrador', 'success');
-    } else {
-        showNotification('Credenciales incorrectas', 'error');
+    try {
+        const usuario = document.getElementById('adminUsuario').value;
+        const password = document.getElementById('adminPassword').value;
+        
+        console.log('Intentando login admin con:', usuario, password);
+        
+        const data = getData();
+        console.log('Datos cargados para admin:', data);
+        console.log('Admin en datos:', data.admin);
+        
+        if (!data || !data.admin) {
+            console.error('Error: No se pudieron cargar los datos del admin');
+            showNotification('Error al cargar los datos', 'error');
+            return;
+        }
+        
+        if (data.admin.usuario === usuario && data.admin.password === password) {
+            currentUser = data.admin;
+            currentRole = 'admin';
+            console.log('Login admin exitoso, redirigiendo...');
+            showScreen('adminDashboard');
+            loadAdminDashboard();
+            showNotification('Bienvenido, Administrador', 'success');
+        } else {
+            console.log('Credenciales admin incorrectas');
+            showNotification('Credenciales incorrectas', 'error');
+        }
+    } catch (error) {
+        console.error('Error en handleAdminLogin:', error);
+        showNotification('Error en el login', 'error');
     }
 }
 
