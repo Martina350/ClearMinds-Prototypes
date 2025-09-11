@@ -6,33 +6,21 @@
     <title>Sistema de Gestión de Referidos</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <!-- Pantalla de Login -->
     <div id="loginScreen" class="screen active">
         <div class="login-layout">
-            <!-- Sección Izquierda - Logo -->
-            <div class="login-left">
-                <div class="logo-main">
-                    <img src="images/logo.png" alt="Logo" class="logo-large">
-                </div>
-            </div>
-
-            <!-- Sección Derecha - Formulario -->
-            <div class="login-right">
+            <!-- Formulario Centrado -->
+            <div class="login-center">
                 <div class="login-form-container">
-                    <h1 class="login-title">Iniciar Sesión</h1>
-                    
-                    <div class="login-tabs">
-                        <button class="tab-btn active" onclick="switchLoginTab('docente')">
-                            <i class="fas fa-chalkboard-teacher"></i>
-                <span>Docente</span>
-                        </button>
-                        <button class="tab-btn" onclick="switchLoginTab('admin')">
-                            <i class="fas fa-user-shield"></i>
-                            <span>Administrador</span>
-                        </button>
+                    <!-- Logo terciario dentro del formulario -->
+                    <div class="logo-form-container">
+                        <img src="images/logoTerciario.png" alt="Logo Terciario" class="logo-form">
                     </div>
+                    
+                    <h1 class="login-title">Bienvenido !</h1>
 
                     <!-- Formulario Login Docente -->
                     <form id="docenteLogin" class="login-form active">
@@ -50,6 +38,13 @@
                         </button>
                     </form>
 
+                    <!-- Enlace de Acceso Administrador -->
+                    <div class="admin-access-link">
+                        <a href="#" onclick="showAdminLogin()" class="admin-link">
+                            Acceso Administrador
+                        </a>
+                    </div>
+
                     <!-- Formulario Login Administrador -->
                     <form id="adminLogin" class="login-form">
                         <div class="form-group">
@@ -64,6 +59,12 @@
                             <i class="fas fa-arrow-right"></i>
                             Iniciar Sesión
                         </button>
+                        <div class="back-to-docente">
+                            <a href="#" onclick="showDocenteLogin()" class="back-link">
+                                <i class="fas fa-arrow-left"></i>
+                                Volver a Docente
+                            </a>
+                        </div>
                     </form>
 
                 </div>
@@ -89,15 +90,33 @@
         </header>
 
         <div class="dashboard-content">
-            <!-- Métricas -->
+            <!-- Navegación por pestañas -->
+            <div class="admin-tabs">
+                <button class="tab-btn active" onclick="showDocenteTab('dashboard')">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </button>
+                <button class="tab-btn" onclick="showDocenteTab('referir')">
+                    <i class="fas fa-user-plus"></i> Referir Estudiante
+                </button>
+                <button class="tab-btn" onclick="showDocenteTab('referidos')">
+                    <i class="fas fa-list"></i> Mis Referidos
+                </button>
+                <button class="tab-btn" onclick="showDocenteTab('pagos')">
+                    <i class="fas fa-wallet"></i> Mis Pagos
+                </button>
+            </div>
+
+            <!-- Contenido del Dashboard -->
+            <div id="docenteDashboardContent" class="admin-tab-content active">
+            <!-- Panel de Bienvenida - Resumen -->
             <div class="metrics-grid">
                 <div class="metric-card">
                     <div class="metric-icon" style="background: var(--gradient-primary);">
                         <i class="fas fa-user-plus"></i>
                     </div>
                     <div class="metric-info">
-                        <h3 id="totalReferidos">0</h3>
-                        <p>Estudiantes Referidos</p>
+                        <h3 id="totalReferidos">20</h3>
+                        <p>Total Referidos</p>
                     </div>
                 </div>
                 <div class="metric-card">
@@ -105,8 +124,8 @@
                         <i class="fas fa-user-check"></i>
                     </div>
                     <div class="metric-info">
-                        <h3 id="totalInscritos">0</h3>
-                        <p>Estudiantes Inscritos</p>
+                        <h3 id="totalInscritos">10</h3>
+                        <p>Total Inscritos</p>
                     </div>
                 </div>
                 <div class="metric-card">
@@ -114,8 +133,8 @@
                         <i class="fas fa-clock"></i>
                     </div>
                     <div class="metric-info">
-                        <h3 id="comisionPendiente">$0</h3>
-                        <p>Comisión Pendiente</p>
+                        <h3 id="comisionPendiente">$100</h3>
+                        <p>Comisiones Pendientes</p>
                     </div>
                 </div>
                 <div class="metric-card">
@@ -123,82 +142,160 @@
                         <i class="fas fa-wallet"></i>
                     </div>
                     <div class="metric-info">
-                        <h3 id="comisionPagada">$0</h3>
-                        <p>Comisión Pagada</p>
+                        <h3 id="comisionPagada">$250</h3>
+                        <p>Comisiones Pagadas</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Formulario de Referido -->
+            <!-- Gráfico de Evolución Mensual -->
             <div class="card">
-                <h2><i class="fas fa-user-plus"></i> Registrar Estudiante Referido</h2>
-                <form id="referidoForm" class="form-vertical">
-                    <div class="form-group">
-                        <label for="estudianteNombre">Nombre Completo:</label>
-                        <input type="text" id="estudianteNombre" required>
+                <h2><i class="fas fa-chart-line"></i> Evolución Mensual de Inscritos</h2>
+                <div class="chart-container">
+                    <canvas id="monthlyChart" width="400" height="200"></canvas>
                     </div>
-                    <div class="form-group">
-                        <label for="estudianteCedula">Cédula:</label>
-                        <input type="text" id="estudianteCedula" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="estudianteAsignatura">Asignatura:</label>
-                        <select id="estudianteAsignatura" required>
-                            <option value="">Seleccionar asignatura</option>
-                            <option value="ingles">Inglés</option>
-                            <option value="matematicas">Matemáticas</option>
-                            <option value="robotica">Robótica</option>
-                            <option value="programacion">Programación</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="estudianteFecha">Fecha de Registro:</label>
-                        <input type="date" id="estudianteFecha" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i> Registrar Referido
-                    </button>
-                </form>
+                </div>
             </div>
 
-            <!-- Lista de Referidos -->
+            <!-- Pestaña Referir Estudiante -->
+            <div id="docenteReferirContent" class="admin-tab-content">
             <div class="card">
-                <h2><i class="fas fa-list"></i> Mis Estudiantes Referidos</h2>
+                <h2><i class="fas fa-user-plus"></i> Referir Alumno</h2>
+                <form id="referidoForm" class="form-horizontal">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="estudianteNombre">Nombre Completo:</label>
+                            <input type="text" id="estudianteNombre" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="estudianteCedula">Cédula/Pasaporte:</label>
+                            <input type="text" id="estudianteCedula" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="estudianteCurso">Materia de interés:</label>
+                            <select id="estudianteCurso" required>
+                                <option value="">Seleccionar materia</option>
+                                <option value="ingles">Inglés</option>
+                                <option value="matematicas">Matemáticas</option>
+                                <option value="robotica">Robótica</option>
+                                <option value="programacion">Programación</option>
+                                <option value="lenguaje">Lenguaje</option>
+                                <option value="otro">Otro</option>
+                            </select>
+                            <input type="text" id="estudianteCursoOtro" placeholder="Especificar materia" style="display: none; margin-top: var(--spacing-xs);">
+                        </div>
+                        <div class="form-group">
+                            <label for="estudianteTelefono">Teléfono:</label>
+                            <div class="phone-input-container">
+                                <span class="phone-prefix">593</span>
+                                <input type="tel" id="estudianteTelefono" placeholder="123456789" maxlength="9" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Guardar
+                        </button>
+                    </div>
+                </form>
+                </div>
+            </div>
+
+            <!-- Pestaña Mis Referidos -->
+            <div id="docenteReferidosContent" class="admin-tab-content">
+            <div class="card">
+                <h2><i class="fas fa-list"></i> Mis Referidos</h2>
+                
+                <!-- Filtros -->
+                <div class="filters">
+                    <select id="filtroEstado">
+                        <option value="">Todos los estados</option>
+                        <option value="referido">Referido</option>
+                        <option value="inscrito">Inscrito</option>
+                    </select>
+                    <select id="filtroCurso">
+                        <option value="">Todas las materias</option>
+                        <option value="ingles">Inglés</option>
+                        <option value="matematicas">Matemáticas</option>
+                        <option value="robotica">Robótica</option>
+                        <option value="programacion">Programación</option>
+                        <option value="lenguaje">Lenguaje</option>
+                    </select>
+                    <input type="date" id="filtroFecha" placeholder="Filtrar por fecha">
+                </div>
+
                 <div class="table-container">
                     <table id="referidosTable">
                         <thead>
                             <tr>
                                 <th>Nombre</th>
-                                <th>Cédula</th>
-                                <th>Asignatura</th>
-                                <th>Fecha</th>
                                 <th>Estado</th>
+                                <th>Materia</th>
+                                <th>Fecha Registro</th>
                                 <th>Comisión</th>
-                                <th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody id="referidosTableBody">
                         </tbody>
                     </table>
+                    </div>
                 </div>
             </div>
 
-            <!-- Historial de Pagos -->
+            <!-- Pestaña Mis Pagos -->
+            <div id="docentePagosContent" class="admin-tab-content">
             <div class="card">
-                <h2><i class="fas fa-history"></i> Historial de Pagos</h2>
+                <h2><i class="fas fa-wallet"></i> Mis Pagos</h2>
+                
+                    <!-- Resumen de Comisiones -->
+                    <div class="comisiones-resumen">
+                        <div class="resumen-card">
+                            <div class="resumen-icon" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">
+                            <i class="fas fa-dollar-sign"></i>
+                            </div>
+                            <div class="resumen-info">
+                                <h3>Saldo Pendiente</h3>
+                                <span class="resumen-monto" id="saldoPendienteMonto">$0</span>
+                            </div>
+                        </div>
+                        <div class="resumen-card">
+                            <div class="resumen-icon" style="background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="resumen-info">
+                                <h3>Total Pagado</h3>
+                                <span class="resumen-monto" id="totalPagadoMonto">$0</span>
+                            </div>
+                        </div>
+                        <div class="resumen-card">
+                            <div class="resumen-icon" style="background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);">
+                                <i class="fas fa-calculator"></i>
+                            </div>
+                            <div class="resumen-info">
+                                <h3>Comisión por Estudiante</h3>
+                                <span class="resumen-monto">$10</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="table-container">
                     <table id="pagosTable">
                         <thead>
                             <tr>
-                                <th>Fecha</th>
-                                <th>Monto</th>
-                                <th>Estudiantes</th>
-                                <th>Estado</th>
+                                <th>Mes de liquidación</th>
+                                <th>Nº de inscritos pagados</th>
+                                <th>Comisión generada</th>
+                                <th>Estado del pago</th>
+                                <th>Fecha de abono</th>
                             </tr>
                         </thead>
                         <tbody id="pagosTableBody">
                         </tbody>
                     </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -222,6 +319,24 @@
         </header>
 
         <div class="dashboard-content">
+            <!-- Navegación por pestañas -->
+            <div class="admin-tabs">
+                <button class="tab-btn active" onclick="showAdminTab('dashboard')">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </button>
+                <button class="tab-btn" onclick="showAdminTab('docentes')">
+                    <i class="fas fa-chalkboard-teacher"></i> Gestión de Docentes
+                </button>
+                <button class="tab-btn" onclick="showAdminTab('referidos')">
+                    <i class="fas fa-user-plus"></i> Gestión de Referidos
+                </button>
+                <button class="tab-btn" onclick="showAdminTab('pagos')">
+                    <i class="fas fa-money-bill-wave"></i> Gestión de Pagos
+                </button>
+            </div>
+
+            <!-- Contenido del Dashboard -->
+            <div id="adminDashboardContent" class="admin-tab-content active">
             <!-- Métricas Generales -->
             <div class="metrics-grid">
                 <div class="metric-card">
@@ -229,26 +344,26 @@
                         <i class="fas fa-chalkboard-teacher"></i>
                     </div>
                     <div class="metric-info">
-                        <h3 id="totalDocentes">0</h3>
-                        <p>Docentes Registrados</p>
+                            <h3 id="totalDocentesActivos">0</h3>
+                            <p>Total Docentes Activos</p>
                     </div>
                 </div>
                 <div class="metric-card">
                     <div class="metric-icon" style="background: var(--gradient-secondary);">
-                        <i class="fas fa-user-check"></i>
+                            <i class="fas fa-users"></i>
                     </div>
                     <div class="metric-info">
-                        <h3 id="docentesActivos">0</h3>
-                        <p>Docentes Activos</p>
+                            <h3 id="totalAlumnosReferidos">0</h3>
+                            <p>Total Alumnos Referidos</p>
                     </div>
                 </div>
                 <div class="metric-card">
                     <div class="metric-icon" style="background: linear-gradient(135deg, #ffa617 0%, #fdcb6e 100%);">
-                        <i class="fas fa-users"></i>
+                            <i class="fas fa-user-check"></i>
                     </div>
                     <div class="metric-info">
-                        <h3 id="totalReferidosAdmin">0</h3>
-                        <p>Total Referidos</p>
+                            <h3 id="totalAlumnosInscritos">0</h3>
+                            <p>Total Alumnos Inscritos</p>
                     </div>
                 </div>
                 <div class="metric-card">
@@ -256,116 +371,207 @@
                         <i class="fas fa-dollar-sign"></i>
                     </div>
                     <div class="metric-info">
-                        <h3 id="totalComisiones">$0</h3>
-                        <p>Comisiones Totales</p>
+                            <h3 id="totalComisionesGeneradas">$0</h3>
+                            <p>Total Comisiones Generadas</p>
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon" style="background: linear-gradient(135deg, #17a2b8 0%, #20c997 100%);">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="metric-info">
+                            <h3 id="totalComisionesPagadas">$0</h3>
+                            <p>Total Comisiones Pagadas</p>
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon" style="background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="metric-info">
+                            <h3 id="totalComisionesPendientes">$0</h3>
+                            <p>Total Comisiones Pendientes</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gráficos -->
+                <div class="charts-grid">
+                    <div class="card">
+                        <h2><i class="fas fa-chart-bar"></i> Inscritos por Mes</h2>
+                        <div class="chart-container">
+                            <canvas id="monthlyInscritosChart" width="400" height="200"></canvas>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h2><i class="fas fa-chart-pie"></i> Distribución por Curso</h2>
+                        <div class="chart-container">
+                            <canvas id="cursosChart" width="400" height="200"></canvas>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Gestión de Comisiones -->
+            <!-- Gestión de Docentes -->
+            <div id="adminDocentesContent" class="admin-tab-content">
             <div class="card">
-                <h2><i class="fas fa-calculator"></i> Gestión de Comisiones</h2>
-                <div class="filters">
-                    <select id="filtroDocente">
-                        <option value="">Todos los docentes</option>
-                    </select>
-                    <select id="filtroEstado">
-                        <option value="">Todos los estados</option>
-                        <option value="pendiente">Pendiente</option>
-                        <option value="pagado">Pagado</option>
-                    </select>
-                    <button onclick="filtrarComisiones()" class="btn btn-secondary">
-                        <i class="fas fa-filter"></i> Filtrar
-                    </button>
-                    <button onclick="limpiarFiltrosComisiones()" class="btn btn-secondary">
-                        <i class="fas fa-times"></i> Limpiar
-                    </button>
-                </div>
+                    <h2><i class="fas fa-chalkboard-teacher"></i> Gestión de Docentes</h2>
+                    
+
                 <div class="table-container">
-                    <table id="comisionesTable">
+                        <table id="docentesTable">
                         <thead>
                             <tr>
-                                <th>Docente</th>
-                                <th>Referidos</th>
-                                <th>Inscritos</th>
-                                <th>Comisión</th>
-                                <th>Estado</th>
-                                <th>Fecha Pago</th>
-                                <th>Acciones</th>
+                                    <th>Nombre del Docente</th>
+                                    <th>Nº Alumnos Referidos</th>
+                                    <th>Nº Alumnos Inscritos</th>
+                                    <th>Comisión Generada</th>
+                                    <th>Comisión Pagada</th>
+                                    <th>Saldo Pendiente</th>
                             </tr>
                         </thead>
-                        <tbody id="comisionesTableBody">
+                            <tbody id="docentesTableBody">
                         </tbody>
                     </table>
+                    </div>
                 </div>
             </div>
 
-            <!-- Registrar Pago -->
+            <!-- Gestión de Referidos -->
+            <div id="adminReferidosContent" class="admin-tab-content">
             <div class="card">
-                <h2><i class="fas fa-money-bill-wave"></i> Registrar Pago</h2>
-                <form id="pagoForm">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="pagoDocente">Docente:</label>
-                            <select id="pagoDocente" required>
-                                <option value="">Seleccionar docente</option>
+                    <h2><i class="fas fa-user-plus"></i> Gestión de Referidos (Alumnos)</h2>
+                    
+                    <!-- Filtros -->
+                    <div class="filters">
+                        <select id="filtroReferidoEstado">
+                            <option value="">Todos los estados</option>
+                            <option value="referido">Referido</option>
+                            <option value="inscrito">Inscrito</option>
+                        </select>
+                        <select id="filtroReferidoDocente">
+                            <option value="">Todos los docentes</option>
+                        </select>
+                        <select id="filtroReferidoCurso">
+                            <option value="">Todas las materias</option>
+                            <option value="ingles">Inglés</option>
+                            <option value="matematicas">Matemáticas</option>
+                            <option value="robotica">Robótica</option>
+                            <option value="programacion">Programación</option>
+                            <option value="lenguaje">Lenguaje</option>
                             </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="pagoMonto">Monto:</label>
-                            <input type="number" id="pagoMonto" step="0.01" required>
-                        </div>
+                        <input type="month" id="filtroReferidoMes" placeholder="Filtrar por mes/año">
                     </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="pagoFecha">Fecha de Pago:</label>
-                            <input type="date" id="pagoFecha" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="pagoComprobante">Comprobante:</label>
-                            <input type="file" id="pagoComprobante" accept=".pdf,.jpg,.jpeg,.png">
-                        </div>
+
+                    <div class="table-container">
+                        <table id="referidosAdminTable">
+                            <thead>
+                                <tr>
+                                    <th>Nombre Completo</th>
+                                    <th>Docente que lo Refirió</th>
+                                    <th>Materia de Interés</th>
+                                    <th>Estado</th>
+                                    <th>Fecha de Registro</th>
+                                    <th>Comisión</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="referidosAdminTableBody">
+                            </tbody>
+                        </table>
                     </div>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-check"></i> Registrar Pago
-                    </button>
-                </form>
+                </div>
             </div>
 
-            <!-- Lista de Estudiantes -->
+            <!-- Gestión de Pagos -->
+            <div id="adminPagosContent" class="admin-tab-content">
+                <!-- Pagos Pendientes -->
             <div class="card">
-                <h2><i class="fas fa-graduation-cap"></i> Todos los Estudiantes</h2>
-                <div class="filters">
-                    <select id="filtroAsignatura">
-                        <option value="">Todas las asignaturas</option>
-                        <option value="ingles">Inglés</option>
-                        <option value="matematicas">Matemáticas</option>
-                        <option value="robotica">Robótica</option>
-                        <option value="programacion">Programación</option>
-                    </select>
-                    <button onclick="filtrarEstudiantes()" class="btn btn-secondary">
-                        <i class="fas fa-filter"></i> Filtrar
-                    </button>
-                    <button onclick="limpiarFiltrosEstudiantes()" class="btn btn-secondary">
-                        <i class="fas fa-times"></i> Limpiar
-                    </button>
+                    <h2><i class="fas fa-money-bill-wave"></i> Gestión de Pagos</h2>
+                    
+                    <div class="table-container">
+                        <table id="pagosPendientesTable">
+                            <thead>
+                                <tr>
+                                    <th>Nombre del Docente</th>
+                                    <th>Nº Alumnos Inscritos</th>
+                                    <th>Comisión Generada</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pagosPendientesTableBody">
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
+
+                <!-- Historial de Pagos -->
+                <div class="card">
+                    <h2><i class="fas fa-history"></i> Historial de Pagos</h2>
+                    
                 <div class="table-container">
-                    <table id="estudiantesTable">
+                        <table id="historialPagosTable">
                         <thead>
                             <tr>
-                                <th>Nombre</th>
-                                <th>Cédula</th>
-                                <th>Asignatura</th>
-                                <th>Fecha Registro</th>
+                                    <th>Mes / Año</th>
                                 <th>Docente</th>
-                                <th>Estado</th>
+                                    <th>Comisión Pagada</th>
+                                    <th>Fecha de Pago</th>
+                                    <th>Comprobante</th>
                             </tr>
                         </thead>
-                        <tbody id="estudiantesTableBody">
+                            <tbody id="historialPagosTableBody">
                         </tbody>
                     </table>
+                    </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Registrar Pago -->
+    <div id="pagoModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-money-bill-wave"></i> Registrar Pago</h2>
+                <button class="modal-close" onclick="closePagoModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="pagoModalForm">
+                    <div class="form-group">
+                        <label for="pagoModalDocente">Docente:</label>
+                        <input type="text" id="pagoModalDocente" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="pagoModalMonto">Total a Pagar:</label>
+                        <input type="text" id="pagoModalMonto" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="pagoModalFecha">Fecha de Pago:</label>
+                        <input type="date" id="pagoModalFecha" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="pagoModalComprobante">Comprobante (PDF/JPG/PNG):</label>
+                        <input type="file" id="pagoModalComprobante" accept=".pdf,.jpg,.jpeg,.png" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Detalle de Alumnos que Generan Comisión:</label>
+                        <div id="pagoModalDetalle" class="pago-detalle">
+                            <!-- Se llenará dinámicamente -->
+                        </div>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" onclick="closePagoModal()" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-check"></i> Confirmar Pago
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
