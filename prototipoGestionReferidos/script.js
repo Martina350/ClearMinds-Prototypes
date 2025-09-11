@@ -190,12 +190,20 @@ const DEMO_DATA = {
             id: 1,
             docenteId: 1,
             monto: 20,
-            fecha: '2024-09-20',
+            fecha: '2025-08-15',
             estudiantes: 2,
             estado: 'pagado'
         },
         {
             id: 2,
+            docenteId: 1,
+            monto: 20,
+            fecha: '2025-09-20',
+            estudiantes: 2,
+            estado: 'pagado'
+        },
+        {
+            id: 3,
             docenteId: 2,
             monto: 20,
             fecha: '2024-10-15',
@@ -203,7 +211,7 @@ const DEMO_DATA = {
             estado: 'pagado'
         },
         {
-            id: 3,
+            id: 4,
             docenteId: 3,
             monto: 10,
             fecha: '2024-11-25',
@@ -211,7 +219,7 @@ const DEMO_DATA = {
             estado: 'pagado'
         },
         {
-            id: 4,
+            id: 5,
             docenteId: 4,
             monto: 10,
             fecha: '2024-12-10',
@@ -219,7 +227,7 @@ const DEMO_DATA = {
             estado: 'pagado'
         },
         {
-            id: 5,
+            id: 6,
             docenteId: 5,
             monto: 20,
             fecha: '2024-12-30',
@@ -350,6 +358,13 @@ function saveData(data) {
 // Obtener datos actuales
 function getData() {
     try {
+        // Siempre usar DEMO_DATA actualizado para desarrollo
+        console.log('Usando DEMO_DATA actualizado - Timestamp:', new Date().toISOString());
+        console.log('Pagos del docente1:', DEMO_DATA.pagos.filter(p => p.docenteId === 1));
+        return DEMO_DATA;
+        
+        // Código comentado para usar localStorage en producción
+        /*
         const data = localStorage.getItem('referidosData');
         if (data) {
             const parsedData = JSON.parse(data);
@@ -359,10 +374,19 @@ function getData() {
             console.log('No hay datos en localStorage, usando DEMO_DATA');
             return DEMO_DATA;
         }
+        */
     } catch (error) {
         console.error('Error al cargar datos:', error);
         return DEMO_DATA;
     }
+}
+
+// Función para forzar recarga de datos (útil para desarrollo)
+function reloadData() {
+    localStorage.removeItem('referidosData');
+    localStorage.setItem('referidosData', JSON.stringify(DEMO_DATA));
+    console.log('Datos recargados desde DEMO_DATA');
+    return DEMO_DATA;
 }
 
 // Mostrar formulario de administrador
@@ -439,12 +463,12 @@ function handleAdminLogin(e) {
     e.preventDefault();
     
     try {
-        const usuario = document.getElementById('adminUsuario').value;
-        const password = document.getElementById('adminPassword').value;
+    const usuario = document.getElementById('adminUsuario').value;
+    const password = document.getElementById('adminPassword').value;
         
         console.log('Intentando login admin con:', usuario, password);
-        
-        const data = getData();
+    
+    const data = getData();
         console.log('Datos cargados para admin:', data);
         console.log('Admin en datos:', data.admin);
         
@@ -453,17 +477,17 @@ function handleAdminLogin(e) {
             showNotification('Error al cargar los datos', 'error');
             return;
         }
-        
-        if (data.admin.usuario === usuario && data.admin.password === password) {
-            currentUser = data.admin;
-            currentRole = 'admin';
+    
+    if (data.admin.usuario === usuario && data.admin.password === password) {
+        currentUser = data.admin;
+        currentRole = 'admin';
             console.log('Login admin exitoso, redirigiendo...');
-            showScreen('adminDashboard');
-            loadAdminDashboard();
-            showNotification('Bienvenido, Administrador', 'success');
-        } else {
+        showScreen('adminDashboard');
+        loadAdminDashboard();
+        showNotification('Bienvenido, Administrador', 'success');
+    } else {
             console.log('Credenciales admin incorrectas');
-            showNotification('Credenciales incorrectas', 'error');
+        showNotification('Credenciales incorrectas', 'error');
         }
     } catch (error) {
         console.error('Error en handleAdminLogin:', error);
@@ -503,6 +527,17 @@ function loadDocenteDashboard() {
     const pagosDocente = data.pagos.filter(p => p.docenteId === docenteId);
     const comisionPagada = pagosDocente.reduce((sum, p) => sum + p.monto, 0);
     const comisionPendiente = comisionTotalGenerada - comisionPagada;
+    
+    console.log('Dashboard Docente - Cálculos:', {
+        docenteId,
+        docenteNombre: currentUser.nombre,
+        estudiantesDocente: estudiantesDocente.length,
+        inscritos: inscritos.length,
+        comisionTotalGenerada,
+        pagosDocente: pagosDocente.length,
+        comisionPagada,
+        comisionPendiente
+    });
     
     // Actualizar métricas
     document.getElementById('totalReferidos').textContent = estudiantesDocente.length;
@@ -569,10 +604,14 @@ function loadPagosTable(pagos) {
     
     // Debug: Log de valores
     console.log('Debug Pagos:', {
+        docenteId,
+        docenteNombre: currentUser.nombre,
+        estudiantesInscritos: estudiantesInscritos.length,
         comisionTotalGenerada,
+        pagos: pagos.length,
         comisionTotalPagada,
         saldoPendiente,
-        docenteId
+        pagosDetalle: pagos.map(p => ({ id: p.id, monto: p.monto, estudiantes: p.estudiantes, fecha: p.fecha }))
     });
     
     // Actualizar los elementos del resumen con validaciones
@@ -616,6 +655,7 @@ function loadPagosTable(pagos) {
             };
         }
         
+        // Usar los valores reales del pago
         pagosPorMes[mesAño].inscritos += pago.estudiantes;
         pagosPorMes[mesAño].comision += pago.monto;
     });
