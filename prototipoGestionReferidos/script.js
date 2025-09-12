@@ -829,10 +829,10 @@ function handleReferidoSubmit(e) {
     const curso = document.getElementById('estudianteCurso').value;
     const cursoOtro = document.getElementById('estudianteCursoOtro').value.trim();
     const telefono = document.getElementById('estudianteTelefono').value.trim();
-    const fecha = document.getElementById('filtroFecha').value;
+    const fecha = document.getElementById('estudianteFecha').value;
     
     console.log('Datos del formulario:', { nombre, cedula, curso, cursoOtro, telefono, fecha });
-    console.log('Fecha capturada del campo filtroFecha:', fecha);
+    console.log('Fecha capturada del campo estudianteFecha:', fecha);
     
     // Validaciones básicas
     if (!nombre) {
@@ -873,6 +873,16 @@ function handleReferidoSubmit(e) {
         return;
     }
     
+    // Validar formato de fecha y asegurar que se guarde exactamente como se selecciona
+    console.log('Fecha original seleccionada:', fecha);
+    
+    // La fecha del input type="date" ya viene en formato YYYY-MM-DD
+    // No necesitamos convertirla, solo validar que esté en el formato correcto
+    if (!fecha.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        showNotification('Formato de fecha inválido', 'error');
+        return;
+    }
+    
     // Validar teléfono (máximo 9 números después del 593)
     const telefonoRegex = /^\d{1,9}$/;
     if (!telefonoRegex.test(telefono)) {
@@ -897,10 +907,12 @@ function handleReferidoSubmit(e) {
         curso: cursoFinal,
         telefono: `593${telefono}`, // Agregar prefijo 593
         email: '', // No disponible en el formulario actual
-        fecha: fecha, // Usar la fecha seleccionada en el formulario
+        fecha: fecha, // Usar la fecha seleccionada en el formulario (formato YYYY-MM-DD)
         docenteId: currentUser.id,
         estado: 'referido'
     };
+    
+    console.log('Nuevo estudiante creado con fecha:', nuevoEstudiante.fecha);
     
     console.log('Nuevo estudiante:', nuevoEstudiante);
     console.log('Fecha que se va a guardar:', nuevoEstudiante.fecha);
@@ -1878,6 +1890,16 @@ function getAsignaturaNombre(asignatura) {
 }
 
 function formatDate(dateString) {
+    if (!dateString) return '';
+    
+    // Si la fecha ya está en formato correcto, devolverla tal como está
+    if (typeof dateString === 'string' && dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        // Convertir de YYYY-MM-DD a DD/MM/YYYY
+        const [year, month, day] = dateString.split('-');
+        return `${day}/${month}/${year}`;
+    }
+    
+    // Para otros formatos, usar el método anterior
     const date = new Date(dateString);
     return date.toLocaleDateString('es-ES');
 }
