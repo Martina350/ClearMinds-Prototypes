@@ -1941,3 +1941,33 @@ html {
     pointer-events: none;
     z-index: 1;
 }
+
+/* Estilos para el campo de materia personalizada */
+#estudianteCursoOtro {
+    transition: all 0.3s ease;
+    border: 1px solid var(--color-primary);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-sm);
+    font-size: var(--font-size-sm);
+    width: 100%;
+    background: white;
+    color: var(--color-text);
+    margin-top: var(--spacing-xs);
+    display: none; /* Inicialmente oculto */
+}
+
+#estudianteCursoOtro:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px rgba(128, 90, 213, 0.2);
+}
+
+#estudianteCursoOtro::placeholder {
+    color: #999;
+    font-style: italic;
+}
+
+/* Asegurar que el campo sea visible cuando se muestra */
+#estudianteCursoOtro[style*="display: block"] {
+    display: block !important;
+}

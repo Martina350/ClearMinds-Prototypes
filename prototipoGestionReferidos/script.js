@@ -313,11 +313,16 @@ function setupEventListeners() {
     // Mostrar/ocultar campo "Otro" en materia
     document.addEventListener('change', function(e) {
         if (e.target.id === 'estudianteCurso') {
+            console.log('Cambio detectado en estudianteCurso:', e.target.value);
             const cursoOtroField = document.getElementById('estudianteCursoOtro');
+            console.log('Campo estudianteCursoOtro encontrado:', !!cursoOtroField);
+            
             if (e.target.value === 'otro') {
+                console.log('Mostrando campo de materia personalizada');
                 cursoOtroField.style.display = 'block';
                 cursoOtroField.required = true;
             } else {
+                console.log('Ocultando campo de materia personalizada');
                 cursoOtroField.style.display = 'none';
                 cursoOtroField.required = false;
                 cursoOtroField.value = '';
@@ -928,6 +933,51 @@ function handleReferidoSubmit(e) {
     }
 }
 
+// Configurar event listeners específicos para el formulario de referir
+function setupReferirFormListeners() {
+    console.log('Configurando event listeners para el formulario de referir');
+    
+    const estudianteCursoSelect = document.getElementById('estudianteCurso');
+    const cursoOtroField = document.getElementById('estudianteCursoOtro');
+    
+    console.log('Elementos encontrados:', {
+        estudianteCursoSelect: !!estudianteCursoSelect,
+        cursoOtroField: !!cursoOtroField
+    });
+    
+    if (estudianteCursoSelect) {
+        // Remover event listeners existentes para evitar duplicados
+        estudianteCursoSelect.removeEventListener('change', handleCursoChange);
+        
+        // Agregar nuevo event listener
+        estudianteCursoSelect.addEventListener('change', handleCursoChange);
+        console.log('Event listener agregado para estudianteCurso');
+    }
+}
+
+// Manejar cambio en el select de curso
+function handleCursoChange(e) {
+    console.log('Cambio detectado en estudianteCurso:', e.target.value);
+    const cursoOtroField = document.getElementById('estudianteCursoOtro');
+    console.log('Campo estudianteCursoOtro encontrado:', !!cursoOtroField);
+    
+    if (e.target.value === 'otro') {
+        console.log('Mostrando campo de materia personalizada');
+        if (cursoOtroField) {
+            cursoOtroField.style.display = 'block';
+            cursoOtroField.required = true;
+            cursoOtroField.focus(); // Enfocar el campo para mejor UX
+        }
+    } else {
+        console.log('Ocultando campo de materia personalizada');
+        if (cursoOtroField) {
+            cursoOtroField.style.display = 'none';
+            cursoOtroField.required = false;
+            cursoOtroField.value = '';
+        }
+    }
+}
+
 // Configurar filtros específicos del docente
 function setupDocenteFilters() {
     const filtroEstado = document.getElementById('filtroEstado');
@@ -1079,6 +1129,11 @@ function showDocenteTab(tabName) {
     // Recargar datos si es necesario
     if (tabName === 'dashboard') {
         loadDocenteDashboard();
+    } else if (tabName === 'referir') {
+        // Configurar event listeners específicos para el formulario de referir
+        setTimeout(() => {
+            setupReferirFormListeners();
+        }, 100);
     } else if (tabName === 'referidos') {
         // Recargar tabla de referidos cuando se accede a esa pestaña
         // Configurar filtros y aplicar filtros actuales si existen
