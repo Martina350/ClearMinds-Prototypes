@@ -174,6 +174,10 @@
                     </div>
                     <div class="form-row">
                         <div class="form-group">
+                            <label for="filtroFecha">Fecha de Referido:</label>
+                            <input type="date" id="filtroFecha" placeholder="Filtrar por fecha" required>
+                        </div>
+                        <div class="form-group">
                             <label for="estudianteCurso">Materia de interés:</label>
                             <select id="estudianteCurso" required>
                                 <option value="">Seleccionar materia</option>
@@ -186,12 +190,17 @@
                             </select>
                             <input type="text" id="estudianteCursoOtro" placeholder="Especificar materia" style="display: none; margin-top: var(--spacing-xs);">
                         </div>
+                    </div>
+                    <div class="form-row">
                         <div class="form-group">
                             <label for="estudianteTelefono">Teléfono:</label>
                             <div class="phone-input-container">
                                 <span class="phone-prefix">593</span>
                                 <input type="tel" id="estudianteTelefono" placeholder="123456789" maxlength="9" required>
                             </div>
+                        </div>
+                        <div class="form-group">
+                            <!-- Campo vacío para mantener el layout -->
                         </div>
                     </div>
                     <div class="form-row">
@@ -404,7 +413,7 @@
                         </div>
                     </div>
                     <div class="card">
-                        <h2><i class="fas fa-chart-pie"></i> Distribución por Curso</h2>
+                        <h2><i class="fas fa-chart-pie"></i> Distribución por Materia</h2>
                         <div class="chart-container">
                             <canvas id="cursosChart" width="400" height="200"></canvas>
                         </div>

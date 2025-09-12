@@ -1006,6 +1006,12 @@ tr:last-child td {
     border: 1px solid rgba(23, 162, 184, 0.3);
 }
 
+.status.sin-comision {
+    background: rgba(108, 117, 125, 0.1);
+    color: #495057;
+    border: 1px solid rgba(108, 117, 125, 0.3);
+}
+
 /* ========================================
    BOTONES DE ACCIÓN
    ======================================== */

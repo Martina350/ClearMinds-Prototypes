@@ -24,7 +24,7 @@ const DEMO_DATA = {
             curso: 'matematicas',
             telefono: '+56912345678',
             email: 'juan.perez@email.com',
-            fecha: '2024-09-01',
+            fecha: '2025-07-19',
             docenteId: 1,
             estado: 'inscrito'
         },
@@ -36,7 +36,7 @@ const DEMO_DATA = {
             curso: 'ingles',
             telefono: '+56987654321',
             email: 'sofia.rodriguez@email.com',
-            fecha: '2024-09-03',
+            fecha: '2025-05-18',
             docenteId: 1,
             estado: 'referido'
         },
@@ -48,7 +48,7 @@ const DEMO_DATA = {
             curso: 'programacion',
             telefono: '+56911223344',
             email: 'diego.gonzalez@email.com',
-            fecha: '2024-09-05',
+            fecha: '2025-06-23',
             docenteId: 1,
             estado: 'inscrito'
         },
@@ -60,7 +60,7 @@ const DEMO_DATA = {
             curso: 'robotica',
             telefono: '+56955667788',
             email: 'julian.sanchez@email.com',
-            fecha: '2024-09-10',
+            fecha: '2025-06-02',
             docenteId: 1,
             estado: 'referido'
         },
@@ -190,7 +190,7 @@ const DEMO_DATA = {
             id: 1,
             docenteId: 1,
             monto: 20,
-            fecha: '2025-08-15',
+            fecha: '2025-09-22',
             estudiantes: 2,
             estado: 'pagado'
         },
@@ -198,7 +198,7 @@ const DEMO_DATA = {
             id: 2,
             docenteId: 1,
             monto: 20,
-            fecha: '2025-09-20',
+            fecha: '2025-08-23',
             estudiantes: 2,
             estado: 'pagado'
         },
@@ -206,7 +206,7 @@ const DEMO_DATA = {
             id: 3,
             docenteId: 2,
             monto: 20,
-            fecha: '2024-10-15',
+            fecha: '2025-07-15',
             estudiantes: 2,
             estado: 'pagado'
         },
@@ -214,7 +214,7 @@ const DEMO_DATA = {
             id: 4,
             docenteId: 3,
             monto: 10,
-            fecha: '2024-11-25',
+            fecha: '2025-06-25',
             estudiantes: 1,
             estado: 'pagado'
         },
@@ -222,7 +222,7 @@ const DEMO_DATA = {
             id: 5,
             docenteId: 4,
             monto: 10,
-            fecha: '2024-12-10',
+            fecha: '2025-05-10',
             estudiantes: 1,
             estado: 'pagado'
         },
@@ -230,7 +230,7 @@ const DEMO_DATA = {
             id: 6,
             docenteId: 5,
             monto: 20,
-            fecha: '2024-12-30',
+            fecha: '2025-04-30',
             estudiantes: 2,
             estado: 'pagado'
         }
@@ -358,13 +358,6 @@ function saveData(data) {
 // Obtener datos actuales
 function getData() {
     try {
-        // Siempre usar DEMO_DATA actualizado para desarrollo
-        console.log('Usando DEMO_DATA actualizado - Timestamp:', new Date().toISOString());
-        console.log('Pagos del docente1:', DEMO_DATA.pagos.filter(p => p.docenteId === 1));
-        return DEMO_DATA;
-        
-        // Código comentado para usar localStorage en producción
-        /*
         const data = localStorage.getItem('referidosData');
         if (data) {
             const parsedData = JSON.parse(data);
@@ -374,7 +367,6 @@ function getData() {
             console.log('No hay datos en localStorage, usando DEMO_DATA');
             return DEMO_DATA;
         }
-        */
     } catch (error) {
         console.error('Error al cargar datos:', error);
         return DEMO_DATA;
@@ -670,7 +662,7 @@ function loadPagosTable(pagos) {
             mes: mesActual,
             inscritos: estudiantesPendientes,
             comision: saldoPendiente,
-            estado: 'Pendiente',
+            estado: 'PENDIENTE',
             fechaAbono: '--'
         };
     }
@@ -698,11 +690,19 @@ function loadPagosTable(pagos) {
     // Mostrar los pagos
     pagosArray.forEach((pago, index) => {
         const row = document.createElement('tr');
+        // Determinar la clase CSS según el estado
+        let estadoClass = 'pagado';
+        if (pago.estado === 'PENDIENTE') {
+            estadoClass = 'pendiente';
+        } else if (pago.estado === 'Pagado') {
+            estadoClass = 'pagado';
+        }
+        
         row.innerHTML = `
             <td>${pago.mes}</td>
             <td>${pago.inscritos}</td>
             <td>$${pago.comision}</td>
-            <td><span class="status ${pago.estado.toLowerCase()}">${pago.estado}</span></td>
+            <td><span class="status ${estadoClass}">${pago.estado}</span></td>
             <td>${pago.fechaAbono}</td>
         `;
         
@@ -728,8 +728,10 @@ function handleReferidoSubmit(e) {
     const curso = document.getElementById('estudianteCurso').value;
     const cursoOtro = document.getElementById('estudianteCursoOtro').value.trim();
     const telefono = document.getElementById('estudianteTelefono').value.trim();
+    const fecha = document.getElementById('filtroFecha').value;
     
-    console.log('Datos del formulario:', { nombre, cedula, curso, cursoOtro, telefono });
+    console.log('Datos del formulario:', { nombre, cedula, curso, cursoOtro, telefono, fecha });
+    console.log('Fecha capturada del campo filtroFecha:', fecha);
     
     // Validaciones básicas
     if (!nombre) {
@@ -765,6 +767,11 @@ function handleReferidoSubmit(e) {
         return;
     }
     
+    if (!fecha) {
+        showNotification('Por favor, seleccione la fecha de referido', 'error');
+        return;
+    }
+    
     // Validar teléfono (máximo 9 números después del 593)
     const telefonoRegex = /^\d{1,9}$/;
     if (!telefonoRegex.test(telefono)) {
@@ -789,16 +796,18 @@ function handleReferidoSubmit(e) {
         curso: cursoFinal,
         telefono: `593${telefono}`, // Agregar prefijo 593
         email: '', // No disponible en el formulario actual
-        fecha: new Date().toISOString().split('T')[0],
+        fecha: fecha, // Usar la fecha seleccionada en el formulario
         docenteId: currentUser.id,
         estado: 'referido'
     };
     
     console.log('Nuevo estudiante:', nuevoEstudiante);
+    console.log('Fecha que se va a guardar:', nuevoEstudiante.fecha);
     
     data.estudiantes.push(nuevoEstudiante);
     saveData(data);
     console.log('Datos guardados:', data);
+    console.log('Último estudiante agregado:', data.estudiantes[data.estudiantes.length - 1]);
     
     // Limpiar formulario
     document.getElementById('referidoForm').reset();
@@ -989,23 +998,38 @@ function loadComisionesTable(data) {
         const pendiente = comision - totalPagado;
         
         const row = document.createElement('tr');
+        
+        // Determinar el estado del pago
+        let estadoPago, estadoClass, accionBoton;
+        if (pendiente > 0) {
+            estadoPago = 'PENDIENTE';
+            estadoClass = 'pendiente';
+            accionBoton = `
+                <button class="action-btn check" onclick="marcarPago(${docente.id}, ${pendiente})">
+                    <i class="fas fa-check"></i>
+                </button>
+            `;
+        } else if (comision > 0) {
+            estadoPago = 'COMPLETAMENTE PAGADO';
+            estadoClass = 'pagado';
+            accionBoton = '<span class="status pagado">COMPLETAMENTE PAGADO</span>';
+        } else {
+            estadoPago = 'SIN COMISIONES';
+            estadoClass = 'sin-comision';
+            accionBoton = '<span class="status sin-comision">SIN COMISIONES</span>';
+        }
+        
         row.innerHTML = `
             <td>${docente.nombre}</td>
-            <td>${estudiantesDocente.length}</td>
             <td>${inscritos.length}</td>
             <td>$${comision}</td>
             <td>
-                <span class="status ${pendiente > 0 ? 'pendiente' : 'pagado'}">
-                    ${pendiente > 0 ? 'Pendiente: $' + pendiente : 'Pagado'}
+                <span class="status ${estadoClass}">
+                    ${estadoPago}
                 </span>
             </td>
-            <td>${pagosDocente.length > 0 ? formatDate(pagosDocente[pagosDocente.length - 1].fecha) : '-'}</td>
             <td>
-                ${pendiente > 0 ? `
-                    <button class="action-btn check" onclick="marcarPago(${docente.id}, ${pendiente})">
-                        <i class="fas fa-check"></i>
-                    </button>
-                ` : ''}
+                ${accionBoton}
             </td>
         `;
         tbody.appendChild(row);
@@ -1630,12 +1654,7 @@ function getAsignaturaNombre(asignatura) {
 
 function formatDate(dateString) {
     const date = new Date(dateString);
-    // Generar fecha aleatoria de 2025
-    const year = 2025;
-    const month = Math.floor(Math.random() * 12) + 1;
-    const day = Math.floor(Math.random() * 28) + 1;
-    const newDate = new Date(year, month - 1, day);
-    return newDate.toLocaleDateString('es-ES');
+    return date.toLocaleDateString('es-ES');
 }
 
 function showNotification(message, type = 'info') {
@@ -1712,6 +1731,39 @@ function mostrarDetallePago(pago, index) {
 // FUNCIONES ESPECÍFICAS DEL ADMINISTRADOR
 // ========================================
 
+// Actualizar estado de pagos cuando se inscribe un nuevo estudiante
+function updatePaymentStatusForTeacher(docenteId) {
+    const data = getData();
+    
+    // Calcular comisiones actuales
+    const estudiantesDocente = data.estudiantes.filter(e => e.docenteId === docenteId);
+    const inscritos = estudiantesDocente.filter(e => e.estado === 'inscrito');
+    const comisionTotalGenerada = inscritos.length * COMISION_POR_ESTUDIANTE;
+    
+    // Calcular comisiones pagadas
+    const pagosDocente = data.pagos.filter(p => p.docenteId === docenteId);
+    const comisionTotalPagada = pagosDocente.reduce((sum, p) => sum + p.monto, 0);
+    
+    // Calcular saldo pendiente
+    const saldoPendiente = comisionTotalGenerada - comisionTotalPagada;
+    
+    console.log(`Actualizando estado de pagos para docente ${docenteId}:`, {
+        inscritos: inscritos.length,
+        comisionTotalGenerada,
+        comisionTotalPagada,
+        saldoPendiente
+    });
+    
+    // Si hay saldo pendiente, el estado cambia a pendiente
+    // Si no hay saldo pendiente, el estado es completamente pagado
+    return {
+        comisionTotalGenerada,
+        comisionTotalPagada,
+        saldoPendiente,
+        estado: saldoPendiente > 0 ? 'pendiente' : 'completamente_pagado'
+    };
+}
+
 // Marcar estudiante como inscrito
 function marcarComoInscrito(estudianteId) {
     const data = getData();
@@ -1719,6 +1771,10 @@ function marcarComoInscrito(estudianteId) {
     
     if (estudiante) {
         estudiante.estado = 'inscrito';
+        
+        // Actualizar estado de pagos del docente
+        updatePaymentStatusForTeacher(estudiante.docenteId);
+        
         saveData(data);
         loadAdminDashboard();
         showNotification('Estudiante marcado como inscrito', 'success');
