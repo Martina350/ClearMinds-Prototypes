@@ -24,7 +24,7 @@ const DEMO_DATA = {
             curso: 'matematicas',
             telefono: '+56912345678',
             email: 'juan.perez@email.com',
-            fecha: '2025-07-19',
+            fecha: '2025-01-19',
             docenteId: 1,
             estado: 'inscrito'
         },
@@ -36,7 +36,7 @@ const DEMO_DATA = {
             curso: 'ingles',
             telefono: '+56987654321',
             email: 'sofia.rodriguez@email.com',
-            fecha: '2025-05-18',
+            fecha: '2025-02-18',
             docenteId: 1,
             estado: 'referido'
         },
@@ -48,7 +48,7 @@ const DEMO_DATA = {
             curso: 'programacion',
             telefono: '+56911223344',
             email: 'diego.gonzalez@email.com',
-            fecha: '2025-06-23',
+            fecha: '2025-03-23',
             docenteId: 1,
             estado: 'inscrito'
         },
@@ -60,7 +60,7 @@ const DEMO_DATA = {
             curso: 'robotica',
             telefono: '+56955667788',
             email: 'julian.sanchez@email.com',
-            fecha: '2025-06-02',
+            fecha: '2025-04-02',
             docenteId: 1,
             estado: 'referido'
         },
@@ -72,7 +72,7 @@ const DEMO_DATA = {
             curso: 'ingles',
             telefono: '+56999887766',
             email: 'valentina.morales@email.com',
-            fecha: '2024-10-05',
+            fecha: '2025-02-05',
             docenteId: 2,
             estado: 'inscrito'
         },
@@ -84,7 +84,7 @@ const DEMO_DATA = {
             curso: 'matematicas',
             telefono: '+56955443322',
             email: 'sebastian.herrera@email.com',
-            fecha: '2024-10-12',
+            fecha: '2025-02-12',
             docenteId: 2,
             estado: 'inscrito'
         },
@@ -96,7 +96,7 @@ const DEMO_DATA = {
             curso: 'programacion',
             telefono: '+56911223399',
             email: 'camila.vega@email.com',
-            fecha: '2024-11-03',
+            fecha: '2025-03-03',
             docenteId: 3,
             estado: 'referido'
         },
@@ -108,7 +108,7 @@ const DEMO_DATA = {
             curso: 'robotica',
             telefono: '+56977665544',
             email: 'andres.castillo@email.com',
-            fecha: '2024-11-15',
+            fecha: '2025-03-15',
             docenteId: 3,
             estado: 'inscrito'
         },
@@ -120,7 +120,7 @@ const DEMO_DATA = {
             curso: 'lenguaje',
             telefono: '+56933445566',
             email: 'isabella.rojas@email.com',
-            fecha: '2024-12-01',
+            fecha: '2025-04-01',
             docenteId: 4,
             estado: 'inscrito'
         },
@@ -132,7 +132,7 @@ const DEMO_DATA = {
             curso: 'matematicas',
             telefono: '+56988990011',
             email: 'matias.espinoza@email.com',
-            fecha: '2024-12-08',
+            fecha: '2025-04-08',
             docenteId: 4,
             estado: 'referido'
         },
@@ -144,7 +144,7 @@ const DEMO_DATA = {
             curso: 'ingles',
             telefono: '+56922334455',
             email: 'sofia.mendoza@email.com',
-            fecha: '2024-12-20',
+            fecha: '2025-08-20',
             docenteId: 5,
             estado: 'inscrito'
         },
@@ -180,7 +180,7 @@ const DEMO_DATA = {
             curso: 'lenguaje',
             telefono: '+56988991122',
             email: 'diego.morales@email.com',
-            fecha: '2025-01-18',
+            fecha: '2025-09-18',
             docenteId: 6,
             estado: 'inscrito'
         }
@@ -190,7 +190,7 @@ const DEMO_DATA = {
             id: 1,
             docenteId: 1,
             monto: 20,
-            fecha: '2025-09-22',
+            fecha: '2025-01-22',
             estudiantes: 2,
             estado: 'pagado'
         },
@@ -198,7 +198,7 @@ const DEMO_DATA = {
             id: 2,
             docenteId: 1,
             monto: 20,
-            fecha: '2025-08-23',
+            fecha: '2025-02-23',
             estudiantes: 2,
             estado: 'pagado'
         },
@@ -206,7 +206,7 @@ const DEMO_DATA = {
             id: 3,
             docenteId: 2,
             monto: 20,
-            fecha: '2025-07-15',
+            fecha: '2025-03-15',
             estudiantes: 2,
             estado: 'pagado'
         },
@@ -214,7 +214,7 @@ const DEMO_DATA = {
             id: 4,
             docenteId: 3,
             monto: 10,
-            fecha: '2025-06-25',
+            fecha: '2025-04-25',
             estudiantes: 1,
             estado: 'pagado'
         },
@@ -230,7 +230,7 @@ const DEMO_DATA = {
             id: 6,
             docenteId: 5,
             monto: 20,
-            fecha: '2025-04-30',
+            fecha: '2025-09-15',
             estudiantes: 2,
             estado: 'pagado'
         }
@@ -242,6 +242,9 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeApp();
     setupEventListeners();
     loadData();
+    
+    // Limpiar datos antiguos con fechas de 2024
+    clearOldDataAndReload();
 });
 
 // Inicializar la aplicación
@@ -298,10 +301,14 @@ function setupEventListeners() {
     
     // Filtros automáticos para docente
     document.addEventListener('change', function(e) {
-        if (e.target.id === 'filtroEstado' || e.target.id === 'filtroCurso' || e.target.id === 'filtroFecha') {
+        if (e.target.id === 'filtroEstado' || e.target.id === 'filtroCurso' || e.target.id === 'filtroFechaReferidos') {
+            console.log('Filtro cambiado:', e.target.id, e.target.value);
             filtrarReferidos();
         }
     });
+    
+    // Configurar filtros específicos del docente cuando se carga la pestaña
+    setupDocenteFilters();
     
     // Mostrar/ocultar campo "Otro" en materia
     document.addEventListener('change', function(e) {
@@ -362,6 +369,34 @@ function getData() {
         if (data) {
             const parsedData = JSON.parse(data);
             console.log('Datos cargados desde localStorage:', parsedData);
+            
+            // Verificar si hay fechas de 2024 y actualizarlas automáticamente
+            let needsUpdate = false;
+            
+            if (parsedData.estudiantes) {
+                parsedData.estudiantes.forEach(estudiante => {
+                    if (estudiante.fecha && estudiante.fecha.includes('2024')) {
+                        console.log('Fecha de 2024 encontrada en estudiante:', estudiante.fecha);
+                        needsUpdate = true;
+                    }
+                });
+            }
+            
+            if (parsedData.pagos) {
+                parsedData.pagos.forEach(pago => {
+                    if (pago.fecha && pago.fecha.includes('2024')) {
+                        console.log('Fecha de 2024 encontrada en pago:', pago.fecha);
+                        needsUpdate = true;
+                    }
+                });
+            }
+            
+            if (needsUpdate) {
+                console.log('Fechas de 2024 detectadas, actualizando datos...');
+                localStorage.setItem('referidosData', JSON.stringify(DEMO_DATA));
+                return DEMO_DATA;
+            }
+            
             return parsedData;
         } else {
             console.log('No hay datos en localStorage, usando DEMO_DATA');
@@ -378,6 +413,24 @@ function reloadData() {
     localStorage.removeItem('referidosData');
     localStorage.setItem('referidosData', JSON.stringify(DEMO_DATA));
     console.log('Datos recargados desde DEMO_DATA');
+    return DEMO_DATA;
+}
+
+// Función para limpiar datos antiguos y actualizar fechas
+function clearOldDataAndReload() {
+    console.log('Limpiando datos antiguos y recargando con fechas actualizadas...');
+    localStorage.removeItem('referidosData');
+    localStorage.setItem('referidosData', JSON.stringify(DEMO_DATA));
+    console.log('Datos actualizados con fechas de 2025');
+    
+    // Recargar dashboards si están activos
+    if (currentRole === 'admin') {
+        loadAdminDashboard();
+    } else if (currentRole === 'docente') {
+        loadDocenteDashboard();
+    }
+    
+    showNotification('Datos actualizados con fechas de 2025', 'success');
     return DEMO_DATA;
 }
 
@@ -503,6 +556,43 @@ function logout() {
     showNotification('Sesión cerrada correctamente', 'info');
 }
 
+// Actualizar métricas del dashboard del docente
+function updateDocenteMetrics() {
+    if (currentRole !== 'docente' || !currentUser) return;
+    
+    const data = getData();
+    const docenteId = currentUser.id;
+    
+    // Filtrar estudiantes del docente
+    const estudiantesDocente = data.estudiantes.filter(e => e.docenteId === docenteId);
+    const inscritos = estudiantesDocente.filter(e => e.estado === 'inscrito');
+    
+    // Calcular comisiones
+    const comisionTotalGenerada = inscritos.length * COMISION_POR_ESTUDIANTE;
+    const pagosDocente = data.pagos.filter(p => p.docenteId === docenteId);
+    const comisionPagada = pagosDocente.reduce((sum, p) => sum + p.monto, 0);
+    const comisionPendiente = comisionTotalGenerada - comisionPagada;
+    
+    console.log('Actualizando métricas del docente:', {
+        docenteId,
+        estudiantesInscritos: inscritos.length,
+        comisionTotalGenerada,
+        comisionPagada,
+        comisionPendiente
+    });
+    
+    // Actualizar métricas con validación de elementos
+    const totalReferidosElement = document.getElementById('totalReferidos');
+    const totalInscritosElement = document.getElementById('totalInscritos');
+    const comisionPendienteElement = document.getElementById('comisionPendiente');
+    const comisionPagadaElement = document.getElementById('comisionPagada');
+    
+    if (totalReferidosElement) totalReferidosElement.textContent = estudiantesDocente.length;
+    if (totalInscritosElement) totalInscritosElement.textContent = inscritos.length;
+    if (comisionPendienteElement) comisionPendienteElement.textContent = '$' + comisionPendiente;
+    if (comisionPagadaElement) comisionPagadaElement.textContent = '$' + comisionPagada;
+}
+
 // Cargar dashboard del docente
 function loadDocenteDashboard() {
     if (currentRole !== 'docente') return;
@@ -520,7 +610,7 @@ function loadDocenteDashboard() {
     const comisionPagada = pagosDocente.reduce((sum, p) => sum + p.monto, 0);
     const comisionPendiente = comisionTotalGenerada - comisionPagada;
     
-    console.log('Dashboard Docente - Cálculos:', {
+    console.log('Dashboard Docente - Cálculos actualizados:', {
         docenteId,
         docenteNombre: currentUser.nombre,
         estudiantesDocente: estudiantesDocente.length,
@@ -531,12 +621,18 @@ function loadDocenteDashboard() {
         comisionPendiente
     });
     
-    // Actualizar métricas
-    document.getElementById('totalReferidos').textContent = estudiantesDocente.length;
-    document.getElementById('totalInscritos').textContent = inscritos.length;
-    document.getElementById('comisionPendiente').textContent = '$' + comisionPendiente;
-    document.getElementById('comisionPagada').textContent = '$' + comisionPagada;
-    document.getElementById('docenteNombre').textContent = currentUser.nombre;
+    // Actualizar métricas con validación de elementos
+    const totalReferidosElement = document.getElementById('totalReferidos');
+    const totalInscritosElement = document.getElementById('totalInscritos');
+    const comisionPendienteElement = document.getElementById('comisionPendiente');
+    const comisionPagadaElement = document.getElementById('comisionPagada');
+    const docenteNombreElement = document.getElementById('docenteNombre');
+    
+    if (totalReferidosElement) totalReferidosElement.textContent = estudiantesDocente.length;
+    if (totalInscritosElement) totalInscritosElement.textContent = inscritos.length;
+    if (comisionPendienteElement) comisionPendienteElement.textContent = '$' + comisionPendiente;
+    if (comisionPagadaElement) comisionPagadaElement.textContent = '$' + comisionPagada;
+    if (docenteNombreElement) docenteNombreElement.textContent = currentUser.nombre;
     
     // Cargar tabla de referidos
     loadReferidosTable(estudiantesDocente);
@@ -832,6 +928,40 @@ function handleReferidoSubmit(e) {
     }
 }
 
+// Configurar filtros específicos del docente
+function setupDocenteFilters() {
+    const filtroEstado = document.getElementById('filtroEstado');
+    const filtroCurso = document.getElementById('filtroCurso');
+    const filtroFecha = document.getElementById('filtroFechaReferidos');
+    
+    console.log('Configurando filtros del docente:', {
+        filtroEstado: !!filtroEstado,
+        filtroCurso: !!filtroCurso,
+        filtroFecha: !!filtroFecha
+    });
+    
+    if (filtroEstado) {
+        filtroEstado.addEventListener('change', function() {
+            console.log('Filtro estado cambiado:', this.value);
+            filtrarReferidos();
+        });
+    }
+    
+    if (filtroCurso) {
+        filtroCurso.addEventListener('change', function() {
+            console.log('Filtro curso cambiado:', this.value);
+            filtrarReferidos();
+        });
+    }
+    
+    if (filtroFecha) {
+        filtroFecha.addEventListener('change', function() {
+            console.log('Filtro fecha cambiado:', this.value);
+            filtrarReferidos();
+        });
+    }
+}
+
 // Configurar event listeners del administrador
 function setupAdminEventListeners() {
     // Filtros automáticos para administrador
@@ -951,10 +1081,11 @@ function showDocenteTab(tabName) {
         loadDocenteDashboard();
     } else if (tabName === 'referidos') {
         // Recargar tabla de referidos cuando se accede a esa pestaña
-        const data = getData();
-        const docenteId = currentUser.id;
-        const estudiantesDocente = data.estudiantes.filter(e => e.docenteId === docenteId);
-        loadReferidosTable(estudiantesDocente);
+        // Configurar filtros y aplicar filtros actuales si existen
+        setTimeout(() => {
+            setupDocenteFilters();
+            filtrarReferidos();
+        }, 100);
     } else if (tabName === 'pagos') {
         // Recargar tabla de pagos cuando se accede a esa pestaña
         const data = getData();
@@ -1277,7 +1408,20 @@ function marcarPago(docenteId, monto) {
     data.pagos.push(nuevoPago);
     saveData(data);
     
+    // Recargar dashboard del admin
     loadAdminDashboard();
+    
+    // Si el docente afectado está logueado, actualizar su dashboard también
+    if (currentRole === 'docente' && currentUser && currentUser.id === docenteId) {
+        console.log('Actualizando dashboard del docente después de marcar pago');
+        updateDocenteMetrics();
+        // También actualizar las tablas si están visibles
+        const estudiantesDocente = data.estudiantes.filter(e => e.docenteId === docenteId);
+        const pagosDocente = data.pagos.filter(p => p.docenteId === docenteId);
+        loadReferidosTable(estudiantesDocente);
+        loadPagosTable(pagosDocente);
+    }
+    
     showNotification('Pago marcado como realizado', 'success');
 }
 
@@ -1388,33 +1532,59 @@ function limpiarFiltrosEstudiantes() {
 
 // Filtrar referidos
 function filtrarReferidos() {
-    const filtroEstado = document.getElementById('filtroEstado').value;
-    const filtroCurso = document.getElementById('filtroCurso').value;
-    const filtroFecha = document.getElementById('filtroFecha').value;
+    console.log('=== INICIANDO FILTRADO DE REFERIDOS ===');
+    
+    const filtroEstado = document.getElementById('filtroEstado')?.value || '';
+    const filtroCurso = document.getElementById('filtroCurso')?.value || '';
+    const filtroFecha = document.getElementById('filtroFechaReferidos')?.value || '';
+    
+    console.log('Filtros aplicados:', { filtroEstado, filtroCurso, filtroFecha });
+    console.log('Usuario actual:', currentUser);
+    
+    if (!currentUser || !currentUser.id) {
+        console.error('No hay usuario actual o ID de usuario');
+        return;
+    }
     
     const data = getData();
+    console.log('Datos obtenidos:', data);
+    
     let estudiantesFiltrados = data.estudiantes.filter(e => e.docenteId === currentUser.id);
+    console.log('Estudiantes del docente antes del filtrado:', estudiantesFiltrados.length);
+    console.log('Estudiantes del docente:', estudiantesFiltrados);
     
     if (filtroEstado) {
         estudiantesFiltrados = estudiantesFiltrados.filter(e => e.estado === filtroEstado);
+        console.log('Después de filtrar por estado:', estudiantesFiltrados.length);
     }
     
     if (filtroCurso) {
         estudiantesFiltrados = estudiantesFiltrados.filter(e => e.curso === filtroCurso);
+        console.log('Después de filtrar por curso:', estudiantesFiltrados.length);
     }
     
     if (filtroFecha) {
         estudiantesFiltrados = estudiantesFiltrados.filter(e => e.fecha === filtroFecha);
+        console.log('Después de filtrar por fecha:', estudiantesFiltrados.length);
     }
     
+    console.log('Estudiantes filtrados finales:', estudiantesFiltrados.length);
+    console.log('Estudiantes filtrados:', estudiantesFiltrados);
+    
     loadReferidosTable(estudiantesFiltrados);
+    console.log('=== FILTRADO COMPLETADO ===');
 }
 
 // Limpiar filtros de referidos
 function limpiarFiltrosReferidos() {
-    document.getElementById('filtroEstado').value = '';
-    document.getElementById('filtroCurso').value = '';
-    document.getElementById('filtroFecha').value = '';
+    const filtroEstado = document.getElementById('filtroEstado');
+    const filtroCurso = document.getElementById('filtroCurso');
+    const filtroFecha = document.getElementById('filtroFechaReferidos');
+    
+    if (filtroEstado) filtroEstado.value = '';
+    if (filtroCurso) filtroCurso.value = '';
+    if (filtroFecha) filtroFecha.value = '';
+    
     loadDocenteDashboard();
     showNotification('Filtros limpiados', 'info');
 }
@@ -1776,7 +1946,22 @@ function marcarComoInscrito(estudianteId) {
         updatePaymentStatusForTeacher(estudiante.docenteId);
         
         saveData(data);
+        
+        // Recargar dashboard del admin
         loadAdminDashboard();
+        
+        // Si el docente afectado está logueado, actualizar su dashboard también
+        if (currentRole === 'docente' && currentUser && currentUser.id === estudiante.docenteId) {
+            console.log('Actualizando dashboard del docente después de inscribir estudiante');
+            updateDocenteMetrics();
+            // También actualizar las tablas si están visibles
+            const data = getData();
+            const estudiantesDocente = data.estudiantes.filter(e => e.docenteId === estudiante.docenteId);
+            const pagosDocente = data.pagos.filter(p => p.docenteId === estudiante.docenteId);
+            loadReferidosTable(estudiantesDocente);
+            loadPagosTable(pagosDocente);
+        }
+        
         showNotification('Estudiante marcado como inscrito', 'success');
     }
 }
