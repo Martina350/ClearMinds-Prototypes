@@ -5,6 +5,9 @@ class EcoSolutionApp {
         this.currentView = 'services';
         this.currentService = null;
         this.bookingData = null;
+        this.currentRescheduleBookingId = null;
+        this.selectedServiceCountry = null;
+        this.initialSelection = null;
         
         // Base de datos quemada
         this.database = {
@@ -357,7 +360,10 @@ class EcoSolutionApp {
         this.setupEventListeners();
         this.updateNotificationCounts();
         this.setupMobileToggle();
-        // No cargar servicios aquí, se cargarán cuando el usuario se loguee
+        
+        // Mostrar servicios públicamente al inicio
+        this.showScreen('client');
+        this.loadServices();
     }
 
     hideLoadingScreen() {
@@ -427,9 +433,19 @@ class EcoSolutionApp {
             this.handleLogin();
         });
 
-        document.getElementById('registerFormElement')?.addEventListener('submit', (e) => {
+        document.getElementById('initialSelectionForm')?.addEventListener('submit', (e) => {
             e.preventDefault();
-            this.handleRegister();
+            this.handleInitialSelection();
+        });
+
+        document.getElementById('clientRegisterFormElement')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.handleClientRegister();
+        });
+
+        document.getElementById('companyRegisterFormElement')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.handleCompanyRegister();
         });
 
         document.getElementById('adminLoginFormElement')?.addEventListener('submit', (e) => {
@@ -452,10 +468,6 @@ class EcoSolutionApp {
             });
         });
 
-        // Service filter
-        document.getElementById('serviceFilter')?.addEventListener('change', (e) => {
-            this.filterServices(e.target.value);
-        });
 
         // Status filters
         document.querySelectorAll('.filter-btn').forEach(btn => {
@@ -542,9 +554,27 @@ class EcoSolutionApp {
             this.handleTransferPayment();
         });
 
-        // Client type change handler
-        document.getElementById('clientType')?.addEventListener('change', (e) => {
-            this.updateServiceDuration();
+
+
+        // Reschedule modal
+        document.getElementById('closeRescheduleModal')?.addEventListener('click', () => {
+            this.closeModal('rescheduleModal');
+        });
+
+        document.getElementById('rescheduleForm')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.handleReschedule();
+        });
+
+        // Botones de volver en registro
+        document.getElementById('backToInitialSelection')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.showAuthForm('register');
+        });
+
+        document.getElementById('backToInitialSelectionCompany')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.showAuthForm('register');
         });
     }
 
@@ -552,15 +582,30 @@ class EcoSolutionApp {
         // Hide all forms
         document.querySelectorAll('.auth-form').forEach(form => {
             form.classList.remove('active');
+            form.style.display = 'none';
         });
+
+        // Limpiar indicadores de preselección
+        this.clearPreselectionIndicators();
 
         // Show selected form
         if (formType === 'login') {
             document.getElementById('loginForm').classList.add('active');
+            document.getElementById('loginForm').style.display = 'block';
         } else if (formType === 'register') {
             document.getElementById('registerForm').classList.add('active');
+            document.getElementById('registerForm').style.display = 'block';
         } else if (formType === 'admin') {
             document.getElementById('adminLoginForm').classList.add('active');
+            document.getElementById('adminLoginForm').style.display = 'block';
+        }
+    }
+
+    clearPreselectionIndicators() {
+        const countrySelect = document.getElementById('registerCountry');
+        if (countrySelect) {
+            countrySelect.style.backgroundColor = '';
+            countrySelect.style.borderColor = '';
         }
     }
 
@@ -578,6 +623,10 @@ class EcoSolutionApp {
             this.currentUser = user;
             this.showScreen('client');
             this.loadUserData();
+            
+            // Mostrar botones de navegación después del login
+            this.showNavigationButtons();
+            
             this.loadServices(); // Cargar servicios filtrados por país y zona
             this.showToast('¡Bienvenido!', 'success');
         } else {
@@ -585,20 +634,94 @@ class EcoSolutionApp {
         }
     }
 
-    async handleRegister() {
-        const formData = {
-            country: document.getElementById('registerCountry').value,
-            name: document.getElementById('registerName').value,
-            email: document.getElementById('registerEmail').value,
-            phone: document.getElementById('registerPhone').value,
-            address: document.getElementById('registerAddress').value,
-            city: document.getElementById('registerCity').value,
-            state: document.getElementById('registerState').value,
-            password: document.getElementById('registerPassword').value
-        };
+    handleInitialSelection() {
+        const userType = document.getElementById('registerUserType').value;
+        const country = document.getElementById('registerCountry').value;
 
         // Validate required fields
-        if (!formData.country || !formData.name || !formData.email || !formData.password) {
+        if (!userType || !country) {
+            this.showToast('Por favor selecciona tipo de usuario y país', 'error');
+            return;
+        }
+
+        // Guardar selección inicial
+        this.initialSelection = { userType, country };
+
+        // Mostrar formulario correspondiente
+        if (userType === 'cliente') {
+            this.showClientRegisterForm();
+        } else if (userType === 'empresa') {
+            this.showCompanyRegisterForm();
+        }
+    }
+
+    showClientRegisterForm() {
+        // Hide all forms
+        document.querySelectorAll('.auth-form').forEach(form => {
+            form.classList.remove('active');
+            form.style.display = 'none';
+        });
+
+        // Show client form
+        document.getElementById('clientRegisterForm').classList.add('active');
+        document.getElementById('clientRegisterForm').style.display = 'block';
+    }
+
+    showCompanyRegisterForm() {
+        // Hide all forms
+        document.querySelectorAll('.auth-form').forEach(form => {
+            form.classList.remove('active');
+            form.style.display = 'none';
+        });
+
+        // Show company form
+        document.getElementById('companyRegisterForm').classList.add('active');
+        document.getElementById('companyRegisterForm').style.display = 'block';
+    }
+
+    async handleClientRegister() {
+        const formData = {
+            userType: 'cliente',
+            country: this.initialSelection.country,
+            name: document.getElementById('clientRegisterName').value,
+            email: document.getElementById('clientRegisterEmail').value,
+            phone: document.getElementById('clientRegisterPhone').value,
+            address: document.getElementById('clientRegisterAddress').value,
+            city: document.getElementById('clientRegisterCity').value,
+            state: document.getElementById('clientRegisterState').value,
+            password: document.getElementById('clientRegisterPassword').value
+        };
+
+        await this.processRegistration(formData);
+    }
+
+    async handleCompanyRegister() {
+        const formData = {
+            userType: 'empresa',
+            country: this.initialSelection.country,
+            name: document.getElementById('companyRegisterName').value,
+            email: document.getElementById('companyRegisterEmail').value,
+            phone: document.getElementById('companyRegisterPhone').value,
+            companyType: document.getElementById('companyRegisterType').value,
+            locationsCount: document.getElementById('companyRegisterLocationsCount').value,
+            address: document.getElementById('companyRegisterAddress').value,
+            city: document.getElementById('companyRegisterCity').value,
+            state: document.getElementById('companyRegisterState').value,
+            password: document.getElementById('companyRegisterPassword').value
+        };
+
+        // Validar campos específicos de empresa
+        if (!formData.companyType || !formData.locationsCount) {
+            this.showToast('Por favor completa todos los campos de empresa', 'error');
+            return;
+        }
+
+        await this.processRegistration(formData);
+    }
+
+    async processRegistration(formData) {
+        // Validate required fields
+        if (!formData.name || !formData.email || !formData.password) {
             this.showToast('Por favor completa todos los campos requeridos', 'error');
             return;
         }
@@ -610,21 +733,92 @@ class EcoSolutionApp {
             return;
         }
 
+        // Mapear nombres de países a códigos consistentes
+        const countryMapping = {
+            'Ecuador': 'Ecuador',
+            'Estados Unidos': 'USA',
+            'USA': 'USA',
+            'Canadá': 'Canada',
+            'Canada': 'Canada',
+            'Perú': 'Peru',
+            'Peru': 'Peru'
+        };
+
+        // Verificar que el país mapeado esté en la base de datos
+        const mappedCountry = countryMapping[formData.country] || formData.country;
+        const availableCountries = [...new Set(this.database.services.map(s => s.country))];
+        
+        if (!availableCountries.includes(mappedCountry)) {
+            this.showToast('Error: País no válido', 'error');
+            return;
+        }
+
         // Create new user
         const newUser = {
             id: this.database.users.length + 1,
             role: 'client',
             ...formData,
+            country: mappedCountry,
             createdAt: new Date()
         };
 
         this.database.users.push(newUser);
-        try { window.Region?.setRegion(this.mapCountryCode(newUser.country), this.defaultLangForCountry(this.mapCountryCode(newUser.country))); } catch (_) {}
         this.currentUser = newUser;
         this.showScreen('client');
         this.loadUserData();
-        this.loadServices(); // Cargar servicios filtrados por país y zona
+        
+        // Mostrar botones de navegación después del registro
+        this.showNavigationButtons();
+        
+        // Limpiar indicadores de preselección
+        this.clearPreselectionIndicators();
+        
+        // Si había un servicio seleccionado, mostrar solo los servicios de ese país
+        if (this.selectedServiceCountry) {
+            this.filterServicesByCountry(this.selectedServiceCountry);
+            this.selectedServiceCountry = null; // Limpiar la selección
+        } else {
+            // Cargar servicios filtrados por país y zona
+            this.loadServices();
+        }
+        
+        // Asegurar que la vista esté activa
+        setTimeout(() => {
+            this.switchView('services');
+        }, 100);
+        
+        // Forzar recarga de servicios después del registro
+        setTimeout(() => {
+            this.loadServices();
+        }, 500);
+        
         this.showToast('¡Registro exitoso!', 'success');
+    }
+
+    showNavigationButtons() {
+        // Mostrar botones de navegación después del registro
+        const myServicesNav = document.getElementById('myServicesNav');
+        const profileNav = document.getElementById('profileNav');
+        
+        if (myServicesNav) {
+            myServicesNav.style.display = 'block';
+        }
+        if (profileNav) {
+            profileNav.style.display = 'block';
+        }
+    }
+
+    hideNavigationButtons() {
+        // Ocultar botones de navegación al cerrar sesión
+        const myServicesNav = document.getElementById('myServicesNav');
+        const profileNav = document.getElementById('profileNav');
+        
+        if (myServicesNav) {
+            myServicesNav.style.display = 'none';
+        }
+        if (profileNav) {
+            profileNav.style.display = 'none';
+        }
     }
 
     async handleAdminLogin() {
@@ -728,23 +922,53 @@ class EcoSolutionApp {
         const servicesList = document.getElementById('servicesList');
         if (!servicesList) return;
 
+        // Si no hay usuario logueado, mostrar todos los servicios con banderas
+        if (!this.currentUser) {
+            this.loadPublicServices();
+            return;
+        }
+
         const country = this.currentUser?.country || 'Ecuador';
         const userState = this.currentUser?.state;
         
+        console.log('DEBUG - Usuario:', this.currentUser.name, 'País:', country, 'Estado:', userState);
+        console.log('DEBUG - Total servicios en DB:', this.database.services.length);
+        
         // Filtrar servicios por país y disponibilidad en la zona del usuario
-        const services = this.database.services.filter(service => {
-            if (service.country !== country || !service.available) return false;
+        const userServices = this.database.services.filter(service => {
+            console.log(`DEBUG - Servicio: ${service.name} (${service.country}) - Disponible: ${service.available}`);
             
-            // Verificar si el servicio está disponible en la zona del usuario
-            if (userState && service.coverage) {
-                return service.coverage.includes(userState);
+            if (service.country !== country || !service.available) {
+                console.log(`DEBUG - Servicio ${service.name} filtrado: país no coincide o no disponible`);
+                return false;
             }
             
+            // Si no hay estado específico del usuario o el estado es inválido, mostrar todos los servicios del país
+            if (!userState || userState.length <= 1) {
+                console.log(`DEBUG - Servicio ${service.name} incluido: no hay estado específico del usuario o estado inválido`);
+                return true;
+            }
+            
+            // Verificar si el servicio está disponible en la zona del usuario
+            if (service.coverage) {
+                const isInCoverage = service.coverage.includes(userState);
+                console.log(`DEBUG - Servicio ${service.name} - Cobertura: ${service.coverage.join(', ')} - Estado usuario: ${userState} - Incluido: ${isInCoverage}`);
+                return isInCoverage;
+            }
+            
+            console.log(`DEBUG - Servicio ${service.name} incluido: sin restricciones de cobertura`);
             return true;
         });
 
+        console.log('DEBUG - Servicios filtrados:', userServices.length);
+
+        // Agrupar servicios del usuario por nombre
+        const groupedUserServices = this.groupUserServicesByName(userServices);
+        
+        console.log('DEBUG - Servicios agrupados:', groupedUserServices.length);
+
         // Mostrar mensaje si no hay servicios disponibles
-        if (services.length === 0) {
+        if (groupedUserServices.length === 0) {
             servicesList.innerHTML = `
                 <div class="no-services-message">
                     <div class="no-services-icon">🚫</div>
@@ -755,7 +979,7 @@ class EcoSolutionApp {
             return;
         }
 
-        servicesList.innerHTML = services.map(service => `
+        servicesList.innerHTML = groupedUserServices.map(service => `
             <div class="service-card" onclick="app.showServiceDetail('${service.id}')">
                 <div class="service-image">
                     <img src="${this.getServiceImagePath(service)}" alt="${service.name}">
@@ -772,28 +996,141 @@ class EcoSolutionApp {
         `).join('');
     }
 
-    filterServices(country) {
+    loadPublicServices() {
         const servicesList = document.getElementById('servicesList');
         if (!servicesList) return;
 
-        const userState = this.currentUser?.state;
-        
-        let services;
-        if (country === 'all') {
-            services = this.database.services.filter(s => s.available);
-        } else {
-            services = this.database.services.filter(s => s.country === country && s.available);
+        // Agrupar servicios por nombre
+        const groupedServices = this.groupServicesByName();
+
+        if (groupedServices.length === 0) {
+            servicesList.innerHTML = `
+                <div class="no-services-message">
+                    <div class="no-services-icon">🚫</div>
+                    <h3>No hay servicios disponibles</h3>
+                    <p>Próximamente tendremos servicios disponibles.</p>
+                </div>
+            `;
+            return;
         }
 
-        // Filtrar por cobertura de zona si el usuario está logueado
-        if (this.currentUser && userState) {
-            services = services.filter(service => {
-                if (service.coverage) {
-                    return service.coverage.includes(userState);
-                }
-                return true;
-            });
-        }
+        servicesList.innerHTML = groupedServices.map(service => `
+            <div class="service-card" onclick="app.showServiceDetail('${service.id}')">
+                <div class="service-image">
+                    <img src="${this.getServiceImagePath(service)}" alt="${service.name}">
+                    <div class="country-flags">${service.countries.map(country => this.getCountryFlag(country)).join('')}</div>
+                </div>
+                <div class="service-content">
+                    <h3 class="service-name">${service.name}</h3>
+                    <p class="service-description">${service.description}</p>
+                    <div class="service-location">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>${service.countries.join(', ')}</span>
+                    </div>
+                    <div class="service-price">Desde $${service.minPrice}</div>
+                    <div class="service-actions">
+                        <button class="btn btn-primary btn-small">Solicitar Servicio</button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    groupServicesByName() {
+        const services = this.database.services.filter(service => service.available);
+        const grouped = {};
+
+        // Función para normalizar nombres de servicios (agrupar variaciones similares)
+        const normalizeServiceName = (name) => {
+            return name.toLowerCase()
+                .replace(/de|del|la|el|los|las/g, '')
+                .replace(/\s+/g, ' ')
+                .trim();
+        };
+
+        // Agrupar servicios por nombre normalizado
+        services.forEach(service => {
+            const normalizedName = normalizeServiceName(service.name);
+            
+            if (!grouped[normalizedName]) {
+                grouped[normalizedName] = {
+                    id: service.id, // Usar el primer ID encontrado
+                    name: service.name, // Usar el nombre original del primer servicio
+                    description: service.description,
+                    countries: [],
+                    prices: [],
+                    minPrice: service.price,
+                    maxPrice: service.price,
+                    originalServices: []
+                };
+            }
+            
+            // Evitar duplicados de países
+            if (!grouped[normalizedName].countries.includes(service.country)) {
+                grouped[normalizedName].countries.push(service.country);
+                grouped[normalizedName].prices.push(service.price);
+                grouped[normalizedName].minPrice = Math.min(grouped[normalizedName].minPrice, service.price);
+                grouped[normalizedName].maxPrice = Math.max(grouped[normalizedName].maxPrice, service.price);
+            }
+            
+            grouped[normalizedName].originalServices.push(service);
+        });
+
+        // Convertir a array y ordenar por nombre
+        return Object.values(grouped).sort((a, b) => a.name.localeCompare(b.name));
+    }
+
+    groupUserServicesByName(userServices) {
+        const grouped = {};
+
+        // Función para normalizar nombres de servicios (agrupar variaciones similares)
+        const normalizeServiceName = (name) => {
+            return name.toLowerCase()
+                .replace(/de|del|la|el|los|las/g, '')
+                .replace(/\s+/g, ' ')
+                .trim();
+        };
+
+        // Agrupar servicios del usuario por nombre normalizado
+        userServices.forEach(service => {
+            const normalizedName = normalizeServiceName(service.name);
+            
+            if (!grouped[normalizedName]) {
+                grouped[normalizedName] = {
+                    id: service.id, // Usar el primer ID encontrado
+                    name: service.name, // Usar el nombre original del primer servicio
+                    description: service.description,
+                    price: service.price,
+                    duration: service.duration,
+                    originalServices: []
+                };
+            }
+            
+            grouped[normalizedName].originalServices.push(service);
+        });
+
+        // Convertir a array y ordenar por nombre
+        return Object.values(grouped).sort((a, b) => a.name.localeCompare(b.name));
+    }
+
+    getCountryFlag(country) {
+        const flags = {
+            'Ecuador': '🇪🇨',
+            'USA': '🇺🇸',
+            'Canada': '🇨🇦',
+            'Peru': '🇵🇪'
+        };
+        return flags[country] || '🌍';
+    }
+
+    filterServicesByCountry(country) {
+        const servicesList = document.getElementById('servicesList');
+        if (!servicesList) return;
+
+        // Filtrar servicios por país específico
+        const services = this.database.services.filter(service => 
+            service.country === country && service.available
+        );
 
         // Mostrar mensaje si no hay servicios disponibles
         if (services.length === 0) {
@@ -801,7 +1138,7 @@ class EcoSolutionApp {
                 <div class="no-services-message">
                     <div class="no-services-icon">🚫</div>
                     <h3>No hay servicios disponibles</h3>
-                    <p>No hay servicios disponibles en tu zona actual. Próximamente expandiremos nuestra cobertura.</p>
+                    <p>No hay servicios disponibles en ${country}. Próximamente expandiremos nuestra cobertura.</p>
                 </div>
             `;
             return;
@@ -823,24 +1160,82 @@ class EcoSolutionApp {
             </div>
         `).join('');
     }
+
 
     showServiceDetail(serviceId) {
         const service = this.database.services.find(s => s.id === serviceId);
         if (!service) return;
 
+        // Si no hay usuario logueado, redirigir al registro
+        if (!this.currentUser) {
         this.currentService = service;
+            this.selectedServiceCountry = service.country;
+            this.showScreen('auth');
+            this.showAuthForm('register');
+            
+            // Preseleccionar el país del servicio en el formulario de registro
+            setTimeout(() => {
+                const countrySelect = document.getElementById('registerCountry');
+                if (countrySelect) {
+                    // Mapear el país del servicio al valor del select
+                    const countryMapping = {
+                        'Ecuador': 'Ecuador',
+                        'USA': 'USA',
+                        'Canada': 'Canada',
+                        'Peru': 'Peru'
+                    };
+                    const selectValue = countryMapping[service.country] || service.country;
+                    countrySelect.value = selectValue;
+                    
+                    // Agregar indicador visual sutil de preselección
+                    countrySelect.style.backgroundColor = '#e8f5e8';
+                    countrySelect.style.borderColor = '#4CAF50';
+                }
+            }, 100);
+            
+            this.showToast('Por favor regístrate para solicitar este servicio', 'info');
+            return;
+        }
+
+        // Si el usuario está logueado, verificar si el servicio está disponible en su país
+        const userCountry = this.currentUser.country;
+        
+        // Buscar servicios similares por nombre normalizado
+        const normalizeServiceName = (name) => {
+            return name.toLowerCase()
+                .replace(/de|del|la|el|los|las/g, '')
+                .replace(/\s+/g, ' ')
+                .trim();
+        };
+        
+        const normalizedServiceName = normalizeServiceName(service.name);
+        const availableServices = this.database.services.filter(s => 
+            normalizeServiceName(s.name) === normalizedServiceName && 
+            s.country === userCountry && 
+            s.available
+        );
+
+        if (availableServices.length === 0) {
+            this.showToast('Este servicio no está disponible en tu país', 'error');
+            return;
+        }
+
+        // Usar el servicio específico del país del usuario
+        this.currentService = availableServices[0];
 
         // Update modal content
-        document.getElementById('modalServiceName').textContent = service.name;
-        document.getElementById('modalServiceDescription').textContent = service.description;
-        document.getElementById('modalServicePrice').textContent = `$${service.price}`;
-        document.getElementById('modalServiceDuration').textContent = `${service.duration} min`;
+        document.getElementById('modalServiceName').textContent = this.currentService.name;
+        document.getElementById('modalServiceDescription').textContent = this.currentService.description;
+        document.getElementById('modalServicePrice').textContent = `$${this.currentService.price}`;
 
         const modalImg = document.getElementById('modalServiceImage');
         if (modalImg) {
-            modalImg.src = this.getServiceImagePath(service);
-            modalImg.alt = service.name;
+            modalImg.src = this.getServiceImagePath(this.currentService);
+            modalImg.alt = this.currentService.name;
         }
+
+        // Actualizar duración basada en el tipo de usuario
+        this.updateServiceDuration();
 
         // Poblar slots disponibles de fecha y hora en un único select
         this.populateAvailableDateTimes();
@@ -933,11 +1328,12 @@ class EcoSolutionApp {
     }
 
     updateServiceDuration() {
-        const clientType = document.getElementById('clientType').value;
         const durationElement = document.getElementById('modalServiceDuration');
         
-        if (this.currentService && durationElement) {
+        if (this.currentService && durationElement && this.currentUser) {
             let duration = this.currentService.duration;
+            const clientType = this.currentUser.userType === 'empresa' ? 'empresa' : 'casa';
+            
             if (clientType === 'empresa') {
                 duration = Math.round(duration * 1.5); // 50% more time for businesses
             }
@@ -946,7 +1342,6 @@ class EcoSolutionApp {
     }
 
     handleBooking() {
-        const clientType = document.getElementById('clientType').value;
         const combined = document.getElementById('bookingDateTime').value;
         const [date, time] = combined ? combined.split('|') : ['', ''];
 
@@ -954,6 +1349,9 @@ class EcoSolutionApp {
             this.showToast('Por favor selecciona fecha y hora', 'error');
             return;
         }
+
+        // Usar el tipo de usuario del registro
+        const clientType = this.currentUser.userType === 'empresa' ? 'empresa' : 'casa';
 
         this.bookingData = {
             clientType,
@@ -982,7 +1380,34 @@ class EcoSolutionApp {
         document.getElementById('paymentTotal').textContent = `$${total}`;
         document.getElementById('transferAmount').textContent = `$${total}`;
 
+        // Configurar opciones de pago según el país
+        this.configurePaymentOptionsByCountry();
+
         this.showModal('paymentModal');
+    }
+
+    configurePaymentOptionsByCountry() {
+        const transferTab = document.getElementById('transferTab');
+        const cardTab = document.querySelector('[data-method="card"]');
+        
+        // Obtener el país del usuario actual
+        const userCountry = this.currentUser?.country;
+        
+        if (userCountry === 'USA' || userCountry === 'Canada') {
+            // Para USA y Canadá: solo tarjeta (con opción débito/crédito)
+            transferTab.style.display = 'none';
+            cardTab.style.display = 'block';
+            
+            // Activar la pestaña de tarjeta por defecto
+            this.switchPaymentMethod('card');
+        } else {
+            // Para Ecuador y Perú: tarjeta + transferencia
+            transferTab.style.display = 'block';
+            cardTab.style.display = 'block';
+            
+            // Activar la pestaña de tarjeta por defecto
+            this.switchPaymentMethod('card');
+        }
     }
 
     switchPaymentMethod(method) {
@@ -996,10 +1421,16 @@ class EcoSolutionApp {
         document.querySelectorAll('.payment-form').forEach(form => {
             form.classList.remove('active');
         });
-        document.getElementById(`${method}Payment`).classList.add('active');
+        
+        if (method === 'card') {
+            document.getElementById('cardPayment').classList.add('active');
+        } else if (method === 'transfer') {
+            document.getElementById('transferPayment').classList.add('active');
+        }
     }
 
     handleCardPayment() {
+        const cardType = document.getElementById('cardType').value;
         const cardData = {
             number: document.getElementById('cardNumber').value,
             expiry: document.getElementById('cardExpiry').value,
@@ -1009,7 +1440,7 @@ class EcoSolutionApp {
 
         // Simulate card validation
         if (cardData.number && cardData.expiry && cardData.cvc && cardData.holder) {
-            this.processPayment('card', cardData);
+            this.processPayment(cardType, cardData);
         } else {
             this.showToast('Por favor completa todos los campos de la tarjeta', 'error');
         }
@@ -1035,11 +1466,11 @@ class EcoSolutionApp {
             client_type: this.bookingData.clientType,
             date: this.bookingData.date,
             time: this.bookingData.time,
-            status: method === 'card' ? 'confirmado' : 'pendiente',
+            status: (method === 'debit' || method === 'credit') ? 'confirmado' : 'pendiente',
             payment: {
                 method: method,
                 proof: data.proof || null,
-                status: method === 'card' ? 'approved' : 'pending'
+                status: (method === 'debit' || method === 'credit') ? 'approved' : 'pending'
             },
             technician_id: null,
             notes: '',
@@ -1050,7 +1481,7 @@ class EcoSolutionApp {
         
         this.closeModal('paymentModal');
         this.showToast(
-            method === 'card' 
+            (method === 'debit' || method === 'credit')
                 ? '¡Pago procesado exitosamente! Servicio confirmado.' 
                 : '¡Comprobante enviado! Esperando validación del pago.',
             'success'
@@ -1063,6 +1494,13 @@ class EcoSolutionApp {
         // Update views
         this.loadMyServices();
         this.updateNotificationCounts();
+        
+        // Limpiar cualquier estado inconsistente
+        this.selectedServiceCountry = null;
+        this.initialSelection = null;
+        
+        // Recargar servicios para asegurar que se muestren correctamente
+        this.loadServices();
     }
 
     loadMyServices() {
@@ -1090,8 +1528,8 @@ class EcoSolutionApp {
                         <p><strong>Pago:</strong> ${booking.payment.method === 'card' ? 'Tarjeta' : 'Transferencia'} - ${booking.payment.status}</p>
                     </div>
                     <div class="booking-actions">
-                        ${booking.status === 'pendiente' ? `
-                            <button class="btn btn-secondary btn-small" onclick="app.cancelBooking('${booking.id}')">Cancelar</button>
+                        ${booking.status === 'pendiente' || booking.status === 'confirmado' ? `
+                            <button class="btn btn-primary btn-small" onclick="app.showRescheduleModal('${booking.id}')">Reagendar</button>
                         ` : ''}
                     </div>
                 </div>
@@ -1130,8 +1568,8 @@ class EcoSolutionApp {
                         <p><strong>Pago:</strong> ${booking.payment.method === 'card' ? 'Tarjeta' : 'Transferencia'} - ${booking.payment.status}</p>
                     </div>
                     <div class="booking-actions">
-                        ${booking.status === 'pendiente' ? `
-                            <button class="btn btn-secondary btn-small" onclick="app.cancelBooking('${booking.id}')">Cancelar</button>
+                        ${booking.status === 'pendiente' || booking.status === 'confirmado' ? `
+                            <button class="btn btn-primary btn-small" onclick="app.showRescheduleModal('${booking.id}')">Reagendar</button>
                         ` : ''}
                     </div>
                 </div>
@@ -1139,12 +1577,70 @@ class EcoSolutionApp {
         }).join('');
     }
 
-    cancelBooking(bookingId) {
+    showRescheduleModal(bookingId) {
+        const booking = this.database.bookings.find(b => b.id === bookingId);
+        if (!booking) return;
+
+        const service = this.database.services.find(s => s.id === booking.service_id);
+        if (!service) return;
+
+        // Guardar el ID del booking para el reagendamiento
+        this.currentRescheduleBookingId = bookingId;
+
+        // Actualizar información del modal
+        document.getElementById('rescheduleServiceName').textContent = service.name;
+        document.getElementById('rescheduleCurrentDate').textContent = this.formatDateDisplay(booking.date);
+        document.getElementById('rescheduleCurrentTime').textContent = booking.time;
+
+        // Poblar opciones de reagendamiento
+        this.populateRescheduleOptions(service, booking);
+
+        // Mostrar modal
+        this.showModal('rescheduleModal');
+    }
+
+    populateRescheduleOptions(service, currentBooking) {
+        const select = document.getElementById('rescheduleDateTime');
+        if (!select) return;
+
+        const slots = this.generateAvailableSlots(service, 14);
+        
+        // Filtrar el slot actual
+        const availableSlots = slots.filter(slot => 
+            !(slot.date === currentBooking.date && slot.time === currentBooking.time)
+        );
+
+        if (availableSlots.length === 0) {
+            select.innerHTML = '<option value="" disabled>No hay horarios disponibles</option>';
+            return;
+        }
+
+        select.innerHTML = '<option value="">Seleccionar nueva fecha y hora</option>' +
+            availableSlots.map(({ date, time }) => {
+                const label = `${this.formatDateDisplay(date)} - ${time}`;
+                const value = `${date}|${time}`;
+                return `<option value="${value}">${label}</option>`;
+            }).join('');
+    }
+
+    handleReschedule() {
+        const bookingId = this.currentRescheduleBookingId;
+        const combined = document.getElementById('rescheduleDateTime').value;
+        const [date, time] = combined ? combined.split('|') : ['', ''];
+
+        if (!date || !time) {
+            this.showToast('Por favor selecciona una nueva fecha y hora', 'error');
+            return;
+        }
+
         const booking = this.database.bookings.find(b => b.id === bookingId);
         if (booking) {
-            booking.status = 'cancelado';
+            booking.date = date;
+            booking.time = time;
+            booking.status = 'pendiente'; // Resetear a pendiente para nueva confirmación
             this.loadMyServices();
-            this.showToast('Servicio cancelado', 'success');
+            this.closeModal('rescheduleModal');
+            this.showToast('Servicio reagendado exitosamente', 'success');
         }
     }
 
@@ -1702,6 +2198,10 @@ class EcoSolutionApp {
         this.currentUser = null;
         this.currentService = null;
         this.bookingData = null;
+        
+        // Ocultar botones de navegación al cerrar sesión
+        this.hideNavigationButtons();
+        
         this.showScreen('auth');
         this.showAuthForm('login');
         this.showToast('Sesión cerrada', 'info');

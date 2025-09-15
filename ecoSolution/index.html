@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-i18n="app.title">EcoSolution</title>
+    <title>EcoSolution</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
@@ -27,9 +27,9 @@
         <div id="authScreen" class="screen active">
             <div class="auth-container">
                 <div class="logo">
-                    <i class="fas fa-leaf"></i>
-                    <h1 data-i18n="app.title">EcoSolution</h1>
-                    <p data-i18n="app.subtitle">Servicios de Sanidad Ambiental</p>
+                    <div class="logo-container">
+                        <img src="images/logo.jfif" alt="EcoSolution Logo" class="logo-image">
+                    </div>
                 </div>
                 
                 <!-- Login Form -->
@@ -55,10 +55,18 @@
                     </div>
                 </div>
 
-                <!-- Register Form -->
+                <!-- Initial Selection Form -->
                 <div id="registerForm" class="auth-form">
                     <h2>Crear Cuenta</h2>
-                    <form id="registerFormElement">
+                    <form id="initialSelectionForm">
+                        <div class="input-group">
+                            <i class="fas fa-user-tag"></i>
+                            <select id="registerUserType" required>
+                                <option value="">Tipo de usuario</option>
+                                <option value="cliente">Cliente</option>
+                                <option value="empresa">Empresa</option>
+                            </select>
+                        </div>
                         <div class="input-group">
                             <i class="fas fa-globe"></i>
                             <select id="registerCountry" required>
@@ -69,39 +77,102 @@
                                 <option value="Peru">Perú</option>
                             </select>
                         </div>
-                        <div class="input-group">
-                            <i class="fas fa-user"></i>
-                            <input type="text" id="registerName" placeholder="Nombre completo" required>
-                        </div>
-                        <div class="input-group">
-                            <i class="fas fa-envelope"></i>
-                            <input type="email" id="registerEmail" placeholder="Correo electrónico" required>
-                        </div>
-                        <div class="input-group">
-                            <i class="fas fa-phone"></i>
-                            <input type="tel" id="registerPhone" placeholder="Teléfono" required>
-                        </div>
-                        <div class="input-group">
-                            <i class="fas fa-map-marker-alt"></i>
-                            <input type="text" id="registerAddress" placeholder="Dirección" required>
-                        </div>
-                        <div class="input-group">
-                            <i class="fas fa-city"></i>
-                            <input type="text" id="registerCity" placeholder="Ciudad" required>
-                        </div>
-                        <div class="input-group">
-                            <i class="fas fa-flag"></i>
-                            <input type="text" id="registerState" placeholder="Estado/Provincia" required>
-                        </div>
-                        <div class="input-group">
-                            <i class="fas fa-lock"></i>
-                            <input type="password" id="registerPassword" placeholder="Contraseña" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Registrarse</button>
+                        <button type="submit" class="btn btn-primary">Continuar</button>
                     </form>
                     <p class="auth-switch">
                         ¿Ya tienes cuenta? 
                         <a href="#" id="showLogin">Inicia sesión aquí</a>
+                    </p>
+                </div>
+
+                <!-- Client Registration Form -->
+                <div id="clientRegisterForm" class="auth-form" style="display: none;">
+                    <h2>Registro de Cliente</h2>
+                    <form id="clientRegisterFormElement">
+                        <div class="input-group">
+                            <i class="fas fa-user"></i>
+                            <input type="text" id="clientRegisterName" placeholder="Nombre completo" required>
+                        </div>
+                        <div class="input-group">
+                            <i class="fas fa-envelope"></i>
+                            <input type="email" id="clientRegisterEmail" placeholder="Correo electrónico" required>
+                        </div>
+                        <div class="input-group">
+                            <i class="fas fa-phone"></i>
+                            <input type="tel" id="clientRegisterPhone" placeholder="Teléfono" required>
+                        </div>
+                        <div class="input-group">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <input type="text" id="clientRegisterAddress" placeholder="Dirección" required>
+                        </div>
+                        <div class="input-group">
+                            <i class="fas fa-city"></i>
+                            <input type="text" id="clientRegisterCity" placeholder="Ciudad" required>
+                        </div>
+                        <div class="input-group">
+                            <i class="fas fa-flag"></i>
+                            <input type="text" id="clientRegisterState" placeholder="Estado/Provincia" required>
+                        </div>
+                        <div class="input-group">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="clientRegisterPassword" placeholder="Contraseña" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Registrarse</button>
+                    </form>
+                    <p class="auth-switch">
+                        <a href="#" id="backToInitialSelection">← Volver a selección</a>
+                    </p>
+                </div>
+
+                <!-- Company Registration Form -->
+                <div id="companyRegisterForm" class="auth-form" style="display: none;">
+                    <h2>Registro de Empresa</h2>
+                    <form id="companyRegisterFormElement">
+                        <div class="input-group">
+                            <i class="fas fa-user"></i>
+                            <input type="text" id="companyRegisterName" placeholder="Nombre de la empresa" required>
+                        </div>
+                        <div class="input-group">
+                            <i class="fas fa-envelope"></i>
+                            <input type="email" id="companyRegisterEmail" placeholder="Correo electrónico" required>
+                        </div>
+                        <div class="input-group">
+                            <i class="fas fa-phone"></i>
+                            <input type="tel" id="companyRegisterPhone" placeholder="Teléfono" required>
+                        </div>
+                        <div class="input-group">
+                            <i class="fas fa-building"></i>
+                            <select id="companyRegisterType" required>
+                                <option value="">Tipo de empresa</option>
+                                <option value="comercial">Comercial</option>
+                                <option value="industrial">Industrial</option>
+                                <option value="otro">Otro</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <i class="fas fa-map-marked-alt"></i>
+                            <input type="number" id="companyRegisterLocationsCount" placeholder="Número de ubicaciones" min="1" required>
+                        </div>
+                        <div class="input-group">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <input type="text" id="companyRegisterAddress" placeholder="Dirección principal" required>
+                        </div>
+                        <div class="input-group">
+                            <i class="fas fa-city"></i>
+                            <input type="text" id="companyRegisterCity" placeholder="Ciudad" required>
+                        </div>
+                        <div class="input-group">
+                            <i class="fas fa-flag"></i>
+                            <input type="text" id="companyRegisterState" placeholder="Estado/Provincia" required>
+                        </div>
+                        <div class="input-group">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="companyRegisterPassword" placeholder="Contraseña" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Registrarse</button>
+                    </form>
+                    <p class="auth-switch">
+                        <a href="#" id="backToInitialSelectionCompany">← Volver a selección</a>
                     </p>
                 </div>
 
@@ -131,7 +202,7 @@
             <!-- Header -->
             <header class="app-header">
                 <div class="header-content">
-                    <h1 data-i18n="app.title">EcoSolution</h1>
+                    <h1>EcoSolution</h1>
                     <div class="header-actions">
                         <button id="notificationsBtn" class="btn-icon">
                             <i class="fas fa-bell"></i>
@@ -148,15 +219,15 @@
             <nav class="bottom-nav">
                 <button class="nav-item active" data-view="services">
                     <i class="fas fa-list"></i>
-                    <span data-i18n="nav.services">Servicios</span>
+                    <span>Servicios</span>
                 </button>
-                <button class="nav-item" data-view="myServices">
+                <button class="nav-item" data-view="myServices" id="myServicesNav" style="display: none;">
                     <i class="fas fa-calendar-check"></i>
-                    <span data-i18n="nav.myServices">Mis Servicios</span>
+                    <span>Mis Servicios</span>
                 </button>
-                <button class="nav-item" data-view="profile">
+                <button class="nav-item" data-view="profile" id="profileNav" style="display: none;">
                     <i class="fas fa-user"></i>
-                    <span data-i18n="nav.profile">Perfil</span>
+                    <span>Perfil</span>
                 </button>
             </nav>
 
@@ -165,16 +236,7 @@
                 <!-- Services View -->
                 <div id="servicesView" class="view active">
                     <div class="view-header">
-                        <h2 data-i18n="services.heading">Nuestros Servicios</h2>
-                        <div class="filter-controls">
-                            <select id="serviceFilter">
-                                <option value="all">Todos los servicios</option>
-                                <option value="Ecuador">Ecuador</option>
-                                <option value="USA">Estados Unidos</option>
-                                <option value="Canada">Canadá</option>
-                                <option value="Peru">Perú</option>
-                            </select>
-                        </div>
+                        <h2>Nuestros Servicios</h2>
                     </div>
                     <div id="servicesList" class="services-grid">
                         <!-- Services will be loaded here -->
@@ -213,7 +275,7 @@
                         </button>
                         <button class="action-btn" id="profileLangBtn" title="Idioma">
                             <i class="fas fa-globe"></i>
-                            <span data-i18n="selector.language">Idioma</span>
+                            <span>Idioma</span>
                         </button>
                         <button class="action-btn" id="logoutBtn">
                             <i class="fas fa-sign-out-alt"></i>
@@ -391,13 +453,6 @@
                 </div>
                 <form id="bookingForm">
                     <div class="form-group">
-                        <label>Tipo de Cliente:</label>
-                        <select id="clientType" required>
-                            <option value="casa">Casa</option>
-                            <option value="empresa">Empresa</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
                         <label>Fechas y horas disponibles:</label>
                         <select id="bookingDateTime" required>
                             <option value="">Seleccionar fecha y hora</option>
@@ -450,6 +505,32 @@
         </div>
     </div>
 
+    <!-- Reschedule Modal -->
+    <div id="rescheduleModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Reagendar Servicio</h3>
+                <button class="close-btn" id="closeRescheduleModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="reschedule-info">
+                    <h4 id="rescheduleServiceName">Servicio</h4>
+                    <p><strong>Fecha actual:</strong> <span id="rescheduleCurrentDate"></span></p>
+                    <p><strong>Hora actual:</strong> <span id="rescheduleCurrentTime"></span></p>
+                </div>
+                <form id="rescheduleForm">
+                    <div class="form-group">
+                        <label>Nueva fecha y hora:</label>
+                        <select id="rescheduleDateTime" required>
+                            <option value="">Seleccionar nueva fecha y hora</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Confirmar Reagendamiento</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Payment Modal -->
     <div id="paymentModal" class="modal">
         <div class="modal-content">
@@ -479,14 +560,21 @@
                 </div>
                 
                 <div class="payment-methods">
-                    <div class="payment-tabs">
+                    <div class="payment-tabs" id="paymentTabs">
                         <button class="payment-tab active" data-method="card">Tarjeta</button>
-                        <button class="payment-tab" data-method="transfer">Transferencia</button>
+                        <button class="payment-tab" data-method="transfer" id="transferTab" style="display: none;">Transferencia</button>
                     </div>
                     
                     <!-- Card Payment -->
                     <div id="cardPayment" class="payment-form active">
                         <form id="cardPaymentForm">
+                            <div class="form-group">
+                                <label>Tipo de Tarjeta:</label>
+                                <select id="cardType" required>
+                                    <option value="debit">Tarjeta Débito</option>
+                                    <option value="credit">Tarjeta Crédito</option>
+                                </select>
+                            </div>
                             <div class="form-group">
                                 <label>Número de Tarjeta:</label>
                                 <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" required>
@@ -535,88 +623,10 @@
 
     <!-- Scripts -->
     <script type="module">
-        import { resolveRegion, setRegion, COUNTRY_LANGS, getRegion } from './region.js';
-        import { initI18n, applyTranslations } from './i18n.js';
         import { applyFeatureFlags } from './helpers.js';
 
-        // UI simple para seleccionar país/idioma
-        const selector = document.createElement('div');
-        selector.className = 'region-selector';
-        selector.innerHTML = `
-            <div class="region-controls">
-                <label><span data-i18n="selector.country">País</span>
-                    <select id="regionCountry">
-                        <option value="US">US</option>
-                        <option value="CA">CA</option>
-                        <option value="PE">PE</option>
-                        <option value="EC">EC</option>
-                    </select>
-                </label>
-                <label><span data-i18n="selector.language">Idioma</span>
-                    <select id="regionLang"></select>
-                </label>
-                <button id="regionSave" class="btn btn-small" data-i18n="btn.save">Guardar</button>
-            </div>
-        `;
-        document.body.appendChild(selector);
-        selector.style.display = 'none';
-        selector.style.position = 'fixed';
-        selector.style.zIndex = '10000';
-        // Botón flotante global para idioma
-        // Nota: FAB global removido; ahora se usa el botón dentro del Perfil
-
-        function populateLangs(country, currentLang) {
-            const select = document.getElementById('regionLang');
-            select.innerHTML = '';
-            (COUNTRY_LANGS[country] || ['en-US']).forEach(code => {
-                const opt = document.createElement('option');
-                opt.value = code; opt.textContent = code;
-                if (code === currentLang) opt.selected = true;
-                select.appendChild(opt);
-            });
-        }
-
-        async function bootstrapRegion() {
-            const region = resolveRegion();
-            await initI18n();
-            applyTranslations();
-            applyFeatureFlags();
-
-            document.getElementById('regionCountry').value = region.country;
-            populateLangs(region.country, region.lang);
-
-            document.getElementById('regionCountry').addEventListener('change', (e) => {
-                populateLangs(e.target.value, (COUNTRY_LANGS[e.target.value]||[])[0]);
-            });
-
-            document.getElementById('regionSave').addEventListener('click', async () => {
-                const c = document.getElementById('regionCountry').value;
-                const l = document.getElementById('regionLang').value;
-                setRegion(c, l);
-                selector.style.display = 'none';
-            });
-
-            document.addEventListener('i18n:change', () => {
-                applyTranslations();
-            });
-
-            document.addEventListener('region:prompt', (e) => {
-                const region = getRegion();
-                document.getElementById('regionCountry').value = region.country;
-                populateLangs(region.country, region.lang);
-                selector.style.display = 'block';
-                if (e?.detail?.anchorRect) {
-                    const rect = e.detail.anchorRect;
-                    selector.style.top = Math.round((rect.bottom + 8)) + 'px';
-                    selector.style.left = Math.round((rect.left)) + 'px';
-                } else {
-                    selector.style.bottom = '16px';
-                    selector.style.right = '16px';
-                }
-            });
-        }
-
-        bootstrapRegion();
+        // Inicializar funcionalidades básicas
+        applyFeatureFlags();
     </script>
     <script src="app.js"></script>
 </body>
