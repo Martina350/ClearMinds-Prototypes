@@ -935,41 +935,28 @@ class EcoSolutionApp {
         const country = this.currentUser?.country || 'Ecuador';
         const userState = this.currentUser?.state;
         
-        console.log('DEBUG - Usuario:', this.currentUser.name, 'País:', country, 'Estado:', userState);
-        console.log('DEBUG - Total servicios en DB:', this.database.services.length);
-        
         // Filtrar servicios por país y disponibilidad en la zona del usuario
         const userServices = this.database.services.filter(service => {
-            console.log(`DEBUG - Servicio: ${service.name} (${service.country}) - Disponible: ${service.available}`);
-            
             if (service.country !== country || !service.available) {
-                console.log(`DEBUG - Servicio ${service.name} filtrado: país no coincide o no disponible`);
                 return false;
             }
             
             // Si no hay estado específico del usuario o el estado es inválido, mostrar todos los servicios del país
             if (!userState || userState.length <= 1) {
-                console.log(`DEBUG - Servicio ${service.name} incluido: no hay estado específico del usuario o estado inválido`);
                 return true;
             }
             
             // Verificar si el servicio está disponible en la zona del usuario
             if (service.coverage) {
                 const isInCoverage = service.coverage.includes(userState);
-                console.log(`DEBUG - Servicio ${service.name} - Cobertura: ${service.coverage.join(', ')} - Estado usuario: ${userState} - Incluido: ${isInCoverage}`);
                 return isInCoverage;
             }
             
-            console.log(`DEBUG - Servicio ${service.name} incluido: sin restricciones de cobertura`);
             return true;
         });
 
-        console.log('DEBUG - Servicios filtrados:', userServices.length);
-
         // Agrupar servicios del usuario por nombre
         const groupedUserServices = this.groupUserServicesByName(userServices);
-        
-        console.log('DEBUG - Servicios agrupados:', groupedUserServices.length);
 
         // Mostrar mensaje si no hay servicios disponibles
         if (groupedUserServices.length === 0) {
