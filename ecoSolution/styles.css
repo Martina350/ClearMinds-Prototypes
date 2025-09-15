@@ -221,7 +221,8 @@ body {
     .app-container.mobile-view .auth-container {
         height: 812px;
         min-height: 812px;
-        padding: 30px 20px;
+        padding: 20px 20px;
+        padding-top: 30px;
     }
     
     .app-container.mobile-view .main-content {
@@ -279,30 +280,38 @@ body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
     padding: 20px;
+    padding-top: 40px;
     background: linear-gradient(135deg, #134E5E 0%, #71B280 100%);
+}
+
+/* Contenedor específico para formulario de selección inicial */
+.auth-container:has(.initial-selection-form) {
+    justify-content: center;
+    padding-top: 20px;
 }
 
 @media (min-width: 768px) {
     .auth-container {
         height: 812px;
         min-height: 812px;
-        padding: 30px 20px;
+        padding: 20px 20px;
+        padding-top: 30px;
     }
 }
 
 .logo {
     text-align: center;
     color: white;
-    margin-bottom: 40px;
+    margin-bottom: 20px;
 }
 
 .logo-container {
     display: flex;
     justify-content: center;
-    margin-bottom: 35px;
+    margin-bottom: 15px;
 }
 
 .logo-image {
@@ -327,11 +336,11 @@ body {
 
 .auth-form {
     background: white;
-    padding: 40px;
-    border-radius: 20px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
     width: 100%;
-    max-width: 400px;
+    max-width: 350px;
     display: none;
 }
 
@@ -341,20 +350,20 @@ body {
 
 .auth-form h2 {
     text-align: center;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
     color: #333;
-    font-size: 1.8rem;
+    font-size: 1.5rem;
 }
 
 
 .input-group {
     position: relative;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
 }
 
 .input-group i {
     position: absolute;
-    left: 15px;
+    left: 12px;
     top: 50%;
     transform: translateY(-50%);
     color: #666;
@@ -364,10 +373,10 @@ body {
 .input-group input,
 .input-group select {
     width: 100%;
-    padding: 15px 15px 15px 45px;
+    padding: 10px 10px 10px 40px;
     border: 2px solid #e0e0e0;
-    border-radius: 10px;
-    font-size: 16px;
+    border-radius: 8px;
+    font-size: 14px;
     transition: border-color 0.3s ease;
     background: #f9f9f9;
 }
@@ -381,10 +390,10 @@ body {
 
 .btn {
     width: 100%;
-    padding: 15px;
+    padding: 12px;
     border: none;
-    border-radius: 10px;
-    font-size: 16px;
+    border-radius: 8px;
+    font-size: 14px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -413,7 +422,7 @@ body {
 
 .auth-switch {
     text-align: center;
-    margin-top: 20px;
+    margin-top: 15px;
     color: #666;
 }
 
@@ -421,6 +430,82 @@ body {
     color: #4CAF50;
     text-decoration: none;
     font-weight: 600;
+}
+
+/* Estilos específicos para formulario de selección inicial */
+.initial-selection-form {
+    max-width: 350px !important;
+    padding: 30px !important;
+}
+
+.initial-selection-form h2 {
+    font-size: 1.6rem !important;
+    margin-bottom: 25px !important;
+}
+
+.initial-selection-form .input-group {
+    margin-bottom: 18px !important;
+}
+
+.initial-selection-form .input-group input,
+.initial-selection-form .input-group select {
+    padding: 12px 12px 12px 45px !important;
+    font-size: 15px !important;
+    border-radius: 8px !important;
+}
+
+.initial-selection-form .input-group i {
+    left: 12px !important;
+    font-size: 14px !important;
+}
+
+.initial-selection-form .btn {
+    padding: 14px !important;
+    font-size: 15px !important;
+    border-radius: 8px !important;
+}
+
+.initial-selection-form .auth-switch {
+    margin-top: 18px !important;
+    font-size: 14px !important;
+}
+
+/* Estilos específicos para formulario de empresa */
+.company-form {
+    max-width: 320px !important;
+    padding: 20px !important;
+}
+
+.company-form h2 {
+    font-size: 1.3rem !important;
+    margin-bottom: 15px !important;
+}
+
+.company-form .input-group {
+    margin-bottom: 12px !important;
+}
+
+.company-form .input-group input,
+.company-form .input-group select {
+    padding: 8px 8px 8px 35px !important;
+    font-size: 13px !important;
+    border-radius: 6px !important;
+}
+
+.company-form .input-group i {
+    left: 10px !important;
+    font-size: 12px !important;
+}
+
+.company-form .btn {
+    padding: 10px !important;
+    font-size: 13px !important;
+    border-radius: 6px !important;
+}
+
+.company-form .auth-switch {
+    margin-top: 12px !important;
+    font-size: 13px !important;
 }
 
 .auth-switch a:hover {
@@ -1451,8 +1536,18 @@ body {
 /* Responsive Design */
 @media (max-width: 768px) {
     .auth-form {
-        padding: 30px 20px;
+        padding: 20px 15px;
         margin: 0 10px;
+    }
+    
+    .company-form {
+        padding: 15px 12px !important;
+        max-width: 300px !important;
+    }
+    
+    .initial-selection-form {
+        padding: 25px 20px !important;
+        max-width: 320px !important;
     }
     
     .services-grid {
