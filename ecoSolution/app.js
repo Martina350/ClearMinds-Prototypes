@@ -79,6 +79,7 @@ class EcoSolutionApp {
                 }
             ],
             services: [
+                // ECUADOR
                 {
                     id: 's1',
                     country: 'Ecuador',
@@ -112,6 +113,7 @@ class EcoSolutionApp {
                     image: '🛠️',
                     available: true
                 },
+                // USA
                 {
                     id: 's4',
                     country: 'USA',
@@ -145,41 +147,9 @@ class EcoSolutionApp {
                     image: '🚽',
                     available: true
                 },
+                // PERÚ
                 {
                     id: 's7',
-                    country: 'Canada',
-                    name: 'Limpieza de Contenedores',
-                    description: 'Servicio de limpieza y desinfección de contenedores de basura comerciales y residenciales.',
-                    price: 90,
-                    duration: 45,
-                    coverage: ['ON', 'BC', 'AB', 'QC'],
-                    image: '🗑️',
-                    available: true
-                },
-                {
-                    id: 's8',
-                    country: 'Canada',
-                    name: 'Recolección de Residuos',
-                    description: 'Recolección especializada de residuos industriales y de construcción.',
-                    price: 250,
-                    duration: 120,
-                    coverage: ['ON', 'BC', 'AB', 'QC', 'MB'],
-                    image: '♻️',
-                    available: true
-                },
-                {
-                    id: 's9',
-                    country: 'Canada',
-                    name: 'Baños Portátiles',
-                    description: 'Alquiler de baños portátiles para eventos, construcciones y emergencias.',
-                    price: 110,
-                    duration: 60,
-                    coverage: ['ON', 'BC', 'AB', 'QC', 'MB', 'SK'],
-                    image: '🚽',
-                    available: true
-                },
-                {
-                    id: 's10',
                     country: 'Peru',
                     name: 'Baños Portátiles',
                     description: 'Servicio de alquiler de baños portátiles para eventos y construcciones.',
@@ -190,9 +160,9 @@ class EcoSolutionApp {
                     available: true
                 },
                 {
-                    id: 's11',
+                    id: 's8',
                     country: 'Peru',
-                    name: 'Limpieza de Pozos Sépticos',
+                    name: 'Pozos Sépticos',
                     description: 'Limpieza y mantenimiento de pozos sépticos residenciales y comerciales.',
                     price: 120,
                     duration: 90,
@@ -201,14 +171,48 @@ class EcoSolutionApp {
                     available: true
                 },
                 {
-                    id: 's12',
+                    id: 's9',
                     country: 'Peru',
-                    name: 'Recolección de Escombros',
-                    description: 'Recolección y disposición de escombros de construcción y demolición.',
+                    name: 'Trampas de Grasa',
+                    description: 'Instalación y mantenimiento de trampas de grasa para restaurantes y cocinas industriales.',
                     price: 180,
                     duration: 120,
                     coverage: ['Lima', 'Arequipa', 'Cusco'],
+                    image: '🛠️',
+                    available: true
+                },
+                // CANADÁ
+                {
+                    id: 's10',
+                    country: 'Canada',
+                    name: 'Limpieza de Basureros',
+                    description: 'Servicio de limpieza y desinfección de contenedores de basura comerciales y residenciales.',
+                    price: 90,
+                    duration: 45,
+                    coverage: ['ON', 'BC', 'AB', 'QC'],
+                    image: '🗑️',
+                    available: true
+                },
+                {
+                    id: 's11',
+                    country: 'Canada',
+                    name: 'Recolección de Escombros',
+                    description: 'Recolección y disposición de escombros de construcción y demolición.',
+                    price: 250,
+                    duration: 120,
+                    coverage: ['ON', 'BC', 'AB', 'QC', 'MB'],
                     image: '🏗️',
+                    available: true
+                },
+                {
+                    id: 's12',
+                    country: 'Canada',
+                    name: 'Baños Portátiles',
+                    description: 'Alquiler de baños portátiles para eventos, construcciones y emergencias.',
+                    price: 110,
+                    duration: 60,
+                    coverage: ['ON', 'BC', 'AB', 'QC', 'MB', 'SK'],
+                    image: '🚽',
                     available: true
                 }
             ],
@@ -1018,7 +1022,6 @@ class EcoSolutionApp {
             <div class="service-card" onclick="app.showServiceDetail('${service.id}')">
                 <div class="service-image">
                     <img src="${this.getServiceImagePath(service)}" alt="${service.name}">
-                    <div class="country-flags">${service.countries.map(country => this.getCountryFlag(country)).join('')}</div>
                 </div>
                 <div class="service-content">
                     <h3 class="service-name">${service.name}</h3>
