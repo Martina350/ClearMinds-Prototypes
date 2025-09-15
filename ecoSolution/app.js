@@ -1123,6 +1123,21 @@ class EcoSolutionApp {
         return flags[country] || '🌍';
     }
 
+    getPaymentDisplayText(payment) {
+        if (payment.method === 'transfer') {
+            return 'Transferencia';
+        } else if (payment.method === 'card') {
+            if (payment.cardType === 'debit') {
+                return 'Tarjeta Débito';
+            } else if (payment.cardType === 'credit') {
+                return 'Tarjeta Crédito';
+            } else {
+                return 'Tarjeta';
+            }
+        }
+        return 'Pago';
+    }
+
     filterServicesByCountry(country) {
         const servicesList = document.getElementById('servicesList');
         if (!servicesList) return;
@@ -1458,6 +1473,19 @@ class EcoSolutionApp {
     }
 
     processPayment(method, data) {
+        // Determinar el tipo de pago y estado según el método
+        let paymentMethod, paymentStatus, bookingStatus;
+        
+        if (method === 'debit' || method === 'credit') {
+            paymentMethod = 'card';
+            paymentStatus = 'approved';
+            bookingStatus = 'confirmado';
+        } else if (method === 'transfer') {
+            paymentMethod = 'transfer';
+            paymentStatus = 'pending';
+            bookingStatus = 'pendiente';
+        }
+
         // Create booking
         const booking = {
             id: 'b' + (this.database.bookings.length + 1),
@@ -1466,11 +1494,12 @@ class EcoSolutionApp {
             client_type: this.bookingData.clientType,
             date: this.bookingData.date,
             time: this.bookingData.time,
-            status: (method === 'debit' || method === 'credit') ? 'confirmado' : 'pendiente',
+            status: bookingStatus,
             payment: {
-                method: method,
+                method: paymentMethod,
+                cardType: (method === 'debit' || method === 'credit') ? method : null,
                 proof: data.proof || null,
-                status: (method === 'debit' || method === 'credit') ? 'approved' : 'pending'
+                status: paymentStatus
             },
             technician_id: null,
             notes: '',
@@ -1480,10 +1509,16 @@ class EcoSolutionApp {
         this.database.bookings.push(booking);
         
         this.closeModal('paymentModal');
+        // Crear objeto de pago temporal para obtener el texto de visualización
+        const tempPayment = {
+            method: (method === 'debit' || method === 'credit') ? 'card' : 'transfer',
+            cardType: (method === 'debit' || method === 'credit') ? method : null
+        };
+        
         this.showToast(
             (method === 'debit' || method === 'credit')
-                ? '¡Pago procesado exitosamente! Servicio confirmado.' 
-                : '¡Comprobante enviado! Esperando validación del pago.',
+                ? `¡Pago con ${this.getPaymentDisplayText(tempPayment)} procesado exitosamente! Servicio confirmado.` 
+                : '¡Comprobante de transferencia enviado! Esperando validación del pago.',
             'success'
         );
 
@@ -1525,7 +1560,7 @@ class EcoSolutionApp {
                         <p><strong>Fecha:</strong> ${booking.date}</p>
                         <p><strong>Hora:</strong> ${booking.time}</p>
                         <p><strong>Tipo:</strong> ${booking.client_type === 'casa' ? 'Casa' : 'Empresa'}</p>
-                        <p><strong>Pago:</strong> ${booking.payment.method === 'card' ? 'Tarjeta' : 'Transferencia'} - ${booking.payment.status}</p>
+                        <p><strong>Pago:</strong> ${this.getPaymentDisplayText(booking.payment)} - ${booking.payment.status}</p>
                     </div>
                     <div class="booking-actions">
                         ${booking.status === 'pendiente' || booking.status === 'confirmado' ? `
@@ -1565,7 +1600,7 @@ class EcoSolutionApp {
                         <p><strong>Fecha:</strong> ${booking.date}</p>
                         <p><strong>Hora:</strong> ${booking.time}</p>
                         <p><strong>Tipo:</strong> ${booking.client_type === 'casa' ? 'Casa' : 'Empresa'}</p>
-                        <p><strong>Pago:</strong> ${booking.payment.method === 'card' ? 'Tarjeta' : 'Transferencia'} - ${booking.payment.status}</p>
+                        <p><strong>Pago:</strong> ${this.getPaymentDisplayText(booking.payment)} - ${booking.payment.status}</p>
                     </div>
                     <div class="booking-actions">
                         ${booking.status === 'pendiente' || booking.status === 'confirmado' ? `
