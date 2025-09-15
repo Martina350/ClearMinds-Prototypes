@@ -853,9 +853,9 @@ body {
 
 /* Bookings List */
 .bookings-list {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
 }
 
 .booking-card {
@@ -937,9 +937,9 @@ body {
 }
 
 .profile-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
 }
 
 .action-btn {
@@ -1551,6 +1551,14 @@ body {
     }
     
     .services-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .bookings-list {
+        grid-template-columns: 1fr;
+    }
+    
+    .profile-actions {
         grid-template-columns: 1fr;
     }
     
