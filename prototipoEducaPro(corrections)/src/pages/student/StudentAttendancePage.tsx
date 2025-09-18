@@ -291,12 +291,14 @@ export function StudentAttendancePage() {
                   </span>
                 </td>
                 <td>
-                  <button 
-                    className="btn btn-outline-primary btn-sm"
-                    onClick={() => handleViewDetails(a)}
-                  >
-                    <i className="bi bi-eye me-1"></i>Ver
-                  </button>
+                  {a.status !== 'present' && (
+                    <button 
+                      className="btn btn-outline-primary btn-sm"
+                      onClick={() => handleViewDetails(a)}
+                    >
+                      <i className="bi bi-eye me-1"></i>Ver Detalles
+                    </button>
+                  )}
                 </td>
               </tr>
             ))}
@@ -314,27 +316,8 @@ export function StudentAttendancePage() {
                 <button type="button" className="btn-close" onClick={handleCloseModal}></button>
               </div>
               <div className="modal-body">
-                <div className="row">
-                  <div className="col-md-6">
-                    <h6>Información</h6>
-                    <ul className="list-group list-group-flush">
-                      <li className="list-group-item d-flex justify-content-between">
-                        <span>Fecha:</span>
-                        <span>{new Date(selectedAttendance.date).toLocaleDateString()}</span>
-                      </li>
-                      <li className="list-group-item d-flex justify-content-between">
-                        <span>Clase:</span>
-                        <span>{selectedAttendance.classId}</span>
-                      </li>
-                      <li className="list-group-item d-flex justify-content-between">
-                        <span>Estado:</span>
-                        <span className={`badge ${getStatusBadge(selectedAttendance.status)}`}>
-                          {getStatusText(selectedAttendance.status)}
-                        </span>
-                      </li>
-                    </ul>
-                  </div>
-                  <div className="col-md-6">
+                <div className="row justify-content-center">
+                  <div className="col-md-8">
                     <div className="card bg-light">
                       <div className="card-body text-center">
                         <i className={`bi ${selectedAttendance.status === 'present' ? 'bi-check-circle text-success' : selectedAttendance.status === 'late' ? 'bi-clock text-warning' : 'bi-x-circle text-danger'} display-4 mb-3`}></i>
@@ -344,6 +327,29 @@ export function StudentAttendancePage() {
                            selectedAttendance.status === 'late' ? 'Llegaste tarde' : 
                            'No asististe a clase'}
                         </p>
+                        
+                        {/* Descripción de razones para estados específicos */}
+                        {selectedAttendance.status === 'late' && (
+                          <div style={{ marginTop: 'var(--space-4)', padding: 'var(--space-3)', backgroundColor: 'var(--color-warning-50)', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-warning-100)' }}>
+                            <h6 style={{ fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-semibold)', color: 'var(--color-warning-800)', marginBottom: 'var(--space-2)' }}>
+                              Razón del retraso:
+                            </h6>
+                            <p style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-warning-700)', margin: 0, textAlign: 'left' }}>
+                              Tráfico pesado en la avenida principal. El estudiante se comunicó con el docente para informar el retraso.
+                            </p>
+                          </div>
+                        )}
+                        
+                        {selectedAttendance.status === 'absent' && (
+                          <div style={{ marginTop: 'var(--space-4)', padding: 'var(--space-3)', backgroundColor: 'var(--color-danger-50)', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-danger-100)' }}>
+                            <h6 style={{ fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-semibold)', color: 'var(--color-danger-800)', marginBottom: 'var(--space-2)' }}>
+                              Razón de la ausencia:
+                            </h6>
+                            <p style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-danger-700)', margin: 0, textAlign: 'left' }}>
+                              Enfermedad del estudiante. Se presentó justificación médica y se coordinó la recuperación del contenido.
+                            </p>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
