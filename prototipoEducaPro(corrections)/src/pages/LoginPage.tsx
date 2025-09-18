@@ -70,40 +70,42 @@ export function LoginPage() {
 
         {/* Login Card */}
         <div style={{
-          maxWidth: '500px',
+          maxWidth: '400px',
           margin: '0 auto',
           backgroundColor: 'var(--color-background)',
-          borderRadius: 'var(--radius-2xl)',
-          boxShadow: 'var(--shadow-xl)',
+          borderRadius: 'var(--radius-xl)',
+          boxShadow: 'var(--shadow-lg)',
           overflow: 'hidden'
         }}>
-          <div style={{ padding: 'var(--space-8)' }}>
+          <div style={{ padding: 'var(--space-5)' }}>
             {/* Card Header */}
-            <div style={{ textAlign: 'center', marginBottom: 'var(--space-8)' }}>
+            <div style={{ textAlign: 'center', marginBottom: 'var(--space-5)' }}>
               <div style={{
-                width: '80px',
-                height: '80px',
+                width: '60px',
+                height: '60px',
                 backgroundColor: 'var(--color-primary-50)',
                 borderRadius: 'var(--radius-full)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                margin: '0 auto var(--space-4)',
-                fontSize: 'var(--font-size-3xl)',
+                margin: '0 auto var(--space-3)',
+                fontSize: 'var(--font-size-2xl)',
                 color: 'var(--color-primary)'
               }}>
                 <i className="bi bi-person-circle"></i>
               </div>
               <h2 style={{
-                fontSize: 'var(--font-size-2xl)',
+                fontSize: 'var(--font-size-xl)',
                 fontWeight: 'var(--font-weight-semibold)',
                 color: 'var(--color-text-primary)',
-                marginBottom: 'var(--space-2)'
+                marginBottom: 'var(--space-2)',
+                margin: '0 0 var(--space-2) 0'
               }}>
                 Iniciar Sesión
               </h2>
               <p style={{
                 color: 'var(--color-text-secondary)',
+                fontSize: 'var(--font-size-sm)',
                 margin: 0
               }}>
                 Selecciona tu rol para acceder
@@ -112,14 +114,14 @@ export function LoginPage() {
 
             {/* Login Form */}
             <form onSubmit={(e) => e.preventDefault()}>
-              <div style={{ marginBottom: 'var(--space-6)' }}>
-                <div style={{ marginBottom: 'var(--space-4)' }}>
+              <div style={{ marginBottom: 'var(--space-4)' }}>
+                <div style={{ marginBottom: 'var(--space-3)' }}>
                   <label htmlFor="loginEmail" style={{
                     display: 'block',
-                    fontSize: 'var(--font-size-sm)',
+                    fontSize: 'var(--font-size-xs)',
                     fontWeight: 'var(--font-weight-medium)',
                     color: 'var(--color-text-primary)',
-                    marginBottom: 'var(--space-2)'
+                    marginBottom: 'var(--space-1)'
                   }}>
                     Correo electrónico
                   </label>
@@ -130,7 +132,7 @@ export function LoginPage() {
                     required
                     style={{
                       width: '100%',
-                      padding: 'var(--space-3) var(--space-4)',
+                      padding: 'var(--space-2) var(--space-3)',
                       fontSize: 'var(--font-size-sm)',
                       border: '1px solid var(--color-gray-300)',
                       borderRadius: 'var(--radius-md)',
@@ -139,7 +141,7 @@ export function LoginPage() {
                     }}
                     onFocus={(e) => {
                       e.target.style.borderColor = 'var(--color-primary)'
-                      e.target.style.boxShadow = '0 0 0 3px var(--color-primary-50)'
+                      e.target.style.boxShadow = '0 0 0 2px var(--color-primary-50)'
                     }}
                     onBlur={(e) => {
                       e.target.style.borderColor = 'var(--color-gray-300)'
@@ -151,10 +153,10 @@ export function LoginPage() {
                 <div>
                   <label htmlFor="loginPass" style={{
                     display: 'block',
-                    fontSize: 'var(--font-size-sm)',
+                    fontSize: 'var(--font-size-xs)',
                     fontWeight: 'var(--font-weight-medium)',
                     color: 'var(--color-text-primary)',
-                    marginBottom: 'var(--space-2)'
+                    marginBottom: 'var(--space-1)'
                   }}>
                     Contraseña
                   </label>
@@ -166,7 +168,7 @@ export function LoginPage() {
                     minLength={6}
                     style={{
                       width: '100%',
-                      padding: 'var(--space-3) var(--space-4)',
+                      padding: 'var(--space-2) var(--space-3)',
                       fontSize: 'var(--font-size-sm)',
                       border: '1px solid var(--color-gray-300)',
                       borderRadius: 'var(--radius-md)',
@@ -175,7 +177,7 @@ export function LoginPage() {
                     }}
                     onFocus={(e) => {
                       e.target.style.borderColor = 'var(--color-primary)'
-                      e.target.style.boxShadow = '0 0 0 3px var(--color-primary-50)'
+                      e.target.style.boxShadow = '0 0 0 2px var(--color-primary-50)'
                     }}
                     onBlur={(e) => {
                       e.target.style.borderColor = 'var(--color-gray-300)'
@@ -186,7 +188,7 @@ export function LoginPage() {
               </div>
               
               {/* Role Selection Buttons */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
                 <button 
                   type="button"
                   onClick={() => simulateLogin('estudiante')}
@@ -196,7 +198,7 @@ export function LoginPage() {
                     alignItems: 'center',
                     justifyContent: 'center',
                     gap: 'var(--space-2)',
-                    padding: 'var(--space-4)',
+                    padding: 'var(--space-3)',
                     backgroundColor: 'var(--color-primary)',
                     color: 'var(--color-text-inverse)',
                     border: '1px solid var(--color-primary)',
@@ -235,7 +237,7 @@ export function LoginPage() {
                     alignItems: 'center',
                     justifyContent: 'center',
                     gap: 'var(--space-2)',
-                    padding: 'var(--space-4)',
+                    padding: 'var(--space-3)',
                     backgroundColor: 'transparent',
                     color: 'var(--color-primary)',
                     border: '1px solid var(--color-primary)',
@@ -272,7 +274,7 @@ export function LoginPage() {
                     alignItems: 'center',
                     justifyContent: 'center',
                     gap: 'var(--space-2)',
-                    padding: 'var(--space-4)',
+                    padding: 'var(--space-3)',
                     backgroundColor: 'transparent',
                     color: 'var(--color-info)',
                     border: '1px solid var(--color-info)',
@@ -309,7 +311,7 @@ export function LoginPage() {
                     alignItems: 'center',
                     justifyContent: 'center',
                     gap: 'var(--space-2)',
-                    padding: 'var(--space-4)',
+                    padding: 'var(--space-3)',
                     backgroundColor: 'transparent',
                     color: 'var(--color-gray-600)',
                     border: '1px solid var(--color-gray-300)',
@@ -346,7 +348,7 @@ export function LoginPage() {
                     alignItems: 'center',
                     justifyContent: 'center',
                     gap: 'var(--space-2)',
-                    padding: 'var(--space-4)',
+                    padding: 'var(--space-3)',
                     backgroundColor: 'transparent',
                     color: 'var(--color-success)',
                     border: '1px solid var(--color-success)',
@@ -385,7 +387,7 @@ export function LoginPage() {
             fontSize: 'var(--font-size-sm)',
             margin: 0
           }}>
-            © 2024 EducaPro. Todos los derechos reservados.
+            © 2025 EducaPro. Todos los derechos reservados.
           </p>
         </div>
       </div>

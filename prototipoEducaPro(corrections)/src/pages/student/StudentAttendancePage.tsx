@@ -13,12 +13,26 @@ export function StudentAttendancePage() {
   const [selectedPeriod, setSelectedPeriod] = useState('week')
   const [showDetailsModal, setShowDetailsModal] = useState(false)
   const [selectedAttendance, setSelectedAttendance] = useState<Attendance | null>(null)
+  const [hoveredSegment, setHoveredSegment] = useState<string | null>(null)
+  const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 })
 
   useEffect(() => {}, [])
 
   const handleViewDetails = (attendance: Attendance) => {
     setSelectedAttendance(attendance)
     setShowDetailsModal(true)
+  }
+
+  const handleMouseMove = (e: React.MouseEvent, segment: string) => {
+    const containerRect = e.currentTarget.parentElement?.getBoundingClientRect()
+    
+    if (containerRect) {
+      setTooltipPosition({
+        x: e.clientX - containerRect.left,
+        y: -50 // Posición fija arriba de la barra
+      })
+    }
+    setHoveredSegment(segment)
   }
 
   const handleCloseModal = () => {
@@ -73,38 +87,185 @@ export function StudentAttendancePage() {
         </div>
       </div>
 
-      {/* Estadísticas */}
-      <div className="row g-3 mb-4">
-        <div className="col-6 col-md-3">
-          <div className="card bg-primary text-white">
-            <div className="card-body text-center">
-              <h6>Asistencia</h6>
-              <h3>{stats.percentage}%</h3>
-            </div>
+      {/* Barra de Progreso de Asistencia */}
+      <div style={{ marginBottom: 'var(--space-8)' }}>
+        <div className="card" style={{
+          backgroundColor: 'var(--color-background)',
+          border: '1px solid var(--color-gray-200)',
+          borderRadius: 'var(--radius-xl)',
+          boxShadow: 'var(--shadow-lg)',
+          overflow: 'hidden'
+        }}>
+          <div style={{
+            padding: 'var(--space-6)',
+            borderBottom: '1px solid var(--color-gray-200)',
+            backgroundColor: 'var(--color-background-tertiary)'
+          }}>
+            <h5 style={{
+              margin: 0,
+              fontSize: 'var(--font-size-lg)',
+              fontWeight: 'var(--font-weight-semibold)',
+              color: 'var(--color-text-primary)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 'var(--space-2)'
+            }}>
+              <i className="bi bi-graph-up"></i>
+              Progreso de Asistencia
+            </h5>
           </div>
-        </div>
-        <div className="col-6 col-md-3">
-          <div className="card bg-success text-white">
-            <div className="card-body text-center">
-              <h6>Presente</h6>
-              <h3>{stats.present}</h3>
+          <div style={{ padding: 'var(--space-6)' }}>
+            {/* Porcentaje Total */}
+            <div style={{
+              textAlign: 'center',
+              marginBottom: 'var(--space-6)'
+            }}>
+              <div style={{
+                fontSize: 'var(--font-size-4xl)',
+                fontWeight: 'var(--font-weight-bold)',
+                color: 'var(--color-primary)',
+                marginBottom: 'var(--space-2)'
+              }}>
+                {stats.percentage}%
+              </div>
+              <p style={{
+                color: 'var(--color-text-secondary)',
+                fontSize: 'var(--font-size-base)',
+                margin: 0
+              }}>
+                Asistencia Total
+              </p>
             </div>
-          </div>
-        </div>
-        <div className="col-6 col-md-3">
-          <div className="card bg-warning text-white">
-            <div className="card-body text-center">
-              <h6>Tarde</h6>
-              <h3>{stats.late}</h3>
+
+            {/* Barra de Progreso */}
+            <div style={{ marginBottom: 'var(--space-6)', position: 'relative' }}>
+              <div style={{
+                display: 'flex',
+                height: '24px',
+                backgroundColor: 'var(--color-gray-200)',
+                borderRadius: 'var(--radius-full)',
+                overflow: 'hidden',
+                boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.1)',
+                cursor: 'pointer'
+              }}>
+                {/* Presente */}
+                {stats.present > 0 && (
+                  <div 
+                    style={{
+                      width: `${(stats.present / stats.total) * 100}%`,
+                      backgroundColor: 'var(--color-success)',
+                      transition: 'all 0.3s ease-in-out',
+                      transform: hoveredSegment === 'present' ? 'scaleY(1.2)' : 'scaleY(1)',
+                      transformOrigin: 'center'
+                    }}
+                    onMouseMove={(e) => handleMouseMove(e, 'present')}
+                    onMouseLeave={() => setHoveredSegment(null)}
+                    title={`Presente: ${stats.present} clases (${Math.round((stats.present / stats.total) * 100)}%)`}
+                  ></div>
+                )}
+                {/* Tarde */}
+                {stats.late > 0 && (
+                  <div 
+                    style={{
+                      width: `${(stats.late / stats.total) * 100}%`,
+                      backgroundColor: 'var(--color-warning)',
+                      transition: 'all 0.3s ease-in-out',
+                      transform: hoveredSegment === 'late' ? 'scaleY(1.2)' : 'scaleY(1)',
+                      transformOrigin: 'center'
+                    }}
+                    onMouseMove={(e) => handleMouseMove(e, 'late')}
+                    onMouseLeave={() => setHoveredSegment(null)}
+                    title={`Tarde: ${stats.late} clases (${Math.round((stats.late / stats.total) * 100)}%)`}
+                  ></div>
+                )}
+                {/* Ausente */}
+                {stats.absent > 0 && (
+                  <div 
+                    style={{
+                      width: `${(stats.absent / stats.total) * 100}%`,
+                      backgroundColor: 'var(--color-danger)',
+                      transition: 'all 0.3s ease-in-out',
+                      transform: hoveredSegment === 'absent' ? 'scaleY(1.2)' : 'scaleY(1)',
+                      transformOrigin: 'center'
+                    }}
+                    onMouseMove={(e) => handleMouseMove(e, 'absent')}
+                    onMouseLeave={() => setHoveredSegment(null)}
+                    title={`Ausente: ${stats.absent} clases (${Math.round((stats.absent / stats.total) * 100)}%)`}
+                  ></div>
+                )}
+              </div>
+
+              {/* Tooltip */}
+              {hoveredSegment && (
+                <div style={{
+                  position: 'absolute',
+                  top: `${tooltipPosition.y}px`,
+                  left: `${tooltipPosition.x}px`,
+                  transform: 'translateX(-50%)',
+                  backgroundColor: 'var(--color-gray-800)',
+                  color: 'var(--color-text-inverse)',
+                  padding: 'var(--space-2) var(--space-3)',
+                  borderRadius: 'var(--radius-md)',
+                  fontSize: 'var(--font-size-sm)',
+                  fontWeight: 'var(--font-weight-medium)',
+                  boxShadow: 'var(--shadow-lg)',
+                  zIndex: 1000,
+                  whiteSpace: 'nowrap',
+                  animation: 'fadeIn 0.2s ease-out',
+                  pointerEvents: 'none'
+                }}>
+                  {hoveredSegment === 'present' && (
+                    <>
+                      <div style={{ textAlign: 'center' }}>
+                        <div style={{ fontSize: 'var(--font-size-base)', fontWeight: 'var(--font-weight-semibold)' }}>
+                          Presente
+                        </div>
+                        <div style={{ fontSize: 'var(--font-size-sm)', opacity: 0.8 }}>
+                          {stats.present} clases • {Math.round((stats.present / stats.total) * 100)}%
+                        </div>
+                      </div>
+                    </>
+                  )}
+                  {hoveredSegment === 'late' && (
+                    <>
+                      <div style={{ textAlign: 'center' }}>
+                        <div style={{ fontSize: 'var(--font-size-base)', fontWeight: 'var(--font-weight-semibold)' }}>
+                          Tarde
+                        </div>
+                        <div style={{ fontSize: 'var(--font-size-sm)', opacity: 0.8 }}>
+                          {stats.late} clases • {Math.round((stats.late / stats.total) * 100)}%
+                        </div>
+                      </div>
+                    </>
+                  )}
+                  {hoveredSegment === 'absent' && (
+                    <>
+                      <div style={{ textAlign: 'center' }}>
+                        <div style={{ fontSize: 'var(--font-size-base)', fontWeight: 'var(--font-weight-semibold)' }}>
+                          Ausente
+                        </div>
+                        <div style={{ fontSize: 'var(--font-size-sm)', opacity: 0.8 }}>
+                          {stats.absent} clases • {Math.round((stats.absent / stats.total) * 100)}%
+                        </div>
+                      </div>
+                    </>
+                  )}
+                  {/* Flecha del tooltip */}
+                  <div style={{
+                    position: 'absolute',
+                    bottom: '-6px',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    width: 0,
+                    height: 0,
+                    borderLeft: '6px solid transparent',
+                    borderRight: '6px solid transparent',
+                    borderTop: '6px solid var(--color-gray-800)'
+                  }}></div>
+                </div>
+              )}
             </div>
-          </div>
-        </div>
-        <div className="col-6 col-md-3">
-          <div className="card bg-danger text-white">
-            <div className="card-body text-center">
-              <h6>Ausente</h6>
-              <h3>{stats.absent}</h3>
-            </div>
+
           </div>
         </div>
       </div>
