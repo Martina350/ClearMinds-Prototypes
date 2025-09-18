@@ -164,19 +164,8 @@ export function TeacherDashboard() {
     <div className="container-fluid">
       <div className="row mb-4">
         <div className="col-12">
-          <div className="d-flex justify-content-between align-items-center">
-            <div>
-              <h1 className="h3 mb-0">Dashboard Docente</h1>
-              <p className="text-muted">Panel de control para docentes</p>
-            </div>
-            <button 
-              className="btn btn-outline-danger"
-              onClick={handleLogout}
-            >
-              <i className="bi bi-box-arrow-right me-2"></i>
-              Cerrar Sesión
-            </button>
-          </div>
+          <h1 className="h3 fw-semibold text-dark mb-1">Dashboard Docente</h1>
+          <p className="text-muted">Panel de control para docentes</p>
         </div>
       </div>
 
