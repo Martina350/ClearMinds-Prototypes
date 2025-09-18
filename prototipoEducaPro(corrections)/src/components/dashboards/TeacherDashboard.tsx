@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import { useNavigate, Outlet, Link } from 'react-router-dom'
-import { teacherService, classService, taskService, studentService, getDashboardStats, userService } from '../../services/dataService'
+import { useNavigate, Outlet } from 'react-router-dom'
+import { teacherService, classService, taskService, studentService, getDashboardStats } from '../../services/dataService'
 import type { Teacher, Class, Task, Student } from '../../types'
 
 export function TeacherDashboard() {
@@ -13,41 +13,21 @@ export function TeacherDashboard() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const handleLogout = () => {
-    userService.logout()
-    navigate('/')
+  // Funciones de navegación para las tarjetas de métricas
+  const handleViewAllStudents = () => {
+    navigate('/app/docente/estudiantes')
   }
 
-  const handleNewTask = () => {
+  const handleTakeTodayAttendance = () => {
+    navigate('/app/docente/asistencia')
+  }
+
+  const handleUpdateGrades = () => {
+    navigate('/app/docente/calificaciones')
+  }
+
+  const handleReviewSubmissions = () => {
     navigate('/app/docente/tareas')
-  }
-
-  const handleTakeAttendance = () => {
-    navigate('/app/docente/asistencia')
-  }
-
-  const handleGradeWork = () => {
-    navigate('/app/docente/calificaciones')
-  }
-
-  const handleSendNotification = () => {
-    navigate('/app/notificaciones')
-  }
-
-  const handleVirtualMonitoring = () => {
-    navigate('/app/docente/monitoreo')
-  }
-
-  const handleViewStudent = () => {
-    navigate(`/app/docente/estudiantes`)
-  }
-
-  const handleGradeStudent = () => {
-    navigate('/app/docente/calificaciones')
-  }
-
-  const handleTakeStudentAttendance = () => {
-    navigate('/app/docente/asistencia')
   }
 
   useEffect(() => {
@@ -161,246 +141,627 @@ export function TeacherDashboard() {
   // const completedTasks = tasks.filter(t => new Date(t.dueDate) <= new Date()).length
 
   return (
-    <div className="container-fluid">
-      <div className="row mb-4">
-        <div className="col-12">
-          <h1 className="h3 fw-semibold text-dark mb-1">Dashboard Docente</h1>
-          <p className="text-muted">Panel de control para docentes</p>
-        </div>
-      </div>
-
-      {/* Estadísticas principales */}
-      <div className="row g-4 mb-4">
-        <div className="col-6 col-md-3">
-          <div className="card bg-primary text-white">
-            <div className="card-body">
-              <div className="d-flex justify-content-between">
-                <div>
-                  <h6 className="card-title">Mis Clases</h6>
-                  <h3 className="mb-0">{classes.length}</h3>
-                </div>
-                <i className="bi bi-book display-4 opacity-50"></i>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div className="col-6 col-md-3">
-          <div className="card bg-success text-white">
-            <div className="card-body">
-              <div className="d-flex justify-content-between">
-                <div>
-                  <h6 className="card-title">Estudiantes</h6>
-                  <h3 className="mb-0">{totalStudents}</h3>
-                </div>
-                <i className="bi bi-people display-4 opacity-50"></i>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div className="col-6 col-md-3">
-          <div className="card bg-warning text-white">
-            <div className="card-body">
-              <div className="d-flex justify-content-between">
-                <div>
-                  <h6 className="card-title">Tareas Activas</h6>
-                  <h3 className="mb-0">{pendingTasks}</h3>
-                </div>
-                <i className="bi bi-journal-text display-4 opacity-50"></i>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div className="col-6 col-md-3">
-          <div className="card bg-info text-white">
-            <div className="card-body">
-              <div className="d-flex justify-content-between">
-                <div>
-                  <h6 className="card-title">Materia</h6>
-                  <h6 className="mb-0">{teacher.subject}</h6>
-                </div>
-                <i className="bi bi-mortarboard display-4 opacity-50"></i>
-              </div>
-            </div>
+    <div style={{
+      padding: 'var(--space-6)',
+      maxWidth: '1200px',
+      margin: '0 auto'
+    }}>
+      {/* Header con saludo personalizado */}
+      <div style={{ marginBottom: 'var(--space-8)' }}>
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          marginBottom: 'var(--space-6)'
+        }}>
+          <div>
+            <h1 style={{
+              fontSize: 'var(--font-size-3xl)',
+              fontWeight: 'var(--font-weight-semibold)',
+              color: 'var(--color-text-primary)',
+              marginBottom: 'var(--space-2)',
+              margin: 0
+            }}>
+              ¡Hola, Prof. {teacher.name.split(' ')[0]}!
+            </h1>
+            <p style={{
+              color: 'var(--color-text-secondary)',
+              fontSize: 'var(--font-size-base)',
+              margin: 0
+            }}>
+              Aquí tienes un resumen de tu día de enseñanza.
+            </p>
           </div>
         </div>
       </div>
 
-      <div className="row g-4">
-        {/* Acciones rápidas - Lado derecho */}
-        <div className="col-12 col-xl-3">
-          <div className="card">
-            <div className="card-header">
-              <h5 className="mb-0">Acciones Rápidas</h5>
-            </div>
-            <div className="card-body">
-              <div className="d-grid gap-2">
-                <button className="btn btn-primary" onClick={handleNewTask}>
-                  <i className="bi bi-plus-circle me-2"></i>
-                  Nueva Tarea
-                </button>
-                <button className="btn btn-success" onClick={handleTakeAttendance}>
-                  <i className="bi bi-calendar-check me-2"></i>
-                  Tomar Asistencia
-                </button>
-                <button className="btn btn-warning" onClick={handleGradeWork}>
-                  <i className="bi bi-star me-2"></i>
-                  Calificar Trabajos
-                </button>
-                <button className="btn btn-info" onClick={handleSendNotification}>
-                  <i className="bi bi-bell me-2"></i>
-                  Enviar Notificación
-                </button>
-                <button className="btn btn-secondary" onClick={handleVirtualMonitoring}>
-                  <i className="bi bi-eye me-2"></i>
-                  Monitoreo Virtual
-                </button>
+
+      {/* Tarjetas de métricas principales */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+        gap: 'var(--space-6)',
+        marginBottom: 'var(--space-8)'
+      }}>
+        {/* Lista de Estudiantes */}
+        <div className="card" style={{
+          backgroundColor: 'var(--color-background)',
+          border: '1px solid var(--color-gray-200)',
+          borderRadius: 'var(--radius-xl)',
+          boxShadow: 'var(--shadow-lg)',
+          overflow: 'hidden'
+        }}>
+          <div style={{ padding: 'var(--space-6)' }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 'var(--space-4)',
+              marginBottom: 'var(--space-4)'
+            }}>
+              <div style={{
+                width: '60px',
+                height: '60px',
+                backgroundColor: 'var(--color-info-50)',
+                borderRadius: 'var(--radius-full)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <i className="bi bi-people" style={{
+                  fontSize: 'var(--font-size-2xl)',
+                  color: 'var(--color-info)'
+                }}></i>
+              </div>
+                <div>
+                <div style={{
+                  fontSize: 'var(--font-size-sm)',
+                  fontWeight: 'var(--font-weight-medium)',
+                  color: 'var(--color-text-secondary)',
+                  marginBottom: 'var(--space-1)'
+                }}>
+                  Lista de Estudiantes
+                </div>
+                <div style={{
+                  fontSize: 'var(--font-size-2xl)',
+                  fontWeight: 'var(--font-weight-bold)',
+                  color: 'var(--color-text-primary)'
+                }}>
+                  {totalStudents}
+                </div>
+                <div style={{
+                  fontSize: 'var(--font-size-xs)',
+                  color: 'var(--color-text-secondary)'
+                }}>
+                  total en {classes.length} clases
+                </div>
               </div>
             </div>
+            <button 
+              onClick={handleViewAllStudents}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: 'var(--color-primary)',
+                fontSize: 'var(--font-size-sm)',
+                fontWeight: 'var(--font-weight-medium)',
+                cursor: 'pointer',
+                textDecoration: 'underline'
+              }}
+            >
+              Ver Todos
+            </button>
+          </div>
+        </div>
+        
+        {/* Asistencia */}
+        <div className="card" style={{
+          backgroundColor: 'var(--color-background)',
+          border: '1px solid var(--color-gray-200)',
+          borderRadius: 'var(--radius-xl)',
+          boxShadow: 'var(--shadow-lg)',
+          overflow: 'hidden'
+        }}>
+          <div style={{ padding: 'var(--space-6)' }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 'var(--space-4)',
+              marginBottom: 'var(--space-4)'
+            }}>
+              <div style={{
+                width: '60px',
+                height: '60px',
+                backgroundColor: 'var(--color-warning-50)',
+                borderRadius: 'var(--radius-full)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <i className="bi bi-calendar-check" style={{
+                  fontSize: 'var(--font-size-2xl)',
+                  color: 'var(--color-warning)'
+                }}></i>
+              </div>
+                <div>
+                <div style={{
+                  fontSize: 'var(--font-size-sm)',
+                  fontWeight: 'var(--font-weight-medium)',
+                  color: 'var(--color-text-secondary)',
+                  marginBottom: 'var(--space-1)'
+                }}>
+                  Asistencia
+                </div>
+                <div style={{
+                  fontSize: 'var(--font-size-2xl)',
+                  fontWeight: 'var(--font-weight-bold)',
+                  color: 'var(--color-text-primary)'
+                }}>
+                  98.2%
+                </div>
+                <div style={{
+                  fontSize: 'var(--font-size-xs)',
+                  color: 'var(--color-text-secondary)'
+                }}>
+                  promedio esta semana
+                </div>
+              </div>
+            </div>
+            <button 
+              onClick={handleTakeTodayAttendance}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: 'var(--color-primary)',
+                fontSize: 'var(--font-size-sm)',
+                fontWeight: 'var(--font-weight-medium)',
+                cursor: 'pointer',
+                textDecoration: 'underline'
+              }}
+            >
+              Tomar Hoy
+            </button>
+          </div>
+        </div>
+        
+        {/* Calificaciones */}
+        <div className="card" style={{
+          backgroundColor: 'var(--color-background)',
+          border: '1px solid var(--color-gray-200)',
+          borderRadius: 'var(--radius-xl)',
+          boxShadow: 'var(--shadow-lg)',
+          overflow: 'hidden'
+        }}>
+          <div style={{ padding: 'var(--space-6)' }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 'var(--space-4)',
+              marginBottom: 'var(--space-4)'
+            }}>
+              <div style={{
+                width: '60px',
+                height: '60px',
+                backgroundColor: 'var(--color-success-50)',
+                borderRadius: 'var(--radius-full)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <i className="bi bi-list-check" style={{
+                  fontSize: 'var(--font-size-2xl)',
+                  color: 'var(--color-success)'
+                }}></i>
+              </div>
+                <div>
+                <div style={{
+                  fontSize: 'var(--font-size-sm)',
+                  fontWeight: 'var(--font-weight-medium)',
+                  color: 'var(--color-text-secondary)',
+                  marginBottom: 'var(--space-1)'
+                }}>
+                  Calificaciones
+                </div>
+                <div style={{
+                  fontSize: 'var(--font-size-2xl)',
+                  fontWeight: 'var(--font-weight-bold)',
+                  color: 'var(--color-text-primary)'
+                }}>
+                  B+
+                </div>
+                <div style={{
+                  fontSize: 'var(--font-size-xs)',
+                  color: 'var(--color-text-secondary)'
+                }}>
+                  rendimiento promedio
+                </div>
+              </div>
+            </div>
+            <button 
+              onClick={handleUpdateGrades}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: 'var(--color-primary)',
+                fontSize: 'var(--font-size-sm)',
+                fontWeight: 'var(--font-weight-medium)',
+                cursor: 'pointer',
+                textDecoration: 'underline'
+              }}
+            >
+              Actualizar Calificaciones
+            </button>
+          </div>
+        </div>
+        
+        {/* Entregas */}
+        <div className="card" style={{
+          backgroundColor: 'var(--color-background)',
+          border: '1px solid var(--color-gray-200)',
+          borderRadius: 'var(--radius-xl)',
+          boxShadow: 'var(--shadow-lg)',
+          overflow: 'hidden'
+        }}>
+          <div style={{ padding: 'var(--space-6)' }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 'var(--space-4)',
+              marginBottom: 'var(--space-4)'
+            }}>
+              <div style={{
+                width: '60px',
+                height: '60px',
+                backgroundColor: 'var(--color-danger-50)',
+                borderRadius: 'var(--radius-full)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <i className="bi bi-file-earmark-check" style={{
+                  fontSize: 'var(--font-size-2xl)',
+                  color: 'var(--color-danger)'
+                }}></i>
+              </div>
+                <div>
+                <div style={{
+                  fontSize: 'var(--font-size-sm)',
+                  fontWeight: 'var(--font-weight-medium)',
+                  color: 'var(--color-text-secondary)',
+                  marginBottom: 'var(--space-1)'
+                }}>
+                  Entregas
+                </div>
+                <div style={{
+                  fontSize: 'var(--font-size-2xl)',
+                  fontWeight: 'var(--font-weight-bold)',
+                  color: 'var(--color-text-primary)'
+                }}>
+                  {pendingTasks}/{totalStudents}
+                </div>
+                <div style={{
+                  fontSize: 'var(--font-size-xs)',
+                  color: 'var(--color-text-secondary)'
+                }}>
+                  entregas esperando revisión
+                </div>
+              </div>
+            </div>
+            <button 
+              onClick={handleReviewSubmissions}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: 'var(--color-primary)',
+                fontSize: 'var(--font-size-sm)',
+                fontWeight: 'var(--font-weight-medium)',
+                cursor: 'pointer',
+                textDecoration: 'underline'
+              }}
+            >
+              Revisar Ahora
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Secciones inferiores - Actividad Reciente y Fechas Límite */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr',
+        gap: 'var(--space-6)'
+      }}>
+        {/* Actividad Reciente - Columna Izquierda */}
+        <div className="card" style={{
+          backgroundColor: 'var(--color-background)',
+          border: '1px solid var(--color-gray-200)',
+          borderRadius: 'var(--radius-xl)',
+          boxShadow: 'var(--shadow-lg)',
+          overflow: 'hidden'
+        }}>
+          <div style={{
+            padding: 'var(--space-6)',
+            borderBottom: '1px solid var(--color-gray-200)',
+            backgroundColor: 'var(--color-background-tertiary)'
+          }}>
+            <h5 style={{
+              margin: 0,
+              fontSize: 'var(--font-size-lg)',
+              fontWeight: 'var(--font-weight-bold)',
+              color: 'var(--color-text-primary)'
+            }}>
+              Actividad Reciente
+            </h5>
+            </div>
+          <div style={{ padding: 'var(--space-6)' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+              {/* Actividad 1 */}
+              <div style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: 'var(--space-3)',
+                padding: 'var(--space-3)',
+                backgroundColor: 'var(--color-background)',
+                border: '1px solid var(--color-gray-200)',
+                borderRadius: 'var(--radius-lg)'
+              }}>
+                <div style={{
+                  width: '40px',
+                  height: '40px',
+                  backgroundColor: 'var(--color-success-50)',
+                  borderRadius: 'var(--radius-full)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0
+                }}>
+                  <i className="bi bi-check-circle" style={{
+                    fontSize: 'var(--font-size-base)',
+                    color: 'var(--color-success)'
+                  }}></i>
+              </div>
+                <div>
+                  <div style={{
+                    fontSize: 'var(--font-size-sm)',
+                    fontWeight: 'var(--font-weight-medium)',
+                    color: 'var(--color-text-primary)',
+                    marginBottom: 'var(--space-1)'
+                  }}>
+                    Matemáticas 101 - Tarea 3 calificada
+            </div>
+                  <small style={{
+                    fontSize: 'var(--font-size-xs)',
+                    color: 'var(--color-text-secondary)'
+                  }}>
+                    hace 15 minutos
+                  </small>
           </div>
         </div>
 
-        {/* Contenido principal - Lado izquierdo */}
-        <div className="col-12 col-xl-9">
-          <div className="row g-4">
-            {/* Mis clases */}
-            <div className="col-12 col-lg-6">
-              <div className="card h-100">
-                <div className="card-header d-flex justify-content-between align-items-center">
-                  <h5 className="mb-0">Mis Clases</h5>
-                  <Link to="/app/docente/clases" className="btn btn-sm btn-outline-primary">Gestionar</Link>
+              {/* Actividad 2 */}
+              <div style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: 'var(--space-3)',
+                padding: 'var(--space-3)',
+                backgroundColor: 'var(--color-background)',
+                border: '1px solid var(--color-gray-200)',
+                borderRadius: 'var(--radius-lg)'
+              }}>
+                <div style={{
+                  width: '40px',
+                  height: '40px',
+                  backgroundColor: 'var(--color-warning-50)',
+                  borderRadius: 'var(--radius-full)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0
+                }}>
+                  <i className="bi bi-bell" style={{
+                    fontSize: 'var(--font-size-base)',
+                    color: 'var(--color-warning)'
+                  }}></i>
                 </div>
-                <div className="card-body">
-                  {classes.length === 0 ? (
-                    <p className="text-muted text-center py-4">No tienes clases asignadas</p>
-                  ) : (
-                    <div className="list-group list-group-flush">
-                      {classes.map(cls => (
-                        <div key={cls.id} className="list-group-item">
-                          <div className="d-flex w-100 justify-content-between">
-                            <h6 className="mb-1">{cls.name}</h6>
-                            <span className="badge bg-primary">{cls.studentIds.length} estudiantes</span>
+                <div>
+                  <div style={{
+                    fontSize: 'var(--font-size-sm)',
+                    fontWeight: 'var(--font-weight-medium)',
+                    color: 'var(--color-text-primary)',
+                    marginBottom: 'var(--space-1)'
+                  }}>
+                    Física 202 - Fecha límite mañana
                           </div>
-                          <p className="mb-1 text-muted">{cls.subject}</p>
-                          <small className="text-muted">
-                            <i className="bi bi-calendar me-1"></i>
-                            {cls.schedule} - {cls.room}
+                  <small style={{
+                    fontSize: 'var(--font-size-xs)',
+                    color: 'var(--color-text-secondary)'
+                  }}>
+                    hace 1 hora
+                          </small>
+              </div>
+            </div>
+
+              {/* Actividad 3 */}
+              <div style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: 'var(--space-3)',
+                padding: 'var(--space-3)',
+                backgroundColor: 'var(--color-background)',
+                border: '1px solid var(--color-gray-200)',
+                borderRadius: 'var(--radius-lg)'
+              }}>
+                <div style={{
+                  width: '40px',
+                  height: '40px',
+                  backgroundColor: 'var(--color-info-50)',
+                  borderRadius: 'var(--radius-full)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0
+                }}>
+                  <i className="bi bi-envelope" style={{
+                    fontSize: 'var(--font-size-base)',
+                    color: 'var(--color-info)'
+                  }}></i>
+                </div>
+                <div>
+                  <div style={{
+                    fontSize: 'var(--font-size-sm)',
+                    fontWeight: 'var(--font-weight-medium)',
+                    color: 'var(--color-text-primary)',
+                    marginBottom: 'var(--space-1)'
+                  }}>
+                    Nuevo mensaje de Juan Pérez
+                          </div>
+                  <small style={{
+                    fontSize: 'var(--font-size-xs)',
+                    color: 'var(--color-text-secondary)'
+                  }}>
+                    hace 3 horas
                           </small>
                         </div>
-                      ))}
                     </div>
-                  )}
                 </div>
               </div>
             </div>
 
-            {/* Tareas recientes */}
-            <div className="col-12 col-lg-6">
-              <div className="card h-100">
-                <div className="card-header d-flex justify-content-between align-items-center">
-                  <h5 className="mb-0">Tareas Recientes</h5>
-                  <Link to="/app/docente/tareas" className="btn btn-sm btn-outline-primary">Ver todas</Link>
+        {/* Fechas Límite Próximas - Columna Derecha */}
+        <div className="card" style={{
+          backgroundColor: 'var(--color-background)',
+          border: '1px solid var(--color-gray-200)',
+          borderRadius: 'var(--radius-xl)',
+          boxShadow: 'var(--shadow-lg)',
+          overflow: 'hidden'
+        }}>
+          <div style={{
+            padding: 'var(--space-6)',
+            borderBottom: '1px solid var(--color-gray-200)',
+            backgroundColor: 'var(--color-background-tertiary)'
+          }}>
+            <h5 style={{
+              margin: 0,
+              fontSize: 'var(--font-size-lg)',
+              fontWeight: 'var(--font-weight-bold)',
+              color: 'var(--color-text-primary)'
+            }}>
+              Fechas Límite Próximas
+            </h5>
+          </div>
+          <div style={{ padding: 'var(--space-6)' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+              {/* Fecha límite 1 */}
+              <div style={{
+                padding: 'var(--space-4)',
+                backgroundColor: 'var(--color-background)',
+                border: '1px solid var(--color-gray-200)',
+                borderRadius: 'var(--radius-lg)',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center'
+              }}>
+                <div>
+                  <div style={{
+                    fontSize: 'var(--font-size-sm)',
+                    fontWeight: 'var(--font-weight-semibold)',
+                    color: 'var(--color-text-primary)',
+                    marginBottom: 'var(--space-1)'
+                  }}>
+                    Reporte de Laboratorio de Química
+                  </div>
+                  <div style={{
+                    fontSize: 'var(--font-size-xs)',
+                    color: 'var(--color-text-secondary)'
+                  }}>
+                    Vence: 25 Oct, 11:59 PM
+                  </div>
                 </div>
-                <div className="card-body">
-                  {tasks.length === 0 ? (
-                    <p className="text-muted text-center py-4">No hay tareas creadas</p>
-                  ) : (
-                    <div className="list-group list-group-flush">
-                      {tasks.slice(0, 4).map(task => (
-                        <div key={task.id} className="list-group-item">
-                          <div className="d-flex w-100 justify-content-between">
-                            <h6 className="mb-1">{task.title}</h6>
-                            <span className={`badge ${
-                              new Date(task.dueDate) > new Date() ? 'bg-warning' : 'bg-success'
-                            }`}>
-                              {new Date(task.dueDate) > new Date() ? 'Activa' : 'Completada'}
-                            </span>
-                          </div>
-                          <p className="mb-1 text-muted small">{task.description}</p>
-                          <small className="text-muted">
-                            Vence: {new Date(task.dueDate).toLocaleDateString()}
-                          </small>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
+                <span style={{
+                  padding: 'var(--space-1) var(--space-2)',
+                  backgroundColor: 'var(--color-danger)',
+                  color: 'var(--color-text-inverse)',
+                  borderRadius: 'var(--radius-full)',
+                  fontSize: 'var(--font-size-xs)',
+                  fontWeight: 'var(--font-weight-medium)'
+                }}>
+                  2 Días
+                </span>
               </div>
-            </div>
 
-            {/* Estudiantes */}
-            <div className="col-12">
-              <div className="card">
-                <div className="card-header">
-                  <h5 className="mb-0">Mis Estudiantes</h5>
-                </div>
-                <div className="card-body">
-                  {students.length === 0 ? (
-                    <p className="text-muted text-center py-4">No hay estudiantes asignados</p>
-                  ) : (
-                    <div className="table-responsive">
-                      <table className="table table-hover">
-                        <thead>
-                          <tr>
-                            <th>Nombre</th>
-                            <th>Grado</th>
-                            <th>Clases</th>
-                            <th>Estado</th>
-                            <th>Acciones</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {students.map(student => (
-                            <tr key={student.id}>
-                              <td>
-                                <div className="d-flex align-items-center">
-                                  <i className="bi bi-person-circle me-2"></i>
-                                  {student.name}
+              {/* Fecha límite 2 */}
+              <div style={{
+                padding: 'var(--space-4)',
+                backgroundColor: 'var(--color-background)',
+                border: '1px solid var(--color-gray-200)',
+                borderRadius: 'var(--radius-lg)',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center'
+              }}>
+                <div>
+                  <div style={{
+                    fontSize: 'var(--font-size-sm)',
+                    fontWeight: 'var(--font-weight-semibold)',
+                    color: 'var(--color-text-primary)',
+                    marginBottom: 'var(--space-1)'
+                  }}>
+                    Ensayo de Historia
+                  </div>
+                  <div style={{
+                    fontSize: 'var(--font-size-xs)',
+                    color: 'var(--color-text-secondary)'
+                  }}>
+                    Vence: 28 Oct, 11:59 PM
+                  </div>
                                 </div>
-                              </td>
-                              <td>{student.grade}</td>
-                              <td>
-                                <span className="badge bg-secondary">
-                                  {student.classIds.length} clases
+                <span style={{
+                  padding: 'var(--space-1) var(--space-2)',
+                  backgroundColor: 'var(--color-warning)',
+                  color: 'var(--color-text-inverse)',
+                  borderRadius: 'var(--radius-full)',
+                  fontSize: 'var(--font-size-xs)',
+                  fontWeight: 'var(--font-weight-medium)'
+                }}>
+                  5 Días
                                 </span>
-                              </td>
-                              <td>
-                                <span className="badge bg-success">Activo</span>
-                              </td>
-                              <td>
-                                <div className="btn-group btn-group-sm">
-                              <button 
-                                className="btn btn-outline-primary" 
-                                title="Ver perfil"
-                                onClick={() => handleViewStudent()}
-                              >
-                                <i className="bi bi-eye"></i>
-                              </button>
-                              <button 
-                                className="btn btn-outline-success" 
-                                title="Calificar"
-                                onClick={() => handleGradeStudent()}
-                              >
-                                <i className="bi bi-star"></i>
-                              </button>
-                              <button 
-                                className="btn btn-outline-info" 
-                                title="Tomar asistencia"
-                                onClick={() => handleTakeStudentAttendance()}
-                              >
-                                <i className="bi bi-calendar-check"></i>
-                              </button>
+              </div>
+
+              {/* Fecha límite 3 */}
+              <div style={{
+                padding: 'var(--space-4)',
+                backgroundColor: 'var(--color-background)',
+                border: '1px solid var(--color-gray-200)',
+                borderRadius: 'var(--radius-lg)',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center'
+              }}>
+                <div>
+                  <div style={{
+                    fontSize: 'var(--font-size-sm)',
+                    fontWeight: 'var(--font-weight-semibold)',
+                    color: 'var(--color-text-primary)',
+                    marginBottom: 'var(--space-1)'
+                  }}>
+                    Examen Parcial de Cálculo
                                 </div>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
+                  <div style={{
+                    fontSize: 'var(--font-size-xs)',
+                    color: 'var(--color-text-secondary)'
+                  }}>
+                    Vence: 30 Oct, 9:00 AM
                     </div>
-                  )}
                 </div>
+                <span style={{
+                  padding: 'var(--space-1) var(--space-2)',
+                  backgroundColor: 'var(--color-success)',
+                  color: 'var(--color-text-inverse)',
+                  borderRadius: 'var(--radius-full)',
+                  fontSize: 'var(--font-size-xs)',
+                  fontWeight: 'var(--font-weight-medium)'
+                }}>
+                  7 Días
+                </span>
               </div>
             </div>
           </div>

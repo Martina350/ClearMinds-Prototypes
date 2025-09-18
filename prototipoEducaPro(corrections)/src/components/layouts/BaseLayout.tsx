@@ -8,6 +8,8 @@ export function BaseLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [unread, setUnread] = useState<number>(0)
   const [toasts, setToasts] = useState<Notification[]>([])
+  const [notificationsOpen, setNotificationsOpen] = useState(false)
+  const [notifications, setNotifications] = useState<Notification[]>([])
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -26,6 +28,19 @@ export function BaseLayout() {
     setUnread(notificationService.getUnreadByUserId(currentUser.id).length)
   }, [navigate])
 
+  // Cerrar dropdown al hacer clic fuera
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement
+      if (notificationsOpen && !target.closest('[data-notifications-dropdown]')) {
+        setNotificationsOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [notificationsOpen])
+
   // Auto-hide de toasts y marcar como leídas
   useEffect(() => {
     if (toasts.length === 0) return
@@ -41,16 +56,27 @@ export function BaseLayout() {
 
   const handleBellClick = () => {
     if (!user) return
-    const unreadList = notificationService.getUnreadByUserId(user.id)
-    if (unreadList.length > 0) {
-      setToasts(unreadList.slice(0, 4))
-      // Marcar como leídas al instante al abrir
+    setNotificationsOpen(!notificationsOpen)
+    
+    if (!notificationsOpen) {
+      // Cargar notificaciones al abrir
+      const allNotifications = notificationService.getByUserId(user.id)
+      setNotifications(allNotifications.slice(0, 10)) // Mostrar las últimas 10
+      
+      // Marcar como leídas todas las no leídas
+      const unreadList = notificationService.getUnreadByUserId(user.id)
       unreadList.forEach(n => notificationService.markAsRead(n.id))
       setUnread(0)
-    } else {
-      const recent = notificationService.getByUserId(user.id).slice(0, 4)
-      setToasts(recent)
-      setUnread(0)
+    }
+  }
+
+  const handleNotificationClick = (notification: Notification) => {
+    // Marcar como leída si no lo está
+    if (!notification.read) {
+      notificationService.markAsRead(notification.id)
+      setNotifications(prev => 
+        prev.map(n => n.id === notification.id ? { ...n, read: true } : n)
+      )
     }
   }
 
@@ -188,41 +214,13 @@ export function BaseLayout() {
             alignItems: 'center',
             justifyContent: 'space-between'
           }}>
-            <button 
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-              style={{
-                background: 'none',
-                border: 'none',
-                fontSize: 'var(--font-size-lg)',
-                color: 'var(--color-text-secondary)',
-                cursor: 'pointer',
-                padding: 'var(--space-2)',
-                borderRadius: 'var(--radius-md)',
-                transition: 'all var(--transition-fast)',
-                display: 'none'
-              }}
-              className="d-lg-none"
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'var(--color-background-tertiary)'
-                e.currentTarget.style.color = 'var(--color-text-primary)'
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'transparent'
-                e.currentTarget.style.color = 'var(--color-text-secondary)'
-              }}
-            >
-              <i className="bi bi-list"></i>
-            </button>
-            
-            <div className="navbar-nav" style={{
+            <div style={{
               display: 'flex',
               alignItems: 'center',
-              gap: 'var(--space-3)',
-              flexDirection: 'row'
+              gap: 'var(--space-3)'
             }}>
               <button 
-                onClick={handleBellClick} 
-                title="Notificaciones"
+                onClick={() => setSidebarOpen(!sidebarOpen)}
                 style={{
                   background: 'none',
                   border: 'none',
@@ -232,11 +230,9 @@ export function BaseLayout() {
                   padding: 'var(--space-2)',
                   borderRadius: 'var(--radius-md)',
                   transition: 'all var(--transition-fast)',
-                  position: 'relative',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
+                  display: 'none'
                 }}
+                className="d-lg-none"
                 onMouseEnter={(e) => {
                   e.currentTarget.style.backgroundColor = 'var(--color-background-tertiary)'
                   e.currentTarget.style.color = 'var(--color-text-primary)'
@@ -246,14 +242,168 @@ export function BaseLayout() {
                   e.currentTarget.style.color = 'var(--color-text-secondary)'
                 }}
               >
-                <i className="bi bi-bell"></i>
-                {unread > 0 && (
-                  <span className="notification-badge">
-                    {unread}
-                  </span>
-                )}
+                <i className="bi bi-list"></i>
               </button>
-              
+
+              {/* Notifications Bell - Moved to left */}
+              <div style={{ position: 'relative' }} data-notifications-dropdown>
+                <button 
+                  onClick={handleBellClick} 
+                  title="Notificaciones"
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    fontSize: 'var(--font-size-lg)',
+                    color: 'var(--color-text-secondary)',
+                    cursor: 'pointer',
+                    padding: 'var(--space-2)',
+                    borderRadius: 'var(--radius-md)',
+                    transition: 'all var(--transition-fast)',
+                    position: 'relative',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--color-background-tertiary)'
+                    e.currentTarget.style.color = 'var(--color-text-primary)'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent'
+                    e.currentTarget.style.color = 'var(--color-text-secondary)'
+                  }}
+                >
+                  <i className="bi bi-bell"></i>
+                  {unread > 0 && (
+                    <span className="notification-badge">
+                      {unread}
+                    </span>
+                  )}
+                </button>
+
+                {/* Notifications Dropdown */}
+                {notificationsOpen && (
+                  <div style={{
+                    position: 'absolute',
+                    top: '100%',
+                    left: '0',
+                    marginTop: 'var(--space-2)',
+                    backgroundColor: 'var(--color-background)',
+                    border: '1px solid var(--color-gray-200)',
+                    borderRadius: 'var(--radius-lg)',
+                    boxShadow: 'var(--shadow-xl)',
+                    minWidth: '320px',
+                    maxWidth: '400px',
+                    maxHeight: '400px',
+                    overflowY: 'auto',
+                    zIndex: 1000,
+                    animation: 'fadeIn 0.2s ease-out'
+                  }}>
+                    <div style={{
+                      padding: 'var(--space-4)',
+                      borderBottom: '1px solid var(--color-gray-200)',
+                      backgroundColor: 'var(--color-background-tertiary)'
+                    }}>
+                      <h6 style={{
+                        margin: 0,
+                        fontSize: 'var(--font-size-base)',
+                        fontWeight: 'var(--font-weight-semibold)',
+                        color: 'var(--color-text-primary)'
+                      }}>
+                        Notificaciones
+                      </h6>
+                    </div>
+                    
+                    <div style={{ padding: 'var(--space-2)' }}>
+                      {notifications.length === 0 ? (
+                        <div style={{
+                          padding: 'var(--space-6)',
+                          textAlign: 'center',
+                          color: 'var(--color-text-secondary)'
+                        }}>
+                          <i className="bi bi-bell-slash" style={{
+                            fontSize: 'var(--font-size-2xl)',
+                            marginBottom: 'var(--space-2)',
+                            display: 'block'
+                          }}></i>
+                          <p style={{
+                            margin: 0,
+                            fontSize: 'var(--font-size-sm)'
+                          }}>
+                            No hay notificaciones
+                          </p>
+                        </div>
+                      ) : (
+                        notifications.map(notification => (
+                          <div 
+                            key={notification.id}
+                            onClick={() => handleNotificationClick(notification)}
+                            style={{
+                              padding: 'var(--space-3)',
+                              borderBottom: '1px solid var(--color-gray-100)',
+                              cursor: 'pointer',
+                              transition: 'background-color var(--transition-fast)',
+                              backgroundColor: notification.read ? 'transparent' : 'var(--color-primary-50)'
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor = 'var(--color-background-tertiary)'
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor = notification.read ? 'transparent' : 'var(--color-primary-50)'
+                            }}
+                          >
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'flex-start',
+                              gap: 'var(--space-3)'
+                            }}>
+                              <div style={{
+                                width: '8px',
+                                height: '8px',
+                                borderRadius: 'var(--radius-full)',
+                                backgroundColor: notification.read ? 'transparent' : 'var(--color-primary)',
+                                marginTop: 'var(--space-2)',
+                                flexShrink: 0
+                              }}></div>
+                              <div style={{ flex: 1 }}>
+                                <div style={{
+                                  fontSize: 'var(--font-size-sm)',
+                                  fontWeight: notification.read ? 'var(--font-weight-normal)' : 'var(--font-weight-semibold)',
+                                  color: 'var(--color-text-primary)',
+                                  marginBottom: 'var(--space-1)'
+                                }}>
+                                  {notification.title}
+                                </div>
+                                <div style={{
+                                  fontSize: 'var(--font-size-xs)',
+                                  color: 'var(--color-text-secondary)',
+                                  marginBottom: 'var(--space-1)'
+                                }}>
+                                  {notification.message}
+                                </div>
+                                <div style={{
+                                  fontSize: 'var(--font-size-xs)',
+                                  color: 'var(--color-text-secondary)'
+                                }}>
+                                  {new Date(notification.createdAt).toLocaleDateString()}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            <div className="navbar-nav" style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 'var(--space-3)',
+              flexDirection: 'row'
+            }}>
               <button 
                 onClick={handleLogout}
                 style={{

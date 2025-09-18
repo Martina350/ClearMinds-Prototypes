@@ -1,44 +1,27 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, Outlet } from 'react-router-dom'
-import { userService, studentService, parentService, teacherService, classService, getDashboardStats } from '../../services/dataService'
-import type { User, Student, Parent, Teacher, Class } from '../../types'
+import { studentService, teacherService, getDashboardStats } from '../../services/dataService'
+import type { Student, Teacher } from '../../types'
 
 export function AdminDashboard() {
   const navigate = useNavigate()
   const [stats, setStats] = useState<any>(null)
-  const [users, setUsers] = useState<User[]>([])
   const [students, setStudents] = useState<Student[]>([])
-  const [parents, setParents] = useState<Parent[]>([])
   const [teachers, setTeachers] = useState<Teacher[]>([])
-  const [classes, setClasses] = useState<Class[]>([])
 
   const go = (path: string, label?: string) => {
     console.log('[AdminDashboard] click:', label || path)
     navigate(path)
   }
 
-  const handleLogout = () => {
-    userService.logout()
-    navigate('/')
-  }
-
   useEffect(() => {
     const adminId = '4' // ID del admin actual (simulado)
-    
-    const usersData = userService.getAll()
-    setUsers(usersData)
     
     const studentsData = studentService.getAll()
     setStudents(studentsData)
     
-    const parentsData = parentService.getAll()
-    setParents(parentsData)
-    
     const teachersData = teacherService.getAll()
     setTeachers(teachersData)
-    
-    const classesData = classService.getAll()
-    setClasses(classesData)
     
     const userStats = getDashboardStats(adminId, 'admin')
     setStats(userStats)
@@ -48,267 +31,576 @@ export function AdminDashboard() {
     return <div className="d-flex justify-content-center"><div className="spinner-border"></div></div>
   }
 
-  const totalUsers = users.length
   const activeStudents = students.length
   const activeTeachers = teachers.length
-  const totalClasses = classes.length
 
   return (
-    <div className="container-fluid">
-      <div className="row mb-4">
-        <div className="col-12">
-          <h1 className="h3 fw-semibold text-dark mb-1">Dashboard Administrador</h1>
-          <p className="text-muted">Panel de control del sistema</p>
-        </div>
-      </div>
-
-      {/* Estadísticas principales */}
-      <div className="row g-4 mb-4">
-        <div className="col-6 col-md-3">
-          <div className="card bg-primary text-white">
-            <div className="card-body">
-              <div className="d-flex justify-content-between">
-                <div>
-                  <h6 className="card-title">Total Usuarios</h6>
-                  <h3 className="mb-0">{totalUsers}</h3>
-                </div>
-                <i className="bi bi-people display-4 opacity-50"></i>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div className="col-6 col-md-3">
-          <div className="card bg-success text-white">
-            <div className="card-body">
-              <div className="d-flex justify-content-between">
-                <div>
-                  <h6 className="card-title">Estudiantes</h6>
-                  <h3 className="mb-0">{activeStudents}</h3>
-                </div>
-                <i className="bi bi-person-badge display-4 opacity-50"></i>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div className="col-6 col-md-3">
-          <div className="card bg-warning text-white">
-            <div className="card-body">
-              <div className="d-flex justify-content-between">
-                <div>
-                  <h6 className="card-title">Docentes</h6>
-                  <h3 className="mb-0">{activeTeachers}</h3>
-                </div>
-                <i className="bi bi-person-workspace display-4 opacity-50"></i>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div className="col-6 col-md-3">
-          <div className="card bg-info text-white">
-            <div className="card-body">
-              <div className="d-flex justify-content-between">
-                <div>
-                  <h6 className="card-title">Clases</h6>
-                  <h3 className="mb-0">{totalClasses}</h3>
-                </div>
-                <i className="bi bi-book display-4 opacity-50"></i>
-              </div>
-            </div>
+    <div style={{
+      padding: 'var(--space-6)',
+      maxWidth: '1200px',
+      margin: '0 auto'
+    }}>
+      {/* Header */}
+      <div style={{ marginBottom: 'var(--space-8)' }}>
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          marginBottom: 'var(--space-6)'
+        }}>
+          <div>
+            <h1 style={{
+              fontSize: 'var(--font-size-3xl)',
+              fontWeight: 'var(--font-weight-bold)',
+              color: 'var(--color-text-primary)',
+              marginBottom: 'var(--space-2)',
+              margin: 0
+            }}>
+              Dashboard Administrador
+            </h1>
           </div>
         </div>
       </div>
 
-      <div className="row g-4">
-        {/* Acciones administrativas - Lado derecho */}
-        <div className="col-12 col-xl-3">
-          <div className="card">
-            <div className="card-header">
-              <h5 className="mb-0">Acciones Administrativas</h5>
-            </div>
-            <div className="card-body">
-              <div className="d-grid gap-2">
-                <button className="btn btn-primary" onClick={() => go('/app/admin/usuarios', 'Crear Usuario (quick action)')}>
-                  <i className="bi bi-person-plus me-2"></i>
-                  Crear Usuario
-                </button>
-                <button className="btn btn-success" onClick={() => go('/app/admin/clases', 'Gestionar Clases (quick action)')}>
-                  <i className="bi bi-book me-2"></i>
-                  Gestionar Clases
-                </button>
-                <button className="btn btn-warning" onClick={() => go('/app/admin/matriculas', 'Matricular Estudiante (quick action)')}>
-                  <i className="bi bi-person-check me-2"></i>
-                  Matricular Estudiante
-                </button>
-                <button className="btn btn-info" onClick={() => go('/app/admin/usuarios', 'Gestionar Accesos (quick action)')}>
-                  <i className="bi bi-key me-2"></i>
-                  Gestionar Accesos
-                </button>
-                <button className="btn btn-secondary" onClick={() => go('/app/admin/reportes', 'Generar Reportes (quick action)')}>
-                  <i className="bi bi-file-earmark-text me-2"></i>
-                  Generar Reportes
-                </button>
-                <button className="btn btn-dark" onClick={() => console.log('[AdminDashboard] Configuración del Sistema (no implementado)')}>
-                  <i className="bi bi-gear me-2"></i>
-                  Configuración del Sistema
-                </button>
-              </div>
-            </div>
+      {/* KPIs Section */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+        gap: 'var(--space-6)',
+        marginBottom: 'var(--space-8)'
+      }}>
+        {/* Gestión de Estudiantes */}
+        <div style={{
+          backgroundColor: 'var(--color-primary)',
+          color: 'var(--color-text-inverse)',
+          borderRadius: 'var(--radius-xl)',
+          boxShadow: 'var(--shadow-lg)',
+          padding: 'var(--space-6)',
+          position: 'relative',
+          overflow: 'hidden'
+        }}>
+          <div style={{
+            position: 'absolute',
+            top: 'var(--space-4)',
+            right: 'var(--space-4)',
+            width: '60px',
+            height: '60px',
+            backgroundColor: 'rgba(255,255,255,0.2)',
+            borderRadius: 'var(--radius-full)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <i className="bi bi-mortarboard" style={{
+              fontSize: 'var(--font-size-2xl)',
+              color: 'var(--color-text-inverse)'
+            }}></i>
           </div>
-
-          {/* Resumen por rol */}
-          <div className="card mt-4">
-            <div className="card-header">
-              <h5 className="mb-0">Resumen por Rol</h5>
+          <div>
+            <div style={{
+              fontSize: 'var(--font-size-sm)',
+              fontWeight: 'var(--font-weight-semibold)',
+              marginBottom: 'var(--space-2)',
+              opacity: 0.9
+            }}>
+              Gestión de Estudiantes
             </div>
-            <div className="card-body">
-              <div className="list-group list-group-flush">
-                <div className="list-group-item d-flex justify-content-between align-items-center">
-                  <div>
-                    <i className="bi bi-person-badge text-primary me-2"></i>
-                    Estudiantes
-                  </div>
-                  <span className="badge bg-primary rounded-pill">{activeStudents}</span>
-                </div>
-                <div className="list-group-item d-flex justify-content-between align-items-center">
-                  <div>
-                    <i className="bi bi-people text-success me-2"></i>
-                    Padres
-                  </div>
-                  <span className="badge bg-success rounded-pill">{parents.length}</span>
-                </div>
-                <div className="list-group-item d-flex justify-content-between align-items-center">
-                  <div>
-                    <i className="bi bi-person-workspace text-warning me-2"></i>
-                    Docentes
-                  </div>
-                  <span className="badge bg-warning rounded-pill">{activeTeachers}</span>
-                </div>
-                <div className="list-group-item d-flex justify-content-between align-items-center">
-                  <div>
-                    <i className="bi bi-book text-info me-2"></i>
-                    Clases
-                  </div>
-                  <span className="badge bg-info rounded-pill">{totalClasses}</span>
-                </div>
-              </div>
+            <div style={{
+              fontSize: 'var(--font-size-3xl)',
+              fontWeight: 'var(--font-weight-bold)',
+              lineHeight: 1,
+              marginBottom: 'var(--space-1)'
+            }}>
+              {activeStudents}
+            </div>
+            <div style={{
+              fontSize: 'var(--font-size-sm)',
+              opacity: 0.8
+            }}>
+              Total Estudiantes
             </div>
           </div>
         </div>
 
-        {/* Contenido principal - Lado izquierdo */}
-        <div className="col-12 col-xl-9">
-          <div className="row g-4">
-            {/* Gestión de usuarios */}
-            <div className="col-12">
-              <div className="card">
-                <div className="card-header d-flex justify-content-between align-items-center">
-                  <h5 className="mb-0">Gestión de Usuarios</h5>
-                  <div className="btn-group btn-group-sm">
-                    <button className="btn btn-primary" onClick={() => go('/app/admin/usuarios', 'Nuevo Usuario')}>
-                      <i className="bi bi-plus me-1"></i>Nuevo Usuario
-                    </button>
-                    <button className="btn btn-outline-secondary" onClick={() => go('/app/admin/usuarios', 'Exportar Usuarios')}>
-                      <i className="bi bi-download me-1"></i>Exportar
-                    </button>
-                  </div>
-                </div>
-                <div className="card-body">
-                  <div className="table-responsive">
-                    <table className="table table-hover">
-                      <thead>
-                        <tr>
-                          <th>Nombre</th>
-                          <th>Email</th>
-                          <th>Rol</th>
-                          <th>Estado</th>
-                          <th>Acciones</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {users.map((user, index) => (
-                          <tr key={`user-${user.id}-${index}`}>
-                            <td>
-                              <div className="d-flex align-items-center">
-                                <i className="bi bi-person-circle me-2"></i>
-                                {user.name}
-                              </div>
-                            </td>
-                            <td>{user.email}</td>
-                            <td>
-                              <span className={`badge ${
-                                user.role === 'estudiante' ? 'bg-primary' :
-                                user.role === 'padre' ? 'bg-success' :
-                                user.role === 'docente' ? 'bg-warning' :
-                                user.role === 'admin' ? 'bg-danger' : 'bg-info'
-                              }`}>
-                                {user.role === 'estudiante' ? 'Estudiante' :
-                                 user.role === 'padre' ? 'Padre' :
-                                 user.role === 'docente' ? 'Docente' :
-                                 user.role === 'admin' ? 'Admin' : 'Finanzas'}
-                              </span>
-                            </td>
-                            <td>
-                              <span className="badge bg-success">Activo</span>
-                            </td>
-                            <td>
-                              <div className="btn-group btn-group-sm">
-                                <button className="btn btn-outline-primary" title="Editar" onClick={() => go('/app/admin/usuarios', 'Editar Usuario desde dashboard')}>
-                                  <i className="bi bi-pencil"></i>
-                                </button>
-                                <button className="btn btn-outline-danger" title="Eliminar" onClick={() => console.log('[AdminDashboard] Eliminar Usuario desde dashboard (navega a usuarios)')}>
-                                  <i className="bi bi-trash"></i>
-                                </button>
-                                <button className="btn btn-outline-info" title="Ver detalles" onClick={() => go('/app/admin/usuarios', 'Ver detalles Usuario desde dashboard')}>
-                                  <i className="bi bi-eye"></i>
-                                </button>
-                              </div>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
+        {/* Gestión de Docentes */}
+        <div style={{
+          backgroundColor: 'var(--color-danger)',
+          color: 'var(--color-text-inverse)',
+          borderRadius: 'var(--radius-xl)',
+          boxShadow: 'var(--shadow-lg)',
+          padding: 'var(--space-6)',
+          position: 'relative',
+          overflow: 'hidden'
+        }}>
+          <div style={{
+            position: 'absolute',
+            top: 'var(--space-4)',
+            right: 'var(--space-4)',
+            width: '60px',
+            height: '60px',
+            backgroundColor: 'rgba(255,255,255,0.2)',
+            borderRadius: 'var(--radius-full)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <i className="bi bi-people" style={{
+              fontSize: 'var(--font-size-2xl)',
+              color: 'var(--color-text-inverse)'
+            }}></i>
+          </div>
+          <div>
+            <div style={{
+              fontSize: 'var(--font-size-sm)',
+              fontWeight: 'var(--font-weight-semibold)',
+              marginBottom: 'var(--space-2)',
+              opacity: 0.9
+            }}>
+              Gestión de Docentes
             </div>
-
-            {/* Clases activas */}
-            <div className="col-12">
-              <div className="card">
-                <div className="card-header d-flex justify-content-between align-items-center">
-                  <h5 className="mb-0">Clases Activas</h5>
-                  <button className="btn btn-sm btn-outline-primary" onClick={() => go('/app/admin/clases', 'Gestionar Clases')}>
-                    Gestionar
-                  </button>
-                </div>
-                <div className="card-body">
-                  {classes.length === 0 ? (
-                    <p className="text-muted text-center py-4">No hay clases registradas</p>
-                  ) : (
-                    <div className="list-group list-group-flush">
-                      {classes.map(cls => (
-                        <div key={cls.id} className="list-group-item">
-                          <div className="d-flex w-100 justify-content-between">
-                            <h6 className="mb-1">{cls.name}</h6>
-                            <span className="badge bg-primary">{cls.studentIds.length} estudiantes</span>
-                          </div>
-                          <p className="mb-1 text-muted">{cls.subject}</p>
-                          <small className="text-muted">
-                            <i className="bi bi-calendar me-1"></i>
-                            {cls.schedule} - {cls.room}
-                          </small>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
+            <div style={{
+              fontSize: 'var(--font-size-3xl)',
+              fontWeight: 'var(--font-weight-bold)',
+              lineHeight: 1,
+              marginBottom: 'var(--space-1)'
+            }}>
+              {activeTeachers}
+            </div>
+            <div style={{
+              fontSize: 'var(--font-size-sm)',
+              opacity: 0.8
+            }}>
+              Total Docentes
             </div>
           </div>
         </div>
+
+        {/* Resumen Financiero */}
+        <div style={{
+          backgroundColor: 'var(--color-info)',
+          color: 'var(--color-text-inverse)',
+          borderRadius: 'var(--radius-xl)',
+          boxShadow: 'var(--shadow-lg)',
+          padding: 'var(--space-6)',
+          position: 'relative',
+          overflow: 'hidden'
+        }}>
+          <div style={{
+            position: 'absolute',
+            top: 'var(--space-4)',
+            right: 'var(--space-4)',
+            width: '60px',
+            height: '60px',
+            backgroundColor: 'rgba(255,255,255,0.2)',
+            borderRadius: 'var(--radius-full)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <i className="bi bi-eye" style={{
+              fontSize: 'var(--font-size-2xl)',
+              color: 'var(--color-text-inverse)'
+            }}></i>
+          </div>
+          <div>
+            <div style={{
+              fontSize: 'var(--font-size-sm)',
+              fontWeight: 'var(--font-weight-semibold)',
+              marginBottom: 'var(--space-2)',
+              opacity: 0.9
+            }}>
+              Resumen Financiero
+            </div>
+            <div style={{
+              fontSize: 'var(--font-size-3xl)',
+              fontWeight: 'var(--font-weight-bold)',
+              lineHeight: 1,
+              marginBottom: 'var(--space-1)'
+            }}>
+              $52,480
+            </div>
+            <div style={{
+              fontSize: 'var(--font-size-sm)',
+              opacity: 0.8
+            }}>
+              Ingresos Este Mes
+            </div>
+          </div>
+        </div>
+
+        {/* Anuncios */}
+        <div style={{
+          backgroundColor: 'var(--color-warning)',
+          color: 'var(--color-text-inverse)',
+          borderRadius: 'var(--radius-xl)',
+          boxShadow: 'var(--shadow-lg)',
+          padding: 'var(--space-6)',
+          position: 'relative',
+          overflow: 'hidden'
+        }}>
+          <div style={{
+            position: 'absolute',
+            top: 'var(--space-4)',
+            right: 'var(--space-4)',
+            width: '60px',
+            height: '60px',
+            backgroundColor: 'rgba(255,255,255,0.2)',
+            borderRadius: 'var(--radius-full)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <i className="bi bi-megaphone" style={{
+              fontSize: 'var(--font-size-2xl)',
+              color: 'var(--color-text-inverse)'
+            }}></i>
+          </div>
+          <div>
+            <div style={{
+              fontSize: 'var(--font-size-sm)',
+              fontWeight: 'var(--font-weight-semibold)',
+              marginBottom: 'var(--space-2)',
+              opacity: 0.9
+            }}>
+              Anuncios
+            </div>
+            <div style={{
+              fontSize: 'var(--font-size-3xl)',
+              fontWeight: 'var(--font-weight-bold)',
+              lineHeight: 1,
+              marginBottom: 'var(--space-1)'
+            }}>
+              5
+            </div>
+            <div style={{
+              fontSize: 'var(--font-size-sm)',
+              opacity: 0.8
+            }}>
+              Anuncios Activos
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Tabla de Registros Recientes de Estudiantes */}
+      <div className="card" style={{
+        backgroundColor: 'var(--color-background)',
+        border: '1px solid var(--color-gray-200)',
+        borderRadius: 'var(--radius-xl)',
+        boxShadow: 'var(--shadow-lg)',
+        overflow: 'hidden',
+        marginBottom: 'var(--space-6)'
+      }}>
+        <div style={{
+          padding: 'var(--space-6)',
+          borderBottom: '1px solid var(--color-gray-200)',
+          backgroundColor: 'var(--color-background-tertiary)'
+        }}>
+          <h5 style={{
+            margin: 0,
+            fontSize: 'var(--font-size-lg)',
+            fontWeight: 'var(--font-weight-bold)',
+            color: 'var(--color-text-primary)'
+          }}>
+            Registros Recientes de Estudiantes
+          </h5>
+        </div>
+        <div style={{ padding: 'var(--space-6)' }}>
+          <div style={{ overflow: 'hidden' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <thead>
+                <tr>
+                  <th style={{
+                    textAlign: 'left',
+                    fontSize: 'var(--font-size-sm)',
+                    fontWeight: 'var(--font-weight-semibold)',
+                    color: 'var(--color-text-secondary)',
+                    paddingBottom: 'var(--space-4)',
+                    borderBottom: '1px solid var(--color-gray-200)'
+                  }}>
+                    ID Estudiante
+                  </th>
+                  <th style={{
+                    textAlign: 'left',
+                    fontSize: 'var(--font-size-sm)',
+                    fontWeight: 'var(--font-weight-semibold)',
+                    color: 'var(--color-text-secondary)',
+                    paddingBottom: 'var(--space-4)',
+                    borderBottom: '1px solid var(--color-gray-200)'
+                  }}>
+                    Nombre
+                  </th>
+                  <th style={{
+                    textAlign: 'left',
+                    fontSize: 'var(--font-size-sm)',
+                    fontWeight: 'var(--font-weight-semibold)',
+                    color: 'var(--color-text-secondary)',
+                    paddingBottom: 'var(--space-4)',
+                    borderBottom: '1px solid var(--color-gray-200)'
+                  }}>
+                    Curso
+                  </th>
+                  <th style={{
+                    textAlign: 'left',
+                    fontSize: 'var(--font-size-sm)',
+                    fontWeight: 'var(--font-weight-semibold)',
+                    color: 'var(--color-text-secondary)',
+                    paddingBottom: 'var(--space-4)',
+                    borderBottom: '1px solid var(--color-gray-200)'
+                  }}>
+                    Fecha de Registro
+                  </th>
+                  <th style={{
+                    textAlign: 'left',
+                    fontSize: 'var(--font-size-sm)',
+                    fontWeight: 'var(--font-weight-semibold)',
+                    color: 'var(--color-text-secondary)',
+                    paddingBottom: 'var(--space-4)',
+                    borderBottom: '1px solid var(--color-gray-200)'
+                  }}>
+                    Estado
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {/* Juan Pérez */}
+                <tr>
+                  <td style={{ padding: 'var(--space-4) 0' }}>
+                    <span style={{
+                      fontSize: 'var(--font-size-sm)',
+                      color: 'var(--color-text-secondary)'
+                    }}>
+                      #EST-001
+                    </span>
+                  </td>
+                  <td style={{ padding: 'var(--space-4) 0' }}>
+                    <span style={{
+                      fontSize: 'var(--font-size-sm)',
+                      fontWeight: 'var(--font-weight-medium)',
+                      color: 'var(--color-text-primary)'
+                    }}>
+                      Juan Pérez
+                    </span>
+                  </td>
+                  <td style={{ padding: 'var(--space-4) 0' }}>
+                    <span style={{
+                      fontSize: 'var(--font-size-sm)',
+                      color: 'var(--color-text-secondary)'
+                    }}>
+                      Ciencias de la Computación
+                    </span>
+                  </td>
+                  <td style={{ padding: 'var(--space-4) 0' }}>
+                    <span style={{
+                      fontSize: 'var(--font-size-sm)',
+                      color: 'var(--color-text-secondary)'
+                    }}>
+                      2023-10-26
+                    </span>
+                  </td>
+                  <td style={{ padding: 'var(--space-4) 0' }}>
+                    <span style={{
+                      padding: 'var(--space-1) var(--space-2)',
+                      backgroundColor: 'var(--color-success)',
+                      color: 'var(--color-text-inverse)',
+                      borderRadius: 'var(--radius-full)',
+                      fontSize: 'var(--font-size-xs)',
+                      fontWeight: 'var(--font-weight-medium)'
+                    }}>
+                      Aprobado
+                    </span>
+                  </td>
+                </tr>
+
+                {/* María González */}
+                <tr>
+                  <td style={{ padding: 'var(--space-4) 0' }}>
+                    <span style={{
+                      fontSize: 'var(--font-size-sm)',
+                      color: 'var(--color-text-secondary)'
+                    }}>
+                      #EST-002
+                    </span>
+                  </td>
+                  <td style={{ padding: 'var(--space-4) 0' }}>
+                    <span style={{
+                      fontSize: 'var(--font-size-sm)',
+                      fontWeight: 'var(--font-weight-medium)',
+                      color: 'var(--color-text-primary)'
+                    }}>
+                      María González
+                    </span>
+                  </td>
+                  <td style={{ padding: 'var(--space-4) 0' }}>
+                    <span style={{
+                      fontSize: 'var(--font-size-sm)',
+                      color: 'var(--color-text-secondary)'
+                    }}>
+                      Administración de Empresas
+                    </span>
+                  </td>
+                  <td style={{ padding: 'var(--space-4) 0' }}>
+                    <span style={{
+                      fontSize: 'var(--font-size-sm)',
+                      color: 'var(--color-text-secondary)'
+                    }}>
+                      2023-10-25
+                    </span>
+                  </td>
+                  <td style={{ padding: 'var(--space-4) 0' }}>
+                    <span style={{
+                      padding: 'var(--space-1) var(--space-2)',
+                      backgroundColor: 'var(--color-success)',
+                      color: 'var(--color-text-inverse)',
+                      borderRadius: 'var(--radius-full)',
+                      fontSize: 'var(--font-size-xs)',
+                      fontWeight: 'var(--font-weight-medium)'
+                    }}>
+                      Aprobado
+                    </span>
+                  </td>
+                </tr>
+
+                {/* Carlos Rodríguez */}
+                <tr>
+                  <td style={{ padding: 'var(--space-4) 0' }}>
+                    <span style={{
+                      fontSize: 'var(--font-size-sm)',
+                      color: 'var(--color-text-secondary)'
+                    }}>
+                      #EST-003
+                    </span>
+                  </td>
+                  <td style={{ padding: 'var(--space-4) 0' }}>
+                    <span style={{
+                      fontSize: 'var(--font-size-sm)',
+                      fontWeight: 'var(--font-weight-medium)',
+                      color: 'var(--color-text-primary)'
+                    }}>
+                      Carlos Rodríguez
+                    </span>
+                  </td>
+                  <td style={{ padding: 'var(--space-4) 0' }}>
+                    <span style={{
+                      fontSize: 'var(--font-size-sm)',
+                      color: 'var(--color-text-secondary)'
+                    }}>
+                      Diseño Gráfico
+                    </span>
+                  </td>
+                  <td style={{ padding: 'var(--space-4) 0' }}>
+                    <span style={{
+                      fontSize: 'var(--font-size-sm)',
+                      color: 'var(--color-text-secondary)'
+                    }}>
+                      2023-10-25
+                    </span>
+                  </td>
+                  <td style={{ padding: 'var(--space-4) 0' }}>
+                    <span style={{
+                      padding: 'var(--space-1) var(--space-2)',
+                      backgroundColor: 'var(--color-warning)',
+                      color: 'var(--color-text-inverse)',
+                      borderRadius: 'var(--radius-full)',
+                      fontSize: 'var(--font-size-xs)',
+                      fontWeight: 'var(--font-weight-medium)'
+                    }}>
+                      Pendiente
+                    </span>
+                  </td>
+                </tr>
+
+                {/* Ana Martínez */}
+                <tr>
+                  <td style={{ padding: 'var(--space-4) 0' }}>
+                    <span style={{
+                      fontSize: 'var(--font-size-sm)',
+                      color: 'var(--color-text-secondary)'
+                    }}>
+                      #EST-004
+                    </span>
+                  </td>
+                  <td style={{ padding: 'var(--space-4) 0' }}>
+                    <span style={{
+                      fontSize: 'var(--font-size-sm)',
+                      fontWeight: 'var(--font-weight-medium)',
+                      color: 'var(--color-text-primary)'
+                    }}>
+                      Ana Martínez
+                    </span>
+                  </td>
+                  <td style={{ padding: 'var(--space-4) 0' }}>
+                    <span style={{
+                      fontSize: 'var(--font-size-sm)',
+                      color: 'var(--color-text-secondary)'
+                    }}>
+                      Psicología
+                    </span>
+                  </td>
+                  <td style={{ padding: 'var(--space-4) 0' }}>
+                    <span style={{
+                      fontSize: 'var(--font-size-sm)',
+                      color: 'var(--color-text-secondary)'
+                    }}>
+                      2023-10-24
+                    </span>
+                  </td>
+                  <td style={{ padding: 'var(--space-4) 0' }}>
+                    <span style={{
+                      padding: 'var(--space-1) var(--space-2)',
+                      backgroundColor: 'var(--color-danger)',
+                      color: 'var(--color-text-inverse)',
+                      borderRadius: 'var(--radius-full)',
+                      fontSize: 'var(--font-size-xs)',
+                      fontWeight: 'var(--font-weight-medium)'
+                    }}>
+                      Rechazado
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      {/* Botón Agregar Nuevo Docente */}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'flex-end',
+        marginBottom: 'var(--space-6)'
+      }}>
+        <button 
+          onClick={() => go('/app/admin/usuarios', 'Agregar Nuevo Docente')}
+          style={{
+            backgroundColor: 'var(--color-info)',
+            color: 'var(--color-text-inverse)',
+            border: '1px solid var(--color-info)',
+            borderRadius: 'var(--radius-lg)',
+            padding: 'var(--space-4) var(--space-6)',
+            fontSize: 'var(--font-size-sm)',
+            fontWeight: 'var(--font-weight-medium)',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 'var(--space-2)',
+            transition: 'all var(--transition-fast)',
+            boxShadow: 'var(--shadow-md)'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = 'var(--color-info-dark)'
+            e.currentTarget.style.transform = 'translateY(-2px)'
+            e.currentTarget.style.boxShadow = 'var(--shadow-lg)'
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'var(--color-info)'
+            e.currentTarget.style.transform = 'translateY(0)'
+            e.currentTarget.style.boxShadow = 'var(--shadow-md)'
+          }}
+        >
+          <i className="bi bi-person-plus"></i>
+          Agregar Nuevo Docente
+        </button>
       </div>
       
       {/* Renderizar las rutas anidadas */}

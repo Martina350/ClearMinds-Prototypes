@@ -7,8 +7,6 @@ export function StudentMaterialsPage() {
     { id: 'm3', title: 'Ejercicios de Historia', type: 'DOC', size: '1.2MB', subject: 'Historia', uploadedDate: '2024-01-12' },
     { id: 'm4', title: 'Manual de Laboratorio', type: 'PDF', size: '3.5MB', subject: 'Química', uploadedDate: '2024-01-08' },
   ])
-  const [showMaterialModal, setShowMaterialModal] = useState(false)
-  const [selectedMaterial, setSelectedMaterial] = useState<any>(null)
   const [filter, setFilter] = useState('all')
 
   const handleDownload = (material: any) => {
@@ -16,15 +14,6 @@ export function StudentMaterialsPage() {
     alert(`Descargando: ${material.title} (${material.size})`)
   }
 
-  const handleViewDetails = (material: any) => {
-    setSelectedMaterial(material)
-    setShowMaterialModal(true)
-  }
-
-  const handleCloseModal = () => {
-    setShowMaterialModal(false)
-    setSelectedMaterial(null)
-  }
 
   const filteredMaterials = filter === 'all' 
     ? materials 
@@ -78,18 +67,12 @@ export function StudentMaterialsPage() {
                   </div>
                 </div>
                 
-                <div className="d-grid gap-2">
+                <div className="d-grid">
                   <button 
                     className="btn btn-outline-primary btn-sm"
                     onClick={() => handleDownload(m)}
                   >
                     <i className="bi bi-download me-1"></i>Descargar
-                  </button>
-                  <button 
-                    className="btn btn-outline-secondary btn-sm"
-                    onClick={() => handleViewDetails(m)}
-                  >
-                    <i className="bi bi-eye me-1"></i>Ver Detalles
                   </button>
                 </div>
               </div>
@@ -106,72 +89,6 @@ export function StudentMaterialsPage() {
         </div>
       )}
 
-      {/* Modal para ver detalles del material */}
-      {showMaterialModal && selectedMaterial && (
-        <div className="modal show d-block" tabIndex={-1} style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
-          <div className="modal-dialog modal-lg">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title">
-                  <i className={`bi ${getFileIcon(selectedMaterial.type)} me-2`}></i>
-                  {selectedMaterial.title}
-                </h5>
-                <button type="button" className="btn-close" onClick={handleCloseModal}></button>
-              </div>
-              <div className="modal-body">
-                <div className="row">
-                  <div className="col-md-8">
-                    <h6>Información del Archivo</h6>
-                    <ul className="list-group list-group-flush">
-                      <li className="list-group-item d-flex justify-content-between">
-                        <span>Título:</span>
-                        <span>{selectedMaterial.title}</span>
-                      </li>
-                      <li className="list-group-item d-flex justify-content-between">
-                        <span>Materia:</span>
-                        <span className="badge bg-primary">{selectedMaterial.subject}</span>
-                      </li>
-                      <li className="list-group-item d-flex justify-content-between">
-                        <span>Tipo:</span>
-                        <span className="badge bg-secondary">{selectedMaterial.type}</span>
-                      </li>
-                      <li className="list-group-item d-flex justify-content-between">
-                        <span>Tamaño:</span>
-                        <span>{selectedMaterial.size}</span>
-                      </li>
-                      <li className="list-group-item d-flex justify-content-between">
-                        <span>Subido:</span>
-                        <span>{new Date(selectedMaterial.uploadedDate).toLocaleDateString()}</span>
-                      </li>
-                    </ul>
-                  </div>
-                  <div className="col-md-4">
-                    <div className="card bg-light">
-                      <div className="card-body text-center">
-                        <i className={`bi ${getFileIcon(selectedMaterial.type)} display-1 mb-3`}></i>
-                        <h6>Vista Previa</h6>
-                        <p className="small text-muted">Archivo {selectedMaterial.type}</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" onClick={handleCloseModal}>
-                  Cerrar
-                </button>
-                <button type="button" className="btn btn-primary" onClick={() => {
-                  handleDownload(selectedMaterial)
-                  handleCloseModal()
-                }}>
-                  <i className="bi bi-download me-2"></i>
-                  Descargar
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   )
 }

@@ -8,7 +8,6 @@ export function StudentTasksPage() {
   const [submissions, setSubmissions] = useState<TaskSubmission[]>([])
   const [showSubmitModal, setShowSubmitModal] = useState(false)
   const [selectedTask, setSelectedTask] = useState<Task | null>(null)
-  const [showTaskModal, setShowTaskModal] = useState(false)
 
   useEffect(() => {
     setTasks(taskService.getByStudentId(studentId))
@@ -29,18 +28,8 @@ export function StudentTasksPage() {
     alert(`Descargando: ${task.title}`)
   }
 
-  const handleViewTaskDetails = (task: Task) => {
-    setSelectedTask(task)
-    setShowTaskModal(true)
-  }
-
   const handleCloseSubmitModal = () => {
     setShowSubmitModal(false)
-    setSelectedTask(null)
-  }
-
-  const handleCloseTaskModal = () => {
-    setShowTaskModal(false)
     setSelectedTask(null)
   }
 
@@ -103,12 +92,6 @@ export function StudentTasksPage() {
                       onClick={() => handleDownloadTask(task)}
                     >
                       <i className="bi bi-download me-1"></i>Descargar
-                    </button>
-                    <button 
-                      className="btn btn-outline-info"
-                      onClick={() => handleViewTaskDetails(task)}
-                    >
-                      <i className="bi bi-eye me-1"></i>Ver
                     </button>
                   </div>
                 </td>
@@ -174,82 +157,6 @@ export function StudentTasksPage() {
         </div>
       )}
 
-      {/* Modal para ver detalles de tarea */}
-      {showTaskModal && selectedTask && (
-        <div className="modal show d-block" tabIndex={-1} style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
-          <div className="modal-dialog modal-lg">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title">{selectedTask.title}</h5>
-                <button type="button" className="btn-close" onClick={handleCloseTaskModal}></button>
-              </div>
-              <div className="modal-body">
-                <div className="row">
-                  <div className="col-md-8">
-                    <h6>Descripción</h6>
-                    <p className="text-muted">{selectedTask.description}</p>
-                    
-                    <h6>Detalles</h6>
-                    <ul className="list-group list-group-flush">
-                      <li className="list-group-item d-flex justify-content-between">
-                        <span>Materia:</span>
-                        <span>{selectedTask.classId}</span>
-                      </li>
-                      <li className="list-group-item d-flex justify-content-between">
-                        <span>Fecha de asignación:</span>
-                        <span>{new Date(selectedTask.createdAt).toLocaleDateString()}</span>
-                      </li>
-                      <li className="list-group-item d-flex justify-content-between">
-                        <span>Fecha de vencimiento:</span>
-                        <span className={new Date(selectedTask.dueDate) < new Date() ? 'text-danger fw-bold' : 'text-primary fw-bold'}>
-                          {new Date(selectedTask.dueDate).toLocaleDateString()}
-                        </span>
-                      </li>
-                      <li className="list-group-item d-flex justify-content-between">
-                        <span>Tipo:</span>
-                        <span className="badge bg-secondary">{selectedTask.type}</span>
-                      </li>
-                      <li className="list-group-item d-flex justify-content-between">
-                        <span>Estado:</span>
-                        <span className={`badge ${statusOf(selectedTask.id) === 'Entregada' ? 'bg-success' : 'bg-warning'}`}>
-                          {statusOf(selectedTask.id)}
-                        </span>
-                      </li>
-                    </ul>
-                  </div>
-                  <div className="col-md-4">
-                    <div className="card bg-light">
-                      <div className="card-body text-center">
-                        <h6>Acciones</h6>
-                        <div className="d-grid gap-2">
-                          {statusOf(selectedTask.id) !== 'Entregada' && (
-                            <button className="btn btn-primary btn-sm" onClick={() => {
-                              handleCloseTaskModal()
-                              submit(selectedTask)
-                            }}>
-                              <i className="bi bi-upload me-1"></i>
-                              Entregar
-                            </button>
-                          )}
-                          <button className="btn btn-outline-secondary btn-sm" onClick={() => handleDownloadTask(selectedTask)}>
-                            <i className="bi bi-download me-1"></i>
-                            Descargar
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" onClick={handleCloseTaskModal}>
-                  Cerrar
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   )
 }
