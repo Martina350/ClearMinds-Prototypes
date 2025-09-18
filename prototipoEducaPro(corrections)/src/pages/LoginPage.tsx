@@ -39,83 +39,354 @@ export function LoginPage() {
   }
 
   return (
-    <div className="auth-hero">
-      <div className="container-fluid py-5">
-        <div className="row justify-content-center px-3 px-md-4">
-          <div className="col-12 col-xl-11 col-xxl-10">
-            <div className="text-center mb-5">
-              <h1 className="display-5 fw-bold auth-title mb-2">EducaPro</h1>
-              <p className="lead text-white-50 mb-0">Plataforma Educativa Integral</p>
+    <div style={{
+      minHeight: '100vh',
+      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: 'var(--space-4)'
+    }}>
+      <div style={{ width: '100%', maxWidth: '1200px' }}>
+        {/* Header */}
+        <div style={{ textAlign: 'center', marginBottom: 'var(--space-12)' }}>
+          <h1 style={{
+            fontSize: 'var(--font-size-4xl)',
+            fontWeight: 'var(--font-weight-bold)',
+            color: 'var(--color-text-inverse)',
+            marginBottom: 'var(--space-3)',
+            textShadow: '0 2px 4px rgba(0,0,0,0.1)'
+          }}>
+            EducaPro
+          </h1>
+          <p style={{
+            fontSize: 'var(--font-size-lg)',
+            color: 'rgba(255,255,255,0.8)',
+            margin: 0
+          }}>
+            Plataforma Educativa Integral
+          </p>
+        </div>
+
+        {/* Login Card */}
+        <div style={{
+          maxWidth: '500px',
+          margin: '0 auto',
+          backgroundColor: 'var(--color-background)',
+          borderRadius: 'var(--radius-2xl)',
+          boxShadow: 'var(--shadow-xl)',
+          overflow: 'hidden'
+        }}>
+          <div style={{ padding: 'var(--space-8)' }}>
+            {/* Card Header */}
+            <div style={{ textAlign: 'center', marginBottom: 'var(--space-8)' }}>
+              <div style={{
+                width: '80px',
+                height: '80px',
+                backgroundColor: 'var(--color-primary-50)',
+                borderRadius: 'var(--radius-full)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto var(--space-4)',
+                fontSize: 'var(--font-size-3xl)',
+                color: 'var(--color-primary)'
+              }}>
+                <i className="bi bi-person-circle"></i>
+              </div>
+              <h2 style={{
+                fontSize: 'var(--font-size-2xl)',
+                fontWeight: 'var(--font-weight-semibold)',
+                color: 'var(--color-text-primary)',
+                marginBottom: 'var(--space-2)'
+              }}>
+                Iniciar Sesión
+              </h2>
+              <p style={{
+                color: 'var(--color-text-secondary)',
+                margin: 0
+              }}>
+                Selecciona tu rol para acceder
+              </p>
             </div>
-            
-            <div className="row row-cols-1 row-cols-lg-2 g-4 g-xxl-5 align-items-stretch">
-              <div className="col col-12 col-md-10 col-lg-6 col-xxl-5 mx-auto">
-                <div className="card card-elevated h-100">
-                  <div className="card-body p-4 p-lg-5">
-                    <div className="text-center mb-4">
-                      <i className="bi bi-person-circle display-4 text-primary mb-3"></i>
-                      <h2 className="h4 mb-3">Iniciar Sesión</h2>
-                      <p className="text-muted">Accede a tu cuenta</p>
-                    </div>
-                    
-                    <form className="vstack gap-3" onSubmit={(e) => e.preventDefault()}>
-                      <div className="form-floating">
-                        <input type="email" className="form-control" id="loginEmail" placeholder="name@example.com" required />
-                        <label htmlFor="loginEmail">Correo electrónico</label>
-                      </div>
-                      <div className="form-floating">
-                        <input type="password" className="form-control" id="loginPass" placeholder="••••••" required minLength={6} />
-                        <label htmlFor="loginPass">Contraseña</label>
-                      </div>
-                      
-                      <div className="d-grid gap-2">
-                        <button 
-                          className="btn btn-primary btn-lg btn-full" 
-                          onClick={() => simulateLogin('estudiante')}
-                          disabled={isLoading}
-                        >
-                          <i className="bi bi-person-badge me-2"></i>
-                          Estudiante
-                        </button>
-                        <button 
-                          className="btn btn-outline-primary btn-lg btn-full" 
-                          onClick={() => simulateLogin('padre')}
-                          disabled={isLoading}
-                        >
-                          <i className="bi bi-people me-2"></i>
-                          Padre
-                        </button>
-                        <button 
-                          className="btn btn-outline-secondary btn-lg btn-full" 
-                          onClick={() => simulateLogin('docente')}
-                          disabled={isLoading}
-                        >
-                          <i className="bi bi-person-workspace me-2"></i>
-                          Docente
-                        </button>
-                        <button 
-                          className="btn btn-outline-dark btn-lg btn-full" 
-                          onClick={() => simulateLogin('admin')}
-                          disabled={isLoading}
-                        >
-                          <i className="bi bi-gear me-2"></i>
-                          Admin
-                        </button>
-                        <button 
-                          className="btn btn-outline-success btn-lg btn-full" 
-                          onClick={() => simulateLogin('finanzas')}
-                          disabled={isLoading}
-                        >
-                          <i className="bi bi-currency-dollar me-2"></i>
-                          Finanzas
-                        </button>
-                      </div>
-                    </form>
-                  </div>
+
+            {/* Login Form */}
+            <form onSubmit={(e) => e.preventDefault()}>
+              <div style={{ marginBottom: 'var(--space-6)' }}>
+                <div style={{ marginBottom: 'var(--space-4)' }}>
+                  <label htmlFor="loginEmail" style={{
+                    display: 'block',
+                    fontSize: 'var(--font-size-sm)',
+                    fontWeight: 'var(--font-weight-medium)',
+                    color: 'var(--color-text-primary)',
+                    marginBottom: 'var(--space-2)'
+                  }}>
+                    Correo electrónico
+                  </label>
+                  <input 
+                    type="email" 
+                    id="loginEmail" 
+                    placeholder="nombre@ejemplo.com"
+                    required
+                    style={{
+                      width: '100%',
+                      padding: 'var(--space-3) var(--space-4)',
+                      fontSize: 'var(--font-size-sm)',
+                      border: '1px solid var(--color-gray-300)',
+                      borderRadius: 'var(--radius-md)',
+                      backgroundColor: 'var(--color-background)',
+                      transition: 'border-color var(--transition-fast), box-shadow var(--transition-fast)'
+                    }}
+                    onFocus={(e) => {
+                      e.target.style.borderColor = 'var(--color-primary)'
+                      e.target.style.boxShadow = '0 0 0 3px var(--color-primary-50)'
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = 'var(--color-gray-300)'
+                      e.target.style.boxShadow = 'none'
+                    }}
+                  />
+                </div>
+                
+                <div>
+                  <label htmlFor="loginPass" style={{
+                    display: 'block',
+                    fontSize: 'var(--font-size-sm)',
+                    fontWeight: 'var(--font-weight-medium)',
+                    color: 'var(--color-text-primary)',
+                    marginBottom: 'var(--space-2)'
+                  }}>
+                    Contraseña
+                  </label>
+                  <input 
+                    type="password" 
+                    id="loginPass" 
+                    placeholder="••••••••"
+                    required 
+                    minLength={6}
+                    style={{
+                      width: '100%',
+                      padding: 'var(--space-3) var(--space-4)',
+                      fontSize: 'var(--font-size-sm)',
+                      border: '1px solid var(--color-gray-300)',
+                      borderRadius: 'var(--radius-md)',
+                      backgroundColor: 'var(--color-background)',
+                      transition: 'border-color var(--transition-fast), box-shadow var(--transition-fast)'
+                    }}
+                    onFocus={(e) => {
+                      e.target.style.borderColor = 'var(--color-primary)'
+                      e.target.style.boxShadow = '0 0 0 3px var(--color-primary-50)'
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = 'var(--color-gray-300)'
+                      e.target.style.boxShadow = 'none'
+                    }}
+                  />
                 </div>
               </div>
-            </div>
+              
+              {/* Role Selection Buttons */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+                <button 
+                  type="button"
+                  onClick={() => simulateLogin('estudiante')}
+                  disabled={isLoading}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 'var(--space-2)',
+                    padding: 'var(--space-4)',
+                    backgroundColor: 'var(--color-primary)',
+                    color: 'var(--color-text-inverse)',
+                    border: '1px solid var(--color-primary)',
+                    borderRadius: 'var(--radius-md)',
+                    fontSize: 'var(--font-size-sm)',
+                    fontWeight: 'var(--font-weight-medium)',
+                    cursor: 'pointer',
+                    transition: 'all var(--transition-fast)',
+                    opacity: isLoading ? 0.6 : 1
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isLoading) {
+                      e.currentTarget.style.backgroundColor = 'var(--color-primary-dark)'
+                      e.currentTarget.style.transform = 'translateY(-1px)'
+                      e.currentTarget.style.boxShadow = 'var(--shadow-md)'
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isLoading) {
+                      e.currentTarget.style.backgroundColor = 'var(--color-primary)'
+                      e.currentTarget.style.transform = 'translateY(0)'
+                      e.currentTarget.style.boxShadow = 'none'
+                    }
+                  }}
+                >
+                  <i className="bi bi-person-badge"></i>
+                  Estudiante
+                </button>
+
+                <button 
+                  type="button"
+                  onClick={() => simulateLogin('padre')}
+                  disabled={isLoading}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 'var(--space-2)',
+                    padding: 'var(--space-4)',
+                    backgroundColor: 'transparent',
+                    color: 'var(--color-primary)',
+                    border: '1px solid var(--color-primary)',
+                    borderRadius: 'var(--radius-md)',
+                    fontSize: 'var(--font-size-sm)',
+                    fontWeight: 'var(--font-weight-medium)',
+                    cursor: 'pointer',
+                    transition: 'all var(--transition-fast)',
+                    opacity: isLoading ? 0.6 : 1
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isLoading) {
+                      e.currentTarget.style.backgroundColor = 'var(--color-primary)'
+                      e.currentTarget.style.color = 'var(--color-text-inverse)'
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isLoading) {
+                      e.currentTarget.style.backgroundColor = 'transparent'
+                      e.currentTarget.style.color = 'var(--color-primary)'
+                    }
+                  }}
+                >
+                  <i className="bi bi-people"></i>
+                  Padre/Madre
+                </button>
+
+                <button 
+                  type="button"
+                  onClick={() => simulateLogin('docente')}
+                  disabled={isLoading}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 'var(--space-2)',
+                    padding: 'var(--space-4)',
+                    backgroundColor: 'transparent',
+                    color: 'var(--color-info)',
+                    border: '1px solid var(--color-info)',
+                    borderRadius: 'var(--radius-md)',
+                    fontSize: 'var(--font-size-sm)',
+                    fontWeight: 'var(--font-weight-medium)',
+                    cursor: 'pointer',
+                    transition: 'all var(--transition-fast)',
+                    opacity: isLoading ? 0.6 : 1
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isLoading) {
+                      e.currentTarget.style.backgroundColor = 'var(--color-info)'
+                      e.currentTarget.style.color = 'var(--color-text-inverse)'
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isLoading) {
+                      e.currentTarget.style.backgroundColor = 'transparent'
+                      e.currentTarget.style.color = 'var(--color-info)'
+                    }
+                  }}
+                >
+                  <i className="bi bi-person-workspace"></i>
+                  Docente
+                </button>
+
+                <button 
+                  type="button"
+                  onClick={() => simulateLogin('admin')}
+                  disabled={isLoading}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 'var(--space-2)',
+                    padding: 'var(--space-4)',
+                    backgroundColor: 'transparent',
+                    color: 'var(--color-gray-600)',
+                    border: '1px solid var(--color-gray-300)',
+                    borderRadius: 'var(--radius-md)',
+                    fontSize: 'var(--font-size-sm)',
+                    fontWeight: 'var(--font-weight-medium)',
+                    cursor: 'pointer',
+                    transition: 'all var(--transition-fast)',
+                    opacity: isLoading ? 0.6 : 1
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isLoading) {
+                      e.currentTarget.style.backgroundColor = 'var(--color-gray-600)'
+                      e.currentTarget.style.color = 'var(--color-text-inverse)'
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isLoading) {
+                      e.currentTarget.style.backgroundColor = 'transparent'
+                      e.currentTarget.style.color = 'var(--color-gray-600)'
+                    }
+                  }}
+                >
+                  <i className="bi bi-gear"></i>
+                  Administrador
+                </button>
+
+                <button 
+                  type="button"
+                  onClick={() => simulateLogin('finanzas')}
+                  disabled={isLoading}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 'var(--space-2)',
+                    padding: 'var(--space-4)',
+                    backgroundColor: 'transparent',
+                    color: 'var(--color-success)',
+                    border: '1px solid var(--color-success)',
+                    borderRadius: 'var(--radius-md)',
+                    fontSize: 'var(--font-size-sm)',
+                    fontWeight: 'var(--font-weight-medium)',
+                    cursor: 'pointer',
+                    transition: 'all var(--transition-fast)',
+                    opacity: isLoading ? 0.6 : 1
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isLoading) {
+                      e.currentTarget.style.backgroundColor = 'var(--color-success)'
+                      e.currentTarget.style.color = 'var(--color-text-inverse)'
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isLoading) {
+                      e.currentTarget.style.backgroundColor = 'transparent'
+                      e.currentTarget.style.color = 'var(--color-success)'
+                    }
+                  }}
+                >
+                  <i className="bi bi-currency-dollar"></i>
+                  Finanzas
+                </button>
+              </div>
+            </form>
           </div>
+        </div>
+
+        {/* Footer */}
+        <div style={{ textAlign: 'center', marginTop: 'var(--space-8)' }}>
+          <p style={{
+            color: 'rgba(255,255,255,0.7)',
+            fontSize: 'var(--font-size-sm)',
+            margin: 0
+          }}>
+            © 2024 EducaPro. Todos los derechos reservados.
+          </p>
         </div>
       </div>
     </div>

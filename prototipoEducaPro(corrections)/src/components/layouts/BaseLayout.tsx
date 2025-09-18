@@ -60,11 +60,38 @@ export function BaseLayout() {
   }
 
   if (!user) {
-    return <div className="d-flex justify-content-center align-items-center vh-100">
-      <div className="spinner-border text-primary" role="status">
-        <span className="visually-hidden">Cargando...</span>
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        backgroundColor: 'var(--color-background-secondary)'
+      }}>
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: 'var(--space-4)'
+        }}>
+          <div style={{
+            width: '40px',
+            height: '40px',
+            border: '4px solid var(--color-primary-100)',
+            borderTop: '4px solid var(--color-primary)',
+            borderRadius: 'var(--radius-full)',
+            animation: 'spin 1s linear infinite'
+          }}></div>
+          <p style={{
+            color: 'var(--color-text-secondary)',
+            fontSize: 'var(--font-size-sm)',
+            margin: 0
+          }}>
+            Cargando...
+          </p>
+        </div>
       </div>
-    </div>
+    )
   }
 
   const typeToToastClass = (t?: Notification['type']) => {
@@ -77,114 +104,305 @@ export function BaseLayout() {
   }
 
   return (
-    <div className="d-flex vh-100">
+    <div style={{ display: 'flex', height: '100vh' }}>
       {/* Sidebar */}
-      <div className={`bg-dark text-white ${sidebarOpen ? 'sidebar-open' : 'sidebar-closed'}`} 
+      <div className={`sidebar ${sidebarOpen ? 'open' : ''}`} 
            style={{ 
-             width: sidebarOpen ? '250px' : '60px', 
-             transition: 'width 0.3s ease',
-             minHeight: '100vh'
+             width: sidebarOpen ? '280px' : '70px',
            }}>
-        <div className="p-3">
-          <div className="d-flex align-items-center justify-content-between">
-            {sidebarOpen && <h5 className="mb-0">EducaPro</h5>}
-            <button 
-              className="btn btn-link text-white p-0"
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-            >
-              <i className={`bi bi-${sidebarOpen ? 'x' : 'list'}`}></i>
-            </button>
-          </div>
+        <div className="sidebar-header">
+          {sidebarOpen && (
+            <h5 style={{
+              margin: 0,
+              fontSize: 'var(--font-size-lg)',
+              fontWeight: 'var(--font-weight-semibold)',
+              color: 'var(--color-text-inverse)'
+            }}>
+              EducaPro
+            </h5>
+          )}
+          <button 
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: 'var(--color-text-inverse)',
+              fontSize: 'var(--font-size-lg)',
+              cursor: 'pointer',
+              padding: 'var(--space-2)',
+              borderRadius: 'var(--radius-md)',
+              transition: 'background-color var(--transition-fast)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'var(--color-gray-700)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'transparent'
+            }}
+          >
+            <i className={`bi bi-${sidebarOpen ? 'x-lg' : 'list'}`}></i>
+          </button>
         </div>
         
-        <nav className="nav flex-column px-3">
+        <nav className="sidebar-nav">
           {getNavigationItems(user.role).map((item, index) => (
             <Link
               key={`nav-${item.href}-${index}`}
               to={item.href}
-              className={`nav-link text-white-50 d-flex align-items-center ${
-                location.pathname.startsWith(item.href) ? 'active bg-primary' : ''
+              className={`sidebar-nav-item ${
+                location.pathname.startsWith(item.href) ? 'active' : ''
               }`}
-              style={{ padding: '0.75rem 0.5rem' }}
               title={item.label}
             >
-              <i className={`bi bi-${item.icon} me-2`} style={{ width: '20px' }}></i>
-              {sidebarOpen && <span>{item.label}</span>}
+              <i className={`bi bi-${item.icon}`} style={{ 
+                width: '20px', 
+                textAlign: 'center',
+                fontSize: 'var(--font-size-base)'
+              }}></i>
+              {sidebarOpen && (
+                <span style={{
+                  marginLeft: 'var(--space-3)',
+                  fontSize: 'var(--font-size-sm)',
+                  fontWeight: 'var(--font-weight-medium)'
+                }}>
+                  {item.label}
+                </span>
+              )}
             </Link>
           ))}
         </nav>
       </div>
 
       {/* Main Content */}
-      <div className="flex-grow-1 d-flex flex-column">
+      <div style={{ 
+        flex: 1, 
+        display: 'flex', 
+        flexDirection: 'column',
+        minWidth: 0
+      }}>
         {/* Top Navbar */}
-        <nav className="navbar navbar-expand-lg navbar-light bg-white border-bottom">
-          <div className="w-100 d-flex align-items-center justify-content-between px-3">
+        <nav className="navbar">
+          <div style={{
+            width: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between'
+          }}>
             <button 
-              className="btn btn-link d-lg-none"
               onClick={() => setSidebarOpen(!sidebarOpen)}
+              style={{
+                background: 'none',
+                border: 'none',
+                fontSize: 'var(--font-size-lg)',
+                color: 'var(--color-text-secondary)',
+                cursor: 'pointer',
+                padding: 'var(--space-2)',
+                borderRadius: 'var(--radius-md)',
+                transition: 'all var(--transition-fast)',
+                display: 'none'
+              }}
+              className="d-lg-none"
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--color-background-tertiary)'
+                e.currentTarget.style.color = 'var(--color-text-primary)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent'
+                e.currentTarget.style.color = 'var(--color-text-secondary)'
+              }}
             >
               <i className="bi bi-list"></i>
             </button>
             
-            <div className="navbar-nav d-flex align-items-center gap-3 ms-auto">
-              <button className="btn btn-link nav-link position-relative p-0" onClick={handleBellClick} title="Notificaciones">
-                <i className="bi bi-bell fs-5"></i>
+            <div className="navbar-nav" style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 'var(--space-3)',
+              flexDirection: 'row'
+            }}>
+              <button 
+                onClick={handleBellClick} 
+                title="Notificaciones"
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  fontSize: 'var(--font-size-lg)',
+                  color: 'var(--color-text-secondary)',
+                  cursor: 'pointer',
+                  padding: 'var(--space-2)',
+                  borderRadius: 'var(--radius-md)',
+                  transition: 'all var(--transition-fast)',
+                  position: 'relative',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--color-background-tertiary)'
+                  e.currentTarget.style.color = 'var(--color-text-primary)'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent'
+                  e.currentTarget.style.color = 'var(--color-text-secondary)'
+                }}
+              >
+                <i className="bi bi-bell"></i>
                 {unread > 0 && (
-                  <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                  <span className="notification-badge">
                     {unread}
                   </span>
                 )}
               </button>
-              <button className="btn btn-sm btn-outline-danger" onClick={handleLogout}>
-                <i className="bi bi-box-arrow-right me-1"></i>
-                Cerrar Sesión
+              
+              <button 
+                onClick={handleLogout}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 'var(--space-2)',
+                  padding: 'var(--space-2) var(--space-3)',
+                  backgroundColor: 'transparent',
+                  color: 'var(--color-danger)',
+                  border: '1px solid var(--color-danger)',
+                  borderRadius: 'var(--radius-md)',
+                  fontSize: 'var(--font-size-sm)',
+                  fontWeight: 'var(--font-weight-medium)',
+                  cursor: 'pointer',
+                  transition: 'all var(--transition-fast)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--color-danger)'
+                  e.currentTarget.style.color = 'var(--color-text-inverse)'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent'
+                  e.currentTarget.style.color = 'var(--color-danger)'
+                }}
+              >
+                <i className="bi bi-box-arrow-right"></i>
+                <span className="d-none d-md-inline">Cerrar Sesión</span>
               </button>
-              <div className="nav-item dropdown">
-                <a 
-                  className="nav-link dropdown-toggle d-flex align-items-center" 
-                  href="#" 
-                  role="button" 
-                  data-bs-toggle="dropdown"
+              
+              <div style={{ position: 'relative' }}>
+                <button
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 'var(--space-2)',
+                    padding: 'var(--space-2) var(--space-3)',
+                    backgroundColor: 'transparent',
+                    color: 'var(--color-text-secondary)',
+                    border: 'none',
+                    borderRadius: 'var(--radius-md)',
+                    fontSize: 'var(--font-size-sm)',
+                    cursor: 'pointer',
+                    transition: 'all var(--transition-fast)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--color-background-tertiary)'
+                    e.currentTarget.style.color = 'var(--color-text-primary)'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent'
+                    e.currentTarget.style.color = 'var(--color-text-secondary)'
+                  }}
                 >
-                  <i className="bi bi-person-circle me-2"></i>
+                  <i className="bi bi-person-circle"></i>
                   <span className="d-none d-md-inline">{user.name}</span>
-                </a>
-                <ul className="dropdown-menu dropdown-menu-end">
-                  <li><a className="dropdown-item" href="#"><i className="bi bi-person me-2"></i>Perfil</a></li>
-                  <li><a className="dropdown-item" href="#"><i className="bi bi-gear me-2"></i>Configuración</a></li>
-                  <li><hr className="dropdown-divider" /></li>
-                  <li>
-                    <button className="dropdown-item text-danger" onClick={handleLogout}>
-                      <i className="bi bi-box-arrow-right me-2"></i>Cerrar Sesión
-                    </button>
-                  </li>
-                </ul>
+                  <i className="bi bi-chevron-down" style={{ fontSize: 'var(--font-size-xs)' }}></i>
+                </button>
               </div>
             </div>
           </div>
         </nav>
 
         {/* Page Content */}
-        <main className="flex-grow-1" style={{ overflow: 'auto', width: '100%' }}>
-          <div style={{ width: '100%', height: '100%', maxWidth: 'none' }}>
+        <main style={{ 
+          flex: 1, 
+          overflow: 'auto',
+          backgroundColor: 'var(--color-background-secondary)'
+        }}>
+          <div style={{ width: '100%', height: '100%' }}>
             <Outlet />
           </div>
         </main>
       </div>
 
       {/* Toasts desde campana - Parte superior */}
-      <div className="toast-container position-fixed top-0 end-0 p-3" style={{ zIndex: 2000 }}>
+      <div style={{
+        position: 'fixed',
+        top: 'var(--space-4)',
+        right: 'var(--space-4)',
+        zIndex: 'var(--z-modal)',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 'var(--space-2)'
+      }}>
         {toasts.map(n => (
-          <div key={n.id} className={`toast show mb-2 ${typeToToastClass(n.type)}`} role="alert" aria-live="assertive" aria-atomic="true">
-            <div className="d-flex">
-              <div className="toast-body">
-                <strong className="me-2 text-uppercase small">{n.type}</strong>
-                {n.title}
-                <div className="small opacity-75">{n.message}</div>
+          <div 
+            key={n.id} 
+            style={{
+              backgroundColor: n.type === 'success' ? 'var(--color-success)' :
+                              n.type === 'warning' ? 'var(--color-warning)' :
+                              n.type === 'error' ? 'var(--color-danger)' : 'var(--color-info)',
+              color: n.type === 'warning' ? 'var(--color-gray-800)' : 'var(--color-text-inverse)',
+              padding: 'var(--space-4)',
+              borderRadius: 'var(--radius-lg)',
+              boxShadow: 'var(--shadow-lg)',
+              maxWidth: '400px',
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: 'var(--space-3)',
+              animation: 'fadeIn 0.3s ease-out'
+            }}
+            role="alert"
+          >
+            <div style={{ flex: 1 }}>
+              <div style={{
+                fontSize: 'var(--font-size-xs)',
+                fontWeight: 'var(--font-weight-semibold)',
+                textTransform: 'uppercase',
+                marginBottom: 'var(--space-1)',
+                opacity: 0.8
+              }}>
+                {n.type}
               </div>
-              <button type="button" className="btn-close me-2 m-auto" aria-label="Close" onClick={() => handleToastClose(n.id)}></button>
+              <div style={{
+                fontSize: 'var(--font-size-sm)',
+                fontWeight: 'var(--font-weight-medium)',
+                marginBottom: 'var(--space-1)'
+              }}>
+                {n.title}
+              </div>
+              <div style={{
+                fontSize: 'var(--font-size-xs)',
+                opacity: 0.8
+              }}>
+                {n.message}
+              </div>
             </div>
+            <button 
+              type="button" 
+              onClick={() => handleToastClose(n.id)}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: 'inherit',
+                cursor: 'pointer',
+                padding: 'var(--space-1)',
+                borderRadius: 'var(--radius-sm)',
+                opacity: 0.7,
+                transition: 'opacity var(--transition-fast)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.opacity = '1'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.opacity = '0.7'
+              }}
+            >
+              <i className="bi bi-x-lg" style={{ fontSize: 'var(--font-size-sm)' }}></i>
+            </button>
           </div>
         ))}
       </div>
