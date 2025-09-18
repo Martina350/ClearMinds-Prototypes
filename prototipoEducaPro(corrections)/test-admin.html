@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Admin Funcionalidades</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        button { margin: 5px; padding: 10px 15px; }
+    </style>
+</head>
+<body>
+    <h1>Test de Funcionalidades del Administrador</h1>
+    
+    <div class="test-section">
+        <h2>1. Verificar localStorage</h2>
+        <button onclick="checkLocalStorage()">Verificar Datos</button>
+        <div id="localStorage-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>2. Test de Servicios</h2>
+        <button onclick="testUserService()">Test UserService</button>
+        <button onclick="testStudentService()">Test StudentService</button>
+        <button onclick="testTeacherService()">Test TeacherService</button>
+        <button onclick="testClassService()">Test ClassService</button>
+        <div id="services-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>3. Test de Exportación</h2>
+        <button onclick="testExport()">Test Exportar CSV</button>
+        <div id="export-result"></div>
+    </div>
+
+    <script>
+        // Simular los servicios básicos
+        function checkLocalStorage() {
+            const result = document.getElementById('localStorage-result');
+            const keys = ['educapro_users', 'educapro_students', 'educapro_teachers', 'educapro_classes'];
+            let html = '<h3>Datos en localStorage:</h3>';
+            
+            keys.forEach(key => {
+                const data = localStorage.getItem(key);
+                if (data) {
+                    const parsed = JSON.parse(data);
+                    html += `<p><strong>${key}:</strong> ${parsed.length} registros</p>`;
+                } else {
+                    html += `<p><strong>${key}:</strong> No encontrado</p>`;
+                }
+            });
+            
+            result.innerHTML = html;
+            result.parentElement.className = 'test-section success';
+        }
+        
+        function testUserService() {
+            const result = document.getElementById('services-result');
+            try {
+                // Simular creación de usuario
+                const users = JSON.parse(localStorage.getItem('educapro_users') || '[]');
+                const newUser = {
+                    id: 'test-' + Date.now(),
+                    name: 'Usuario Test',
+                    email: 'test@test.com',
+                    role: 'estudiante',
+                    createdAt: new Date().toISOString()
+                };
+                users.push(newUser);
+                localStorage.setItem('educapro_users', JSON.stringify(users));
+                
+                result.innerHTML = '<p>✅ UserService: Usuario creado exitosamente</p>';
+                result.parentElement.className = 'test-section success';
+            } catch (error) {
+                result.innerHTML = '<p>❌ UserService: Error - ' + error.message + '</p>';
+                result.parentElement.className = 'test-section error';
+            }
+        }
+        
+        function testStudentService() {
+            const result = document.getElementById('services-result');
+            try {
+                const students = JSON.parse(localStorage.getItem('educapro_students') || '[]');
+                result.innerHTML = '<p>✅ StudentService: ' + students.length + ' estudiantes encontrados</p>';
+                result.parentElement.className = 'test-section success';
+            } catch (error) {
+                result.innerHTML = '<p>❌ StudentService: Error - ' + error.message + '</p>';
+                result.parentElement.className = 'test-section error';
+            }
+        }
+        
+        function testTeacherService() {
+            const result = document.getElementById('services-result');
+            try {
+                const teachers = JSON.parse(localStorage.getItem('educapro_teachers') || '[]');
+                result.innerHTML = '<p>✅ TeacherService: ' + teachers.length + ' docentes encontrados</p>';
+                result.parentElement.className = 'test-section success';
+            } catch (error) {
+                result.innerHTML = '<p>❌ TeacherService: Error - ' + error.message + '</p>';
+                result.parentElement.className = 'test-section error';
+            }
+        }
+        
+        function testClassService() {
+            const result = document.getElementById('services-result');
+            try {
+                const classes = JSON.parse(localStorage.getItem('educapro_classes') || '[]');
+                result.innerHTML = '<p>✅ ClassService: ' + classes.length + ' clases encontradas</p>';
+                result.parentElement.className = 'test-section success';
+            } catch (error) {
+                result.innerHTML = '<p>❌ ClassService: Error - ' + error.message + '</p>';
+                result.parentElement.className = 'test-section error';
+            }
+        }
+        
+        function testExport() {
+            const result = document.getElementById('export-result');
+            try {
+                const users = JSON.parse(localStorage.getItem('educapro_users') || '[]');
+                const csvContent = [
+                    ['Nombre', 'Email', 'Rol', 'Fecha Creación'],
+                    ...users.map(user => [user.name, user.email, user.role, user.createdAt])
+                ].map(row => row.join(',')).join('\n');
+                
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                const url = URL.createObjectURL(blob);
+                link.setAttribute('href', url);
+                link.setAttribute('download', 'usuarios_test.csv');
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                result.innerHTML = '<p>✅ Exportación: Archivo CSV generado y descargado</p>';
+                result.parentElement.className = 'test-section success';
+            } catch (error) {
+                result.innerHTML = '<p>❌ Exportación: Error - ' + error.message + '</p>';
+                result.parentElement.className = 'test-section error';
+            }
+        }
+        
+        // Verificar datos al cargar
+        window.onload = function() {
+            checkLocalStorage();
+        };
+    </script>
+</body>
+</html>

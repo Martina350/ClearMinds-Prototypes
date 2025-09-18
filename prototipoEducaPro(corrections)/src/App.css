@@ -1,0 +1,528 @@
+/* Estilos personalizados para EducaPro */
+/* Hero de autenticación */
+.auth-hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  width: 100vw;
+  background: linear-gradient(135deg, #5b7cfa 0%, #6d3bb8 100%);
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.auth-title {
+  color: #fff;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.card-elevated {
+  border: none;
+  border-radius: 1rem;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+}
+
+.btn-full {
+  padding: 0.9rem 1.1rem;
+}
+
+/* Ajustes específicos para tablets y desktop medianos */
+@media (min-width: 992px) and (max-width: 1399.98px) {
+  .auth-hero .card-elevated {
+    transform: translateZ(0);
+  }
+}
+
+@media (max-width: 991.98px) {
+  .auth-hero .display-5 { font-size: 2rem; }
+}
+
+.form-floating > .form-control.is-invalid ~ label {
+  color: var(--educapro-danger);
+}
+
+.invalid-feedback {
+  display: block;
+}
+
+/* Variables CSS para colores del tema */
+:root {
+  --educapro-primary: #0d6efd;
+  --educapro-secondary: #6c757d;
+  --educapro-success: #198754;
+  --educapro-warning: #ffc107;
+  --educapro-danger: #dc3545;
+  --educapro-info: #0dcaf0;
+  --educapro-light: #f8f9fa;
+  --educapro-dark: #212529;
+}
+
+/* Contenedor de página que ocupa todo el ancho disponible */
+.page-container {
+  padding: 1rem;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+@media (min-width: 992px) {
+  .page-container {
+    padding: 1.5rem 2rem;
+    max-width: none;
+  }
+}
+
+@media (min-width: 1400px) {
+  .page-container {
+    padding: 2rem 3rem;
+    max-width: none;
+  }
+}
+
+@media (min-width: 1920px) {
+  .page-container {
+    padding: 2.5rem 4rem;
+    max-width: none;
+  }
+}
+
+@media (min-width: 2560px) {
+  .page-container {
+    padding: 3rem 5rem;
+    max-width: none;
+  }
+}
+
+@media (min-width: 3840px) {
+  .page-container {
+    padding: 4rem 6rem;
+    max-width: none;
+  }
+}
+
+/* Asegurar que el contenido principal use todo el ancho */
+main {
+  width: 100%;
+  max-width: none;
+}
+
+/* Contenedores fluidos para tablas y cards */
+.container-fluid {
+  max-width: none;
+  width: 100%;
+}
+
+/* Cards que usen todo el ancho disponible */
+.card {
+  width: 100%;
+}
+
+/* Tablas que se adapten al ancho completo */
+.table-responsive {
+  width: 100%;
+}
+
+/* Forzar ancho completo en todos los elementos de las páginas */
+.w-100 {
+  width: 100% !important;
+}
+
+/* Asegurar que las filas de Bootstrap usen todo el ancho */
+.row {
+  width: 100%;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+/* Asegurar que las columnas usen el espacio disponible */
+.col-12,
+.col-6,
+.col-4,
+.col-3,
+.col-md-6,
+.col-md-4,
+.col-md-3,
+.col-lg-4 {
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
+/* Cards que ocupen todo el ancho disponible */
+.card {
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+/* Headers que ocupen todo el ancho */
+.d-flex.justify-content-between {
+  width: 100%;
+}
+
+/* Asegurar que el contenido principal no tenga restricciones */
+main .w-100 {
+  width: 100% !important;
+  max-width: none !important;
+}
+
+/* Forzar ancho completo en todos los elementos principales */
+main,
+main > div,
+main > div > div {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+}
+
+/* Override de Bootstrap para ancho completo */
+.container,
+.container-fluid,
+.container-sm,
+.container-md,
+.container-lg,
+.container-xl,
+.container-xxl {
+  max-width: none !important;
+  width: 100% !important;
+}
+
+/* Forzar que las filas y columnas usen todo el ancho */
+.row {
+  width: 100% !important;
+  max-width: none !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+/* Asegurar que todos los elementos de las páginas usen ancho completo */
+[class*="col-"] {
+  width: auto !important;
+}
+
+/* Forzar ancho completo en elementos específicos */
+.d-flex.justify-content-between,
+.card,
+.table-responsive,
+.btn-group {
+  width: 100% !important;
+  max-width: none !important;
+}
+
+/* Sidebar responsive */
+.sidebar-closed {
+  width: 60px !important;
+}
+
+.sidebar-open {
+  width: 250px !important;
+}
+
+@media (max-width: 991.98px) {
+  .sidebar-closed,
+  .sidebar-open {
+    width: 250px !important;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: -260px;
+    z-index: 1050;
+    transition: left 0.3s ease;
+  }
+  .sidebar-open { left: 0; }
+}
+
+/* Overlay para móviles */
+@media (max-width: 991.98px) {
+  .sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1040;
+  }
+}
+
+/* Cards con hover effects */
+.card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Botones con efectos */
+.btn {
+  transition: all 0.2s ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+/* Tablas responsive mejoradas */
+.table-responsive {
+  border-radius: 0.375rem;
+  overflow: hidden;
+}
+
+.table th {
+  background-color: var(--educapro-light);
+  border-bottom: 2px solid var(--educapro-primary);
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Badges personalizados */
+.badge {
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.375rem 0.75rem;
+}
+
+/* Stats cards mejoradas */
+.card.bg-primary,
+.card.bg-success,
+.card.bg-warning,
+.card.bg-danger,
+.card.bg-info {
+  background: linear-gradient(135deg, var(--educapro-primary), #0056b3) !important;
+  border: none;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.card.bg-success {
+  background: linear-gradient(135deg, var(--educapro-success), #146c43) !important;
+}
+
+.card.bg-warning {
+  background: linear-gradient(135deg, var(--educapro-warning), #e0a800) !important;
+}
+
+.card.bg-danger {
+  background: linear-gradient(135deg, var(--educapro-danger), #b02a37) !important;
+}
+
+.card.bg-info {
+  background: linear-gradient(135deg, var(--educapro-info), #0aa2c0) !important;
+}
+
+/* Lista de grupos mejorada */
+.list-group-item {
+  border: 1px solid rgba(0, 0, 0, 0.125);
+  transition: background-color 0.2s ease;
+}
+
+.list-group-item:hover {
+  background-color: var(--educapro-light);
+}
+
+/* Formularios mejorados */
+.form-control:focus {
+  border-color: var(--educapro-primary);
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+.form-floating > .form-control:focus ~ label,
+.form-floating > .form-control:not(:placeholder-shown) ~ label {
+  color: var(--educapro-primary);
+}
+
+/* Dropdown mejorado */
+.dropdown-menu {
+  border: none;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 0.5rem;
+}
+
+.dropdown-item {
+  transition: background-color 0.2s ease;
+}
+
+.dropdown-item:hover {
+  background-color: var(--educapro-light);
+}
+
+/* Spinner personalizado */
+.spinner-border {
+  width: 3rem;
+  height: 3rem;
+}
+
+/* Notificaciones */
+.notification-item {
+  border-left: 4px solid var(--educapro-primary);
+  background-color: #f8f9fa;
+  transition: all 0.2s ease;
+}
+
+.notification-item:hover {
+  background-color: #e9ecef;
+  transform: translateX(5px);
+}
+
+/* Gráficos responsive */
+.chart-container {
+  position: relative;
+  height: 300px;
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .chart-container {
+    height: 400px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .chart-container {
+    height: 500px;
+  }
+}
+
+/* Animaciones suaves */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* Scroll personalizado */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--educapro-primary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #0056b3;
+}
+
+/* Utilidades responsive */
+.text-responsive {
+  font-size: 0.875rem;
+}
+
+@media (min-width: 768px) {
+  .text-responsive {
+    font-size: 1rem;
+  }
+}
+
+@media (min-width: 1200px) {
+  .text-responsive {
+    font-size: 1.125rem;
+  }
+}
+
+/* Grid responsive mejorado */
+.row.g-4 > * {
+  margin-bottom: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .row.g-4 > * {
+    margin-bottom: 0;
+  }
+}
+
+/* Cards de estadísticas responsive */
+.stats-card {
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+}
+
+@media (min-width: 768px) {
+  .stats-card {
+    min-height: 140px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .stats-card {
+    min-height: 160px;
+  }
+}
+
+/* Botones de acción responsive */
+.btn-group-responsive {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+@media (min-width: 768px) {
+  .btn-group-responsive {
+    flex-wrap: nowrap;
+  }
+}
+
+/* Tablas responsive con scroll horizontal */
+.table-responsive-horizontal {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Mejoras para pantallas 4K */
+@media (min-width: 2560px) {
+  .container-fluid {
+    font-size: 1.125rem;
+  }
+  
+  .card {
+    border-radius: 0.5rem;
+  }
+  
+  .btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+  }
+  
+  .table th,
+  .table td {
+    padding: 1rem;
+  }
+}
+
+@media (min-width: 3840px) {
+  .container-fluid {
+    font-size: 1.25rem;
+  }
+  
+  .btn {
+    padding: 1rem 2rem;
+    font-size: 1.125rem;
+  }
+  
+  .table th,
+  .table td {
+    padding: 1.25rem;
+  }
+  
+  .card-body {
+    padding: 2rem;
+  }
+}
