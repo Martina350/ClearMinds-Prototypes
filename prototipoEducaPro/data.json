@@ -1,0 +1,29 @@
+{
+  "users": [
+    { "id": "u1", "email": "admin@fivoduc.test", "password": "admin", "role": "admin", "name": "Admin Fivoduc" },
+    { "id": "u2", "email": "docente@fivoduc.test", "password": "docente", "role": "teacher", "name": "María Torres" },
+    { "id": "u3", "email": "alumno1@fivoduc.test", "password": "alumno", "role": "student", "name": "Luis Pérez", "studentId": "s1" },
+    { "id": "u4", "email": "padre1@fivoduc.test", "password": "padre", "role": "parent", "name": "Sr. Pérez", "childStudentId": "s1" },
+    { "id": "u5", "email": "finanzas@fivoduc.test", "password": "finanzas", "role": "finance", "name": "Gabriela Ríos" }
+  ],
+  "groups": [
+    { "id": "g1", "name": "Grupo A", "subject": "Inglés", "modality": "virtual", "teacherId": "u2" },
+    { "id": "g2", "name": "Grupo B", "subject": "Matemáticas", "modality": "presencial", "teacherId": "u2" }
+  ],
+  "students": [
+    { "id": "s1", "fullName": "Luis Pérez", "document": "12345678", "groupId": "g1", "status": "matriculado" }
+  ],
+  "attendance": [],
+  "grades": [],
+  "assignments": [],
+  "payments": [
+    { "id": "p1", "studentId": "s1", "type": "Matrícula", "amount": 120, "status": "pagado", "date": "2025-09-01" },
+    { "id": "p2", "studentId": "s1", "type": "Mensualidad", "amount": 80, "status": "pendiente", "date": "2025-09-10" }
+  ],
+  "feedback": [],
+  "virtualLinks": [
+    { "id": "vl1", "groupId": "g1", "url": "https://meet.example.com/grupoA", "label": "Link clase virtual" }
+  ]
+}
+
+

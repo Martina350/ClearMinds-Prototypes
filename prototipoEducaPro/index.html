@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fivoduc — Prototipo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div id="app">
+      <!-- Login / Selección de rol -->
+      <section id="view-login" class="view view-login">
+        <div class="login-card">
+          <div class="brand">
+            <div class="logo">F</div>
+            <h1>Fivoduc</h1>
+            <p>Plataforma académica — Prototipo</p>
+          </div>
+          <form id="login-form" class="login-form">
+            <div class="field">
+              <label for="email">Correo</label>
+              <input id="email" type="email" placeholder="usuario@fivoduc.test" required />
+            </div>
+            <div class="field">
+              <label for="password">Contraseña</label>
+              <input id="password" type="password" placeholder="••••••••" required />
+            </div>
+            <div class="roles">
+              <button type="button" class="role-btn role-admin" data-role="admin">Administrador</button>
+              <button type="button" class="role-btn role-teacher" data-role="teacher">Docente</button>
+              <button type="button" class="role-btn role-student" data-role="student">Estudiante</button>
+              <button type="button" class="role-btn role-parent" data-role="parent">Padre</button>
+              <button type="button" class="role-btn role-finance" data-role="finance">Finanzas</button>
+            </div>
+            <button type="submit" class="primary-btn">Ingresar</button>
+            <p class="hint">Usa correos mock: admin@fivoduc.test, docente@fivoduc.test, alumno1@fivoduc.test, padre1@fivoduc.test, finanzas@fivoduc.test</p>
+          </form>
+        </div>
+      </section>
+
+      <!-- Layout principal -->
+      <section id="view-app" class="view view-app hidden">
+        <header class="app-header">
+          <div class="left">
+            <div class="logo-small">F</div>
+            <h2 id="current-role-title">Panel</h2>
+          </div>
+          <div class="right">
+            <button id="btn-open-notifications" class="icon-btn" title="Notificaciones">🔔</button>
+            <button id="btn-logout" class="secondary-btn">Salir</button>
+          </div>
+        </header>
+        <div class="app-body">
+          <aside class="sidebar" id="sidebar">
+            <nav id="menu"></nav>
+            <button id="btn-toggle-sidebar" class="hamburger">☰</button>
+          </aside>
+          <main class="content">
+            <!-- Dashboards por rol -->
+            <div id="dashboard" class="dashboard-grid"></div>
+
+            <!-- Secciones comunes reutilizables -->
+            <section id="section-students" class="section hidden"></section>
+            <section id="section-attendance" class="section hidden"></section>
+            <section id="section-grades" class="section hidden"></section>
+            <section id="section-assignments" class="section hidden"></section>
+            <section id="section-finance" class="section hidden"></section>
+            <section id="section-feedback" class="section hidden"></section>
+          </main>
+        </div>
+      </section>
+
+      <!-- Modal genérico -->
+      <div id="modal" class="modal hidden">
+        <div class="modal-dialog">
+          <div class="modal-header">
+            <h3 id="modal-title">Modal</h3>
+            <button id="modal-close" class="icon-btn">✖</button>
+          </div>
+          <div id="modal-body" class="modal-body"></div>
+          <div class="modal-footer">
+            <button id="modal-cancel" class="secondary-btn">Cancelar</button>
+            <button id="modal-confirm" class="primary-btn">Guardar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Toasts -->
+      <div id="toasts" class="toasts"></div>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+  </html>
+
+
