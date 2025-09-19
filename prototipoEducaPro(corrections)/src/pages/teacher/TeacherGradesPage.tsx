@@ -366,44 +366,6 @@ export function TeacherGradesPage() {
           </div>
         </div>
       )}
-
-      {/* Resumen de calificaciones */}
-      {grades.length > 0 && (
-        <div className="row mt-4">
-          <div className="col-md-3">
-            <div className="card bg-primary text-white">
-              <div className="card-body text-center">
-                <h6>Total Calificaciones</h6>
-                <h3>{grades.length}</h3>
-              </div>
-            </div>
-          </div>
-          <div className="col-md-3">
-            <div className="card bg-success text-white">
-              <div className="card-body text-center">
-                <h6>Promedio General</h6>
-                <h3>{(grades.reduce((sum, g) => sum + (g.value / g.maxValue), 0) / grades.length * 100).toFixed(1)}%</h3>
-              </div>
-            </div>
-          </div>
-          <div className="col-md-3">
-            <div className="card bg-warning text-white">
-              <div className="card-body text-center">
-                <h6>Aprobados</h6>
-                <h3>{grades.filter(g => g.value >= (g.maxValue * 0.7)).length}</h3>
-              </div>
-            </div>
-          </div>
-          <div className="col-md-3">
-            <div className="card bg-danger text-white">
-              <div className="card-body text-center">
-                <h6>Reprobados</h6>
-                <h3>{grades.filter(g => g.value < (g.maxValue * 0.7)).length}</h3>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   )
 }

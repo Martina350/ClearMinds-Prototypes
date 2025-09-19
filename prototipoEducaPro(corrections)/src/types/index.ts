@@ -12,6 +12,8 @@ export interface Student extends User {
   classIds: string[]
   grade: string
   status?: 'active' | 'inactive'
+  modality: 'presencial' | 'virtual' | 'in-home'
+  phone?: string
 }
 
 export interface Parent extends User {
@@ -56,6 +58,7 @@ export interface Class {
   studentIds: string[]
   schedule: string
   room: string
+  modality: 'presencial' | 'virtual' | 'in-home'
   createdAt: string
 }
 
@@ -119,4 +122,14 @@ export interface DashboardStats {
   averageGrade: number
   attendanceRate: number
   notifications: number
+}
+
+export interface VirtualClassLink {
+  id: string
+  classId: string
+  teacherId: string
+  link: string
+  date: string
+  sentToStudents: boolean
+  createdAt: string
 }

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { studentService, classService, teacherService } from '../../services/dataService'
+import { studentService, classService, teacherService, initializeData } from '../../services/dataService'
 import type { Student, Class } from '../../types'
 
 export function TeacherStudentsPage() {
@@ -7,26 +7,55 @@ export function TeacherStudentsPage() {
   const [classes, setClasses] = useState<Class[]>([])
   // const [teacher, setTeacher] = useState<Teacher | null>(null)
   const [selectedClass, setSelectedClass] = useState<string>('')
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [modalityFilter, setModalityFilter] = useState<string>('')
 
   useEffect(() => {
-    const teacherId = '52' // ID del docente actual (simulado)
-    const teacherData = teacherService.getById(teacherId)
-    // setTeacher(teacherData || null)
-    
-    if (teacherData) {
-      const classesData = classService.getByTeacherId(teacherId)
-      setClasses(classesData)
+    try {
+      setLoading(true)
+      setError(null)
       
-      // Obtener todos los estudiantes de las clases
-      const allStudentIds = classesData.flatMap(c => c.studentIds)
-      const uniqueStudentIds = [...new Set(allStudentIds)]
-      const studentsData = uniqueStudentIds.map(id => studentService.getById(id)).filter(Boolean) as Student[]
-      setStudents(studentsData)
+      // Asegurar que los datos estén inicializados
+      initializeData()
       
-      // Establecer la primera clase como seleccionada por defecto
-      if (classesData.length > 0) {
-        setSelectedClass(classesData[0].id)
+      const teacherId = '52' // ID del docente actual (simulado)
+      const teacherData = teacherService.getById(teacherId)
+      
+      if (teacherData) {
+        const classesData = classService.getByTeacherId(teacherId)
+        setClasses(classesData || [])
+        
+        // Obtener todos los estudiantes de las clases
+        const allStudentIds = classesData?.flatMap(c => c.studentIds || []) || []
+        const uniqueStudentIds = [...new Set(allStudentIds)]
+        const studentsData = uniqueStudentIds
+          .map(id => studentService.getById(id))
+          .filter(Boolean) as Student[]
+        
+        // Asegurar que todos los estudiantes tengan modalidad y teléfono
+        const studentsWithModality = studentsData.map(student => ({
+          ...student,
+          modality: student.modality || 'presencial',
+          phone: student.phone || `+57${Math.floor(Math.random() * 9000000000) + 1000000000}`
+        }))
+        
+        setStudents(studentsWithModality)
+        
+        // Establecer la primera clase como seleccionada por defecto
+        if (classesData && classesData.length > 0) {
+          setSelectedClass(classesData[0].id)
+        }
+      } else {
+        setError('No se encontró información del docente')
       }
+    } catch (error) {
+      console.error('Error al cargar datos del docente:', error)
+      setError('Error al cargar los datos. Por favor, recarga la página.')
+      setStudents([])
+      setClasses([])
+    } finally {
+      setLoading(false)
     }
   }, [])
 
@@ -34,12 +63,17 @@ export function TeacherStudentsPage() {
     const classData = classes.find(c => c.id === classId)
     if (!classData) return []
     
-    return classData.studentIds.map(id => studentService.getById(id)).filter(Boolean) as Student[]
+    const studentsInClass = (classData.studentIds || [])
+      .map(id => studentService.getById(id))
+      .filter(Boolean) as Student[]
+    
+    // Asegurar que todos los estudiantes tengan modalidad y teléfono
+    return studentsInClass.map(student => ({
+      ...student,
+      modality: student.modality || 'presencial',
+      phone: student.phone || `+57${Math.floor(Math.random() * 9000000000) + 1000000000}`
+    }))
   }
-
-  const filteredStudents = selectedClass 
-    ? getStudentsInClass(selectedClass)
-    : students
 
   const [showStudentModal, setShowStudentModal] = useState(false)
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null)
@@ -51,6 +85,16 @@ export function TeacherStudentsPage() {
   const [attendanceStatus, setAttendanceStatus] = useState<string>('present')
   const [messageSubject, setMessageSubject] = useState<string>('')
   const [messageText, setMessageText] = useState<string>('')
+
+  const filteredStudents = (() => {
+    let filtered = selectedClass ? getStudentsInClass(selectedClass) : students
+    
+    if (modalityFilter) {
+      filtered = filtered.filter(student => student.modality === modalityFilter)
+    }
+    
+    return filtered
+  })()
 
   const handleViewProfile = (student: Student) => {
     setSelectedStudent(student)
@@ -124,23 +168,71 @@ export function TeacherStudentsPage() {
     }
   }
 
+  // Mostrar estado de carga
+  if (loading) {
+    return (
+      <div className="page-container">
+        <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '400px' }}>
+          <div className="text-center">
+            <div className="spinner-border text-primary" role="status">
+              <span className="visually-hidden">Cargando...</span>
+            </div>
+            <p className="mt-3">Cargando estudiantes...</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Mostrar error
+  if (error) {
+    return (
+      <div className="page-container">
+        <div className="alert alert-danger" role="alert">
+          <h4 className="alert-heading">Error</h4>
+          <p>{error}</p>
+          <hr />
+          <button 
+            className="btn btn-outline-danger" 
+            onClick={() => window.location.reload()}
+          >
+            Recargar página
+          </button>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="page-container">
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2 className="h4 mb-0">Mis Estudiantes</h2>
-        <select 
-          className="form-select"
-          style={{ width: 'auto' }}
-          value={selectedClass}
-          onChange={(e) => setSelectedClass(e.target.value)}
-        >
-          <option value="">Todas las clases</option>
-          {classes.map(cls => (
-            <option key={cls.id} value={cls.id}>
-              {cls.name}
-            </option>
-          ))}
-        </select>
+        <div className="d-flex gap-2">
+          <select 
+            className="form-select"
+            style={{ width: 'auto' }}
+            value={selectedClass}
+            onChange={(e) => setSelectedClass(e.target.value)}
+          >
+            <option value="">Todas las clases</option>
+            {classes.map(cls => (
+              <option key={cls.id} value={cls.id}>
+                {cls.name}
+              </option>
+            ))}
+          </select>
+          <select 
+            className="form-select"
+            style={{ width: 'auto' }}
+            value={modalityFilter}
+            onChange={(e) => setModalityFilter(e.target.value)}
+          >
+            <option value="">Todas las modalidades</option>
+            <option value="presencial">Presencial</option>
+            <option value="virtual">Virtual</option>
+            <option value="in-home">In-home</option>
+          </select>
+        </div>
       </div>
 
       {filteredStudents.length === 0 ? (
@@ -164,6 +256,7 @@ export function TeacherStudentsPage() {
                     <th>Estudiante</th>
                     <th>Grado</th>
                     <th>Email</th>
+                    <th>Modalidad</th>
                     <th>Clases</th>
                     <th>Estado</th>
                     <th>Acciones</th>
@@ -180,6 +273,22 @@ export function TeacherStudentsPage() {
                       </td>
                       <td>{student.grade}</td>
                       <td>{student.email}</td>
+                      <td>
+                        <span className={`badge ${
+                          student.modality === 'presencial' ? 'bg-primary' :
+                          student.modality === 'virtual' ? 'bg-success' :
+                          'bg-warning'
+                        }`}>
+                          <i className={`bi ${
+                            student.modality === 'presencial' ? 'bi-building' :
+                            student.modality === 'virtual' ? 'bi-camera-video' :
+                            'bi-house'
+                          } me-1`}></i>
+                          {student.modality === 'presencial' ? 'Presencial' :
+                           student.modality === 'virtual' ? 'Virtual' :
+                           'In-home'}
+                        </span>
+                      </td>
                       <td>
                         <span className="badge bg-secondary">
                           {student.classIds.length} clases
@@ -229,36 +338,6 @@ export function TeacherStudentsPage() {
         </div>
       )}
 
-      {/* Resumen de estudiantes */}
-      {students.length > 0 && (
-        <div className="row mt-4">
-          <div className="col-md-4">
-            <div className="card bg-primary text-white">
-              <div className="card-body text-center">
-                <h6>Total Estudiantes</h6>
-                <h3>{students.length}</h3>
-              </div>
-            </div>
-          </div>
-          <div className="col-md-4">
-            <div className="card bg-success text-white">
-              <div className="card-body text-center">
-                <h6>Estudiantes Activos</h6>
-                <h3>{students.length}</h3>
-              </div>
-            </div>
-          </div>
-          <div className="col-md-4">
-            <div className="card bg-info text-white">
-              <div className="card-body text-center">
-                <h6>Total Clases</h6>
-                <h3>{classes.length}</h3>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Modal para ver perfil del estudiante */}
       {showStudentModal && selectedStudent && (
         <div className="modal show d-block" tabIndex={-1} style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
@@ -281,6 +360,23 @@ export function TeacherStudentsPage() {
                       <li className="list-group-item d-flex justify-content-between">
                         <span>Grado:</span>
                         <span className="badge bg-primary">{selectedStudent.grade}</span>
+                      </li>
+                      <li className="list-group-item d-flex justify-content-between">
+                        <span>Modalidad:</span>
+                        <span className={`badge ${
+                          selectedStudent.modality === 'presencial' ? 'bg-primary' :
+                          selectedStudent.modality === 'virtual' ? 'bg-success' :
+                          'bg-warning'
+                        }`}>
+                          <i className={`bi ${
+                            selectedStudent.modality === 'presencial' ? 'bi-building' :
+                            selectedStudent.modality === 'virtual' ? 'bi-camera-video' :
+                            'bi-house'
+                          } me-1`}></i>
+                          {selectedStudent.modality === 'presencial' ? 'Presencial' :
+                           selectedStudent.modality === 'virtual' ? 'Virtual' :
+                           'In-home'}
+                        </span>
                       </li>
                       <li className="list-group-item d-flex justify-content-between">
                         <span>Estado:</span>

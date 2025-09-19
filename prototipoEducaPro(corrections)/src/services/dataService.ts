@@ -37,8 +37,38 @@ function setData<T>(key: string, data: T[]): void {
   localStorage.setItem(key, JSON.stringify(data))
 }
 
+// Función para migrar datos existentes
+function migrateExistingData(): void {
+  const students = getData<Student>(KEYS.STUDENTS)
+  const classes = getData<Class>(KEYS.CLASSES)
+  
+  // Migrar estudiantes si no tienen modalidad
+  if (students.length > 0 && !students[0].modality) {
+    const modalities: ('presencial' | 'virtual' | 'in-home')[] = ['presencial', 'virtual', 'in-home']
+    const updatedStudents = students.map(student => ({
+      ...student,
+      modality: modalities[Math.floor(Math.random() * modalities.length)],
+      phone: student.phone || `+57${Math.floor(Math.random() * 9000000000) + 1000000000}`
+    }))
+    setData(KEYS.STUDENTS, updatedStudents)
+  }
+  
+  // Migrar clases si no tienen modalidad
+  if (classes.length > 0 && !classes[0].modality) {
+    const modalities: ('presencial' | 'virtual' | 'in-home')[] = ['presencial', 'virtual', 'in-home']
+    const updatedClasses = classes.map(cls => ({
+      ...cls,
+      modality: modalities[Math.floor(Math.random() * modalities.length)]
+    }))
+    setData(KEYS.CLASSES, updatedClasses)
+  }
+}
+
 // Función para inicializar datos de prueba
 export function initializeData(): void {
+  // Migrar datos existentes primero
+  migrateExistingData()
+  
   // Verificar si ya existen datos
   if (getData<User>(KEYS.USERS).length > 0) return
 
@@ -86,6 +116,13 @@ export function initializeData(): void {
     const estudianteId = i.toString()
     studentIds.push(estudianteId)
     
+    // Asignar modalidad aleatoria a los estudiantes
+    const studentModalities: ('presencial' | 'virtual' | 'in-home')[] = ['presencial', 'virtual', 'in-home']
+    const randomStudentModality = studentModalities[Math.floor(Math.random() * studentModalities.length)]
+    
+    // Generar número de teléfono aleatorio
+    const phoneNumber = `+57${Math.floor(Math.random() * 9000000000) + 1000000000}`
+    
     students.push({
       id: estudianteId,
       name: `${nombre} ${apellido}`,
@@ -95,6 +132,8 @@ export function initializeData(): void {
       classIds: [], // Se asignarán después
       grade: grados[Math.floor((i - 1) / 20)],
       status: Math.random() > 0.1 ? 'active' : 'inactive',
+      modality: randomStudentModality,
+      phone: phoneNumber,
       createdAt: now
     })
 
@@ -202,6 +241,10 @@ export function initializeData(): void {
       teacher.classIds.push(classId)
     }
     
+    // Asignar modalidad aleatoria a las clases
+    const modalities: ('presencial' | 'virtual' | 'in-home')[] = ['presencial', 'virtual', 'in-home']
+    const randomModality = modalities[Math.floor(Math.random() * modalities.length)]
+    
     classes.push({
       id: classId,
       name: `${materia} ${grado}`,
@@ -210,6 +253,7 @@ export function initializeData(): void {
       studentIds: studentsInClass,
       schedule: `Lunes ${8 + i}:00-${9 + i}:00`,
       room: `Aula ${200 + i}`,
+      modality: randomModality,
       createdAt: now
     })
   }
@@ -402,6 +446,13 @@ export function resetAllData(): void {
   initializeData()
 }
 
+// Función para forzar migración de datos existentes
+export function forceDataMigration(): void {
+  console.log('🔄 Iniciando migración de datos...')
+  migrateExistingData()
+  console.log('✅ Migración completada')
+}
+
 // Servicios para cada entidad
 export const userService = {
   getCurrentUser: (): User | null => {
@@ -445,8 +496,25 @@ export const userService = {
 }
 
 export const studentService = {
-  getAll: (): Student[] => getData<Student>(KEYS.STUDENTS),
-  getById: (id: string): Student | undefined => getData<Student>(KEYS.STUDENTS).find(s => s.id === id),
+  getAll: (): Student[] => {
+    const students = getData<Student>(KEYS.STUDENTS)
+    // Verificar y corregir estudiantes que no tengan modalidad
+    return students.map(student => ({
+      ...student,
+      modality: student.modality || 'presencial',
+      phone: student.phone || `+57${Math.floor(Math.random() * 9000000000) + 1000000000}`
+    }))
+  },
+  getById: (id: string): Student | undefined => {
+    const student = getData<Student>(KEYS.STUDENTS).find(s => s.id === id)
+    if (!student) return undefined
+    // Asegurar que el estudiante tenga modalidad
+    return {
+      ...student,
+      modality: student.modality || 'presencial',
+      phone: student.phone || `+57${Math.floor(Math.random() * 9000000000) + 1000000000}`
+    }
+  },
   getByParentId: (parentId: string): Student[] => getData<Student>(KEYS.STUDENTS).filter(s => s.parentId === parentId),
   create: (student: Omit<Student, 'id' | 'createdAt'>): Student => {
     console.log('[studentService.create] input:', student)
@@ -535,15 +603,40 @@ export const teacherService = {
 }
 
 export const classService = {
-  getAll: (): Class[] => getData<Class>(KEYS.CLASSES),
-  getById: (id: string): Class | undefined => getData<Class>(KEYS.CLASSES).find(c => c.id === id),
+  getAll: (): Class[] => {
+    const classes = getData<Class>(KEYS.CLASSES)
+    // Verificar y corregir clases que no tengan modalidad
+    return classes.map(cls => ({
+      ...cls,
+      modality: cls.modality || 'presencial'
+    }))
+  },
+  getById: (id: string): Class | undefined => {
+    const cls = getData<Class>(KEYS.CLASSES).find(c => c.id === id)
+    if (!cls) return undefined
+    // Asegurar que la clase tenga modalidad
+    return {
+      ...cls,
+      modality: cls.modality || 'presencial'
+    }
+  },
   getByStudentId: (studentId: string): Class[] => {
     const classes = getData<Class>(KEYS.CLASSES)
-    return classes.filter(c => c.studentIds.includes(studentId))
+    return classes
+      .filter(c => c.studentIds.includes(studentId))
+      .map(cls => ({
+        ...cls,
+        modality: cls.modality || 'presencial'
+      }))
   },
   getByTeacherId: (teacherId: string): Class[] => {
     const classes = getData<Class>(KEYS.CLASSES)
-    return classes.filter(c => c.teacherId === teacherId)
+    return classes
+      .filter(c => c.teacherId === teacherId)
+      .map(cls => ({
+        ...cls,
+        modality: cls.modality || 'presencial'
+      }))
   },
   create: (cls: Omit<Class, 'id' | 'createdAt'>): Class => {
     console.log('[classService.create] input:', cls)

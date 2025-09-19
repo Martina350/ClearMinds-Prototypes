@@ -162,7 +162,7 @@ export function TeacherDashboard() {
               marginBottom: 'var(--space-2)',
               margin: 0
             }}>
-              ¡Hola, Prof. {teacher.name.split(' ')[0]}!
+              ¡Hola, {teacher.name.split(' ')[0]}!
             </h1>
             <p style={{
               color: 'var(--color-text-secondary)',

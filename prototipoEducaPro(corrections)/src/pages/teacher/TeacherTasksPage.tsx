@@ -318,45 +318,7 @@ export function TeacherTasksPage() {
           })}
         </div>
       )}
-
-      {/* Resumen de tareas */}
-      {tasks.length > 0 && (
-        <div className="row mt-4">
-          <div className="col-md-3">
-            <div className="card bg-primary text-white">
-              <div className="card-body text-center">
-                <h6>Total Tareas</h6>
-                <h3>{tasks.length}</h3>
-              </div>
-            </div>
-          </div>
-          <div className="col-md-3">
-            <div className="card bg-success text-white">
-              <div className="card-body text-center">
-                <h6>Activas</h6>
-                <h3>{tasks.filter(t => !isTaskOverdue(t.dueDate) && !isTaskDueSoon(t.dueDate)).length}</h3>
-              </div>
-            </div>
-          </div>
-          <div className="col-md-3">
-            <div className="card bg-warning text-white">
-              <div className="card-body text-center">
-                <h6>Próximas</h6>
-                <h3>{tasks.filter(t => isTaskDueSoon(t.dueDate)).length}</h3>
-              </div>
-            </div>
-          </div>
-          <div className="col-md-3">
-            <div className="card bg-danger text-white">
-              <div className="card-body text-center">
-                <h6>Vencidas</h6>
-                <h3>{tasks.filter(t => isTaskOverdue(t.dueDate)).length}</h3>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
+      
       {/* Modal para ver detalles de la tarea */}
       {showTaskModal && selectedTask && (
         <div className="modal show d-block" tabIndex={-1} style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>

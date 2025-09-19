@@ -84,42 +84,6 @@ export function TeacherMonitoringPage() {
         </div>
       ) : (
         <>
-          {/* Resumen general */}
-          <div className="row g-4 mb-4">
-            <div className="col-md-3">
-              <div className="card bg-success text-white">
-                <div className="card-body text-center">
-                  <h6>Estudiantes Online</h6>
-                  <h3>{Object.values(monitoringData).filter((data: any) => data.currentStatus === 'online').length}</h3>
-                </div>
-              </div>
-            </div>
-            <div className="col-md-3">
-              <div className="card bg-warning text-white">
-                <div className="card-body text-center">
-                  <h6>Estudiantes Offline</h6>
-                  <h3>{Object.values(monitoringData).filter((data: any) => data.currentStatus === 'offline').length}</h3>
-                </div>
-              </div>
-            </div>
-            <div className="col-md-3">
-              <div className="card bg-info text-white">
-                <div className="card-body text-center">
-                  <h6>Tiempo Promedio</h6>
-                  <h3>{formatTime(Math.floor(Object.values(monitoringData).reduce((sum: number, data: any) => sum + data.onlineTime, 0) / students.length))}</h3>
-                </div>
-              </div>
-            </div>
-            <div className="col-md-3">
-              <div className="card bg-primary text-white">
-                <div className="card-body text-center">
-                  <h6>Participación Promedio</h6>
-                  <h3>{Math.floor(Object.values(monitoringData).reduce((sum: number, data: any) => sum + data.participation, 0) / students.length)}%</h3>
-                </div>
-              </div>
-            </div>
-          </div>
-
           {/* Lista de estudiantes con monitoreo */}
           <div className="card">
             <div className="card-header">

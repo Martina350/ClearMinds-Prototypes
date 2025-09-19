@@ -6,6 +6,16 @@
 
 console.log('🔄 Iniciando reinicialización de datos...');
 
+// Primero intentar migrar datos existentes
+try {
+  if (typeof window !== 'undefined' && window.forceDataMigration) {
+    window.forceDataMigration();
+    console.log('✅ Datos migrados exitosamente');
+  }
+} catch (error) {
+  console.log('⚠️ No se pudo migrar datos, procediendo con limpieza completa');
+}
+
 // Limpiar todos los datos existentes
 const keys = [
   'educapro_users',
