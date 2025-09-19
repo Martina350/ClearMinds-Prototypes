@@ -204,58 +204,6 @@ export function AdminReportsPage() {
         </div>
       </div>
 
-      {/* Estadísticas generales */}
-      <div className="row g-4 mb-4">
-        <div className="col-md-2">
-          <div className="card bg-primary text-white">
-            <div className="card-body text-center">
-              <h6>Estudiantes</h6>
-              <h3>{students.length}</h3>
-            </div>
-          </div>
-        </div>
-        <div className="col-md-2">
-          <div className="card bg-warning text-white">
-            <div className="card-body text-center">
-              <h6>Docentes</h6>
-              <h3>{teachers.length}</h3>
-            </div>
-          </div>
-        </div>
-        <div className="col-md-2">
-          <div className="card bg-info text-white">
-            <div className="card-body text-center">
-              <h6>Clases</h6>
-              <h3>{classes.length}</h3>
-            </div>
-          </div>
-        </div>
-        <div className="col-md-2">
-          <div className="card bg-success text-white">
-            <div className="card-body text-center">
-              <h6>Calificaciones</h6>
-              <h3>{grades.length}</h3>
-            </div>
-          </div>
-        </div>
-        <div className="col-md-2">
-          <div className="card bg-secondary text-white">
-            <div className="card-body text-center">
-              <h6>Tareas</h6>
-              <h3>{tasks.length}</h3>
-            </div>
-          </div>
-        </div>
-        <div className="col-md-2">
-          <div className="card bg-dark text-white">
-            <div className="card-body text-center">
-              <h6>Promedio General</h6>
-              <h3>{grades.length > 0 ? (grades.reduce((sum, g) => sum + (g.value / g.maxValue), 0) / grades.length * 100).toFixed(1) : '0'}%</h3>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Vista previa del reporte */}
       {selectedReport && (
         <div className="card">

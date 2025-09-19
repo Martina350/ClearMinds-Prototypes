@@ -13,7 +13,8 @@ export function AdminClassesPage() {
     schedule: '',
     room: '',
     teacherId: '',
-    studentIds: [] as string[]
+    studentIds: [] as string[],
+    modality: 'presencial' as 'presencial' | 'virtual' | 'in-home'
   })
   const [showEditModal, setShowEditModal] = useState(false)
   const [showDetailsModal, setShowDetailsModal] = useState(false)
@@ -25,7 +26,8 @@ export function AdminClassesPage() {
     schedule: '',
     room: '',
     teacherId: '',
-    studentIds: [] as string[]
+    studentIds: [] as string[],
+    modality: 'presencial' as 'presencial' | 'virtual' | 'in-home'
   })
 
   useEffect(() => {
@@ -49,14 +51,15 @@ export function AdminClassesPage() {
       schedule: newClass.schedule,
       room: newClass.room,
       teacherId: newClass.teacherId,
-      studentIds: newClass.studentIds
+      studentIds: newClass.studentIds,
+      modality: newClass.modality
     })
     
     const all = classService.getAll()
     console.log('[AdminClassesPage] after create, classes:', all.length)
     setClasses(all)
     setShowForm(false)
-    setNewClass({ name: '', subject: '', schedule: '', room: '', teacherId: '', studentIds: [] })
+    setNewClass({ name: '', subject: '', schedule: '', room: '', teacherId: '', studentIds: [], modality: 'presencial' })
     alert(`Clase creada exitosamente: ${created.name}`)
   }
 
@@ -69,7 +72,8 @@ export function AdminClassesPage() {
       schedule: classData.schedule,
       room: classData.room,
       teacherId: classData.teacherId,
-      studentIds: classData.studentIds
+      studentIds: classData.studentIds,
+      modality: classData.modality || 'presencial'
     })
     setShowEditModal(true)
   }
@@ -108,7 +112,8 @@ export function AdminClassesPage() {
         schedule: editClass.schedule,
         room: editClass.room,
         teacherId: editClass.teacherId,
-        studentIds: editClass.studentIds
+        studentIds: editClass.studentIds,
+        modality: editClass.modality
       })
       
       if (updated) {
@@ -252,6 +257,19 @@ export function AdminClassesPage() {
                   </select>
                 </div>
                 <div className="col-md-6">
+                  <label className="form-label">Modalidad</label>
+                  <select 
+                    className="form-select"
+                    value={newClass.modality}
+                    onChange={(e) => setNewClass({ ...newClass, modality: e.target.value as 'presencial' | 'virtual' | 'in-home' })}
+                    required
+                  >
+                    <option value="presencial">Presencial</option>
+                    <option value="virtual">Virtual</option>
+                    <option value="in-home">In-home</option>
+                  </select>
+                </div>
+                <div className="col-md-6">
                   <label className="form-label">Estudiantes</label>
                   <select 
                     className="form-select"
@@ -305,6 +323,7 @@ export function AdminClassesPage() {
                   <th>Docente</th>
                   <th>Horario</th>
                   <th>Aula</th>
+                  <th>Modalidad</th>
                   <th>Estudiantes</th>
                   <th>Acciones</th>
                 </tr>
@@ -324,6 +343,22 @@ export function AdminClassesPage() {
                     <td>{getTeacherName(cls.teacherId)}</td>
                     <td>{cls.schedule}</td>
                     <td>{cls.room}</td>
+                    <td>
+                      <span className={`badge ${
+                        cls.modality === 'presencial' ? 'bg-primary' :
+                        cls.modality === 'virtual' ? 'bg-success' :
+                        'bg-warning'
+                      }`}>
+                        <i className={`bi ${
+                          cls.modality === 'presencial' ? 'bi-building' :
+                          cls.modality === 'virtual' ? 'bi-camera-video' :
+                          'bi-house'
+                        } me-1`}></i>
+                        {cls.modality === 'presencial' ? 'Presencial' :
+                         cls.modality === 'virtual' ? 'Virtual' :
+                         'In-home'}
+                      </span>
+                    </td>
                     <td>
                       <span className="badge bg-info">{cls.studentIds.length} estudiantes</span>
                     </td>
@@ -365,25 +400,6 @@ export function AdminClassesPage() {
             </table>
           </div>
         </div>
-      </div>
-
-      {/* Resumen por materia */}
-      <div className="row mt-4">
-        {['Matemáticas', 'Español', 'Ciencias', 'Historia', 'Geografía', 'Inglés', 'Educación Física', 'Arte', 'Música', 'Informática'].map(subject => {
-          const count = classes.filter(c => c.subject === subject).length
-          if (count === 0) return null
-          
-          return (
-            <div key={subject} className="col-md-2 col-lg-1">
-              <div className="card bg-primary text-white">
-                <div className="card-body text-center p-2">
-                  <h6 className="mb-1">{subject}</h6>
-                  <h5 className="mb-0">{count}</h5>
-                </div>
-              </div>
-            </div>
-          )
-        })}
       </div>
 
       {/* Modal para editar clase */}
@@ -466,6 +482,19 @@ export function AdminClassesPage() {
                       </select>
                     </div>
                     <div className="col-md-6">
+                      <label className="form-label">Modalidad</label>
+                      <select 
+                        className="form-select"
+                        value={editClass.modality}
+                        onChange={(e) => setEditClass({ ...editClass, modality: e.target.value as 'presencial' | 'virtual' | 'in-home' })}
+                        required
+                      >
+                        <option value="presencial">Presencial</option>
+                        <option value="virtual">Virtual</option>
+                        <option value="in-home">In-home</option>
+                      </select>
+                    </div>
+                    <div className="col-md-6">
                       <label className="form-label">Estudiantes</label>
                       <select 
                         className="form-select"
@@ -533,6 +562,23 @@ export function AdminClassesPage() {
                       <li className="list-group-item d-flex justify-content-between">
                         <span>Aula:</span>
                         <span>{selectedClass.room}</span>
+                      </li>
+                      <li className="list-group-item d-flex justify-content-between">
+                        <span>Modalidad:</span>
+                        <span className={`badge ${
+                          selectedClass.modality === 'presencial' ? 'bg-primary' :
+                          selectedClass.modality === 'virtual' ? 'bg-success' :
+                          'bg-warning'
+                        }`}>
+                          <i className={`bi ${
+                            selectedClass.modality === 'presencial' ? 'bi-building' :
+                            selectedClass.modality === 'virtual' ? 'bi-camera-video' :
+                            'bi-house'
+                          } me-1`}></i>
+                          {selectedClass.modality === 'presencial' ? 'Presencial' :
+                           selectedClass.modality === 'virtual' ? 'Virtual' :
+                           'In-home'}
+                        </span>
                       </li>
                       <li className="list-group-item d-flex justify-content-between">
                         <span>Estudiantes:</span>

@@ -328,25 +328,6 @@ export function AdminTeachersPage() {
         </div>
       </div>
 
-      {/* Resumen por materia */}
-      <div className="row mt-4">
-        {['Matemáticas', 'Español', 'Ciencias', 'Historia', 'Geografía', 'Inglés', 'Educación Física', 'Arte', 'Música', 'Informática'].map(subject => {
-          const count = teachers.filter(t => t.subject === subject).length
-          if (count === 0) return null
-          
-          return (
-            <div key={subject} className="col-md-2 col-lg-1">
-              <div className="card bg-warning text-white">
-                <div className="card-body text-center p-2">
-                  <h6 className="mb-1">{subject}</h6>
-                  <h5 className="mb-0">{count}</h5>
-                </div>
-              </div>
-            </div>
-          )
-        })}
-      </div>
-
       {/* Modal para editar docente */}
       {showEditModal && selectedTeacher && (
         <div className="modal show d-block" tabIndex={-1} style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>

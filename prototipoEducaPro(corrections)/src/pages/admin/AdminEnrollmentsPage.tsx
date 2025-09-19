@@ -257,42 +257,6 @@ export function AdminEnrollmentsPage() {
           </div>
         </div>
       </div>
-
-      {/* Resumen de matrículas */}
-      <div className="row mt-4">
-        <div className="col-md-3">
-          <div className="card bg-primary text-white">
-            <div className="card-body text-center">
-              <h6>Total Estudiantes</h6>
-              <h3>{students.length}</h3>
-            </div>
-          </div>
-        </div>
-        <div className="col-md-3">
-          <div className="card bg-success text-white">
-            <div className="card-body text-center">
-              <h6>Matriculados</h6>
-              <h3>{students.filter(s => s.classIds.length > 0).length}</h3>
-            </div>
-          </div>
-        </div>
-        <div className="col-md-3">
-          <div className="card bg-warning text-white">
-            <div className="card-body text-center">
-              <h6>Sin Matricular</h6>
-              <h3>{students.filter(s => s.classIds.length === 0).length}</h3>
-            </div>
-          </div>
-        </div>
-        <div className="col-md-3">
-          <div className="card bg-info text-white">
-            <div className="card-body text-center">
-              <h6>Total Clases</h6>
-              <h3>{classes.length}</h3>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   )
 }

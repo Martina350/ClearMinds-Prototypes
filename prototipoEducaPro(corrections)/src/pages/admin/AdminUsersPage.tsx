@@ -367,58 +367,6 @@ export function AdminUsersPage() {
         </div>
       </div>
 
-      {/* Resumen por rol */}
-      <div className="row mt-4">
-        <div className="col-md-2">
-          <div className="card bg-primary text-white">
-            <div className="card-body text-center">
-              <h6>Estudiantes</h6>
-              <h3>{users.filter(u => u.role === 'estudiante').length}</h3>
-            </div>
-          </div>
-        </div>
-        <div className="col-md-2">
-          <div className="card bg-success text-white">
-            <div className="card-body text-center">
-              <h6>Padres</h6>
-              <h3>{users.filter(u => u.role === 'padre').length}</h3>
-            </div>
-          </div>
-        </div>
-        <div className="col-md-2">
-          <div className="card bg-warning text-white">
-            <div className="card-body text-center">
-              <h6>Docentes</h6>
-              <h3>{users.filter(u => u.role === 'docente').length}</h3>
-            </div>
-          </div>
-        </div>
-        <div className="col-md-2">
-          <div className="card bg-danger text-white">
-            <div className="card-body text-center">
-              <h6>Admins</h6>
-              <h3>{users.filter(u => u.role === 'admin').length}</h3>
-            </div>
-          </div>
-        </div>
-        <div className="col-md-2">
-          <div className="card bg-info text-white">
-            <div className="card-body text-center">
-              <h6>Finanzas</h6>
-              <h3>{users.filter(u => u.role === 'finanzas').length}</h3>
-            </div>
-          </div>
-        </div>
-        <div className="col-md-2">
-          <div className="card bg-secondary text-white">
-            <div className="card-body text-center">
-              <h6>Total</h6>
-              <h3>{users.length}</h3>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Modal para editar usuario */}
       {showEditModal && selectedUser && (
         <div className="modal show d-block" tabIndex={-1} style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
