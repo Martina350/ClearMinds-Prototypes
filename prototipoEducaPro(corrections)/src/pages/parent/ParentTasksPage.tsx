@@ -153,65 +153,6 @@ export function ParentTasksPage() {
         </div>
       )}
 
-      {/* Resumen de tareas */}
-      {tasks.length > 0 && (
-        <div className="row mt-4 g-3">
-          <div className="col-6 col-md-3 col-lg-2">
-            <div className="card bg-primary text-white">
-              <div className="card-body text-center">
-                <h6>Total Tareas</h6>
-                <h3>{tasks.length}</h3>
-              </div>
-            </div>
-          </div>
-          <div className="col-6 col-md-3 col-lg-2">
-            <div className="card bg-success text-white">
-              <div className="card-body text-center">
-                <h6>Completadas</h6>
-                <h3>{tasks.filter(t => !isTaskOverdue(t.dueDate) && !isTaskDueSoon(t.dueDate)).length}</h3>
-              </div>
-            </div>
-          </div>
-          <div className="col-6 col-md-3 col-lg-2">
-            <div className="card bg-warning text-white">
-              <div className="card-body text-center">
-                <h6>Próximas</h6>
-                <h3>{tasks.filter(t => isTaskDueSoon(t.dueDate)).length}</h3>
-              </div>
-            </div>
-          </div>
-          <div className="col-6 col-md-3 col-lg-2">
-            <div className="card bg-danger text-white">
-              <div className="card-body text-center">
-                <h6>Vencidas</h6>
-                <h3>{tasks.filter(t => isTaskOverdue(t.dueDate)).length}</h3>
-              </div>
-            </div>
-          </div>
-          <div className="col-6 col-md-3 col-lg-2">
-            <div className="card bg-info text-white">
-              <div className="card-body text-center">
-                <h6>Esta Semana</h6>
-                <h3>{tasks.filter(t => {
-                  const today = new Date()
-                  const weekFromNow = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000)
-                  const taskDate = new Date(t.dueDate)
-                  return taskDate <= weekFromNow && taskDate >= today
-                }).length}</h3>
-              </div>
-            </div>
-          </div>
-          <div className="col-6 col-md-3 col-lg-2">
-            <div className="card bg-secondary text-white">
-              <div className="card-body text-center">
-                <h6>Pendientes</h6>
-                <h3>{tasks.filter(t => t.status === 'pending').length}</h3>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Modal para ver detalles de tarea */}
       {showTaskModal && selectedTask && (
         <div className="modal show d-block" tabIndex={-1} style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>

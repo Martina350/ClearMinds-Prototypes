@@ -129,60 +129,6 @@ export function ParentGradesPage() {
           </div>
         </div>
       )}
-
-      {/* Resumen de calificaciones */}
-      {grades.length > 0 && (
-        <div className="row mt-4 g-3">
-          <div className="col-6 col-md-3 col-lg-2">
-            <div className="card bg-primary text-white">
-              <div className="card-body text-center">
-                <h6>Promedio General</h6>
-                <h3>{(grades.reduce((sum, g) => sum + (g.value / g.maxValue), 0) / grades.length * 100).toFixed(1)}%</h3>
-              </div>
-            </div>
-          </div>
-          <div className="col-6 col-md-3 col-lg-2">
-            <div className="card bg-success text-white">
-              <div className="card-body text-center">
-                <h6>Notas Aprobadas</h6>
-                <h3>{grades.filter(g => g.value >= 7).length}</h3>
-              </div>
-            </div>
-          </div>
-          <div className="col-6 col-md-3 col-lg-2">
-            <div className="card bg-warning text-white">
-              <div className="card-body text-center">
-                <h6>Total Notas</h6>
-                <h3>{grades.length}</h3>
-              </div>
-            </div>
-          </div>
-          <div className="col-6 col-md-3 col-lg-2">
-            <div className="card bg-info text-white">
-              <div className="card-body text-center">
-                <h6>Última Nota</h6>
-                <h3>{grades.length > 0 ? grades[grades.length - 1].value : '0'}</h3>
-              </div>
-            </div>
-          </div>
-          <div className="col-6 col-md-3 col-lg-2">
-            <div className="card bg-secondary text-white">
-              <div className="card-body text-center">
-                <h6>Materias</h6>
-                <h3>5</h3>
-              </div>
-            </div>
-          </div>
-          <div className="col-6 col-md-3 col-lg-2">
-            <div className="card bg-dark text-white">
-              <div className="card-body text-center">
-                <h6>Promedio Gral</h6>
-                <h3>8.5</h3>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   )
 }

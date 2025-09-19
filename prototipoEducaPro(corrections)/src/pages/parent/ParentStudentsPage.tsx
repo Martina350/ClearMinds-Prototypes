@@ -118,61 +118,7 @@ export function ParentStudentsPage() {
           ))}
         </div>
       )}
-
-      {/* Resumen de estudiantes */}
-      {students.length > 0 && (
-        <div className="row mt-4 g-3">
-          <div className="col-6 col-md-3 col-lg-2">
-            <div className="card bg-primary text-white">
-              <div className="card-body text-center">
-                <h6>Total Hijos</h6>
-                <h3>{students.length}</h3>
-              </div>
-            </div>
-          </div>
-          <div className="col-6 col-md-3 col-lg-2">
-            <div className="card bg-success text-white">
-              <div className="card-body text-center">
-                <h6>Activos</h6>
-                <h3>{students.filter(s => s.status === 'active').length}</h3>
-              </div>
-            </div>
-          </div>
-          <div className="col-6 col-md-3 col-lg-2">
-            <div className="card bg-info text-white">
-              <div className="card-body text-center">
-                <h6>Grados Únicos</h6>
-                <h3>{new Set(students.map(s => s.grade)).size}</h3>
-              </div>
-            </div>
-          </div>
-          <div className="col-6 col-md-3 col-lg-2">
-            <div className="card bg-warning text-white">
-              <div className="card-body text-center">
-                <h6>Total Clases</h6>
-                <h3>{students.reduce((sum, s) => sum + s.classIds.length, 0)}</h3>
-              </div>
-            </div>
-          </div>
-          <div className="col-6 col-md-3 col-lg-2">
-            <div className="card bg-secondary text-white">
-              <div className="card-body text-center">
-                <h6>Promedio Edad</h6>
-                <h3>{students.length > 0 ? Math.round(students.reduce((sum, s) => sum + parseInt(s.grade), 0) / students.length + 5) : '0'}</h3>
-              </div>
-            </div>
-          </div>
-          <div className="col-6 col-md-3 col-lg-2">
-            <div className="card bg-dark text-white">
-              <div className="card-body text-center">
-                <h6>Este Año</h6>
-                <h3>{students.length}</h3>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
+      
       {/* Modal para agregar hijo */}
       {showAddForm && (
         <div className="modal show d-block" tabIndex={-1} style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>

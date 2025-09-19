@@ -199,64 +199,6 @@ export function ParentRatingsPage() {
           ))}
         </div>
       )}
-
-      {/* Estadísticas de calificaciones */}
-      {ratings.length > 0 && (
-        <div className="row mt-4 g-3">
-          <div className="col-6 col-md-3 col-lg-2">
-            <div className="card bg-primary text-white">
-              <div className="card-body text-center">
-                <h6>Total Calificaciones</h6>
-                <h3>{ratings.length}</h3>
-              </div>
-            </div>
-          </div>
-          <div className="col-6 col-md-3 col-lg-2">
-            <div className="card bg-warning text-white">
-              <div className="card-body text-center">
-                <h6>Promedio General</h6>
-                <h3>{ratings.length > 0 ? (ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length).toFixed(1) : '0'}</h3>
-              </div>
-            </div>
-          </div>
-          <div className="col-6 col-md-3 col-lg-2">
-            <div className="card bg-success text-white">
-              <div className="card-body text-center">
-                <h6>Calificaciones Altas (4-5)</h6>
-                <h3>{ratings.filter(r => r.rating >= 4).length}</h3>
-              </div>
-            </div>
-          </div>
-          <div className="col-6 col-md-3 col-lg-2">
-            <div className="card bg-info text-white">
-              <div className="card-body text-center">
-                <h6>Excelentes (5)</h6>
-                <h3>{ratings.filter(r => r.rating === 5).length}</h3>
-              </div>
-            </div>
-          </div>
-          <div className="col-6 col-md-3 col-lg-2">
-            <div className="card bg-danger text-white">
-              <div className="card-body text-center">
-                <h6>Bajas (1-2)</h6>
-                <h3>{ratings.filter(r => r.rating <= 2).length}</h3>
-              </div>
-            </div>
-          </div>
-          <div className="col-6 col-md-3 col-lg-2">
-            <div className="card bg-secondary text-white">
-              <div className="card-body text-center">
-                <h6>Este Mes</h6>
-                <h3>{ratings.filter(r => {
-                  const ratingDate = new Date(r.createdAt)
-                  const now = new Date()
-                  return ratingDate.getMonth() === now.getMonth() && ratingDate.getFullYear() === now.getFullYear()
-                }).length}</h3>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   )
 }

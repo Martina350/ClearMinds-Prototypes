@@ -116,59 +116,6 @@ export function ParentPaymentsPage() {
           </button>
         </div>
       </div>
-
-      {/* Resumen de pagos */}
-      <div className="row g-3 mb-4">
-        <div className="col-6 col-md-3 col-lg-2">
-          <div className="card bg-success text-white">
-            <div className="card-body text-center">
-              <h6>Total Pagado</h6>
-              <h3>${totalPaid.toLocaleString()}</h3>
-            </div>
-          </div>
-        </div>
-        <div className="col-6 col-md-3 col-lg-2">
-          <div className="card bg-warning text-white">
-            <div className="card-body text-center">
-              <h6>Pendiente</h6>
-              <h3>${totalPending.toLocaleString()}</h3>
-            </div>
-          </div>
-        </div>
-        <div className="col-6 col-md-3 col-lg-2">
-          <div className="card bg-danger text-white">
-            <div className="card-body text-center">
-              <h6>Vencido</h6>
-              <h3>${totalOverdue.toLocaleString()}</h3>
-            </div>
-          </div>
-        </div>
-        <div className="col-6 col-md-3 col-lg-2">
-          <div className="card bg-info text-white">
-            <div className="card-body text-center">
-              <h6>Total Pagos</h6>
-              <h3>{payments.length}</h3>
-            </div>
-          </div>
-        </div>
-        <div className="col-6 col-md-3 col-lg-2">
-          <div className="card bg-primary text-white">
-            <div className="card-body text-center">
-              <h6>Este Mes</h6>
-              <h3>${(totalPaid * 0.3).toLocaleString()}</h3>
-            </div>
-          </div>
-        </div>
-        <div className="col-6 col-md-3 col-lg-2">
-          <div className="card bg-secondary text-white">
-            <div className="card-body text-center">
-              <h6>Próximo</h6>
-              <h3>${(totalPending * 0.4).toLocaleString()}</h3>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {filteredPayments.length === 0 ? (
         <div className="text-center py-5">
           <i className="bi bi-credit-card display-1 text-muted"></i>
