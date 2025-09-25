@@ -206,7 +206,7 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background.light,
+    backgroundColor: Colors.lavender, // Lavanda Suave - Fondo principal
   },
   contentContainer: {
     padding: Spacing.md,

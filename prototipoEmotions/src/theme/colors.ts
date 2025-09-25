@@ -1,72 +1,83 @@
 export const Colors = {
-  // Colores principales - Gradientes modernos y confiables
+  // Colores principales según especificaciones del prototipo
   primary: {
-    50: '#f0f9ff',
-    100: '#e0f2fe', 
-    200: '#bae6fd',
-    300: '#7dd3fc',
-    400: '#38bdf8',
-    500: '#0ea5e9', // Azul principal
-    600: '#0284c7',
-    700: '#0369a1',
-    800: '#075985',
-    900: '#0c4a6e',
+    50: '#FF6F61', // Coral Brillante - Botones e interacciones principales
+    100: '#FF8A80',
+    200: '#FFAB91',
+    300: '#FF6F61',
+    400: '#FF6F61',
+    500: '#FF6F61', // Coral Brillante principal
+    600: '#E64A19',
+    700: '#D84315',
+    800: '#BF360C',
+    900: '#A52A00',
   },
   
-  // Colores secundarios - Gradientes cálidos
+  // Colores secundarios
   secondary: {
-    50: '#fefce8',
-    100: '#fef9c3',
-    200: '#fef08a',
-    300: '#fde047',
-    400: '#facc15', // Amarillo principal
-    500: '#eab308',
-    600: '#ca8a04',
-    700: '#a16207',
-    800: '#854d0e',
-    900: '#713f12',
+    50: '#40E0D0', // Turquesa - Acciones secundarias
+    100: '#80E4D1',
+    200: '#40E0D0',
+    300: '#40E0D0',
+    400: '#40E0D0',
+    500: '#40E0D0', // Turquesa principal
+    600: '#00BCD4',
+    700: '#00ACC1',
+    800: '#0097A7',
+    900: '#00838F',
   },
 
   // Colores emocionales para estados de ánimo
   emotions: {
-    happy: '#10b981',      // Verde esmeralda
-    sad: '#6366f1',        // Índigo
-    angry: '#ef4444',      // Rojo
-    calm: '#8b5cf6',       // Púrpura
-    excited: '#f59e0b',    // Ámbar
-    tired: '#6b7280',      // Gris
-    confused: '#f97316',   // Naranja
-    confident: '#ec4899',  // Rosa
+    happy: '#40E0D0',      // Turquesa
+    sad: '#616161',        // Gris Medio
+    angry: '#F44336',      // Rojo
+    calm: '#E6E6FA',       // Lavanda Suave
+    excited: '#FF9800',    // Naranja Brillante
+    tired: '#616161',      // Gris Medio
+    confused: '#FF9800',   // Naranja Brillante
+    confident: '#FF6F61',  // Coral Brillante
   },
 
   // Colores neutros
   neutral: {
-    50: '#fafafa',
-    100: '#f5f5f5',
-    200: '#e5e5e5',
-    300: '#d4d4d4',
-    400: '#a3a3a3',
-    500: '#737373',
-    600: '#525252',
-    700: '#404040',
-    800: '#262626',
-    900: '#171717',
+    50: '#FAFAFA',
+    100: '#F5F5F5',
+    200: '#EEEEEE',
+    300: '#E0E0E0',
+    400: '#BDBDBD',
+    500: '#9E9E9E',
+    600: '#616161', // Gris Medio - Texto secundario
+    700: '#424242',
+    800: '#333333', // Gris Oscuro - Texto principal
+    900: '#212121',
   },
 
   // Colores de fondo
   background: {
-    light: '#ffffff',
-    dark: '#0f172a',
-    gradient: ['#667eea', '#764ba2'], // Gradiente púrpura-azul
+    light: '#E6E6FA', // Lavanda Suave - Fondo principal
+    secondary: '#B2EBF2', // Aqua Suave - Fondo suave y relajante
+    dark: '#333333',
+    gradient: ['#FF6F61', '#40E0D0'], // Gradiente Coral-Turquesa
   },
 
   // Colores de estado
   status: {
-    success: '#10b981',
-    warning: '#f59e0b', 
-    error: '#ef4444',
-    info: '#3b82f6',
+    success: '#40E0D0',
+    warning: '#FF9800', // Naranja Brillante - Mensajes de advertencia
+    error: '#F44336',   // Rojo - Mensajes de error
+    info: '#40E0D0',
   },
+
+  // Colores específicos del prototipo
+  coral: '#FF6F61',        // Coral Brillante
+  turquoise: '#40E0D0',    // Turquesa
+  lavender: '#E6E6FA',     // Lavanda Suave
+  aqua: '#B2EBF2',         // Aqua Suave
+  darkGray: '#333333',     // Gris Oscuro
+  mediumGray: '#616161',   // Gris Medio
+  orange: '#FF9800',       // Naranja Brillante
+  red: '#F44336',          // Rojo
 
   // Sombras
   Shadows: {

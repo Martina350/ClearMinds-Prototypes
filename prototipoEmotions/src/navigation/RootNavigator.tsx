@@ -36,18 +36,19 @@ function MainTabs() {
           fontWeight: '600',
           marginTop: 4,
         },
-        tabBarActiveTintColor: Colors.primary[600],
-        tabBarInactiveTintColor: Colors.neutral[500],
+        tabBarActiveTintColor: Colors.coral, // Coral Brillante para tabs activos
+        tabBarInactiveTintColor: Colors.mediumGray, // Gris Medio para tabs inactivos
         headerStyle: {
-          backgroundColor: Colors.background.light,
+          backgroundColor: '#ffffff', // Fondo blanco para headers
           ...Colors.Shadows.small,
         },
         headerTitleStyle: {
           fontSize: 18,
           fontWeight: '700',
-          color: Colors.primary[700],
+          fontFamily: 'Roboto-Bold',
+          color: Colors.darkGray, // Gris Oscuro - Texto principal
         },
-        headerTintColor: Colors.primary[600],
+        headerTintColor: Colors.coral, // Coral Brillante para botones de navegación
       }}
     >
       <Tab.Screen 
@@ -100,15 +101,16 @@ export default function RootNavigator() {
     <Stack.Navigator
       screenOptions={{
         headerStyle: {
-          backgroundColor: Colors.background.light,
+          backgroundColor: '#ffffff', // Fondo blanco para headers
           ...Colors.Shadows.small,
         },
         headerTitleStyle: {
           fontSize: 18,
           fontWeight: '700',
-          color: Colors.primary[700],
+          fontFamily: 'Roboto-Bold',
+          color: Colors.darkGray, // Gris Oscuro - Texto principal
         },
-        headerTintColor: Colors.primary[600],
+        headerTintColor: Colors.coral, // Coral Brillante para botones de navegación
       }}
     >
       <Stack.Screen 

@@ -211,7 +211,7 @@ export default function RegisterScreen({ navigation }: RegisterScreenProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background.light,
+    backgroundColor: Colors.lavender, // Lavanda Suave - Fondo principal
   },
   contentContainer: {
     padding: Spacing.md,
@@ -225,13 +225,13 @@ const styles = StyleSheet.create({
   welcomeText: {
     ...Typography.h1,
     textAlign: 'center',
-    color: Colors.primary[700],
+    color: Colors.darkGray, // Gris Oscuro - Texto principal
     marginBottom: Spacing.sm,
   },
   subtitleText: {
     ...Typography.playful,
     textAlign: 'center',
-    color: Colors.neutral[600],
+    color: Colors.mediumGray, // Gris Medio - Texto secundario
   },
   testCard: {
     marginBottom: Spacing.lg,
@@ -241,12 +241,12 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     ...Typography.h3,
-    color: Colors.primary[700],
+    color: Colors.darkGray, // Gris Oscuro - Texto principal
     marginBottom: Spacing.xs,
   },
   sectionSubtitle: {
     ...Typography.body,
-    color: Colors.neutral[600],
+    color: Colors.mediumGray, // Gris Medio - Texto secundario
     marginBottom: Spacing.lg,
   },
   questionContainer: {
@@ -254,7 +254,7 @@ const styles = StyleSheet.create({
   },
   questionText: {
     ...Typography.h4,
-    color: Colors.neutral[800],
+    color: Colors.darkGray, // Gris Oscuro - Texto principal
     marginBottom: Spacing.md,
   },
   optionsContainer: {

@@ -64,22 +64,26 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   
-  // Variantes
+  // Variantes según especificaciones del prototipo
   primary: {
-    backgroundColor: Colors.primary[600],
+    backgroundColor: Colors.coral, // Coral Brillante para botones principales
+    borderRadius: 8, // Bordes ligeramente redondeados
     ...Colors.Shadows.medium,
   },
   secondary: {
-    backgroundColor: Colors.secondary[400],
+    backgroundColor: Colors.turquoise, // Turquesa para acciones secundarias
+    borderRadius: 8,
     ...Colors.Shadows.medium,
   },
   outline: {
     backgroundColor: 'transparent',
     borderWidth: 2,
-    borderColor: Colors.primary[600],
+    borderColor: Colors.coral,
+    borderRadius: 8,
   },
   ghost: {
     backgroundColor: 'transparent',
+    borderRadius: 8,
   },
   
   // Tamaños
@@ -105,18 +109,19 @@ const styles = StyleSheet.create({
   text: {
     fontWeight: '600',
     textAlign: 'center',
+    fontFamily: 'Roboto-Medium', // Semi-bold para botones
   },
   primaryText: {
     color: '#ffffff',
   },
   secondaryText: {
-    color: Colors.neutral[900],
+    color: Colors.darkGray, // Gris Oscuro
   },
   outlineText: {
-    color: Colors.primary[600],
+    color: Colors.coral, // Coral Brillante
   },
   ghostText: {
-    color: Colors.primary[600],
+    color: Colors.coral,
   },
   
   // Tamaños de texto
