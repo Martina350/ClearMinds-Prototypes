@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, Alert, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, Alert, StyleSheet, Modal, TouchableOpacity } from 'react-native';
+import { MaterialIcons, Ionicons } from '@expo/vector-icons';
 import { saveUser } from '@/storage/localDb';
 import { Colors } from '@/theme/colors';
 import { Typography } from '@/theme/typography';
@@ -11,59 +12,59 @@ import Card from '@/components/Card';
 type Question = { 
   id: string; 
   text: string; 
-  options: Array<{ value: string; emoji?: string; label: string }> 
+  options: Array<{ value: string; icon?: string; label: string }> 
 };
+
 
 const QUESTIONS: Question[] = [
   { 
-    id: 'music', 
-    text: '¿Qué tipo de música prefieres? 🎵', 
+    id: 'app', 
+    text: '¿Qué aplicación no puede faltar en tu teléfono?', 
     options: [
-      { value: 'Pop', emoji: '🎤', label: 'Pop' },
-      { value: 'Rock', emoji: '🎸', label: 'Rock' },
-      { value: 'Clásica', emoji: '🎼', label: 'Clásica' },
-      { value: 'Electrónica', emoji: '🎧', label: 'Electrónica' },
-      { value: 'Latina', emoji: '🥁', label: 'Latina' }
+      { value: 'Instagram', icon: 'camera-alt', label: 'Instagram' },
+      { value: 'Spotify', icon: 'music-note', label: 'Spotify' },
+      { value: 'TikTok', icon: 'videogame-asset', label: 'TikTok' },
+      { value: 'Snapchat', icon: 'chat', label: 'Snapchat' }
     ] 
   },
   { 
-    id: 'activity', 
-    text: '¿Cuál es tu actividad favorita? 🎯', 
+    id: 'day_off', 
+    text: 'Si tuvieras un día libre y dinero ilimitado, ¿qué harías?', 
     options: [
-      { value: 'Leer', emoji: '📚', label: 'Leer' },
-      { value: 'Deporte', emoji: '⚽', label: 'Deporte' },
-      { value: 'Videojuegos', emoji: '🎮', label: 'Videojuegos' },
-      { value: 'Cocinar', emoji: '👨‍🍳', label: 'Cocinar' },
-      { value: 'Pasear', emoji: '🚶‍♀️', label: 'Pasear' }
+      { value: 'Shopping', icon: 'shopping-bag', label: 'Ir de shopping y comprar todo lo que me gusta' },
+      { value: 'Travel', icon: 'flight', label: 'Viajar a un lugar que nunca he visitado' },
+      { value: 'Friends', icon: 'celebration', label: 'Pasar todo el día con mis amigos, haciendo algo épico' },
+      { value: 'Home', icon: 'home', label: 'Pasar el día en casa viendo series y durmiendo' }
     ] 
   },
   { 
-    id: 'animal', 
-    text: '¿Cuál es tu animal favorito? 🐾', 
+    id: 'friends_activity', 
+    text: '¿Qué actividad prefieres hacer con tus amigos?', 
     options: [
-      { value: '🦁', emoji: '🦁', label: 'León' },
-      { value: '🐍', emoji: '🐍', label: 'Serpiente' },
-      { value: '🦋', emoji: '🦋', label: 'Mariposa' },
-      { value: '🐶', emoji: '🐶', label: 'Perro' },
-      { value: '🐱', emoji: '🐱', label: 'Gato' }
+      { value: 'Concert', icon: 'location-city', label: 'Ir a un concierto o festival de música' },
+      { value: 'Movies', icon: 'movie', label: 'Maratón de películas o series en casa' },
+      { value: 'Gaming', icon: 'sports-esports', label: 'Jugar videojuegos en línea con ellos' },
+      { value: 'Creative', icon: 'palette', label: 'Pasar tiempo creativo haciendo proyectos juntos' }
     ] 
   },
   { 
-    id: 'moment', 
-    text: '¿Qué momento del día prefieres? ⏰', 
+    id: 'music_type', 
+    text: '¿Cuál es tu tipo de música favorita?', 
     options: [
-      { value: 'Mañana', emoji: '🌅', label: 'Mañana' },
-      { value: 'Tarde', emoji: '☀️', label: 'Tarde' },
-      { value: 'Noche', emoji: '🌙', label: 'Noche' }
+      { value: 'Pop/Electronic', icon: 'headphones', label: 'Pop o música electrónica, la que me hace bailar' },
+      { value: 'Rock', icon: 'mic', label: 'Rock, me gusta la energía y los riffs de guitarra' },
+      { value: 'HipHop', icon: 'music-note', label: 'Hip-hop o rap, me gusta la lírica y el ritmo' },
+      { value: 'Indie', icon: 'spa', label: 'Indie, música relajada para desconectar' }
     ] 
   },
   { 
-    id: 'social', 
-    text: '¿Te consideras más... 🤔', 
+    id: 'famous_field', 
+    text: 'Si fueras famoso/a, ¿en qué campo te gustaría destacar?', 
     options: [
-      { value: 'Introvertido/a', emoji: '🏠', label: 'Introvertido/a' },
-      { value: 'Extrovertido/a', emoji: '🎉', label: 'Extrovertido/a' },
-      { value: 'Ambivertido/a', emoji: '⚖️', label: 'Ambivertido/a' }
+      { value: 'Music', icon: 'mic', label: 'Música, me encantaría ser cantante o DJ' },
+      { value: 'Acting', icon: 'movie', label: 'Actuar, ser una estrella de cine o televisión' },
+      { value: 'Fashion', icon: 'camera-alt', label: 'Moda, ser un influencer y crear tendencias' },
+      { value: 'Tech', icon: 'computer', label: 'Tecnología, ser un creador de contenido digital o programador/a' }
     ] 
   }
 ];
@@ -81,6 +82,8 @@ export default function RegisterScreen({ navigation }: RegisterScreenProps) {
   const [birth, setBirth] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [showModal, setShowModal] = useState(false);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 
   const validateEmail = (value: string) => /\S+@\S+\.\S+/.test(value);
 
@@ -108,102 +111,170 @@ export default function RegisterScreen({ navigation }: RegisterScreenProps) {
   };
 
   const isTestComplete = Object.keys(answers).length === QUESTIONS.length;
+  const currentQuestion = QUESTIONS[currentQuestionIndex];
+  const isLastQuestion = currentQuestionIndex === QUESTIONS.length - 1;
+
+  const handleAnswerSelect = (questionId: string, answer: string) => {
+    setAnswers(prev => ({ ...prev, [questionId]: answer }));
+    
+    if (isLastQuestion) {
+      // Si es la última pregunta, mostrar el modal después de un pequeño delay
+      setTimeout(() => {
+        setShowModal(true);
+      }, 500);
+    } else {
+      // Si no es la última pregunta, avanzar a la siguiente
+      setTimeout(() => {
+        setCurrentQuestionIndex(prev => prev + 1);
+      }, 300);
+    }
+  };
+
+  const handleTestComplete = () => {
+    if (isTestComplete) {
+      setShowModal(true);
+    }
+  };
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
       {/* Header con gradiente */}
       <View style={styles.header}>
-        <Text style={styles.welcomeText}>¡Bienvenido a ClearMinds! 🧠✨</Text>
+        <Text style={styles.welcomeText}>¡Bienvenido!</Text>
         <Text style={styles.subtitleText}>Conoce más sobre ti en este divertido test</Text>
       </View>
 
       {/* Test de personalidad */}
       <Card variant="elevated" style={styles.testCard}>
-        <Text style={styles.sectionTitle}>Mini test de personalidad 🎨</Text>
-        <Text style={styles.sectionSubtitle}>Ayúdanos a conocerte mejor</Text>
+        <View style={styles.testHeader}>
+          <Text style={styles.sectionTitle}>Mini test de personalidad</Text>
+          <Text style={styles.sectionSubtitle}>Ayúdanos a conocerte mejor</Text>
+          <View style={styles.progressContainer}>
+            <Text style={styles.progressText}>
+              Pregunta {currentQuestionIndex + 1} de {QUESTIONS.length}
+            </Text>
+            <View style={styles.progressBar}>
+              <View 
+                style={[
+                  styles.progressFill, 
+                  { width: `${((currentQuestionIndex + 1) / QUESTIONS.length) * 100}%` }
+                ]} 
+              />
+            </View>
+          </View>
+        </View>
         
-        {QUESTIONS.map((question, questionIndex) => (
-          <View key={question.id} style={styles.questionContainer}>
+        {!isTestComplete && currentQuestion && (
+          <View style={styles.questionContainer}>
             <Text style={styles.questionText}>
-              {questionIndex + 1}. {question.text}
+              {currentQuestionIndex + 1}. {currentQuestion.text}
             </Text>
             <View style={styles.optionsContainer}>
-              {question.options.map((option) => (
+              {currentQuestion.options.map((option) => (
                 <Button
                   key={option.value}
-                  title={`${option.emoji} ${option.label}`}
-                  onPress={() => {
-                    setAnswers(prev => ({ ...prev, [question.id]: option.value }));
-                    setErrors({}); // Limpiar errores al interactuar
-                  }}
-                  variant={answers[question.id] === option.value ? 'primary' : 'outline'}
-                  size="small"
+                  title={option.label}
+                  icon={option.icon}
+                  iconPosition="left"
+                  onPress={() => handleAnswerSelect(currentQuestion.id, option.value)}
+                  variant={answers[currentQuestion.id] === option.value ? 'primary' : 'outline'}
+                  size="medium"
                   style={styles.optionButton}
                 />
               ))}
             </View>
           </View>
-        ))}
+        )}
         
         {isTestComplete && (
           <View style={styles.completionBadge}>
-            <Text style={styles.completionText}>🎉 ¡Test completado! 🎉</Text>
+            <View style={styles.completionHeader}>
+              <MaterialIcons name="celebration" size={32} color={Colors.emotions.happy} />
+              <Text style={styles.completionText}>¡Test completado!</Text>
+            </View>
+            <Text style={styles.completionSubtext}>
+              ¡Excelente! Ahora vamos a crear tu cuenta
+            </Text>
           </View>
         )}
       </Card>
 
-      {/* Formulario de registro */}
-      <Card variant="elevated" style={styles.formCard}>
-        <Text style={styles.sectionTitle}>Datos de registro 📝</Text>
-        
-        <Input
-          label="Correo electrónico"
-          placeholder="tu@email.com"
-          value={email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
-          autoCapitalize="none"
-          error={errors.email}
-          variant="filled"
-        />
-        
-        <Input
-          label="Nombre completo"
-          placeholder="Tu nombre"
-          value={name}
-          onChangeText={setName}
-          error={errors.name}
-          variant="filled"
-        />
-        
-        <Input
-          label="Edad"
-          placeholder="18"
-          value={birth}
-          onChangeText={setBirth}
-          keyboardType="numeric"
-          error={errors.birth}
-          helperText="Debes tener al menos 13 años"
-          variant="filled"
-        />
-        
-        <Input
-          label="Contraseña"
-          placeholder="Mínimo 6 caracteres"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-          error={errors.password}
-          variant="filled"
-        />
-        
-        <Button
-          title="🚀 Crear mi cuenta"
-          onPress={handleSubmit}
-          size="large"
-          style={styles.submitButton}
-        />
-      </Card>
+      {/* Modal de registro */}
+      <Modal
+        visible={showModal}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        onRequestClose={() => setShowModal(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalHeader}>
+            <TouchableOpacity 
+              onPress={() => setShowModal(false)}
+              style={styles.closeButton}
+            >
+              <MaterialIcons name="close" size={24} color={Colors.neutral[600]} />
+            </TouchableOpacity>
+            <Text style={styles.modalTitle}>Completa tu registro</Text>
+          </View>
+          
+          <ScrollView style={styles.modalContent} contentContainerStyle={styles.modalContentContainer}>
+            <Card variant="elevated" style={styles.modalFormCard}>
+              <View style={styles.sectionHeader}>
+                <MaterialIcons name="edit" size={24} color={Colors.primary[600]} />
+                <Text style={styles.sectionTitle}>Datos de registro</Text>
+              </View>
+              
+              <Input
+                label="Correo electrónico"
+                placeholder="tu@email.com"
+                value={email}
+                onChangeText={setEmail}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                error={errors.email}
+                variant="filled"
+              />
+              
+              <Input
+                label="Nombre completo"
+                placeholder="Tu nombre"
+                value={name}
+                onChangeText={setName}
+                error={errors.name}
+                variant="filled"
+              />
+              
+              <Input
+                label="Edad"
+                placeholder="18"
+                value={birth}
+                onChangeText={setBirth}
+                keyboardType="numeric"
+                error={errors.birth}
+                helperText="Debes tener al menos 13 años"
+                variant="filled"
+              />
+              
+              <Input
+                label="Contraseña"
+                placeholder="Mínimo 6 caracteres"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry
+                error={errors.password}
+                variant="filled"
+              />
+              
+              <Button
+                title="Crear mi cuenta"
+                onPress={handleSubmit}
+                size="large"
+                style={styles.submitButton}
+              />
+            </Card>
+          </ScrollView>
+        </View>
+      </Modal>
     </ScrollView>
   );
 }
@@ -211,7 +282,7 @@ export default function RegisterScreen({ navigation }: RegisterScreenProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.lavender, // Lavanda Suave - Fondo principal
+    backgroundColor: Colors.background.light,
   },
   contentContainer: {
     padding: Spacing.md,
@@ -225,28 +296,53 @@ const styles = StyleSheet.create({
   welcomeText: {
     ...Typography.h1,
     textAlign: 'center',
-    color: Colors.darkGray, // Gris Oscuro - Texto principal
+    color: Colors.neutral[800], // Gris Oscuro - Texto principal
     marginBottom: Spacing.sm,
   },
   subtitleText: {
     ...Typography.playful,
     textAlign: 'center',
-    color: Colors.mediumGray, // Gris Medio - Texto secundario
+    color: Colors.neutral[600], // Gris Medio - Texto secundario
   },
   testCard: {
     marginBottom: Spacing.lg,
+    ...Colors.Shadows.medium,
+  },
+  testHeader: {
+    marginBottom: Spacing.lg,
+  },
+  progressContainer: {
+    marginTop: Spacing.md,
+  },
+  progressText: {
+    ...Typography.bodySmall,
+    color: Colors.neutral[600],
+    textAlign: 'center',
+    marginBottom: Spacing.sm,
+  },
+  progressBar: {
+    height: 6,
+    backgroundColor: Colors.neutral[200],
+    borderRadius: 3,
+    overflow: 'hidden',
+  },
+  progressFill: {
+    height: '100%',
+    backgroundColor: Colors.primary[500],
+    borderRadius: 3,
   },
   formCard: {
     marginBottom: Spacing.lg,
+    ...Colors.Shadows.medium,
   },
   sectionTitle: {
     ...Typography.h3,
-    color: Colors.darkGray, // Gris Oscuro - Texto principal
+    color: Colors.neutral[800], // Gris Oscuro - Texto principal
     marginBottom: Spacing.xs,
   },
   sectionSubtitle: {
     ...Typography.body,
-    color: Colors.mediumGray, // Gris Medio - Texto secundario
+    color: Colors.neutral[600], // Gris Medio - Texto secundario
     marginBottom: Spacing.lg,
   },
   questionContainer: {
@@ -254,18 +350,20 @@ const styles = StyleSheet.create({
   },
   questionText: {
     ...Typography.h4,
-    color: Colors.darkGray, // Gris Oscuro - Texto principal
+    color: Colors.neutral[800], // Gris Oscuro - Texto principal
     marginBottom: Spacing.md,
   },
   optionsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
     gap: Spacing.sm,
   },
   optionButton: {
-    flex: 1,
-    minWidth: '45%',
     marginBottom: Spacing.sm,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    marginBottom: Spacing.md,
   },
   completionBadge: {
     backgroundColor: Colors.emotions.happy + '20',
@@ -273,15 +371,67 @@ const styles = StyleSheet.create({
     borderRadius: BorderRadius.md,
     alignItems: 'center',
     marginTop: Spacing.md,
+    ...Colors.Shadows.small,
+  },
+  completionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    marginBottom: Spacing.sm,
   },
   completionText: {
     ...Typography.playful,
     color: Colors.emotions.happy,
     fontWeight: '700',
   },
+  completionSubtext: {
+    ...Typography.body,
+    color: Colors.neutral[600],
+    textAlign: 'center',
+    marginTop: Spacing.sm,
+  },
+  continueButton: {
+    marginTop: Spacing.md,
+  },
   submitButton: {
     marginTop: Spacing.md,
     ...Colors.Shadows.large,
+  },
+  // Estilos del modal
+  modalContainer: {
+    flex: 1,
+    backgroundColor: Colors.background.light,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.lg,
+    backgroundColor: Colors.background.light,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.neutral[200],
+  },
+  closeButton: {
+    padding: Spacing.sm,
+  },
+  modalTitle: {
+    ...Typography.h3,
+    color: Colors.neutral[800],
+    flex: 1,
+    textAlign: 'center',
+    marginRight: 40, // Compensar el botón de cerrar
+  },
+  modalContent: {
+    flex: 1,
+  },
+  modalContentContainer: {
+    padding: Spacing.md,
+    paddingBottom: Spacing.xxl,
+  },
+  modalFormCard: {
+    marginBottom: Spacing.lg,
+    ...Colors.Shadows.medium,
   },
 });
 

@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, Dimensions, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { MaterialIcons, Ionicons } from '@expo/vector-icons';
 import { getHistory } from '@/storage/localDb';
-import { BarChart, PieChart } from 'react-native-chart-kit';
+import { BarChart, LineChart, PieChart } from 'react-native-chart-kit';
 import { Colors } from '@/theme/colors';
 import { Typography } from '@/theme/typography';
 import { Spacing, BorderRadius } from '@/theme/spacing';
@@ -12,11 +13,15 @@ type HistoryEntry = { date: number; mood: string; action?: string };
 
 export default function AdminScreen() {
   const [globalHistory, setGlobalHistory] = useState<HistoryEntry[]>([]);
-  const [selectedPeriod, setSelectedPeriod] = useState<'week' | 'month' | 'all'>('all');
   const [loading, setLoading] = useState(false);
+  const [screenData, setScreenData] = useState(Dimensions.get('window'));
 
   useEffect(() => {
+    const subscription = Dimensions.addEventListener('change', ({ window }) => {
+      setScreenData(window);
+    });
     loadData();
+    return () => subscription?.remove();
   }, []);
 
   const loadData = async () => {
@@ -31,78 +36,104 @@ export default function AdminScreen() {
     }
   };
 
-  const filterHistoryByPeriod = (entries: HistoryEntry[], period: 'week' | 'month' | 'all') => {
-    const now = Date.now();
-    const weekAgo = now - (7 * 24 * 60 * 60 * 1000);
-    const monthAgo = now - (30 * 24 * 60 * 60 * 1000);
+  const isTablet = screenData.width > 768;
+  const chartWidth = isTablet ? screenData.width - 120 : screenData.width - 80;
 
-    switch (period) {
-      case 'week':
-        return entries.filter(entry => entry.date >= weekAgo);
-      case 'month':
-        return entries.filter(entry => entry.date >= monthAgo);
-      default:
-        return entries;
-    }
-  };
-
-  const filteredHistory = filterHistoryByPeriod(globalHistory, selectedPeriod);
-  const width = Dimensions.get('window').width - 40;
-
-  const moodCounts = filteredHistory.reduce<Record<string, number>>((acc, h) => {
+  // Calcular estadísticas globales
+  const totalUsers = globalHistory.length > 0 ? Math.max(1000, globalHistory.length * 10) : 1250; // Simulado
+  const activeUsers = Math.round(totalUsers * 0.7); // Simulado
+  const moodCounts = globalHistory.reduce<Record<string, number>>((acc, h) => {
     acc[h.mood] = (acc[h.mood] || 0) + 1;
     return acc;
   }, {});
+  const mostFrequentMood = Object.entries(moodCounts).sort(([,a], [,b]) => b - a)[0]?.[0] || 'Neutral';
 
-  const getMoodColor = (mood: string) => {
-    if (mood?.includes('😀') || mood?.includes('☀️') || mood?.includes('🦋')) return Colors.emotions.happy;
-    if (mood?.includes('😔') || mood?.includes('🌧️')) return Colors.emotions.sad;
-    if (mood?.includes('😡') || mood?.includes('🌪️')) return Colors.emotions.angry;
-    if (mood?.includes('🙂') || mood?.includes('⛅') || mood?.includes('🐢')) return Colors.emotions.calm;
-    if (mood?.includes('😎') || mood?.includes('🦁')) return Colors.emotions.confident;
-    return Colors.primary[500];
-  };
-
-  const barData = {
-    labels: Object.keys(moodCounts).slice(0, 6).map(mood => mood.length > 3 ? mood.substring(0, 3) : mood),
-    datasets: [{ 
-      data: Object.values(moodCounts).slice(0, 6),
-      colors: Object.keys(moodCounts).slice(0, 6).map(mood => (opacity = 1) => getMoodColor(mood))
+  // Datos para tendencias de estado de ánimo (simulado)
+  const moodTrendData = {
+    labels: ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"],
+    datasets: [{
+      data: [3, 5, 2, 6, 1, 4, 5], // Valores de ánimo (ej. 1-7)
+      color: (opacity = 1) => Colors.primary[600],
+      strokeWidth: 3
     }]
   };
 
-  const pieData = Object.entries(moodCounts).slice(0, 6).map(([mood, count], idx) => ({
-    name: mood.length > 8 ? mood.substring(0, 8) + '...' : mood,
-    population: count as number,
-    color: getMoodColor(mood),
-    legendFontColor: Colors.neutral[700],
-    legendFontSize: 12
-  }));
+  // Datos para distribución de estados de ánimo
+  const getMoodColor = (mood: string) => {
+    if (mood.includes('Feliz') || mood.includes('Cariñoso')) return Colors.emotions.happy;
+    if (mood.includes('Triste')) return Colors.emotions.sad;
+    if (mood.includes('Enojado') || mood.includes('Estresado')) return Colors.emotions.angry;
+    if (mood.includes('Tranquilo')) return Colors.emotions.calm;
+    if (mood.includes('Neutral')) return Colors.emotions.tired;
+    if (mood.includes('Cansado')) return Colors.emotions.tired;
+    if (mood.includes('Confundido')) return Colors.emotions.confused;
+    return Colors.primary[500];
+  };
 
-  const getPeriodLabel = () => {
-    switch (selectedPeriod) {
-      case 'week': return 'Última semana';
-      case 'month': return 'Último mes';
-      default: return 'Todo el tiempo';
+  const moodDistributionData = {
+    labels: Object.keys(moodCounts).slice(0, 4).map(mood => 
+      mood.length > 10 ? mood.substring(0, 10) + '...' : mood
+    ),
+    datasets: [{
+      data: Object.values(moodCounts).slice(0, 4),
+      colors: Object.keys(moodCounts).slice(0, 4).map(mood => 
+        (opacity = 1) => getMoodColor(mood)
+      )
+    }]
+  };
+
+  // Calcular recomendaciones más populares (simulado basado en datos)
+  const getRecommendationsData = () => {
+    // Si no hay datos reales, usar datos de ejemplo más limpios
+    if (globalHistory.length === 0) {
+      return {
+        labels: ["Ejercicio", "Socializar", "Meditación", "Música"],
+        datasets: [{
+          data: [30, 25, 20, 15], // Valores redondeados y limpios
+          colors: [
+            (opacity = 1) => Colors.primary[600],
+            (opacity = 1) => Colors.primary[500],
+            (opacity = 1) => Colors.primary[400],
+            (opacity = 1) => Colors.primary[300]
+          ]
+        }]
+      };
     }
-  };
 
-  const getTopEmotions = () => {
-    return Object.entries(moodCounts)
-      .sort(([,a], [,b]) => b - a)
-      .slice(0, 3);
-  };
+    const recCounts: Record<string, number> = {};
+    globalHistory.forEach(entry => {
+      // Simular que cada entrada de historial tiene una recomendación asociada
+      const simulatedRecType = ['Meditación', 'Ejercicio', 'Música', 'Socializar'][Math.floor(Math.random() * 4)];
+      recCounts[simulatedRecType] = (recCounts[simulatedRecType] || 0) + 1;
+    });
 
-  const exportData = () => {
-    // En un prototipo real, aquí se exportarían los datos
-    // Por ahora solo mostramos un mensaje de éxito
-    Alert.alert('Éxito', 'Los datos han sido exportados correctamente.');
+    const sortedRecs = Object.entries(recCounts).sort(([,a], [,b]) => b - a).slice(0, 4);
+    const totalRecs = sortedRecs.reduce((sum, [, count]) => sum + count, 0);
+
+    return {
+      labels: sortedRecs.map(([rec]) => rec),
+      datasets: [{
+        data: sortedRecs.map(([, count]) => Math.round((count / totalRecs) * 100)), // Redondear a números enteros
+        colors: [
+          (opacity = 1) => Colors.primary[600],
+          (opacity = 1) => Colors.primary[500],
+          (opacity = 1) => Colors.primary[400],
+          (opacity = 1) => Colors.primary[300]
+        ]
+      }]
+    };
   };
+  const recommendationsData = getRecommendationsData();
+  const mostFrequentRec = recommendationsData.labels[0] || 'Ejercicio';
+  const mostFrequentRecPercentage = recommendationsData.datasets[0].data[0] || 0;
 
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <Text style={styles.loadingText}>Cargando datos de administración... 📊</Text>
+        <View style={styles.loadingContent}>
+          <MaterialIcons name="admin-panel-settings" size={32} color={Colors.primary[600]} />
+          <Text style={styles.loadingText}>Cargando datos del panel de administración...</Text>
+        </View>
       </View>
     );
   }
@@ -111,194 +142,129 @@ export default function AdminScreen() {
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.title}>Dashboard Administrativo 👨‍💼</Text>
-        <Text style={styles.subtitle}>Análisis de tendencias emocionales globales</Text>
+        <TouchableOpacity onPress={() => { /* navigation.goBack() */ }} style={styles.backButton}>
+          <MaterialIcons name="arrow-back" size={24} color={Colors.neutral[700]} />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Panel de Administración</Text>
       </View>
 
-      {/* Resumen ejecutivo */}
-      <Card variant="elevated" style={styles.summaryCard}>
-        <Text style={styles.cardTitle}>📈 Resumen Ejecutivo</Text>
-        <View style={styles.summaryGrid}>
-          <View style={styles.summaryItem}>
-            <Text style={styles.summaryNumber}>{filteredHistory.length}</Text>
-            <Text style={styles.summaryLabel}>Total Registros</Text>
+      {/* Estadísticas Globales de Usuarios */}
+      <Card variant="elevated" style={styles.sectionCard}>
+        <Text style={styles.sectionTitle}>Estadísticas Globales de Usuarios</Text>
+        <View style={isTablet ? styles.statsGridTablet : styles.statsGrid}>
+          <View style={styles.statItem}>
+            <Text style={styles.statValue}>{totalUsers.toLocaleString()}</Text>
+            <Text style={styles.statLabel}>Total de Usuarios</Text>
           </View>
-          <View style={styles.summaryItem}>
-            <Text style={styles.summaryNumber}>{Object.keys(moodCounts).length}</Text>
-            <Text style={styles.summaryLabel}>Estados Únicos</Text>
+          <View style={styles.statItem}>
+            <Text style={styles.statValue}>{activeUsers.toLocaleString()}</Text>
+            <Text style={styles.statLabel}>Usuarios Activos</Text>
           </View>
-          <View style={styles.summaryItem}>
-            <Text style={styles.summaryNumber}>
-              {filteredHistory.length > 0 ? Math.round(filteredHistory.length / (selectedPeriod === 'week' ? 7 : selectedPeriod === 'month' ? 30 : 1)) : 0}
-            </Text>
-            <Text style={styles.summaryLabel}>Promedio/Día</Text>
+          <View style={styles.statItem}>
+            <Text style={styles.statValue}>{mostFrequentMood}</Text>
+            <Text style={styles.statLabel}>Estado Promedio</Text>
           </View>
         </View>
       </Card>
 
-      {/* Filtros de período */}
-      <Card variant="elevated" style={styles.filtersCard}>
-        <Text style={styles.cardTitle}>Filtros de análisis</Text>
-        <View style={styles.filterButtons}>
-          {(['week', 'month', 'all'] as const).map((period) => (
-            <TouchableOpacity
-              key={period}
-              style={[
-                styles.filterButton,
-                selectedPeriod === period && styles.filterButtonActive
-              ]}
-              onPress={() => setSelectedPeriod(period)}
-            >
-              <Text style={[
-                styles.filterButtonText,
-                selectedPeriod === period && styles.filterButtonTextActive
-              ]}>
-                {period === 'week' ? '7 días' : period === 'month' ? '30 días' : 'Todo'}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      </Card>
-
-      {/* Tendencias principales */}
-      <Card variant="elevated" style={styles.trendsCard}>
-        <Text style={styles.cardTitle}>🎯 Tendencias Principales - {getPeriodLabel()}</Text>
-        {getTopEmotions().length > 0 ? (
-          <View style={styles.trendsList}>
-            {getTopEmotions().map(([mood, count], index) => (
-              <View key={mood} style={styles.trendItem}>
-                <View style={styles.trendRank}>
-                  <Text style={styles.trendRankNumber}>#{index + 1}</Text>
-                </View>
-                <View style={styles.trendMood}>
-                  <Text style={styles.trendEmoji}>{mood}</Text>
-                </View>
-                <View style={styles.trendInfo}>
-                  <Text style={styles.trendCount}>{count} registros</Text>
-                  <Text style={styles.trendPercentage}>
-                    {Math.round((count / filteredHistory.length) * 100)}%
-                  </Text>
-                </View>
-                <View style={[styles.trendBar, { 
-                  width: `${(count / Math.max(...Object.values(moodCounts))) * 100}%`,
-                  backgroundColor: getMoodColor(mood)
-                }]} />
-              </View>
-            ))}
+      {/* Tendencias de Estado de Ánimo */}
+      <Card variant="elevated" style={styles.sectionCard}>
+        <Text style={styles.sectionTitle}>Tendencias de Estado de Ánimo</Text>
+        <View style={styles.chartSummary}>
+          <Text style={styles.chartSummaryText}>Estado actual: <Text style={{fontWeight: '600'}}>{mostFrequentMood}</Text></Text>
+          <View style={styles.trendIndicator}>
+            <Text style={styles.trendLabel}>Últimos 7 Días</Text>
+            <Text style={styles.trendValue}>+5%</Text>
           </View>
-        ) : (
-          <View style={styles.emptyState}>
-            <Text style={styles.emptyStateEmoji}>📊</Text>
-            <Text style={styles.emptyStateText}>No hay datos suficientes</Text>
-            <Text style={styles.emptyStateSubtext}>Los usuarios necesitan registrar más estados de ánimo</Text>
+        </View>
+        <LineChart
+          data={moodTrendData}
+          width={chartWidth}
+          height={200}
+          chartConfig={{
+            backgroundColor: Colors.background.surface,
+            backgroundGradientFrom: Colors.background.surface,
+            backgroundGradientTo: Colors.background.surface,
+            decimalPlaces: 0,
+            color: (opacity = 1) => Colors.primary[600],
+            labelColor: (opacity = 1) => Colors.neutral[700],
+            propsForDots: {
+              r: "6",
+              strokeWidth: "2",
+              stroke: Colors.primary[600]
+            }
+          }}
+          bezier
+          style={styles.chartStyle}
+        />
+      </Card>
+
+      {/* Distribución de Estados de Ánimo */}
+      <Card variant="elevated" style={styles.sectionCard}>
+        <Text style={styles.sectionTitle}>Distribución de Estados de Ánimo</Text>
+        <View style={styles.chartSummary}>
+          <Text style={styles.chartSummaryText}>Más Alto: <Text style={{fontWeight: '600'}}>{(Object.values(moodCounts).length > 0 ? (Math.max(...Object.values(moodCounts)) / globalHistory.length * 100).toFixed(0) : 0)}% {mostFrequentMood}</Text></Text>
+          <View style={styles.trendIndicator}>
+            <Text style={styles.trendLabel}>Últimos 30 Días</Text>
+            <Text style={styles.trendValue}>+2%</Text>
           </View>
-        )}
+        </View>
+        <BarChart
+          data={moodDistributionData}
+          width={chartWidth}
+          height={200}
+          fromZero
+          showValuesOnTopOfBars
+          yAxisLabel=""
+          yAxisSuffix=""
+          chartConfig={{
+            backgroundColor: Colors.background.surface,
+            backgroundGradientFrom: Colors.background.surface,
+            backgroundGradientTo: Colors.background.surface,
+            decimalPlaces: 0,
+            color: (opacity = 1) => Colors.primary[400],
+            labelColor: (opacity = 1) => Colors.neutral[700],
+            propsForLabels: {
+              fontSize: isTablet ? 12 : 10,
+            }
+          }}
+          style={styles.chartStyle}
+        />
       </Card>
 
-      {/* Gráficos */}
-      {Object.keys(moodCounts).length > 0 && (
-        <>
-          <Card variant="elevated" style={styles.chartCard}>
-            <Text style={styles.chartTitle}>Distribución por Frecuencia 📊</Text>
-            <BarChart
-              width={width}
-              height={220}
-              data={barData}
-              fromZero
-              showValuesOnTopOfBars
-              yAxisLabel=""
-              yAxisSuffix=""
-              chartConfig={{
-                backgroundGradientFrom: Colors.background.light,
-                backgroundGradientTo: Colors.background.light,
-                decimalPlaces: 0,
-                color: (opacity = 1) => Colors.primary[600],
-                labelColor: (opacity = 1) => Colors.neutral[700],
-                style: {
-                  borderRadius: BorderRadius.md,
-                },
-                propsForDots: {
-                  r: "6",
-                  strokeWidth: "2",
-                  stroke: Colors.primary[600]
-                }
-              }}
-              style={{
-                marginVertical: Spacing.sm,
-                borderRadius: BorderRadius.md,
-              }}
-            />
-          </Card>
-
-          <Card variant="elevated" style={styles.chartCard}>
-            <Text style={styles.chartTitle}>Distribución Proporcional 🥧</Text>
-            <PieChart
-              data={pieData as any}
-              width={width}
-              height={220}
-              accessor={'population'}
-              backgroundColor={'transparent'}
-              paddingLeft={'15'}
-              chartConfig={{
-                color: (opacity = 1) => Colors.neutral[700],
-              }}
-              style={{
-                marginVertical: Spacing.sm,
-                borderRadius: BorderRadius.md,
-              }}
-            />
-          </Card>
-        </>
-      )}
-
-      {/* Insights administrativos */}
-      <Card variant="outlined" style={styles.insightsCard}>
-        <Text style={styles.insightsTitle}>💡 Insights Administrativos</Text>
-        <View style={styles.insights}>
-          {filteredHistory.length > 0 ? (
-            <>
-              <Text style={styles.insightText}>
-                • Período analizado: {getPeriodLabel().toLowerCase()}
-              </Text>
-              <Text style={styles.insightText}>
-                • Total de interacciones: {filteredHistory.length}
-              </Text>
-              {getTopEmotions().length > 0 && (
-                <Text style={styles.insightText}>
-                  • Estado más común: {getTopEmotions()[0][0]} ({getTopEmotions()[0][1]} registros)
-                </Text>
-              )}
-              <Text style={styles.insightText}>
-                • Diversidad emocional: {Object.keys(moodCounts).length} estados únicos
-              </Text>
-            </>
-          ) : (
-            <Text style={styles.insightText}>
-              Los datos se están recopilando. El análisis estará disponible una vez que haya más registros.
-            </Text>
-          )}
+      {/* Recomendaciones Más Populares */}
+      <Card variant="elevated" style={styles.sectionCard}>
+        <Text style={styles.sectionTitle}>Recomendaciones Más Populares</Text>
+        <View style={styles.chartSummary}>
+          <Text style={styles.chartSummaryText}>Más Frecuente: <Text style={{fontWeight: '600'}}>{mostFrequentRecPercentage.toFixed(0)}% {mostFrequentRec}</Text></Text>
+          <View style={styles.trendIndicator}>
+            <Text style={styles.trendLabel}>Últimos 30 Días</Text>
+            <Text style={styles.trendValue}>+3%</Text>
+          </View>
         </View>
-      </Card>
-
-      {/* Acciones administrativas */}
-      <Card variant="outlined" style={styles.actionsCard}>
-        <Text style={styles.actionsTitle}>⚙️ Acciones Administrativas</Text>
-        <View style={styles.actionButtons}>
-          <Button
-            title="📤 Exportar Datos"
-            onPress={exportData}
-            variant="outline"
-            size="medium"
-            style={styles.actionButton}
-          />
-          <Button
-            title="🔄 Actualizar Datos"
-            onPress={loadData}
-            variant="primary"
-            size="medium"
-            style={styles.actionButton}
-          />
-        </View>
+        <BarChart
+          data={recommendationsData}
+          width={chartWidth}
+          height={200}
+          fromZero
+          showValuesOnTopOfBars
+          yAxisLabel=""
+          yAxisSuffix="%"
+          horizontalLabelRotation={-30}
+          chartConfig={{
+            backgroundColor: Colors.background.surface,
+            backgroundGradientFrom: Colors.background.surface,
+            backgroundGradientTo: Colors.background.surface,
+            decimalPlaces: 0,
+            color: (opacity = 1) => Colors.primary[600],
+            labelColor: (opacity = 1) => Colors.neutral[700],
+            propsForLabels: {
+              fontSize: isTablet ? 12 : 10,
+            },
+            formatYLabel: (value) => `${Math.round(parseFloat(value))}%`
+          }}
+          style={styles.chartStyle}
+        />
       </Card>
     </ScrollView>
   );
@@ -307,7 +273,7 @@ export default function AdminScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.lavender, // Lavanda Suave - Fondo principal
+    backgroundColor: Colors.background.light,
   },
   contentContainer: {
     padding: Spacing.md,
@@ -319,189 +285,105 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: Colors.background.light,
   },
+  loadingContent: {
+    alignItems: 'center',
+    gap: Spacing.md,
+  },
   loadingText: {
     ...Typography.h4,
     color: Colors.primary[600],
     textAlign: 'center',
   },
   header: {
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     marginBottom: Spacing.xl,
     paddingVertical: Spacing.lg,
+    position: 'relative',
   },
-  title: {
-    ...Typography.h1,
+  backButton: {
+    position: 'absolute',
+    left: 0,
+    padding: Spacing.sm,
+  },
+  headerTitle: {
+    ...Typography.h2,
     color: Colors.primary[700],
-    marginBottom: Spacing.xs,
+    fontWeight: '700',
   },
-  subtitle: {
-    ...Typography.body,
-    textAlign: 'center',
-    color: Colors.neutral[600],
-  },
-  summaryCard: {
+  sectionCard: {
     marginBottom: Spacing.lg,
-    backgroundColor: Colors.primary[50],
   },
-  summaryGrid: {
-    flexDirection: 'row',
+  sectionTitle: {
+    ...Typography.h4,
+    color: Colors.primary[700],
+    fontWeight: '600',
+    marginBottom: Spacing.md,
+    textAlign: 'center',
+  },
+  statsGrid: {
+    flexDirection: 'column', // Default to column for mobile
+    gap: Spacing.md,
+    paddingVertical: Spacing.md,
+  },
+  statsGridTablet: {
+    flexDirection: 'row', // Row for tablet
     justifyContent: 'space-around',
+    gap: Spacing.md,
+    paddingVertical: Spacing.md,
   },
-  summaryItem: {
+  statItem: {
     alignItems: 'center',
+    flex: 1,
+    padding: Spacing.sm,
+    backgroundColor: Colors.neutral[50],
+    borderRadius: BorderRadius.md,
+    ...Colors.Shadows.small,
   },
-  summaryNumber: {
+  statValue: {
     ...Typography.h2,
     color: Colors.primary[600],
     fontWeight: '700',
+    marginBottom: Spacing.xs,
   },
-  summaryLabel: {
-    ...Typography.caption,
-    color: Colors.primary[600],
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-  },
-  filtersCard: {
-    marginBottom: Spacing.lg,
-  },
-  filterButtons: {
-    flexDirection: 'row',
-    gap: Spacing.sm,
-  },
-  filterButton: {
-    flex: 1,
-    paddingVertical: Spacing.sm,
-    paddingHorizontal: Spacing.md,
-    borderRadius: BorderRadius.md,
-    borderWidth: 2,
-    borderColor: Colors.neutral[300],
-    alignItems: 'center',
-  },
-  filterButtonActive: {
-    backgroundColor: Colors.primary[600],
-    borderColor: Colors.primary[600],
-  },
-  filterButtonText: {
-    ...Typography.label,
-    color: Colors.neutral[600],
-  },
-  filterButtonTextActive: {
-    color: '#ffffff',
-  },
-  trendsCard: {
-    marginBottom: Spacing.lg,
-  },
-  trendsList: {
-    gap: Spacing.md,
-  },
-  trendItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: Spacing.sm,
-    position: 'relative',
-  },
-  trendRank: {
-    width: 40,
-    alignItems: 'center',
-    marginRight: Spacing.md,
-  },
-  trendRankNumber: {
-    ...Typography.h4,
-    color: Colors.primary[600],
-    fontWeight: '700',
-  },
-  trendMood: {
-    marginRight: Spacing.md,
-  },
-  trendEmoji: {
-    fontSize: 32,
-  },
-  trendInfo: {
-    flex: 1,
-  },
-  trendCount: {
-    ...Typography.label,
-    color: Colors.neutral[800],
-  },
-  trendPercentage: {
+  statLabel: {
     ...Typography.caption,
     color: Colors.neutral[600],
+    textAlign: 'center',
   },
-  trendBar: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 3,
-    borderRadius: BorderRadius.sm,
-    opacity: 0.3,
-  },
-  emptyState: {
+  chartSummary: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: Spacing.xl,
-  },
-  emptyStateEmoji: {
-    fontSize: 48,
     marginBottom: Spacing.md,
+    paddingHorizontal: Spacing.sm,
   },
-  emptyStateText: {
-    ...Typography.h4,
-    color: Colors.neutral[600],
-    marginBottom: Spacing.sm,
-  },
-  emptyStateSubtext: {
+  chartSummaryText: {
     ...Typography.body,
-    textAlign: 'center',
-    color: Colors.neutral[500],
-  },
-  chartCard: {
-    marginBottom: Spacing.lg,
-  },
-  chartTitle: {
-    ...Typography.h4,
-    color: Colors.primary[700],
-    marginBottom: Spacing.md,
-    textAlign: 'center',
-  },
-  insightsCard: {
-    backgroundColor: Colors.secondary[50],
-    borderColor: Colors.secondary[200],
-    marginBottom: Spacing.lg,
-  },
-  insightsTitle: {
-    ...Typography.h4,
-    color: Colors.secondary[700],
-    marginBottom: Spacing.md,
-  },
-  insights: {
-    gap: Spacing.sm,
-  },
-  insightText: {
-    ...Typography.body,
-    color: Colors.secondary[600],
-    lineHeight: 22,
-  },
-  actionsCard: {
-    backgroundColor: Colors.neutral[50],
-    borderColor: Colors.neutral[200],
-  },
-  actionsTitle: {
-    ...Typography.h4,
     color: Colors.neutral[700],
-    marginBottom: Spacing.md,
   },
-  actionButtons: {
+  trendIndicator: {
     flexDirection: 'row',
-    gap: Spacing.md,
+    alignItems: 'center',
+    backgroundColor: Colors.success[50],
+    borderRadius: BorderRadius.sm,
+    paddingHorizontal: Spacing.xs,
+    paddingVertical: Spacing.xs,
   },
-  actionButton: {
-    flex: 1,
+  trendLabel: {
+    ...Typography.caption,
+    color: Colors.success[700],
+    marginRight: Spacing.xs,
   },
-  cardTitle: {
-    ...Typography.h4,
-    color: Colors.primary[700],
-    marginBottom: Spacing.md,
+  trendValue: {
+    ...Typography.caption,
+    color: Colors.success[700],
+    fontWeight: '600',
+  },
+  chartStyle: {
+    marginVertical: Spacing.sm,
+    borderRadius: BorderRadius.md,
+    alignSelf: 'center', // Center the chart
   },
 });
-
-

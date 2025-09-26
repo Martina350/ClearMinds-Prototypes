@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, Alert, TouchableOpacity, Switch } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, Alert, TouchableOpacity, Switch, Modal } from 'react-native';
+import { MaterialIcons, Ionicons } from '@expo/vector-icons';
 import { getUser, getPreferences, savePreferences } from '@/storage/localDb';
 import { Colors } from '@/theme/colors';
 import { Typography } from '@/theme/typography';
@@ -17,10 +18,36 @@ type UserPreferences = {
   weeklyReport?: boolean;
 };
 
+// Opciones predefinidas para los dropdowns
+const MUSIC_OPTIONS = [
+  'Clásica', 'Pop', 'Rock', 'Electrónica', 'Jazz', 'Lo-fi', 
+  'Ambiental', 'Instrumental', 'R&B', 'Reggae', 'Indie', 'Folk'
+];
+
+const TIPS_OPTIONS = [
+  'Respiración', 'Hábitos', 'Mindfulness', 'Meditación', 'Yoga',
+  'Ejercicio', 'Lectura', 'Escritura', 'Arte', 'Música', 'Naturaleza', 'Social'
+];
+
+const ACTIVITIES_OPTIONS = [
+  'Caminar', 'Yoga', 'Lectura', 'Cocinar', 'Ejercicio', 'Meditación',
+  'Arte', 'Música', 'Escritura', 'Jardinería', 'Deportes', 'Viajar'
+];
+
 export default function SettingsScreen() {
   const [preferences, setPreferences] = useState<UserPreferences>({});
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(false);
+  const [dropdownVisible, setDropdownVisible] = useState<string | null>(null);
+  const [selectedOptions, setSelectedOptions] = useState<{
+    music: string[];
+    tips: string[];
+    activities: string[];
+  }>({
+    music: [],
+    tips: [],
+    activities: []
+  });
 
   useEffect(() => {
     loadData();
@@ -44,7 +71,7 @@ export default function SettingsScreen() {
     try {
       setLoading(true);
       await savePreferences(preferences);
-      Alert.alert('¡Guardado! 💾', 'Tus preferencias se han actualizado correctamente.');
+      Alert.alert('¡Guardado!', 'Tus preferencias se han actualizado correctamente.');
     } catch (error) {
       Alert.alert('Error', 'No se pudieron guardar las preferencias. Inténtalo de nuevo.');
     } finally {
@@ -54,6 +81,32 @@ export default function SettingsScreen() {
 
   const updatePreference = (key: keyof UserPreferences, value: string | boolean) => {
     setPreferences(prev => ({ ...prev, [key]: value }));
+  };
+
+  const toggleOption = (category: 'music' | 'tips' | 'activities', option: string) => {
+    setSelectedOptions(prev => ({
+      ...prev,
+      [category]: prev[category].includes(option)
+        ? prev[category].filter(item => item !== option)
+        : [...prev[category], option]
+    }));
+  };
+
+  const getDisplayText = (category: 'music' | 'tips' | 'activities') => {
+    const selected = selectedOptions[category];
+    if (selected.length === 0) return 'Selecciona opciones';
+    if (selected.length === 1) return selected[0];
+    if (selected.length <= 3) return selected.join(', ');
+    return `${selected.length} opciones seleccionadas`;
+  };
+
+  const getOptionsForCategory = (category: 'music' | 'tips' | 'activities') => {
+    switch (category) {
+      case 'music': return MUSIC_OPTIONS;
+      case 'tips': return TIPS_OPTIONS;
+      case 'activities': return ACTIVITIES_OPTIONS;
+      default: return [];
+    }
   };
 
   const resetPreferences = () => {
@@ -78,7 +131,10 @@ export default function SettingsScreen() {
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.title}>Configuración ⚙️</Text>
+        <View style={styles.titleContainer}>
+          <MaterialIcons name="settings" size={28} color={Colors.primary[600]} />
+          <Text style={styles.title}>Configuración</Text>
+        </View>
         <Text style={styles.subtitle}>Personaliza tu experiencia</Text>
       </View>
 
@@ -96,85 +152,68 @@ export default function SettingsScreen() {
 
       {/* Preferencias de personalización */}
       <Card variant="elevated" style={styles.preferencesCard}>
-        <Text style={styles.cardTitle}>🎯 Preferencias de recomendaciones</Text>
+        <View style={styles.cardHeader}>
+          <MaterialIcons name="tune" size={24} color={Colors.primary[600]} />
+          <Text style={styles.cardTitle}>Preferencias de recomendaciones</Text>
+        </View>
         <Text style={styles.cardSubtitle}>Ayúdanos a personalizar mejor tus sugerencias</Text>
         
-        <Input
-          label="Música preferida 🎵"
-          placeholder="Ej: Clásica, Pop, Rock, Electrónica"
-          value={preferences.music || ''}
-          onChangeText={(value) => updatePreference('music', value)}
-          variant="filled"
-          helperText="Tipo de música que prefieres para relajarte"
-        />
-        
-        <Input
-          label="Tipos de consejos 💡"
-          placeholder="Ej: Respiración, hábitos, mindfulness"
-          value={preferences.tips || ''}
-          onChangeText={(value) => updatePreference('tips', value)}
-          variant="filled"
-          helperText="Qué tipo de consejos te resultan más útiles"
-        />
-        
-        <Input
-          label="Actividades favoritas 🎯"
-          placeholder="Ej: Caminar, yoga, lectura, cocinar"
-          value={preferences.activities || ''}
-          onChangeText={(value) => updatePreference('activities', value)}
-          variant="filled"
-          helperText="Actividades que disfrutas hacer"
-        />
-      </Card>
-
-      {/* Configuraciones de la app */}
-      <Card variant="elevated" style={styles.settingsCard}>
-        <Text style={styles.cardTitle}>📱 Configuración de la aplicación</Text>
-        
-        <View style={styles.settingItem}>
-          <View style={styles.settingInfo}>
-            <Text style={styles.settingLabel}>Notificaciones recordatorias 🔔</Text>
-            <Text style={styles.settingDescription}>Recibe recordatorios para registrar tu estado de ánimo</Text>
-          </View>
-          <Switch
-            value={preferences.notifications ?? true}
-            onValueChange={(value) => updatePreference('notifications', value)}
-            trackColor={{ false: Colors.neutral[300], true: Colors.primary[200] }}
-            thumbColor={preferences.notifications ? Colors.primary[600] : Colors.neutral[400]}
-          />
+        {/* Música preferida */}
+        <View style={styles.dropdownContainer}>
+          <Text style={styles.dropdownLabel}>Música preferida</Text>
+          <TouchableOpacity
+            style={styles.dropdownButton}
+            onPress={() => setDropdownVisible(dropdownVisible === 'music' ? null : 'music')}
+          >
+            <Text style={styles.dropdownText}>{getDisplayText('music')}</Text>
+            <MaterialIcons 
+              name={dropdownVisible === 'music' ? 'keyboard-arrow-up' : 'keyboard-arrow-down'} 
+              size={24} 
+              color={Colors.neutral[600]} 
+            />
+          </TouchableOpacity>
+          <Text style={styles.helperText}>Tipo de música que prefieres para relajarte</Text>
         </View>
 
-        <View style={styles.settingItem}>
-          <View style={styles.settingInfo}>
-            <Text style={styles.settingLabel}>Modo oscuro 🌙</Text>
-            <Text style={styles.settingDescription}>Cambiar el tema de la aplicación</Text>
-          </View>
-          <Switch
-            value={preferences.darkMode ?? false}
-            onValueChange={(value) => updatePreference('darkMode', value)}
-            trackColor={{ false: Colors.neutral[300], true: Colors.primary[200] }}
-            thumbColor={preferences.darkMode ? Colors.primary[600] : Colors.neutral[400]}
-          />
+        {/* Tipos de consejos */}
+        <View style={styles.dropdownContainer}>
+          <Text style={styles.dropdownLabel}>Tipos de consejos</Text>
+          <TouchableOpacity
+            style={styles.dropdownButton}
+            onPress={() => setDropdownVisible(dropdownVisible === 'tips' ? null : 'tips')}
+          >
+            <Text style={styles.dropdownText}>{getDisplayText('tips')}</Text>
+            <MaterialIcons 
+              name={dropdownVisible === 'tips' ? 'keyboard-arrow-up' : 'keyboard-arrow-down'} 
+              size={24} 
+              color={Colors.neutral[600]} 
+            />
+          </TouchableOpacity>
+          <Text style={styles.helperText}>Qué tipo de consejos te resultan más útiles</Text>
         </View>
 
-        <View style={styles.settingItem}>
-          <View style={styles.settingInfo}>
-            <Text style={styles.settingLabel}>Reporte semanal 📊</Text>
-            <Text style={styles.settingDescription}>Recibe un resumen de tu bienestar cada semana</Text>
-          </View>
-          <Switch
-            value={preferences.weeklyReport ?? true}
-            onValueChange={(value) => updatePreference('weeklyReport', value)}
-            trackColor={{ false: Colors.neutral[300], true: Colors.primary[200] }}
-            thumbColor={preferences.weeklyReport ? Colors.primary[600] : Colors.neutral[400]}
-          />
+        {/* Actividades favoritas */}
+        <View style={styles.dropdownContainer}>
+          <Text style={styles.dropdownLabel}>Actividades favoritas</Text>
+          <TouchableOpacity
+            style={styles.dropdownButton}
+            onPress={() => setDropdownVisible(dropdownVisible === 'activities' ? null : 'activities')}
+          >
+            <Text style={styles.dropdownText}>{getDisplayText('activities')}</Text>
+            <MaterialIcons 
+              name={dropdownVisible === 'activities' ? 'keyboard-arrow-up' : 'keyboard-arrow-down'} 
+              size={24} 
+              color={Colors.neutral[600]} 
+            />
+          </TouchableOpacity>
+          <Text style={styles.helperText}>Actividades que disfrutas hacer</Text>
         </View>
       </Card>
 
       {/* Acciones */}
       <Card variant="outlined" style={styles.actionsCard}>
         <Button
-          title="💾 Guardar cambios"
+          title="Guardar cambios"
           onPress={handleSave}
           loading={loading}
           size="large"
@@ -182,7 +221,7 @@ export default function SettingsScreen() {
         />
         
         <Button
-          title="🔄 Restablecer preferencias"
+          title="Restablecer preferencias"
           onPress={resetPreferences}
           variant="outline"
           size="medium"
@@ -190,15 +229,54 @@ export default function SettingsScreen() {
         />
       </Card>
 
-      {/* Información adicional */}
-      <Card variant="outlined" style={styles.infoCard}>
-        <Text style={styles.infoTitle}>ℹ️ Sobre ClearMinds</Text>
-        <Text style={styles.infoText}>
-          ClearMinds te ayuda a entender y gestionar tus emociones a través de recomendaciones personalizadas. 
-          Todas tus datos se almacenan localmente en tu dispositivo para proteger tu privacidad.
-        </Text>
-        <Text style={styles.versionText}>Versión 1.0.0</Text>
-      </Card>
+      {/* Modal para dropdown */}
+      <Modal
+        visible={dropdownVisible !== null}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setDropdownVisible(null)}
+      >
+        <TouchableOpacity
+          style={styles.modalOverlay}
+          activeOpacity={1}
+          onPress={() => setDropdownVisible(null)}
+        >
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>
+                {dropdownVisible === 'music' ? 'Música preferida' :
+                 dropdownVisible === 'tips' ? 'Tipos de consejos' :
+                 'Actividades favoritas'}
+              </Text>
+              <TouchableOpacity
+                onPress={() => setDropdownVisible(null)}
+                style={styles.closeButton}
+              >
+                <MaterialIcons name="close" size={24} color={Colors.neutral[600]} />
+              </TouchableOpacity>
+            </View>
+            
+            <ScrollView style={styles.optionsList}>
+              {dropdownVisible && getOptionsForCategory(dropdownVisible as any).map((option, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={styles.optionItem}
+                  onPress={() => toggleOption(dropdownVisible as keyof typeof selectedOptions, option)}
+                >
+                  <View style={styles.optionContent}>
+                    <Text style={styles.optionText}>{option}</Text>
+                    <MaterialIcons
+                      name={selectedOptions[dropdownVisible as keyof typeof selectedOptions].includes(option) ? 'check-box' : 'check-box-outline-blank'}
+                      size={24}
+                      color={selectedOptions[dropdownVisible as keyof typeof selectedOptions].includes(option) ? Colors.primary[600] : Colors.neutral[400]}
+                    />
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        </TouchableOpacity>
+      </Modal>
     </ScrollView>
   );
 }
@@ -206,7 +284,7 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.lavender, // Lavanda Suave - Fondo principal
+    backgroundColor: Colors.background.light,
   },
   contentContainer: {
     padding: Spacing.md,
@@ -217,10 +295,15 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.xl,
     paddingVertical: Spacing.lg,
   },
+  titleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    marginBottom: Spacing.xs,
+  },
   title: {
     ...Typography.h1,
     color: Colors.primary[700],
-    marginBottom: Spacing.xs,
   },
   subtitle: {
     ...Typography.body,
@@ -243,10 +326,15 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primary[50],
     borderColor: Colors.primary[200],
   },
+  cardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    marginBottom: Spacing.xs,
+  },
   cardTitle: {
     ...Typography.h4,
     color: Colors.primary[700],
-    marginBottom: Spacing.xs,
   },
   cardSubtitle: {
     ...Typography.body,
@@ -311,6 +399,87 @@ const styles = StyleSheet.create({
     ...Typography.caption,
     color: Colors.primary[500],
     textAlign: 'center',
+  },
+  // Estilos para dropdowns
+  dropdownContainer: {
+    marginBottom: Spacing.lg,
+  },
+  dropdownLabel: {
+    ...Typography.label,
+    color: Colors.neutral[800],
+    marginBottom: Spacing.xs,
+    fontWeight: '600',
+  },
+  dropdownButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+    backgroundColor: Colors.neutral[100],
+    borderRadius: BorderRadius.md,
+    borderWidth: 1,
+    borderColor: Colors.neutral[300],
+  },
+  dropdownText: {
+    ...Typography.body,
+    color: Colors.neutral[700],
+    flex: 1,
+  },
+  helperText: {
+    ...Typography.caption,
+    color: Colors.neutral[500],
+    marginTop: Spacing.xs,
+  },
+  // Estilos para modal
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: Spacing.lg,
+  },
+  modalContent: {
+    backgroundColor: Colors.background.surface,
+    borderRadius: BorderRadius.lg,
+    width: '100%',
+    maxHeight: '70%',
+    ...Colors.Shadows.large,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: Spacing.lg,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.neutral[200],
+  },
+  modalTitle: {
+    ...Typography.h4,
+    color: Colors.neutral[800],
+    fontWeight: '600',
+  },
+  closeButton: {
+    padding: Spacing.xs,
+  },
+  optionsList: {
+    maxHeight: 300,
+  },
+  optionItem: {
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.neutral[100],
+  },
+  optionContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  optionText: {
+    ...Typography.body,
+    color: Colors.neutral[700],
+    flex: 1,
   },
 });
 

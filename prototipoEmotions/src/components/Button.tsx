@@ -1,5 +1,6 @@
 import React from 'react';
-import { TouchableOpacity, Text, StyleSheet, ActivityIndicator, ViewStyle, TextStyle } from 'react-native';
+import { TouchableOpacity, Text, StyleSheet, ActivityIndicator, ViewStyle, TextStyle, View } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
 import { Colors } from '@/theme/colors';
 import { Typography } from '@/theme/typography';
 import { Spacing, BorderRadius, Layout } from '@/theme/spacing';
@@ -13,6 +14,8 @@ interface ButtonProps {
   disabled?: boolean;
   style?: ViewStyle;
   textStyle?: TextStyle;
+  icon?: string;
+  iconPosition?: 'left' | 'right';
 }
 
 export default function Button({
@@ -24,6 +27,8 @@ export default function Button({
   disabled = false,
   style,
   textStyle,
+  icon,
+  iconPosition = 'left',
 }: ButtonProps) {
   const buttonStyle = [
     styles.base,
@@ -40,6 +45,31 @@ export default function Button({
     textStyle,
   ];
 
+  const renderContent = () => {
+    if (loading) {
+      return <ActivityIndicator color={variant === 'primary' ? '#ffffff' : Colors.primary[600]} />;
+    }
+
+    if (icon) {
+      const iconColor = variant === 'primary' ? '#ffffff' : Colors.primary[600];
+      const iconSize = size === 'small' ? 16 : size === 'large' ? 20 : 18;
+      
+      return (
+        <View style={styles.iconContainer}>
+          {iconPosition === 'left' && (
+            <MaterialIcons name={icon as any} size={iconSize} color={iconColor} style={styles.iconLeft} />
+          )}
+          <Text style={textStyles}>{title}</Text>
+          {iconPosition === 'right' && (
+            <MaterialIcons name={icon as any} size={iconSize} color={iconColor} style={styles.iconRight} />
+          )}
+        </View>
+      );
+    }
+
+    return <Text style={textStyles}>{title}</Text>;
+  };
+
   return (
     <TouchableOpacity
       style={buttonStyle}
@@ -47,11 +77,7 @@ export default function Button({
       disabled={disabled || loading}
       activeOpacity={0.8}
     >
-      {loading ? (
-        <ActivityIndicator color={variant === 'primary' ? '#ffffff' : Colors.primary[600]} />
-      ) : (
-        <Text style={textStyles}>{title}</Text>
-      )}
+      {renderContent()}
     </TouchableOpacity>
   );
 }
@@ -64,26 +90,26 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   
-  // Variantes según especificaciones del prototipo
+  // Variantes con nueva paleta moderna
   primary: {
-    backgroundColor: Colors.coral, // Coral Brillante para botones principales
-    borderRadius: 8, // Bordes ligeramente redondeados
+    backgroundColor: Colors.primary[500], // Azul principal
+    borderRadius: BorderRadius.md,
     ...Colors.Shadows.medium,
   },
   secondary: {
-    backgroundColor: Colors.turquoise, // Turquesa para acciones secundarias
-    borderRadius: 8,
+    backgroundColor: Colors.secondary[500], // Púrpura principal
+    borderRadius: BorderRadius.md,
     ...Colors.Shadows.medium,
   },
   outline: {
     backgroundColor: 'transparent',
     borderWidth: 2,
-    borderColor: Colors.coral,
-    borderRadius: 8,
+    borderColor: Colors.primary[500],
+    borderRadius: BorderRadius.md,
   },
   ghost: {
     backgroundColor: 'transparent',
-    borderRadius: 8,
+    borderRadius: BorderRadius.md,
   },
   
   // Tamaños
@@ -115,13 +141,13 @@ const styles = StyleSheet.create({
     color: '#ffffff',
   },
   secondaryText: {
-    color: Colors.darkGray, // Gris Oscuro
+    color: '#ffffff',
   },
   outlineText: {
-    color: Colors.coral, // Coral Brillante
+    color: Colors.primary[500], // Azul principal
   },
   ghostText: {
-    color: Colors.coral,
+    color: Colors.primary[500],
   },
   
   // Tamaños de texto
@@ -133,5 +159,18 @@ const styles = StyleSheet.create({
   },
   largeText: {
     fontSize: 18,
+  },
+  
+  // Estilos para iconos
+  iconContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  iconLeft: {
+    marginRight: Spacing.xs,
+  },
+  iconRight: {
+    marginLeft: Spacing.xs,
   },
 });

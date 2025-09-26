@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, Dimensions, StyleSheet, TouchableOpacity } from 'react-native';
+import { MaterialIcons, Ionicons } from '@expo/vector-icons';
 import { getHistory } from '@/storage/localDb';
 import { BarChart, PieChart } from 'react-native-chart-kit';
 import { Colors } from '@/theme/colors';
@@ -50,42 +51,158 @@ export default function HistoryScreen() {
     return acc;
   }, {});
 
+  // Función para limpiar nombres de emociones (remover emojis)
+  const cleanMoodName = (mood: string) => {
+    // Mapeo directo de emojis a nombres de emociones
+    const emojiToName: Record<string, string> = {
+      '😀': 'Feliz',
+      '😺': 'Feliz', 
+      '😿': 'Triste',
+      '😾': 'Enojado',
+      '😌': 'Tranquilo',
+      '😐': 'Neutral',
+      '😴': 'Cansado',
+      '😻': 'Cariñoso',
+      '🙀': 'Estresado',
+      '❓': 'Confundido',
+      '😔': 'Triste',
+      '😢': 'Triste',
+      '😡': 'Enojado',
+      '🤬': 'Enojado',
+      '😠': 'Enojado',
+      '😊': 'Feliz',
+      '😄': 'Feliz',
+      '😞': 'Triste',
+      '😫': 'Cansado',
+      '😪': 'Cansado',
+      '😍': 'Cariñoso',
+      '🥰': 'Cariñoso',
+      '😰': 'Estresado',
+      '😱': 'Estresado',
+      '🤔': 'Confundido',
+      '😕': 'Confundido',
+      '☀️': 'Feliz',
+      '🌧️': 'Triste',
+      '🌪️': 'Enojado',
+      '🦋': 'Feliz',
+      '🐢': 'Tranquilo',
+      '🦁': 'Confident',
+      '⛅': 'Tranquilo',
+      '🙂': 'Tranquilo',
+      '😎': 'Confident'
+    };
+
+    // Si el mood ya es texto limpio, devolverlo
+    if (!/[😀😺😿😾😌😐😴😻🙀❓😔😢😡🤬😠😊😄😞😫😪😍🥰😰😱🤔😕☀️🌧️🌪️🦋🐢🦁⛅🙂😎]/.test(mood)) {
+      return mood;
+    }
+
+    // Buscar emoji en el mapeo
+    for (const [emoji, name] of Object.entries(emojiToName)) {
+      if (mood.includes(emoji)) {
+        return name;
+      }
+    }
+
+    // Si no se encuentra, remover emojis y devolver texto limpio
+    const cleanText = mood
+      .replace(/[\u{1F600}-\u{1F64F}]/gu, '')
+      .replace(/[\u{1F300}-\u{1F5FF}]/gu, '')
+      .replace(/[\u{1F680}-\u{1F6FF}]/gu, '')
+      .replace(/[\u{1F1E0}-\u{1F1FF}]/gu, '')
+      .replace(/[\u{2600}-\u{26FF}]/gu, '')
+      .replace(/[\u{2700}-\u{27BF}]/gu, '')
+      .trim();
+    
+    return cleanText.length > 0 ? cleanText : 'Desconocido';
+  };
+
   const getMoodColor = (mood: string) => {
+    // Detectar por etiquetas de texto primero
+    if (mood.includes('Feliz') || mood.includes('Cariñoso')) return Colors.emotions.happy;
+    if (mood.includes('Triste')) return Colors.emotions.sad;
+    if (mood.includes('Enojado') || mood.includes('Estresado')) return Colors.emotions.angry;
+    if (mood.includes('Tranquilo')) return Colors.emotions.calm;
+    if (mood.includes('Neutral')) return Colors.emotions.tired;
+    if (mood.includes('Cansado')) return Colors.emotions.tired;
+    if (mood.includes('Confundido')) return Colors.emotions.confused;
+    
+    // Fallback para emojis si aún se usan
     if (mood?.includes('😀') || mood?.includes('☀️') || mood?.includes('🦋')) return Colors.emotions.happy;
     if (mood?.includes('😔') || mood?.includes('🌧️')) return Colors.emotions.sad;
     if (mood?.includes('😡') || mood?.includes('🌪️')) return Colors.emotions.angry;
     if (mood?.includes('🙂') || mood?.includes('⛅') || mood?.includes('🐢')) return Colors.emotions.calm;
     if (mood?.includes('😎') || mood?.includes('🦁')) return Colors.emotions.confident;
+    
     return Colors.primary[500];
   };
 
   const barData = {
     labels: Object.keys(moodCounts).slice(0, 6).map(mood => mood.length > 3 ? mood.substring(0, 3) : mood),
-    datasets: [{ 
+    datasets: [{
       data: Object.values(moodCounts).slice(0, 6),
       colors: Object.keys(moodCounts).slice(0, 6).map(mood => (opacity = 1) => getMoodColor(mood))
     }]
   };
 
-  const pieData = Object.entries(moodCounts).slice(0, 6).map(([mood, count], idx) => ({
-    name: mood.length > 8 ? mood.substring(0, 8) + '...' : mood,
-    population: count as number,
-    color: getMoodColor(mood),
-    legendFontColor: Colors.neutral[700],
-    legendFontSize: 12
-  }));
+  // Generar datos para el gráfico de pastel
+  const getPieData = () => {
+    // Definir todas las emociones disponibles
+    const allEmotions = [
+      { name: 'Feliz', color: Colors.emotions.happy },
+      { name: 'Triste', color: Colors.emotions.sad },
+      { name: 'Enojado', color: Colors.emotions.angry },
+      { name: 'Tranquilo', color: Colors.emotions.calm },
+      { name: 'Neutral', color: Colors.emotions.tired },
+      { name: 'Cansado', color: Colors.emotions.tired },
+      { name: 'Cariñoso', color: Colors.emotions.happy },
+      { name: 'Estresado', color: Colors.emotions.angry },
+      { name: 'Confundido', color: Colors.emotions.confused }
+    ];
+
+    // Si no hay datos reales, mostrar todas las emociones con valores de ejemplo
+    if (Object.keys(moodCounts).length === 0) {
+      return allEmotions.map(emotion => ({
+        name: emotion.name,
+        population: Math.floor(Math.random() * 5) + 1, // Valores aleatorios entre 1-5
+        color: emotion.color,
+        legendFontColor: Colors.neutral[700],
+        legendFontSize: 12
+      }));
+    }
+
+    // Crear un mapa de emociones con sus conteos
+    const emotionMap = new Map();
+    
+    // Agregar emociones que tienen registros
+    Object.entries(moodCounts).forEach(([mood, count]) => {
+      const cleanName = cleanMoodName(mood);
+      emotionMap.set(cleanName, count);
+    });
+
+    // Generar datos para el gráfico incluyendo todas las emociones
+    return allEmotions.map(emotion => ({
+      name: emotion.name,
+      population: emotionMap.get(emotion.name) || 0, // 0 si no hay registros
+      color: emotion.color,
+      legendFontColor: Colors.neutral[700],
+      legendFontSize: 12
+    })).filter(item => item.population > 0); // Solo mostrar emociones con registros
+  };
+
+  const pieData = getPieData();
 
   const formatDate = (timestamp: number) => {
     const date = new Date(timestamp);
     return {
-      date: date.toLocaleDateString('es-ES', { 
-        day: '2-digit', 
+      date: date.toLocaleDateString('es-ES', {
+        day: '2-digit',
         month: '2-digit',
         year: '2-digit'
       }),
-      time: date.toLocaleTimeString('es-ES', { 
-        hour: '2-digit', 
-        minute: '2-digit' 
+      time: date.toLocaleTimeString('es-ES', {
+        hour: '2-digit',
+        minute: '2-digit'
       })
     };
   };
@@ -102,7 +219,10 @@ export default function HistoryScreen() {
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.title}>Mi Viaje Emocional 📊</Text>
+        <View style={styles.titleContainer}>
+          <MaterialIcons name="analytics" size={28} color={Colors.primary[600]} />
+          <Text style={styles.title}>Mi Viaje Emocional</Text>
+        </View>
         <Text style={styles.subtitle}>Observa tus patrones y crecimiento personal</Text>
       </View>
 
@@ -153,19 +273,19 @@ export default function HistoryScreen() {
 
       {/* Timeline de emociones */}
       <Card variant="elevated" style={styles.timelineCard}>
-        <Text style={styles.timelineTitle}>Timeline de emociones 📅</Text>
+        <Text style={styles.timelineTitle}>Timeline de emociones</Text>
         {filteredHistory.length > 0 ? (
           <View style={styles.timeline}>
             {filteredHistory.slice().reverse().slice(0, 10).map((entry, idx) => {
               const { date, time } = formatDate(entry.date);
               const moodColor = getMoodColor(entry.mood);
-              
+
               return (
                 <View key={idx} style={styles.timelineItem}>
                   <View style={[styles.timelineDot, { backgroundColor: moodColor }]} />
                   <View style={styles.timelineContent}>
                     <View style={styles.timelineHeader}>
-                      <Text style={styles.timelineMood}>{entry.mood}</Text>
+                      <Text style={styles.timelineMood}>{cleanMoodName(entry.mood)}</Text>
                       <Text style={styles.timelineDate}>{date} {time}</Text>
                     </View>
                     {entry.action && (
@@ -178,72 +298,56 @@ export default function HistoryScreen() {
           </View>
         ) : (
           <View style={styles.emptyState}>
-            <Text style={styles.emptyStateEmoji}>📝</Text>
+            <MaterialIcons name="description" size={48} color={Colors.neutral[400]} />
             <Text style={styles.emptyStateText}>Aún no hay registros</Text>
             <Text style={styles.emptyStateSubtext}>Comienza registrando tu estado de ánimo en la pantalla de inicio</Text>
           </View>
         )}
       </Card>
 
-      {/* Gráficos */}
+      {/* Gráficos de estadísticas */}
       {Object.keys(moodCounts).length > 0 && (
         <>
+          {/* Gráfico de distribución */}
           <Card variant="elevated" style={styles.chartCard}>
-            <Text style={styles.chartTitle}>Frecuencia de emociones 📈</Text>
-            <BarChart
-              width={width}
-              height={220}
-              data={barData}
-              fromZero
-              showValuesOnTopOfBars
-              yAxisLabel=""
-              yAxisSuffix=""
-              chartConfig={{
-                backgroundGradientFrom: Colors.background.light,
-                backgroundGradientTo: Colors.background.light,
-                decimalPlaces: 0,
-                color: (opacity = 1) => Colors.primary[600],
-                labelColor: (opacity = 1) => Colors.neutral[700],
-                style: {
+            <View style={styles.chartHeader}>
+              <View style={styles.chartTitleContainer}>
+                <MaterialIcons name="pie-chart" size={24} color={Colors.primary[600]} />
+                <Text style={styles.chartTitle}>Distribución Emocional</Text>
+              </View>
+              <Text style={styles.chartSubtitle}>
+                Análisis de tus estados de ánimo registrados
+              </Text>
+            </View>
+            <View style={styles.chartContainer}>
+              <PieChart
+                data={pieData as any}
+                width={width}
+                height={220}
+                accessor={'population'}
+                backgroundColor={'transparent'}
+                paddingLeft={'15'}
+                hasLegend={true}
+                chartConfig={{
+                  color: (opacity = 1) => Colors.neutral[700],
+                  labelColor: (opacity = 1) => Colors.neutral[700],
+                }}
+                style={{
+                  marginVertical: Spacing.sm,
                   borderRadius: BorderRadius.md,
-                },
-                propsForDots: {
-                  r: "6",
-                  strokeWidth: "2",
-                  stroke: Colors.primary[600]
-                }
-              }}
-              style={{
-                marginVertical: Spacing.sm,
-                borderRadius: BorderRadius.md,
-              }}
-            />
-          </Card>
-
-          <Card variant="elevated" style={styles.chartCard}>
-            <Text style={styles.chartTitle}>Distribución emocional 🥧</Text>
-            <PieChart
-              data={pieData as any}
-              width={width}
-              height={220}
-              accessor={'population'}
-              backgroundColor={'transparent'}
-              paddingLeft={'15'}
-              chartConfig={{
-                color: (opacity = 1) => Colors.neutral[700],
-              }}
-              style={{
-                marginVertical: Spacing.sm,
-                borderRadius: BorderRadius.md,
-              }}
-            />
+                }}
+              />
+            </View>
           </Card>
         </>
       )}
 
       {/* Insights */}
       <Card variant="outlined" style={styles.insightsCard}>
-        <Text style={styles.insightsTitle}>💡 Insights sobre tu bienestar</Text>
+        <View style={styles.insightsHeader}>
+          <MaterialIcons name="lightbulb" size={24} color={Colors.primary[600]} />
+          <Text style={styles.insightsTitle}>Insights sobre tu bienestar</Text>
+        </View>
         {filteredHistory.length > 0 ? (
           <View style={styles.insights}>
             <Text style={styles.insightText}>
@@ -251,7 +355,7 @@ export default function HistoryScreen() {
             </Text>
             {Object.keys(moodCounts).length > 1 && (
               <Text style={styles.insightText}>
-                • Tu emoción más frecuente es: {Object.entries(moodCounts).sort(([,a], [,b]) => b - a)[0][0]}
+                • Tu emoción más frecuente es: {Object.entries(moodCounts).sort(([, a], [, b]) => b - a)[0][0]}
               </Text>
             )}
             <Text style={styles.insightText}>
@@ -271,7 +375,7 @@ export default function HistoryScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.lavender, // Lavanda Suave - Fondo principal
+    backgroundColor: Colors.background.light,
   },
   contentContainer: {
     padding: Spacing.md,
@@ -282,10 +386,15 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.xl,
     paddingVertical: Spacing.lg,
   },
+  titleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    marginBottom: Spacing.xs,
+  },
   title: {
     ...Typography.h1,
     color: Colors.primary[700],
-    marginBottom: Spacing.xs,
   },
   subtitle: {
     ...Typography.body,
@@ -311,7 +420,9 @@ const styles = StyleSheet.create({
     borderRadius: BorderRadius.md,
     borderWidth: 2,
     borderColor: Colors.neutral[300],
+    backgroundColor: Colors.background.surface,
     alignItems: 'center',
+    ...Colors.Shadows.small,
   },
   filterButtonActive: {
     backgroundColor: Colors.primary[600],
@@ -415,20 +526,30 @@ const styles = StyleSheet.create({
   chartCard: {
     marginBottom: Spacing.lg,
   },
+  chartTitleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    marginBottom: Spacing.md,
+    justifyContent: 'center',
+  },
   chartTitle: {
     ...Typography.h4,
     color: Colors.primary[700],
-    marginBottom: Spacing.md,
-    textAlign: 'center',
   },
   insightsCard: {
     backgroundColor: Colors.secondary[50],
     borderColor: Colors.secondary[200],
   },
+  insightsHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    marginBottom: Spacing.md,
+  },
   insightsTitle: {
     ...Typography.h4,
     color: Colors.secondary[700],
-    marginBottom: Spacing.md,
   },
   insights: {
     gap: Spacing.sm,
@@ -437,6 +558,68 @@ const styles = StyleSheet.create({
     ...Typography.body,
     color: Colors.secondary[600],
     lineHeight: 22,
+  },
+  // Estilos adicionales para estadísticas mejoradas
+  statsHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    marginBottom: Spacing.md,
+  },
+  statValue: {
+    ...Typography.h2,
+    color: Colors.primary[600],
+    fontWeight: '700',
+    marginBottom: Spacing.xs,
+  },
+  chartHeader: {
+    marginBottom: Spacing.md,
+  },
+  chartSubtitle: {
+    ...Typography.body,
+    color: Colors.neutral[600],
+    marginTop: Spacing.xs,
+    textAlign: 'center',
+  },
+  chartContainer: {
+    alignItems: 'center',
+    marginBottom: Spacing.md,
+  },
+  chartLegend: {
+    marginTop: Spacing.md,
+    paddingTop: Spacing.md,
+    borderTopWidth: 1,
+    borderTopColor: Colors.neutral[200],
+  },
+  customLegend: {
+    marginTop: Spacing.md,
+    paddingTop: Spacing.md,
+    borderTopWidth: 1,
+    borderTopColor: Colors.neutral[200],
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-around',
+  },
+  legendItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: Spacing.sm,
+  },
+  legendColor: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    marginRight: Spacing.sm,
+  },
+  legendText: {
+    ...Typography.body,
+    color: Colors.neutral[700],
+    flex: 1,
+  },
+  legendPercentage: {
+    ...Typography.label,
+    color: Colors.primary[600],
+    fontWeight: '600',
   },
 });
 

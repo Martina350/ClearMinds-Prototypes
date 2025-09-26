@@ -1,6 +1,7 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Text } from 'react-native';
+import { MaterialIcons, Ionicons } from '@expo/vector-icons';
 import RegisterScreen from '@/screens/RegisterScreen';
 import HomeScreen from '@/screens/HomeScreen';
 import ResultsScreen from '@/screens/ResultsScreen';
@@ -36,8 +37,8 @@ function MainTabs() {
           fontWeight: '600',
           marginTop: 4,
         },
-        tabBarActiveTintColor: Colors.coral, // Coral Brillante para tabs activos
-        tabBarInactiveTintColor: Colors.mediumGray, // Gris Medio para tabs inactivos
+        tabBarActiveTintColor: Colors.primary[600], // Azul principal para tabs activos
+        tabBarInactiveTintColor: Colors.neutral[600], // Gris Medio para tabs inactivos
         headerStyle: {
           backgroundColor: '#ffffff', // Fondo blanco para headers
           ...Colors.Shadows.small,
@@ -46,9 +47,9 @@ function MainTabs() {
           fontSize: 18,
           fontWeight: '700',
           fontFamily: 'Roboto-Bold',
-          color: Colors.darkGray, // Gris Oscuro - Texto principal
+          color: Colors.neutral[800], // Gris Oscuro - Texto principal
         },
-        headerTintColor: Colors.coral, // Coral Brillante para botones de navegación
+        headerTintColor: Colors.primary[600], // Azul principal para botones de navegación
       }}
     >
       <Tab.Screen 
@@ -56,7 +57,7 @@ function MainTabs() {
         component={HomeScreen}
         options={{
           tabBarIcon: ({ color, size }) => (
-            <Text style={{ fontSize: size, color }}>🏠</Text>
+            <MaterialIcons name="home" size={size} color={color} />
           ),
           headerTitle: '¿Cómo te sientes?',
         }}
@@ -66,7 +67,7 @@ function MainTabs() {
         component={HistoryScreen}
         options={{
           tabBarIcon: ({ color, size }) => (
-            <Text style={{ fontSize: size, color }}>📊</Text>
+            <MaterialIcons name="analytics" size={size} color={color} />
           ),
           headerTitle: 'Mi Progreso',
         }}
@@ -76,7 +77,7 @@ function MainTabs() {
         component={SettingsScreen}
         options={{
           tabBarIcon: ({ color, size }) => (
-            <Text style={{ fontSize: size, color }}>⚙️</Text>
+            <MaterialIcons name="settings" size={size} color={color} />
           ),
           headerTitle: 'Configuración',
         }}
@@ -86,7 +87,7 @@ function MainTabs() {
         component={AdminScreen}
         options={{
           tabBarIcon: ({ color, size }) => (
-            <Text style={{ fontSize: size, color }}>👨‍💼</Text>
+            <MaterialIcons name="admin-panel-settings" size={size} color={color} />
           ),
           headerTitle: 'Dashboard Admin',
           tabBarLabel: 'Admin',
@@ -108,9 +109,9 @@ export default function RootNavigator() {
           fontSize: 18,
           fontWeight: '700',
           fontFamily: 'Roboto-Bold',
-          color: Colors.darkGray, // Gris Oscuro - Texto principal
+          color: Colors.neutral[800], // Gris Oscuro - Texto principal
         },
-        headerTintColor: Colors.coral, // Coral Brillante para botones de navegación
+        headerTintColor: Colors.primary[600], // Azul principal para botones de navegación
       }}
     >
       <Stack.Screen 
@@ -127,7 +128,7 @@ export default function RootNavigator() {
         name="Results" 
         component={ResultsScreen} 
         options={{ 
-          title: '✨ Tus Recomendaciones',
+          title: 'Tus Recomendaciones',
           headerBackTitle: 'Volver',
           presentation: 'modal',
         }} 

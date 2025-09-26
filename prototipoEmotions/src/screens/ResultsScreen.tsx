@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, Animated, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, Animated, TouchableOpacity, Alert, Image } from 'react-native';
+import { MaterialIcons, Ionicons } from '@expo/vector-icons';
 import { getRecommendationsForMood, Recommendation } from '@/services/ai';
 import { savePreferences, getPreferences } from '@/storage/localDb';
 import { Colors } from '@/theme/colors';
@@ -9,15 +10,28 @@ import Card from '@/components/Card';
 import Button from '@/components/Button';
 
 const RECOMMENDATION_ICONS = {
-  music: '🎵',
-  exercise: '💪',
-  quote: '💭',
-  tip: '💡',
+  music: (color: string) => <MaterialIcons name="music-note" size={24} color={color} />,
+  activity: (color: string) => <MaterialIcons name="sports-esports" size={24} color={color} />,
+  quote: (color: string) => <MaterialIcons name="format-quote" size={24} color={color} />,
+  tip: (color: string) => <MaterialIcons name="lightbulb" size={24} color={color} />,
+} as const;
+
+// Mapeo de emociones a sus imágenes
+const MOOD_IMAGES = {
+  'Feliz': require('@/assets/feliz.jpg'),
+  'Tranquilo': require('@/assets/tranquilo.jpg'),
+  'Neutral': require('@/assets/neutral.jpg'),
+  'Triste': require('@/assets/triste.jpg'),
+  'Enojado': require('@/assets/enojado.jpg'),
+  'Cansado': require('@/assets/cansado.jpg'),
+  'Cariñoso': require('@/assets/cariñoso.jpg'),
+  'Confundido': require('@/assets/confundido.jpg'),
+  'Estresado': require('@/assets/estresado.jpg'),
 } as const;
 
 const RECOMMENDATION_COLORS = {
   music: Colors.emotions.happy,
-  exercise: Colors.emotions.confident,
+  activity: Colors.emotions.confident,
   quote: Colors.emotions.calm,
   tip: Colors.emotions.excited,
 } as const;
@@ -78,18 +92,31 @@ export default function ResultsScreen({ route, navigation }: ResultsScreenProps)
       setLikedItems(prev => new Set([...prev, recKey]));
       
       // Feedback visual
-      Alert.alert('¡Guardado! 💾', 'Tu preferencia se ha guardado para personalizar futuras recomendaciones.');
+      Alert.alert('¡Guardado!', 'Tu preferencia se ha guardado para personalizar futuras recomendaciones.');
     } catch (error) {
       Alert.alert('Error', 'No se pudo guardar la preferencia. Inténtalo de nuevo.');
     }
   };
 
   const getMoodColor = () => {
+    // Usar el label si está disponible, sino usar el mood
+    const moodText = label || mood || '';
+    
+    if (moodText.includes('Feliz') || moodText.includes('Cariñoso')) return Colors.emotions.happy;
+    if (moodText.includes('Triste')) return Colors.emotions.sad;
+    if (moodText.includes('Enojado') || moodText.includes('Estresado')) return Colors.emotions.angry;
+    if (moodText.includes('Tranquilo')) return Colors.emotions.calm;
+    if (moodText.includes('Neutral')) return Colors.emotions.tired;
+    if (moodText.includes('Cansado')) return Colors.emotions.tired;
+    if (moodText.includes('Confundido')) return Colors.emotions.confused;
+    
+    // Fallback para emojis si aún se usan
     if (mood?.includes('😀') || mood?.includes('☀️') || mood?.includes('🦋')) return Colors.emotions.happy;
     if (mood?.includes('😔') || mood?.includes('🌧️')) return Colors.emotions.sad;
     if (mood?.includes('😡') || mood?.includes('🌪️')) return Colors.emotions.angry;
     if (mood?.includes('🙂') || mood?.includes('⛅') || mood?.includes('🐢')) return Colors.emotions.calm;
     if (mood?.includes('😎') || mood?.includes('🦁')) return Colors.emotions.confident;
+    
     return Colors.primary[500];
   };
 
@@ -98,7 +125,10 @@ export default function ResultsScreen({ route, navigation }: ResultsScreenProps)
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <Text style={styles.loadingText}>Generando recomendaciones personalizadas... ✨</Text>
+        <View style={styles.loadingContent}>
+          <MaterialIcons name="auto-awesome" size={32} color={Colors.primary[600]} />
+          <Text style={styles.loadingText}>Generando recomendaciones personalizadas...</Text>
+        </View>
       </View>
     );
   }
@@ -108,10 +138,18 @@ export default function ResultsScreen({ route, navigation }: ResultsScreenProps)
       {/* Header con estado de ánimo */}
       <View style={styles.header}>
         <View style={[styles.moodDisplay, { backgroundColor: moodColor + '20' }]}>
-          <Text style={styles.moodEmoji}>{mood}</Text>
+          {label && MOOD_IMAGES[label as keyof typeof MOOD_IMAGES] ? (
+            <Image 
+              source={MOOD_IMAGES[label as keyof typeof MOOD_IMAGES]} 
+              style={styles.moodImage}
+              resizeMode="cover"
+              onError={() => console.log('Error loading image for:', label)}
+            />
+          ) : (
+            <Text style={styles.moodEmoji}>{mood || '😊'}</Text>
+          )}
         </View>
-        <Text style={styles.moodTitle}>¡Perfecto!</Text>
-        <Text style={styles.moodSubtitle}>
+        <Text style={styles.moodTitle}>
           Te sentiste <Text style={{ color: moodColor, fontWeight: '600' }}>{label || 'así'}</Text>
         </Text>
         <Text style={styles.descriptionText}>
@@ -130,12 +168,12 @@ export default function ResultsScreen({ route, navigation }: ResultsScreenProps)
             <Card key={index} variant="elevated" style={styles.recommendationCard}>
               <View style={styles.recommendationHeader}>
                 <View style={[styles.typeIcon, { backgroundColor: recColor + '20' }]}>
-                  <Text style={styles.typeEmoji}>{RECOMMENDATION_ICONS[rec.type]}</Text>
+                  {RECOMMENDATION_ICONS[rec.type](recColor)}
                 </View>
                 <View style={styles.typeInfo}>
                   <Text style={[styles.typeTitle, { color: recColor }]}>
                     {rec.type === 'music' ? 'MÚSICA' :
-                     rec.type === 'exercise' ? 'EJERCICIO' :
+                     rec.type === 'activity' ? 'ACTIVIDAD' :
                      rec.type === 'quote' ? 'FRASE MOTIVACIONAL' :
                      'CONSEJO RÁPIDO'}
                   </Text>
@@ -156,12 +194,19 @@ export default function ResultsScreen({ route, navigation }: ResultsScreenProps)
                   onPress={() => handleLikeRecommendation(rec, index)}
                   activeOpacity={0.7}
                 >
-                  <Text style={[
-                    styles.likeButtonText,
-                    { color: isLiked ? '#ffffff' : recColor }
-                  ]}>
-                    {isLiked ? '❤️ Me gusta' : '🤍 Me gusta'}
-                  </Text>
+                  <View style={styles.likeButtonContent}>
+                    <MaterialIcons 
+                      name={isLiked ? "favorite" : "favorite-border"} 
+                      size={16} 
+                      color={isLiked ? '#ffffff' : recColor} 
+                    />
+                    <Text style={[
+                      styles.likeButtonText,
+                      { color: isLiked ? '#ffffff' : recColor }
+                    ]}>
+                      Me gusta
+                    </Text>
+                  </View>
                 </TouchableOpacity>
               </View>
             </Card>
@@ -171,7 +216,10 @@ export default function ResultsScreen({ route, navigation }: ResultsScreenProps)
 
       {/* Mensaje de personalización */}
       <Card variant="outlined" style={styles.personalizationCard}>
-        <Text style={styles.personalizationTitle}>🎯 Personalización en progreso</Text>
+        <View style={styles.personalizationHeader}>
+          <MaterialIcons name="tune" size={24} color={Colors.primary[600]} />
+          <Text style={styles.personalizationTitle}>Personalización en progreso</Text>
+        </View>
         <Text style={styles.personalizationText}>
           Cuantas más recomendaciones marques como "Me gusta", mejor personalizadas serán tus futuras sugerencias.
         </Text>
@@ -180,7 +228,7 @@ export default function ResultsScreen({ route, navigation }: ResultsScreenProps)
       {/* Botones de acción */}
       <View style={styles.actionButtons}>
         <Button
-          title="📊 Ver mi historial"
+          title="Ver mi historial"
           onPress={() => {
             // Navegar al historial
             navigation.navigate('MainTabs', { screen: 'Historial' });
@@ -190,7 +238,7 @@ export default function ResultsScreen({ route, navigation }: ResultsScreenProps)
           style={styles.actionButton}
         />
         <Button
-          title="🏠 Volver al inicio"
+          title="Volver al inicio"
           onPress={() => {
             // Navegar al inicio
             navigation.navigate('MainTabs', { screen: 'Inicio' });
@@ -207,7 +255,7 @@ export default function ResultsScreen({ route, navigation }: ResultsScreenProps)
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.lavender, // Lavanda Suave - Fondo principal
+    backgroundColor: Colors.background.light,
   },
   contentContainer: {
     padding: Spacing.md,
@@ -218,6 +266,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: Colors.background.light,
+  },
+  loadingContent: {
+    alignItems: 'center',
+    gap: Spacing.md,
   },
   loadingText: {
     ...Typography.h4,
@@ -241,6 +293,11 @@ const styles = StyleSheet.create({
   moodEmoji: {
     fontSize: 40,
   },
+  moodImage: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+  },
   moodTitle: {
     ...Typography.h1,
     color: Colors.primary[700],
@@ -262,6 +319,7 @@ const styles = StyleSheet.create({
   },
   recommendationCard: {
     marginBottom: Spacing.md,
+    ...Colors.Shadows.medium,
   },
   recommendationHeader: {
     flexDirection: 'row',
@@ -303,6 +361,13 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     minWidth: 120,
     alignItems: 'center',
+    backgroundColor: Colors.background.surface,
+    ...Colors.Shadows.small,
+  },
+  likeButtonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
   },
   likeButtonText: {
     ...Typography.label,
@@ -312,11 +377,17 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.lg,
     backgroundColor: Colors.secondary[50],
     borderColor: Colors.secondary[200],
+    ...Colors.Shadows.small,
+  },
+  personalizationHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    marginBottom: Spacing.sm,
   },
   personalizationTitle: {
     ...Typography.h4,
     color: Colors.secondary[700],
-    marginBottom: Spacing.sm,
   },
   personalizationText: {
     ...Typography.body,

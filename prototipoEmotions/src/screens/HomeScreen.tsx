@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, Animated, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, Animated, TouchableOpacity, Alert, Image } from 'react-native';
+import { MaterialIcons, Ionicons } from '@expo/vector-icons';
 import { appendMood } from '@/storage/localDb';
 import { Colors } from '@/theme/colors';
 import { Typography } from '@/theme/typography';
@@ -10,42 +11,17 @@ import PulseButton from '@/components/PulseButton';
 
 const MOOD_CATEGORIES = [
   {
-    title: 'Expresa con emojis 😊',
-    subtitle: '¿Cómo te sientes emocionalmente?',
+    title: 'Expresate con un gatito',
     options: [
-      { emoji: '😀', label: 'Feliz', color: Colors.emotions.happy },
-      { emoji: '🙂', label: 'Tranquilo', color: Colors.emotions.calm },
-      { emoji: '😐', label: 'Neutral', color: Colors.emotions.tired },
-      { emoji: '😔', label: 'Triste', color: Colors.emotions.sad },
-      { emoji: '😡', label: 'Enojado', color: Colors.emotions.angry },
-      { emoji: '😴', label: 'Cansado', color: Colors.emotions.tired },
-      { emoji: '🤗', label: 'Cariñoso', color: Colors.emotions.happy },
-      { emoji: '😎', label: 'Confianza', color: Colors.emotions.confident },
-      { emoji: '😵‍💫', label: 'Confundido', color: Colors.emotions.confused },
-    ]
-  },
-  {
-    title: 'Describe con el clima 🌤️',
-    subtitle: '¿Cómo está tu mundo interior?',
-    options: [
-      { emoji: '☀️', label: 'Soleado', color: Colors.emotions.happy },
-      { emoji: '⛅', label: 'Parcialmente nublado', color: Colors.emotions.calm },
-      { emoji: '🌧️', label: 'Lluvioso', color: Colors.emotions.sad },
-      { emoji: '🌈', label: 'Arcoíris', color: Colors.emotions.excited },
-      { emoji: '🌪️', label: 'Tormentoso', color: Colors.emotions.angry },
-      { emoji: '🌙', label: 'Noche estrellada', color: Colors.emotions.calm },
-    ]
-  },
-  {
-    title: 'Animales que te representan 🐾',
-    subtitle: '¿Con qué animal te identificas hoy?',
-    options: [
-      { emoji: '🦁', label: 'León - Valiente', color: Colors.emotions.confident },
-      { emoji: '🐍', label: 'Serpiente - Sabio', color: Colors.emotions.calm },
-      { emoji: '🦋', label: 'Mariposa - Libre', color: Colors.emotions.happy },
-      { emoji: '🐢', label: 'Tortuga - Paciente', color: Colors.emotions.calm },
-      { emoji: '🦊', label: 'Zorro - Astuto', color: Colors.emotions.confident },
-      { emoji: '🐨', label: 'Koala - Relajado', color: Colors.emotions.calm },
+      { image: require('@/assets/feliz.jpg'), label: 'Feliz', color: Colors.emotions.happy },
+      { image: require('@/assets/triste.jpg'), label: 'Triste', color: Colors.emotions.sad },
+      { image: require('@/assets/enojado.jpg'), label: 'Enojado', color: Colors.emotions.angry },
+      { image: require('@/assets/tranquilo.jpg'), label: 'Tranquilo', color: Colors.emotions.calm },
+      { image: require('@/assets/neutral.jpg'), label: 'Neutral', color: Colors.emotions.tired },
+      { image: require('@/assets/cansado.jpg'), label: 'Cansado', color: Colors.emotions.tired },
+      { image: require('@/assets/cariñoso.jpg'), label: 'Cariñoso', color: Colors.emotions.happy },
+      { image: require('@/assets/estresado.jpg'), label: 'Estresado', color: Colors.emotions.angry },
+      { image: require('@/assets/confundido.jpg'), label: 'Confundido', color: Colors.emotions.confused }     
     ]
   }
 ];
@@ -60,33 +36,33 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
   const [scaleAnim] = useState(new Animated.Value(1));
 
-  const handleMoodSelect = async (mood: string, label: string) => {
-    // Animación de selección
+  const handleMoodSelect = async (label: string) => {
+    // Animación de selección más suave
     Animated.sequence([
       Animated.timing(scaleAnim, {
-        toValue: 0.95,
-        duration: 100,
+        toValue: 0.98,
+        duration: 150,
         useNativeDriver: true,
       }),
       Animated.timing(scaleAnim, {
         toValue: 1,
-        duration: 100,
+        duration: 150,
         useNativeDriver: true,
       }),
     ]).start();
 
-    setSelectedMood(mood);
+    setSelectedMood(label);
     
     try {
       await appendMood({ 
         date: Date.now(), 
-        mood: mood,
+        mood: label,
         action: label 
       });
       
       // Navegar después de un pequeño delay para mostrar la selección
       setTimeout(() => {
-        navigation.navigate('Results', { mood: mood, label: label });
+        navigation.navigate('Results', { mood: label, label: label });
       }, 300);
     } catch (error) {
       console.error('Error saving mood:', error);
@@ -97,8 +73,10 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.welcomeText}>¡Hola! 👋</Text>
-        <Text style={styles.subtitleText}>¿Cómo te sientes hoy?</Text>
+        <View style={styles.welcomeContainer}>
+          <Ionicons name="hand-left" size={24} color={Colors.primary[600]} />
+          <Text style={styles.welcomeText}>¿Cómo te sientes hoy?</Text>
+        </View>
         <Text style={styles.descriptionText}>
           Selecciona la opción que mejor describa tu estado de ánimo actual
         </Text>
@@ -106,15 +84,20 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
 
       {/* Categorías de estado de ánimo */}
       {MOOD_CATEGORIES.map((category, categoryIndex) => (
-        <AnimatedCard 
-          key={categoryIndex} 
-          variant="elevated" 
-          style={styles.categoryCard}
-          delay={categoryIndex * 200}
+        <Animated.View
+          key={categoryIndex}
+          style={[
+            styles.categoryCard,
+            { transform: [{ scale: scaleAnim }] }
+          ]}
         >
+          <AnimatedCard 
+            variant="elevated" 
+            style={styles.categoryCardInner}
+            delay={categoryIndex * 200}
+          >
           <View style={styles.categoryHeader}>
             <Text style={styles.categoryTitle}>{category.title}</Text>
-            <Text style={styles.categorySubtitle}>{category.subtitle}</Text>
           </View>
           
           <View style={styles.optionsGrid}>
@@ -123,43 +106,53 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
                 key={optionIndex}
                 style={[
                   styles.moodOption,
-                  selectedMood === option.emoji && {
+                  selectedMood === option.label && {
                     backgroundColor: option.color + '20',
                     borderColor: option.color,
                     borderWidth: 3,
-                    transform: [{ scale: 1.05 }],
                   }
                 ]}
-                onPress={() => handleMoodSelect(option.emoji, option.label)}
+                onPress={() => handleMoodSelect(option.label)}
                 activeOpacity={0.8}
               >
-                <Text style={styles.moodEmoji}>{option.emoji}</Text>
-                <Text style={[
-                  styles.moodLabel,
-                  selectedMood === option.emoji && { 
-                    color: option.color,
-                    fontWeight: '700' 
-                  }
-                ]}>
+                <Image 
+                  source={option.image} 
+                  style={styles.moodImage}
+                  resizeMode="cover"
+                />
+                <Text 
+                  style={[
+                    styles.moodLabel,
+                    selectedMood === option.label && { 
+                      color: option.color,
+                      fontWeight: '700' 
+                    }
+                  ]}
+                  numberOfLines={2}
+                >
                   {option.label}
                 </Text>
               </TouchableOpacity>
             ))}
           </View>
-        </AnimatedCard>
+          </AnimatedCard>
+        </Animated.View>
       ))}
 
       {/* Mensaje motivacional */}
       <Card variant="outlined" style={styles.motivationCard}>
-        <Text style={styles.motivationText}>
-          💡 Tip: Tu estado de ánimo es válido y temporal. 
-          Recuerda que cada emoción tiene su propósito.
-        </Text>
+        <View style={styles.motivationContainer}>
+          <MaterialIcons name="lightbulb" size={20} color={Colors.primary[600]} />
+          <Text style={styles.motivationText}>
+            Tip: Tu estado de ánimo es válido y temporal. 
+            Recuerda que cada emoción tiene su propósito.
+          </Text>
+        </View>
       </Card>
 
       {/* Botón de ayuda */}
       <PulseButton
-        title="💬 ¿Necesitas ayuda?"
+        title="¿Necesitas ayuda?"
         onPress={() => {
           // Aquí podrías abrir un modal de ayuda o navegar a recursos
           // Por ahora solo mostramos un mensaje de ayuda
@@ -176,7 +169,7 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.lavender, // Lavanda Suave - Fondo principal
+    backgroundColor: Colors.background.light,
   },
   contentContainer: {
     padding: Spacing.md,
@@ -187,10 +180,15 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.xl,
     paddingVertical: Spacing.lg,
   },
+  welcomeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    marginBottom: Spacing.xs,
+  },
   welcomeText: {
     ...Typography.h1,
     color: Colors.primary[700],
-    marginBottom: Spacing.xs,
   },
   subtitleText: {
     ...Typography.h3,
@@ -205,6 +203,10 @@ const styles = StyleSheet.create({
   },
   categoryCard: {
     marginBottom: Spacing.lg,
+    ...Colors.Shadows.medium,
+  },
+  categoryCardInner: {
+    marginBottom: 0,
   },
   categoryHeader: {
     marginBottom: Spacing.md,
@@ -222,36 +224,47 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    gap: Spacing.md,
+    gap: Spacing.sm,
   },
   moodOption: {
     alignItems: 'center',
-    padding: Spacing.md,
+    padding: Spacing.sm,
     borderRadius: BorderRadius.lg,
     borderWidth: 2,
     borderColor: Colors.neutral[200],
-    backgroundColor: '#ffffff',
-    minWidth: '30%',
+    backgroundColor: Colors.background.surface,
+    width: '30%',
+    minHeight: 120,
     ...Colors.Shadows.small,
   },
-  moodEmoji: {
-    fontSize: 36,
-    marginBottom: Spacing.xs,
+  moodImage: {
+    width: 70,
+    height: 70,
+    borderRadius: BorderRadius.md,
+    marginBottom: Spacing.sm,
   },
   moodLabel: {
     ...Typography.bodySmall,
     textAlign: 'center',
     color: Colors.neutral[600],
     fontWeight: '500',
+    fontSize: 12,
+    lineHeight: 14,
   },
   motivationCard: {
     marginBottom: Spacing.lg,
     backgroundColor: Colors.primary[50],
     borderColor: Colors.primary[200],
+    ...Colors.Shadows.small,
+  },
+  motivationContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
   },
   motivationText: {
     ...Typography.body,
-    textAlign: 'center',
+    flex: 1,
     color: Colors.primary[700],
     fontStyle: 'italic',
   },
