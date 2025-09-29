@@ -8,6 +8,7 @@ import { Spacing, BorderRadius } from '@/theme/spacing';
 import Button from '@/components/Button';
 import Input from '@/components/Input';
 import Card from '@/components/Card';
+import BackgroundGradient from '@/components/BackgroundGradient';
 
 type Question = { 
   id: string; 
@@ -154,7 +155,8 @@ export default function RegisterScreen({ navigation }: RegisterScreenProps) {
   };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+    <BackgroundGradient variant="primary">
+      <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
       {/* Header con gradiente */}
       <View style={styles.header}>
         <Text style={styles.welcomeText}>¡Bienvenido!</Text>
@@ -292,14 +294,14 @@ export default function RegisterScreen({ navigation }: RegisterScreenProps) {
           </ScrollView>
         </View>
       </Modal>
-    </ScrollView>
+      </ScrollView>
+    </BackgroundGradient>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background.light,
   },
   contentContainer: {
     padding: Spacing.md,

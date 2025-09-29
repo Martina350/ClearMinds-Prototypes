@@ -8,6 +8,7 @@ import { Typography } from '@/theme/typography';
 import { Spacing, BorderRadius } from '@/theme/spacing';
 import Card from '@/components/Card';
 import Button from '@/components/Button';
+import BackgroundGradient from '@/components/BackgroundGradient';
 
 type HistoryEntry = { date: number; mood: string; action?: string };
 
@@ -228,7 +229,8 @@ export default function HistoryScreen() {
   };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+    <BackgroundGradient variant="primary">
+      <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.titleContainer}>
@@ -380,14 +382,14 @@ export default function HistoryScreen() {
           </Text>
         )}
       </Card>
-    </ScrollView>
+      </ScrollView>
+    </BackgroundGradient>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background.light,
   },
   contentContainer: {
     padding: Spacing.md,

@@ -8,6 +8,7 @@ import { Spacing, BorderRadius } from '@/theme/spacing';
 import AnimatedCard from '@/components/AnimatedCard';
 import Card from '@/components/Card';
 import PulseButton from '@/components/PulseButton';
+import BackgroundGradient from '@/components/BackgroundGradient';
 
 const MOOD_CATEGORIES = [
   {
@@ -67,7 +68,8 @@ export default function DogHomeScreen({ navigation }: DogHomeScreenProps) {
   };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+    <BackgroundGradient variant="primary">
+      <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
       <View style={styles.header}>
         <View style={styles.welcomeContainer}>
           <Ionicons name="paw" size={24} color={Colors.primary[600]} />
@@ -153,14 +155,14 @@ export default function DogHomeScreen({ navigation }: DogHomeScreenProps) {
         size="medium"
         style={styles.helpButton}
       />
-    </ScrollView>
+      </ScrollView>
+    </BackgroundGradient>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background.light,
   },
   contentContainer: {
     padding: Spacing.md,
