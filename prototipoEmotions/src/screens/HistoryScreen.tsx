@@ -137,6 +137,18 @@ export default function HistoryScreen() {
     return Colors.primary[500];
   };
 
+  const getMoodEmoji = (mood: string) => {
+    const text = cleanMoodName(mood);
+    if (text.includes('Feliz') || text.includes('Cariñoso')) return '😊';
+    if (text.includes('Triste')) return '😔';
+    if (text.includes('Enojado') || text.includes('Estresado')) return '😡';
+    if (text.includes('Tranquilo')) return '🙂';
+    if (text.includes('Neutral')) return '😐';
+    if (text.includes('Cansado')) return '😴';
+    if (text.includes('Confundido')) return '🤔';
+    return '🙂';
+  };
+
   const barData = {
     labels: Object.keys(moodCounts).slice(0, 6).map(mood => mood.length > 3 ? mood.substring(0, 3) : mood),
     datasets: [{
@@ -279,18 +291,18 @@ export default function HistoryScreen() {
             {filteredHistory.slice().reverse().slice(0, 10).map((entry, idx) => {
               const { date, time } = formatDate(entry.date);
               const moodColor = getMoodColor(entry.mood);
+              const displayAction = entry.action || cleanMoodName(entry.mood);
+              const emoji = getMoodEmoji(entry.mood);
 
               return (
                 <View key={idx} style={styles.timelineItem}>
                   <View style={[styles.timelineDot, { backgroundColor: moodColor }]} />
                   <View style={styles.timelineContent}>
                     <View style={styles.timelineHeader}>
-                      <Text style={styles.timelineMood}>{cleanMoodName(entry.mood)}</Text>
+                      <Text style={styles.timelineMood}>{emoji}</Text>
                       <Text style={styles.timelineDate}>{date} {time}</Text>
                     </View>
-                    {entry.action && (
-                      <Text style={styles.timelineAction}>Estado: {entry.action}</Text>
-                    )}
+                    <Text style={styles.timelineAction}>Estado: {displayAction}</Text>
                   </View>
                 </View>
               );

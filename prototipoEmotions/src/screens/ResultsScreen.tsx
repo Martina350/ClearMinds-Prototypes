@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, Animated, TouchableOpacity, Alert, Image } from 'react-native';
 import { MaterialIcons, Ionicons } from '@expo/vector-icons';
 import { getRecommendationsForMood, Recommendation } from '@/services/ai';
-import { savePreferences, getPreferences } from '@/storage/localDb';
+import { savePreferences, getPreferences, getUser } from '@/storage/localDb';
 import { Colors } from '@/theme/colors';
 import { Typography } from '@/theme/typography';
 import { Spacing, BorderRadius } from '@/theme/spacing';
@@ -16,8 +16,8 @@ const RECOMMENDATION_ICONS = {
   tip: (color: string) => <MaterialIcons name="lightbulb" size={24} color={color} />,
 } as const;
 
-// Mapeo de emociones a sus imágenes
-const MOOD_IMAGES = {
+// Mapeo de emociones a sus imágenes (Gatos)
+const MOOD_IMAGES_CAT = {
   'Feliz': require('@/assets/feliz.jpg'),
   'Tranquilo': require('@/assets/tranquilo.jpg'),
   'Neutral': require('@/assets/neutral.jpg'),
@@ -27,6 +27,19 @@ const MOOD_IMAGES = {
   'Cariñoso': require('@/assets/cariñoso.jpg'),
   'Confundido': require('@/assets/confundido.jpg'),
   'Estresado': require('@/assets/estresado.jpg'),
+} as const;
+
+// Mapeo de emociones a sus imágenes (Perros)
+const MOOD_IMAGES_DOG = {
+  'Feliz': require('@/assets/felizD.jpg'),
+  'Tranquilo': require('@/assets/tranquiloD.jpg'),
+  'Neutral': require('@/assets/neutralD.jpg'),
+  'Triste': require('@/assets/tristeD.jpg'),
+  'Enojado': require('@/assets/enojadoD.jpg'),
+  'Cansado': require('@/assets/cansadoD.jpg'),
+  'Cariñoso': require('@/assets/cariñosoD.jpg'),
+  'Confundido': require('@/assets/confundidoD.jpg'),
+  'Estresado': require('@/assets/estresadoD.jpg'),
 } as const;
 
 const RECOMMENDATION_COLORS = {
@@ -54,10 +67,27 @@ export default function ResultsScreen({ route, navigation }: ResultsScreenProps)
   const [likedItems, setLikedItems] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [fadeAnim] = useState(new Animated.Value(0));
+  const [petPreference, setPetPreference] = useState<'Cats' | 'Dogs'>('Cats');
 
   useEffect(() => {
+    loadPetPreference();
     loadRecommendations();
   }, [mood]);
+
+  const loadPetPreference = async () => {
+    try {
+      const prefs = await getPreferences<{ petPreference?: 'Cats' | 'Dogs' }>();
+      if (prefs?.petPreference) {
+        setPetPreference(prefs.petPreference);
+        return;
+      }
+      const user = await getUser();
+      const fromUser = (user?.personality || {}).pet_preference as 'Cats' | 'Dogs' | undefined;
+      setPetPreference(fromUser || 'Cats');
+    } catch {
+      setPetPreference('Cats');
+    }
+  };
 
   const loadRecommendations = async () => {
     try {
@@ -109,18 +139,13 @@ export default function ResultsScreen({ route, navigation }: ResultsScreenProps)
     if (moodText.includes('Neutral')) return Colors.emotions.tired;
     if (moodText.includes('Cansado')) return Colors.emotions.tired;
     if (moodText.includes('Confundido')) return Colors.emotions.confused;
-    
-    // Fallback para emojis si aún se usan
-    if (mood?.includes('😀') || mood?.includes('☀️') || mood?.includes('🦋')) return Colors.emotions.happy;
-    if (mood?.includes('😔') || mood?.includes('🌧️')) return Colors.emotions.sad;
-    if (mood?.includes('😡') || mood?.includes('🌪️')) return Colors.emotions.angry;
-    if (mood?.includes('🙂') || mood?.includes('⛅') || mood?.includes('🐢')) return Colors.emotions.calm;
-    if (mood?.includes('😎') || mood?.includes('🦁')) return Colors.emotions.confident;
+
     
     return Colors.primary[500];
   };
 
   const moodColor = getMoodColor();
+  const imageMap = petPreference === 'Dogs' ? MOOD_IMAGES_DOG : MOOD_IMAGES_CAT;
 
   if (loading) {
     return (
@@ -138,9 +163,12 @@ export default function ResultsScreen({ route, navigation }: ResultsScreenProps)
       {/* Header con estado de ánimo */}
       <View style={styles.header}>
         <View style={[styles.moodDisplay, { backgroundColor: moodColor + '20' }]}>
-          {label && MOOD_IMAGES[label as keyof typeof MOOD_IMAGES] ? (
+          {label && ((imageMap as any)[label] || (MOOD_IMAGES_CAT as any)[label]) ? (
             <Image 
-              source={MOOD_IMAGES[label as keyof typeof MOOD_IMAGES]} 
+              source={
+                // @ts-ignore: index signature compatible con require estático
+                imageMap[label as keyof typeof imageMap] || MOOD_IMAGES_CAT[label as keyof typeof MOOD_IMAGES_CAT]
+              } 
               style={styles.moodImage}
               resizeMode="cover"
               onError={() => console.log('Error loading image for:', label)}

@@ -18,6 +18,14 @@ type Question = {
 
 const QUESTIONS: Question[] = [
   { 
+    id: 'pet_preference', 
+    text: '¿Qué prefieres?', 
+    options: [
+      { value: 'Cats', icon: 'pets', label: 'Gatos' },
+      { value: 'Dogs', icon: 'pets', label: 'Perros' }
+    ] 
+  },
+  { 
     id: 'app', 
     text: '¿Qué aplicación no puede faltar en tu teléfono?', 
     options: [
@@ -95,6 +103,7 @@ export default function RegisterScreen({ navigation }: RegisterScreenProps) {
     const age = Number(birth) || 0;
     if (age < 13) newErrors.birth = 'Debes tener al menos 13 años';
     if (password.length < 6) newErrors.password = 'Contraseña muy corta (mín. 6 caracteres)';
+    if (!answers.pet_preference) newErrors.pet_preference = 'Selecciona tu preferencia de mascota';
     
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -104,6 +113,14 @@ export default function RegisterScreen({ navigation }: RegisterScreenProps) {
     try {
       const user = { email, name, age, password, personality: answers };
       await saveUser(user);
+      // Guardar preferencia de mascota para decidir la pantalla de inicio
+      // Se usa también en el decidor de la pestaña Inicio
+      try {
+        const { savePreferences } = await import('@/storage/localDb');
+        await savePreferences({ petPreference: answers.pet_preference || 'Cats' });
+      } catch (e) {
+        // Ignorar errores silenciosamente; la app puede funcionar con el valor en user.personality
+      }
       navigation.replace('MainTabs');
     } catch (error) {
       Alert.alert('Error', 'No se pudo crear la cuenta. Inténtalo de nuevo.');

@@ -25,6 +25,10 @@ export async function getUser(): Promise<User | null> {
   return raw ? JSON.parse(raw) : null;
 }
 
+export async function clearUser(): Promise<void> {
+  await AsyncStorage.removeItem(KEYS.user);
+}
+
 export async function appendMood(entry: MoodEntry): Promise<void> {
   const raw = await AsyncStorage.getItem(KEYS.history);
   const arr: MoodEntry[] = raw ? JSON.parse(raw) : [];
@@ -44,6 +48,10 @@ export async function savePreferences(prefs: Record<string, any>): Promise<void>
 export async function getPreferences<T = Record<string, any>>(): Promise<T | null> {
   const raw = await AsyncStorage.getItem(KEYS.preferences);
   return raw ? JSON.parse(raw) : null;
+}
+
+export async function clearPreferences(): Promise<void> {
+  await AsyncStorage.removeItem(KEYS.preferences);
 }
 
 

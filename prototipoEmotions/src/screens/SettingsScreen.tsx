@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, Alert, TouchableOpacity, Switch, Modal } from 'react-native';
 import { MaterialIcons, Ionicons } from '@expo/vector-icons';
-import { getUser, getPreferences, savePreferences } from '@/storage/localDb';
+import { useNavigation, CommonActions } from '@react-navigation/native';
+import { getUser, getPreferences, savePreferences, clearUser, clearPreferences } from '@/storage/localDb';
 import { Colors } from '@/theme/colors';
 import { Typography } from '@/theme/typography';
 import { Spacing, BorderRadius } from '@/theme/spacing';
@@ -39,6 +40,7 @@ export default function SettingsScreen() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [dropdownVisible, setDropdownVisible] = useState<string | null>(null);
+  const navigation = useNavigation<any>();
   const [selectedOptions, setSelectedOptions] = useState<{
     music: string[];
     tips: string[];
@@ -226,6 +228,37 @@ export default function SettingsScreen() {
           variant="outline"
           size="medium"
           style={styles.resetButton}
+        />
+
+        <Button
+          title="Cerrar sesión"
+          onPress={() => {
+            Alert.alert(
+              'Cerrar sesión',
+              '¿Seguro que deseas salir de tu cuenta?',
+              [
+                { text: 'Cancelar', style: 'cancel' },
+                { text: 'Cerrar sesión', style: 'destructive', onPress: async () => {
+                  try {
+                    await clearUser();
+                    await clearPreferences();
+                    // Reiniciar navegación a pantalla de registro
+                    // @ts-ignore - navigation está disponible vía hook en stacks superiores
+                    // Usamos un evento simple mediante Linking si fuera necesario
+                    // Aquí asumimos que Settings está en Tabs y RootNavigator maneja 'Register'
+                    navigation.dispatch(
+                      CommonActions.reset({ index: 0, routes: [{ name: 'Register' }] })
+                    );
+                  } catch (e) {
+                    Alert.alert('Error', 'No se pudo cerrar sesión');
+                  }
+                } }
+              ]
+            );
+          }}
+          variant="outline"
+          size="medium"
+          style={styles.logoutButton}
         />
       </Card>
 

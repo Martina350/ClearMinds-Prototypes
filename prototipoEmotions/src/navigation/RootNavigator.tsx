@@ -4,6 +4,8 @@ import { Text } from 'react-native';
 import { MaterialIcons, Ionicons } from '@expo/vector-icons';
 import RegisterScreen from '@/screens/RegisterScreen';
 import HomeScreen from '@/screens/HomeScreen';
+import PetHomeDecider from '@/screens/PetHomeDecider';
+import DogHomeScreen from '@/screens/DogHomeScreen';
 import ResultsScreen from '@/screens/ResultsScreen';
 import HistoryScreen from '@/screens/HistoryScreen';
 import SettingsScreen from '@/screens/SettingsScreen';
@@ -54,7 +56,7 @@ function MainTabs() {
     >
       <Tab.Screen 
         name="Inicio" 
-        component={HomeScreen}
+        component={PetHomeDecider}
         options={{
           tabBarIcon: ({ color, size }) => (
             <MaterialIcons name="home" size={size} color={color} />
