@@ -13,23 +13,17 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true,
-      "deploymentTarget": "13.0"
+      "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true,
-      "compileSdkVersion": 34,
-      "targetSdkVersion": 34
+      "edgeToEdgeEnabled": true
     },
     "web": {
       "favicon": ""
-    },
-    "plugins": [
-      "expo-router"
-    ]
+    }
   }
 }
