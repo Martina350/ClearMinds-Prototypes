@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Admin - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+    <header class="bg-blue-600 text-white p-4">
+        <h1 class="text-2xl font-bold">JB Ascensores - Web Admin</h1>
+        <nav class="mt-2">
+            <a href="index.html" class="mr-4 underline">Dashboard</a>
+            <a href="clientes.html" class="mr-4">Clientes</a>
+            <a href="plantillas.html" class="mr-4">Plantillas</a>
+            <a href="agenda.html" class="mr-4">Agenda</a>
+            <a href="ots.html" class="mr-4">OTs</a>
+        </nav>
+    </header>
+    <main class="p-4">
+        <h2 class="text-xl font-semibold mb-4">Dashboard</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <div class="bg-white p-4 rounded shadow">
+                <h3 class="text-lg font-medium">% OTs Completadas</h3>
+                <p id="kpi-completed" class="text-2xl font-bold text-green-600">0%</p>
+            </div>
+            <div class="bg-white p-4 rounded shadow">
+                <h3 class="text-lg font-medium"># Cancelaciones</h3>
+                <p id="kpi-cancellations" class="text-2xl font-bold text-red-600">0</p>
+            </div>
+            <div class="bg-white p-4 rounded shadow">
+                <h3 class="text-lg font-medium"># Emergencias</h3>
+                <p id="kpi-emergencies" class="text-2xl font-bold text-orange-600">0</p>
+            </div>
+            <div class="bg-white p-4 rounded shadow">
+                <h3 class="text-lg font-medium">Tiempo Promedio en Sitio</h3>
+                <p id="kpi-avg-time" class="text-2xl font-bold text-blue-600">0 min</p>
+            </div>
+        </div>
+        <div class="bg-white p-4 rounded shadow mb-8">
+            <h3 class="text-lg font-medium mb-4">OTs Pendientes por Técnico</h3>
+            <canvas id="chart-canvas" width="400" height="200"></canvas>
+        </div>
+    </main>
+    <script src="js/store.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

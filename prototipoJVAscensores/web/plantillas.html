@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Admin - Plantillas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+    <header class="bg-blue-600 text-white p-4">
+        <h1 class="text-2xl font-bold">JB Ascensores - Web Admin</h1>
+        <nav class="mt-2">
+            <a href="index.html" class="mr-4">Dashboard</a>
+            <a href="clientes.html" class="mr-4">Clientes</a>
+            <a href="plantillas.html" class="mr-4 underline">Plantillas</a>
+            <a href="agenda.html" class="mr-4">Agenda</a>
+            <a href="ots.html" class="mr-4">OTs</a>
+        </nav>
+    </header>
+    <main class="p-4">
+        <h2 class="text-xl font-semibold mb-4">Plantillas de Checklist</h2>
+        <div class="mb-4">
+            <button id="add-plantilla" class="bg-blue-600 text-white px-4 py-2 rounded">Agregar Plantilla</button>
+        </div>
+        <table class="w-full bg-white rounded shadow">
+            <thead>
+                <tr class="bg-gray-200">
+                    <th class="p-2 text-left">Nombre</th>
+                    <th class="p-2 text-left">Cliente</th>
+                    <th class="p-2 text-left">Ítems</th>
+                    <th class="p-2 text-left">Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="plantillas-table">
+                <!-- filas dinámicas -->
+            </tbody>
+        </table>
+    </main>
+    <script src="js/store.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/plantillas.js"></script>
+</body>
+</html>

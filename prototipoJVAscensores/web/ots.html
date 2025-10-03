@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Admin - OTs</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+    <header class="bg-blue-600 text-white p-4">
+        <h1 class="text-2xl font-bold">JB Ascensores - Web Admin</h1>
+        <nav class="mt-2">
+            <a href="index.html" class="mr-4">Dashboard</a>
+            <a href="clientes.html" class="mr-4">Clientes</a>
+            <a href="plantillas.html" class="mr-4">Plantillas</a>
+            <a href="agenda.html" class="mr-4">Agenda</a>
+            <a href="ots.html" class="mr-4 underline">OTs</a>
+        </nav>
+    </header>
+    <main class="p-4">
+        <h2 class="text-xl font-semibold mb-4">Órdenes de Trabajo</h2>
+        <div class="mb-4 flex gap-4">
+            <select id="filter-estado" class="border p-2 rounded">
+                <option value="">Todos Estados</option>
+                <option value="programada">Programada</option>
+                <option value="en_curso">En Curso</option>
+                <option value="suspendida">Suspendida</option>
+                <option value="reprogramada">Reprogramada</option>
+                <option value="completada">Completada</option>
+                <option value="cancelada">Cancelada</option>
+            </select>
+            <select id="filter-cliente" class="border p-2 rounded">
+                <option value="">Todos Clientes</option>
+            </select>
+            <select id="filter-tecnico" class="border p-2 rounded">
+                <option value="">Todos Técnicos</option>
+            </select>
+        </div>
+        <table class="w-full bg-white rounded shadow">
+            <thead>
+                <tr class="bg-gray-200">
+                    <th class="p-2 text-left">ID</th>
+                    <th class="p-2 text-left">Tipo</th>
+                    <th class="p-2 text-left">Edificio</th>
+                    <th class="p-2 text-left">Técnico</th>
+                    <th class="p-2 text-left">Estado</th>
+                    <th class="p-2 text-left">Fecha</th>
+                    <th class="p-2 text-left">Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="ots-table">
+                <!-- filas dinámicas -->
+            </tbody>
+        </table>
+    </main>
+    <script src="js/store.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/ots.js"></script>
+</body>
+</html>

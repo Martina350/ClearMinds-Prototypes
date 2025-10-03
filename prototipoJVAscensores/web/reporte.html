@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporte de OT</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @media print {
+            .no-print { display: none; }
+        }
+    </style>
+</head>
+<body class="bg-white p-8">
+    <div id="report-content" class="max-w-4xl mx-auto">
+        <!-- contenido dinámico -->
+    </div>
+    <div class="no-print mt-8 text-center">
+        <button id="print-btn" class="bg-blue-600 text-white px-4 py-2 rounded mr-4">Imprimir/Guardar PDF</button>
+        <button id="email-btn" class="bg-green-600 text-white px-4 py-2 rounded">Enviar por Correo</button>
+    </div>
+    <script src="js/store.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/reporte.js"></script>
+</body>
+</html>
