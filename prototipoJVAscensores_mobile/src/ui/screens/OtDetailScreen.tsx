@@ -31,10 +31,6 @@ export function OtDetailScreen() {
         paddingTop: theme.spacing.lg,
         paddingBottom: theme.spacing.md
       }}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginRight: theme.spacing.md }}>
-          <Icon name="arrow-back" color={theme.colors.text} size={24} />
-        </TouchableOpacity>
-        <Title style={{ flex: 1, textAlign: 'center' }}>Detalles de la OT</Title>
       </View>
 
       <View style={{ paddingHorizontal: theme.spacing.lg }}>

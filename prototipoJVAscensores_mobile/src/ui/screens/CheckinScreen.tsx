@@ -47,11 +47,7 @@ export function CheckinScreen() {
         paddingHorizontal: theme.spacing.lg,
         paddingTop: theme.spacing.lg,
         paddingBottom: theme.spacing.md
-      }}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginRight: theme.spacing.md }}>
-          <Icon name="arrow-back" color={theme.colors.text} size={24} />
-        </TouchableOpacity>
-        <Title style={{ flex: 1, textAlign: 'center' }}>Llegada a OT</Title>
+      }}>                                       
       </View>
 
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: theme.spacing.xl }}>

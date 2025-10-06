@@ -41,10 +41,6 @@ export function SettingsScreen() {
         paddingTop: theme.spacing.lg,
         paddingBottom: theme.spacing.md
       }}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginRight: theme.spacing.md }}>
-          <Icon name="arrow-back" color={theme.colors.text} size={24} />
-        </TouchableOpacity>
-        <Title style={{ flex: 1, textAlign: 'center' }}>Ajustes</Title>
       </View>
 
       <View style={{ flex: 1, paddingHorizontal: theme.spacing.lg }}>
@@ -87,21 +83,91 @@ export function SettingsScreen() {
         </Card>
       </View>
 
-      {/* Botón Cerrar Sesión */}
-      <View style={{ 
-        paddingHorizontal: theme.spacing.lg,
-        paddingVertical: theme.spacing.md,
+      {/* Barra de navegación inferior */}
+      <View style={{
+        flexDirection: 'row',
         backgroundColor: theme.colors.card,
+        paddingVertical: theme.spacing.md,
+        paddingHorizontal: theme.spacing.lg,
         borderTopWidth: 1,
-        borderTopColor: theme.colors.border
+        borderTopColor: theme.colors.border,
+        justifyContent: 'space-around',
+        ...theme.shadows.md
       }}>
-        <AppButton
-          title="Cerrar Sesión"
-          onPress={() => navigation.goBack()}
-          variant="danger"
-          icon="logout"
-          style={{ width: '100%' }}
-        />
+        {/* Ruta */}
+        <TouchableOpacity 
+          style={{ alignItems: 'center' }}
+          onPress={() => navigation.navigate('Home')}
+        >
+          <View style={{
+            width: 40,
+            height: 40,
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginBottom: 4
+          }}>
+            <Icon name="map" color={theme.colors.textSecondary} size={24} />
+          </View>
+          <AppText style={{ fontSize: theme.typography.caption, color: theme.colors.textSecondary }}>
+            Ruta
+          </AppText>
+        </TouchableOpacity>
+        
+        {/* Historial */}
+        <TouchableOpacity 
+          style={{ alignItems: 'center' }}
+          onPress={() => navigation.navigate('History')}
+        >
+          <View style={{
+            width: 40,
+            height: 40,
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginBottom: 4
+          }}>
+            <Icon name="history" color={theme.colors.textSecondary} size={24} />
+          </View>
+          <AppText style={{ fontSize: theme.typography.caption, color: theme.colors.textSecondary }}>
+            Historial
+          </AppText>
+        </TouchableOpacity>
+        
+        {/* Notificaciones */}
+        <TouchableOpacity 
+          style={{ alignItems: 'center' }}
+          onPress={() => navigation.navigate('Notifications')}
+        >
+          <View style={{
+            width: 40,
+            height: 40,
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginBottom: 4
+          }}>
+            <Icon name="notifications" color={theme.colors.textSecondary} size={24} />
+          </View>
+          <AppText style={{ fontSize: theme.typography.caption, color: theme.colors.textSecondary }}>
+            Notificaciones
+          </AppText>
+        </TouchableOpacity>
+        
+        {/* Ajustes - Activo */}
+        <View style={{ alignItems: 'center' }}>
+          <View style={{
+            width: 40,
+            height: 40,
+            borderRadius: 20,
+            backgroundColor: theme.colors.primary + '20',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginBottom: 4
+          }}>
+            <Icon name="settings" color={theme.colors.primary} size={24} />
+          </View>
+          <AppText style={{ fontSize: theme.typography.caption, color: theme.colors.primary, fontWeight: '600' }}>
+            Ajustes
+          </AppText>
+        </View>
       </View>
     </Screen>
   );

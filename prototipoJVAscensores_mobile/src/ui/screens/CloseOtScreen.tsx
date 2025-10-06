@@ -2,7 +2,9 @@ import React from 'react';
 import { View, Alert, TouchableOpacity } from 'react-native';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
-import { useRoute } from '@react-navigation/native';
+import { useRoute, useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { RootStackParamList } from '../navigation/RootNavigator';
 import { useAppState } from '../state/AppState';
 import { Screen } from '../components/Screen';
 import { Title, AppText, Caption } from '../components/AppText';
@@ -11,8 +13,11 @@ import { Card } from '../components/Card';
 import { Icon } from '../components/Icon';
 import { getTheme } from '../theme/tokens';
 
+type Nav = NativeStackNavigationProp<RootStackParamList, 'CloseOt'>;
+
 export function CloseOtScreen() {
   const route = useRoute<any>();
+  const navigation = useNavigation<Nav>();
   const { otId } = route.params ?? {};
   const { getQueue, isDark } = useAppState();
   const theme = getTheme(isDark ? 'dark' : 'light');
@@ -25,6 +30,9 @@ export function CloseOtScreen() {
     } else {
       Alert.alert('PDF generado', uri);
     }
+    
+    // Navegar automáticamente a HomeScreen después de cerrar la OT
+    navigation.navigate('Home');
   };
 
   return (

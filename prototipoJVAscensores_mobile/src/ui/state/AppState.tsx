@@ -2,10 +2,18 @@ import React, { createContext, useContext, useMemo, useReducer, useState } from 
 import { InMemoryQueue, QueueItem } from '../../application/sync/queue';
 import { createEmergencyOt, reorderRouteByIdFirst } from '../../infra/mock/mockApi';
 
+interface ChecklistItem {
+  id: string;
+  item: string;
+  task: string;
+  completed: boolean;
+  observations: string;
+}
+
 export type AppEvent =
   | { type: 'CHECK_IN'; otId: string; lat: number; lon: number; accuracy?: number; overrideReason?: string }
   | { type: 'CHECK_OUT'; otId: string; lat: number; lon: number; accuracy?: number }
-  | { type: 'CHECKLIST_SAVE'; otId: string; values: Record<string, any> }
+  | { type: 'CHECKLIST_SAVE'; otId: string; values: Record<string, any>; checklistItems?: ChecklistItem[] }
   | { type: 'SIGNATURE_SAVE'; otId: string; name: string; dataUrl: string }
   | { type: 'CLOSE_OT'; otId: string }
   | { type: 'EMERGENCIA'; otId: string };
@@ -59,7 +67,7 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
 
   const dispatchEvent = (e: AppEvent) => {
     reducer(queue, e);
-    force(0);
+    force();
   };
 
   const triggerEmergency = () => {

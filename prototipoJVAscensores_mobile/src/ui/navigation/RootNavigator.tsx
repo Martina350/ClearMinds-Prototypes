@@ -9,6 +9,7 @@ import { CheckoutScreen } from '../screens/CheckoutScreen';
 import { CloseOtScreen } from '../screens/CloseOtScreen';
 import { HistoryScreen } from '../screens/HistoryScreen';
 import { SettingsScreen } from '../screens/SettingsScreen';
+import { NotificationsScreen } from '../screens/NotificationsScreen';
 
 export type RootStackParamList = {
   Home: undefined;
@@ -20,6 +21,7 @@ export type RootStackParamList = {
   CloseOt: { otId: string };
   History: undefined;
   Settings: undefined;
+  Notifications: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -36,6 +38,7 @@ export function RootNavigator() {
       <Stack.Screen name="CloseOt" component={CloseOtScreen} options={{ title: 'Cierre' }} />
       <Stack.Screen name="History" component={HistoryScreen} options={{ title: 'Historial del día' }} />
       <Stack.Screen name="Settings" component={SettingsScreen} options={{ title: 'Ajustes' }} />
+      <Stack.Screen name="Notifications" component={NotificationsScreen} options={{ title: 'Notificaciones' }} />
     </Stack.Navigator>
   );
 }

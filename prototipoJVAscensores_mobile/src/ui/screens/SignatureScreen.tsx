@@ -34,10 +34,6 @@ export function SignatureScreen() {
         paddingTop: theme.spacing.lg,
         paddingBottom: theme.spacing.md
       }}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginRight: theme.spacing.md }}>
-          <Icon name="arrow-back" color={theme.colors.text} size={24} />
-        </TouchableOpacity>
-        <Title style={{ flex: 1, textAlign: 'center' }}>Firma del Cliente</Title>
       </View>
 
       <View style={{ flex: 1, paddingHorizontal: theme.spacing.lg }}>

@@ -27,10 +27,6 @@ export function HistoryScreen() {
         paddingTop: theme.spacing.lg,
         paddingBottom: theme.spacing.md
       }}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginRight: theme.spacing.md }}>
-          <Icon name="arrow-back" color={theme.colors.text} size={24} />
-        </TouchableOpacity>
-        <Title style={{ flex: 1, textAlign: 'center' }}>Historial</Title>
       </View>
 
       <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
@@ -97,10 +93,13 @@ export function HistoryScreen() {
         borderTopColor: theme.colors.border,
         justifyContent: 'space-around'
       }}>
-        <View style={{ alignItems: 'center' }}>
+        <TouchableOpacity 
+          style={{ alignItems: 'center' }}
+          onPress={() => navigation.navigate('Home')}
+        >
           <Icon name="map" color={theme.colors.textSecondary} size={24} />
           <Caption style={{ marginTop: 4 }}>Ruta del Día</Caption>
-        </View>
+        </TouchableOpacity>
         
         <View style={{ alignItems: 'center' }}>
           <View style={{
@@ -116,15 +115,21 @@ export function HistoryScreen() {
           <Caption style={{ marginTop: 4, color: theme.colors.primary }}>Historial</Caption>
         </View>
         
-        <View style={{ alignItems: 'center' }}>
+        <TouchableOpacity 
+          style={{ alignItems: 'center' }}
+          onPress={() => navigation.navigate('Notifications')}
+        >
           <Icon name="notifications" color={theme.colors.textSecondary} size={24} />
           <Caption style={{ marginTop: 4 }}>Notificaciones</Caption>
-        </View>
+        </TouchableOpacity>
         
-        <View style={{ alignItems: 'center' }}>
+        <TouchableOpacity 
+          style={{ alignItems: 'center' }}
+          onPress={() => navigation.navigate('Settings')}
+        >
           <Icon name="settings" color={theme.colors.textSecondary} size={24} />
           <Caption style={{ marginTop: 4 }}>Ajustes</Caption>
-        </View>
+        </TouchableOpacity>
       </View>
     </Screen>
   );

@@ -28,19 +28,7 @@ export function HomeScreen() {
   return (
     <Screen>
       {/* Header */}
-      <View style={{ 
-        flexDirection: 'row', 
-        alignItems: 'center', 
-        paddingHorizontal: theme.spacing.lg,
-        paddingTop: theme.spacing.lg,
-        paddingBottom: theme.spacing.md
-      }}>
-        <TouchableOpacity style={{ marginRight: theme.spacing.md }}>
-          <Icon name="menu" color={theme.colors.text} size={24} />
-        </TouchableOpacity>
-        <Title style={{ flex: 1, textAlign: 'center' }}>Ruta del Día</Title>
-      </View>
-
+      
       {/* Banner de notificaciones */}
       {banner && (
         <View style={{ 
@@ -117,27 +105,6 @@ export function HomeScreen() {
           ))}
         </View>
 
-        {/* Botones de acción */}
-        <View style={{ 
-          flexDirection: 'row', 
-          paddingHorizontal: theme.spacing.lg, 
-          marginVertical: theme.spacing.lg,
-          gap: theme.spacing.md
-        }}>
-          <AppButton 
-            title="Optimizar propuesto" 
-            onPress={() => {}} 
-            variant="secondary" 
-            style={{ flex: 1 }}
-          />
-          <AppButton 
-            title="Filtros" 
-            onPress={() => {}} 
-            variant="success" 
-            style={{ flex: 0.6 }}
-          />
-        </View>
-
         {/* Botones de simulación */}
         <View style={{ paddingHorizontal: theme.spacing.lg, marginBottom: theme.spacing.xl }}>
           <AppButton 
@@ -159,21 +126,95 @@ export function HomeScreen() {
               style={{ marginBottom: theme.spacing.sm }}
             />
           )}
-          <AppButton 
-            title="Historial del día" 
-            onPress={() => navigation.navigate('History')} 
-            variant="outline" 
-            icon="history"
-            style={{ marginBottom: theme.spacing.sm }}
-          />
-          <AppButton 
-            title="Ajustes" 
-            onPress={() => navigation.navigate('Settings')} 
-            variant="outline" 
-            icon="settings"
-          />
         </View>
       </ScrollView>
+
+      {/* Barra de navegación inferior */}
+      <View style={{
+        flexDirection: 'row',
+        backgroundColor: theme.colors.card,
+        paddingVertical: theme.spacing.md,
+        paddingHorizontal: theme.spacing.lg,
+        borderTopWidth: 1,
+        borderTopColor: theme.colors.border,
+        justifyContent: 'space-around',
+        ...theme.shadows.md
+      }}>
+        {/* Ruta del Día - Activo */}
+        <View style={{ alignItems: 'center' }}>
+          <View style={{
+            width: 40,
+            height: 40,
+            borderRadius: 20,
+            backgroundColor: theme.colors.primary + '20',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginBottom: 4
+          }}>
+            <Icon name="map" color={theme.colors.primary} size={24} />
+          </View>
+          <AppText style={{ fontSize: theme.typography.caption, color: theme.colors.primary, fontWeight: '600' }}>
+            Ruta del Día
+          </AppText>
+        </View>
+        
+        {/* Historial */}
+        <TouchableOpacity 
+          style={{ alignItems: 'center' }}
+          onPress={() => navigation.navigate('History')}
+        >
+          <View style={{
+            width: 40,
+            height: 40,
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginBottom: 4
+          }}>
+            <Icon name="history" color={theme.colors.textSecondary} size={24} />
+          </View>
+          <AppText style={{ fontSize: theme.typography.caption, color: theme.colors.textSecondary }}>
+            Historial
+          </AppText>
+        </TouchableOpacity>
+        
+        {/* Notificaciones */}
+        <TouchableOpacity 
+          style={{ alignItems: 'center' }}
+          onPress={() => navigation.navigate('Notifications')}
+        >
+          <View style={{
+            width: 40,
+            height: 40,
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginBottom: 4
+          }}>
+            <Icon name="notifications" color={theme.colors.textSecondary} size={24} />
+          </View>
+          <AppText style={{ fontSize: theme.typography.caption, color: theme.colors.textSecondary }}>
+            Notificaciones
+          </AppText>
+        </TouchableOpacity>
+        
+        {/* Perfil */}
+        <TouchableOpacity 
+          style={{ alignItems: 'center' }}
+          onPress={() => navigation.navigate('Settings')}
+        >
+          <View style={{
+            width: 40,
+            height: 40,
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginBottom: 4
+          }}>
+            <Icon name="person" color={theme.colors.textSecondary} size={24} />
+          </View>
+          <AppText style={{ fontSize: theme.typography.caption, color: theme.colors.textSecondary }}>
+            Perfil
+          </AppText>
+        </TouchableOpacity>
+      </View>
     </Screen>
   );
 }
