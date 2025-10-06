@@ -117,7 +117,7 @@ export function CheckinScreen() {
             }
             navigation.navigate('Checklist', { otId });
           }}
-          variant={inside ? 'primary' : 'outline'}
+          variant="success"
           size="lg"
           style={{ 
             width: '100%',
