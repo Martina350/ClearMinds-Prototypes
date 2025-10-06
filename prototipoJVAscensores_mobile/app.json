@@ -1,0 +1,60 @@
+{
+  "expo": {
+    "name": "prototipoJVAscensores_mobile",
+    "slug": "prototipoJVAscensores_mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Necesitamos tu ubicación para validar llegada y salida en sitio.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "Validamos llegada/salida en sitio incluso si la app está en segundo plano durante la atención.",
+        "NSUserTrackingUsageDescription": "Se usa para notificaciones relevantes de reprogramaciones y emergencias.",
+        "NSPhotoLibraryAddUsageDescription": "Guardamos fotos y PDFs generados al cierre.",
+        "NSCameraUsageDescription": "Capturamos fotos como evidencia.",
+        "NSPhotoLibraryUsageDescription": "Adjuntamos fotos como parte del checklist.",
+        "UIFileSharingEnabled": true
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "edgeToEdgeEnabled": true,
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "FOREGROUND_SERVICE_LOCATION",
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "READ_MEDIA_IMAGES",
+        "POST_NOTIFICATIONS"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-sqlite",
+      "expo-asset",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/icon.png",
+          "color": "#1976d2"
+        }
+      ]
+    ]
+  }
+}
