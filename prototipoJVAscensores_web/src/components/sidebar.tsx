@@ -35,13 +35,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
             <Icon icon="lucide:elevator" width={24} height={24} />
           </div>
           {isOpen && (
-            <div className="ml-2 h-8">
-              <Image
-                alt="JBA ASENSORES Logo"
-                src="https://img.heroui.chat/image/ai?w=120&h=40&u=jba123"
-                className="h-full object-contain"
-                removeWrapper
-              />
+            <div className="ml-2 h-8 flex items-center">
+              <span className="text-base font-semibold tracking-wide">JVASCENSORES</span>
             </div>
           )}
         </div>

@@ -1,36 +1,70 @@
 import React from "react";
 import { Card, CardHeader, CardBody, Button, Badge, Tooltip } from "@heroui/react";
 import { Icon } from "@iconify/react";
-import { addToast } from "@heroui/react";
+// @ts-ignore - tipos de react-leaflet se omiten hasta instalar dependencias
+import { MapContainer, TileLayer, CircleMarker, Popup, LayersControl, LayerGroup } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
 
-// Sample elevator locations
-const elevatorLocations = [
-  { id: "A101", lat: 25, lng: 35, status: "Operativo", building: "Torre Norte" },
-  { id: "A102", lat: 25, lng: 75, status: "Alerta", building: "Torre Norte" },
-  { id: "B205", lat: 65, lng: 45, status: "En mantenimiento", building: "Torre Sur" },
-  { id: "C310", lat: 45, lng: 65, status: "Operativo", building: "Torre Este" },
-  { id: "D405", lat: 75, lng: 25, status: "Fuera de servicio", building: "Torre Oeste" },
+type ElevatorStatus = "Operativo" | "Alerta" | "En mantenimiento" | "Fuera de servicio";
+
+type ElevatorLocation = {
+  id: string;
+  lat: number;
+  lng: number;
+  status: ElevatorStatus;
+  building: string;
+};
+
+type TechnicianLocation = {
+  id: string;
+  name: string;
+  lat: number;
+  lng: number;
+  status: "Activo" | "Inactivo";
+};
+
+// Coordenadas base de Quito, Ecuador
+const quitoCenter: [number, number] = [-0.1807, -78.4678];
+
+// Datos de ejemplo (coordenadas alrededor de Quito)
+const elevatorLocations: ElevatorLocation[] = [
+  { id: "A101", lat: -0.185, lng: -78.49, status: "Operativo", building: "Torre Norte" },
+  { id: "A102", lat: -0.17, lng: -78.47, status: "Alerta", building: "Torre La Mariscal" },
+  { id: "B205", lat: -0.2, lng: -78.45, status: "En mantenimiento", building: "Torre Sur" },
+  { id: "C310", lat: -0.155, lng: -78.48, status: "Operativo", building: "Torre Este" },
+  { id: "D405", lat: -0.19, lng: -78.44, status: "Fuera de servicio", building: "Torre Oeste" },
 ];
 
-// Sample technician locations
-const technicianLocations = [
-  { id: "E001", name: "Juan Pérez", lat: 30, lng: 40, status: "Activo" },
-  { id: "E002", name: "María López", lat: 60, lng: 50, status: "Activo" },
-  { id: "E004", name: "Ana Gómez", lat: 50, lng: 70, status: "Activo" },
+const technicianLocations: TechnicianLocation[] = [
+  { id: "E001", name: "Juan Pérez", lat: -0.176, lng: -78.48, status: "Activo" },
+  { id: "E002", name: "María López", lat: -0.19, lng: -78.47, status: "Activo" },
+  { id: "E004", name: "Ana Gómez", lat: -0.168, lng: -78.46, status: "Activo" },
 ];
 
 export const MapView: React.FC = () => {
   const [mapType, setMapType] = React.useState<"satellite" | "roadmap">("roadmap");
-  
-  const handleViewDetails = (id: string) => {
-    addToast({
-      title: "Detalles del ascensor",
-      description: `Mostrando detalles del ascensor ${id}`,
-      severity: "primary",
-    });
+
+  const openGoogleMaps = (lat: number, lng: number) => {
+    const url = `https://www.google.com/maps?q=${lat},${lng}`;
+    window.open(url, "_blank");
   };
 
-  const getStatusColor = (status: string) => {
+  const statusColorHex = (status: ElevatorStatus): string => {
+    switch (status) {
+      case "Operativo":
+        return "#22c55e"; // success
+      case "Alerta":
+        return "#f59e0b"; // warning
+      case "En mantenimiento":
+        return "#3b82f6"; // primary
+      case "Fuera de servicio":
+        return "#ef4444"; // danger
+      default:
+        return "#6b7280"; // default gray
+    }
+  };
+
+  const statusBadgeColor = (status: ElevatorStatus): "success" | "warning" | "primary" | "danger" | "default" => {
     switch (status) {
       case "Operativo":
         return "success";
@@ -72,100 +106,91 @@ export const MapView: React.FC = () => {
         </div>
       </CardHeader>
       <CardBody>
-        <div className="relative w-full h-[400px] bg-gray-100 rounded-lg overflow-hidden">
-          {/* Map container */}
-          <div 
-            className="absolute inset-0 bg-cover bg-center"
-            style={{
-              backgroundImage: mapType === "satellite" 
-                ? "url(https://img.heroui.chat/image/landscape?w=800&h=400&u=1)" 
-                : "url(https://img.heroui.chat/image/dashboard?w=800&h=400&u=2)"
-            }}
-          >
-            {/* Elevator markers */}
-            {elevatorLocations.map((elevator) => (
-              <Tooltip 
-                key={elevator.id}
-                content={
-                  <div className="p-2">
-                    <p className="font-medium">{elevator.id}</p>
-                    <p className="text-small">{elevator.building}</p>
-                    <Badge color={getStatusColor(elevator.status) as any} size="sm">{elevator.status}</Badge>
-                  </div>
-                }
-              >
-                <div 
-                  className={`absolute cursor-pointer flex items-center justify-center w-8 h-8 rounded-full bg-${getStatusColor(elevator.status)}`}
-                  style={{ 
-                    left: `${elevator.lng}%`, 
-                    top: `${elevator.lat}%`,
-                    transform: 'translate(-50%, -50%)'
-                  }}
-                  onClick={() => handleViewDetails(elevator.id)}
+        <div className="relative w-full h-[400px] rounded-lg overflow-hidden">
+          <MapContainer center={quitoCenter} zoom={13} className="w-full h-full">
+            <LayersControl position="topright">
+              <LayersControl.BaseLayer checked={mapType === "roadmap"} name="Mapa">
+                <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution="&copy; OpenStreetMap" />
+              </LayersControl.BaseLayer>
+              <LayersControl.BaseLayer checked={mapType === "satellite"} name="Satélite">
+                <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}" attribution="&copy; Esri" />
+              </LayersControl.BaseLayer>
+            </LayersControl>
+
+            <LayerGroup>
+              {elevatorLocations.map((e) => (
+                <CircleMarker
+                  key={e.id}
+                  center={[e.lat, e.lng]}
+                  radius={10}
+                  color={statusColorHex(e.status)}
+                  fillColor={statusColorHex(e.status)}
+                  fillOpacity={0.9}
+                  eventHandlers={{ click: () => openGoogleMaps(e.lat, e.lng) }}
                 >
-                  <Icon icon="lucide:elevator" className="text-white" width={16} />
-                </div>
-              </Tooltip>
-            ))}
+                  <Popup>
+                    <div className="space-y-1">
+                      <p className="font-medium">{e.id}</p>
+                      <p className="text-small">{e.building}</p>
+                      <Badge color={statusBadgeColor(e.status)} size="sm">{e.status}</Badge>
+                      <Button size="sm" variant="flat" className="mt-2" onPress={() => openGoogleMaps(e.lat, e.lng)}>
+                        <Icon icon="lucide:map-pin" className="mr-1" /> Abrir en Google Maps
+                      </Button>
+                    </div>
+                  </Popup>
+                </CircleMarker>
+              ))}
+            </LayerGroup>
 
-            {/* Technician markers */}
-            {technicianLocations.map((tech) => (
-              <Tooltip 
-                key={tech.id}
-                content={
-                  <div className="p-2">
-                    <p className="font-medium">{tech.name}</p>
-                    <p className="text-small">ID: {tech.id}</p>
-                    <Badge color="success" size="sm">{tech.status}</Badge>
-                  </div>
-                }
-              >
-                <div 
-                  className="absolute cursor-pointer flex items-center justify-center w-8 h-8 rounded-full bg-primary border-2 border-white"
-                  style={{ 
-                    left: `${tech.lng}%`, 
-                    top: `${tech.lat}%`,
-                    transform: 'translate(-50%, -50%)'
-                  }}
+            <LayerGroup>
+              {technicianLocations.map((t) => (
+                <CircleMarker
+                  key={t.id}
+                  center={[t.lat, t.lng]}
+                  radius={8}
+                  color="#0ea5e9"
+                  fillColor="#0ea5e9"
+                  fillOpacity={0.9}
+                  eventHandlers={{ click: () => openGoogleMaps(t.lat, t.lng) }}
                 >
-                  <Icon icon="lucide:user" className="text-white" width={16} />
-                </div>
-              </Tooltip>
-            ))}
-          </div>
+                  <Popup>
+                    <div className="space-y-1">
+                      <p className="font-medium">{t.name}</p>
+                      <p className="text-small">ID: {t.id}</p>
+                      <Badge color="success" size="sm">{t.status}</Badge>
+                      <Button size="sm" variant="flat" className="mt-2" onPress={() => openGoogleMaps(t.lat, t.lng)}>
+                        <Icon icon="lucide:map-pin" className="mr-1" /> Abrir en Google Maps
+                      </Button>
+                    </div>
+                  </Popup>
+                </CircleMarker>
+              ))}
+            </LayerGroup>
+          </MapContainer>
 
-          {/* Map controls */}
-          <div className="absolute top-2 right-2 flex flex-col gap-2">
-            <Button isIconOnly size="sm" variant="flat" className="bg-white/80 backdrop-blur-sm">
-              <Icon icon="lucide:plus" width={16} />
-            </Button>
-            <Button isIconOnly size="sm" variant="flat" className="bg-white/80 backdrop-blur-sm">
-              <Icon icon="lucide:minus" width={16} />
-            </Button>
-            <Button isIconOnly size="sm" variant="flat" className="bg-white/80 backdrop-blur-sm">
-              <Icon icon="lucide:locate" width={16} />
-            </Button>
-          </div>
-
-          {/* Legend */}
+          {/* Leyenda */}
           <div className="absolute bottom-2 left-2 p-2 bg-white/80 backdrop-blur-sm rounded-md">
             <div className="text-tiny font-medium mb-1">Leyenda</div>
             <div className="flex flex-col gap-1">
               <div className="flex items-center gap-1">
-                <div className="w-3 h-3 rounded-full bg-success"></div>
+                <span className="w-3 h-3 rounded-full" style={{ backgroundColor: "#22c55e" }}></span>
                 <span className="text-tiny">Operativo</span>
               </div>
               <div className="flex items-center gap-1">
-                <div className="w-3 h-3 rounded-full bg-warning"></div>
+                <span className="w-3 h-3 rounded-full" style={{ backgroundColor: "#f59e0b" }}></span>
                 <span className="text-tiny">Alerta</span>
               </div>
               <div className="flex items-center gap-1">
-                <div className="w-3 h-3 rounded-full bg-primary"></div>
+                <span className="w-3 h-3 rounded-full" style={{ backgroundColor: "#3b82f6" }}></span>
                 <span className="text-tiny">En mantenimiento</span>
               </div>
               <div className="flex items-center gap-1">
-                <div className="w-3 h-3 rounded-full bg-danger"></div>
+                <span className="w-3 h-3 rounded-full" style={{ backgroundColor: "#ef4444" }}></span>
                 <span className="text-tiny">Fuera de servicio</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="w-3 h-3 rounded-full" style={{ backgroundColor: "#0ea5e9" }}></span>
+                <span className="text-tiny">Técnico</span>
               </div>
             </div>
           </div>

@@ -12,6 +12,8 @@
   "dependencies": {
     "@heroui/react": "2.8.3",
     "@iconify/react": "latest",
+    "leaflet": "^1.9.4",
+    "react-leaflet": "^4.2.1",
     "tailwindcss": "4.1.11",
     "@tailwindcss/postcss": "4.1.11",
     "@tailwindcss/vite": "4.1.11",

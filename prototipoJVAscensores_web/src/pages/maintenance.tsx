@@ -3,10 +3,26 @@ import { Card, CardHeader, CardBody, Tabs, Tab, Button, Input, Select, SelectIte
 import { Icon } from "@iconify/react";
 import { addToast } from "@heroui/react";
 import { MaintenanceTable } from "../components/maintenance-table";
+// @ts-ignore - tipos omitidos hasta instalar dependencias
+import { MapContainer, TileLayer, Polyline, CircleMarker, useMapEvent } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
 
 export const MaintenancePage: React.FC = () => {
   const [activeTab, setActiveTab] = React.useState("programados");
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const [selectedTech, setSelectedTech] = React.useState<string>("E001");
+  const [routesByTech, setRoutesByTech] = React.useState<Record<string, Array<[number, number]>>>({
+    E001: [],
+    E002: [],
+    E003: [],
+    E004: [],
+  });
+  const [techStatusById, setTechStatusById] = React.useState<Record<string, "Disponible" | "Ocupado">>({
+    E001: "Disponible",
+    E002: "Ocupado",
+    E003: "Disponible",
+    E004: "Disponible",
+  });
   
   // Sample data for maintenance planning
   const technicians = [
@@ -20,6 +36,31 @@ export const MaintenancePage: React.FC = () => {
     addToast({
       title: "Rutas optimizadas",
       description: "Se han optimizado las rutas de mantenimiento",
+      severity: "success",
+    });
+  };
+
+  // Quito center
+  const quitoCenter: [number, number] = [-0.1807, -78.4678];
+
+  const addWaypoint = (lat: number, lng: number) => {
+    setRoutesByTech((prev) => ({
+      ...prev,
+      [selectedTech]: [...(prev[selectedTech] || []), [lat, lng]],
+    }));
+    setTechStatusById((prev) => ({ ...prev, [selectedTech]: "Ocupado" }));
+  };
+
+  const clearRoute = () => {
+    setRoutesByTech((prev) => ({ ...prev, [selectedTech]: [] }));
+    setTechStatusById((prev) => ({ ...prev, [selectedTech]: "Disponible" }));
+  };
+
+  const saveRoute = () => {
+    const points = routesByTech[selectedTech] || [];
+    addToast({
+      title: "Ruta guardada",
+      description: `${selectedTech} con ${points.length} puntos` ,
       severity: "success",
     });
   };
@@ -53,8 +94,17 @@ export const MaintenancePage: React.FC = () => {
         </Tab>
         <Tab key="rutas" title="Rutas y Asignaciones">
           <Card className="mt-4">
-            <CardHeader>
+            <CardHeader className="flex items-center justify-between gap-3">
               <h2 className="text-lg font-semibold">Asignación de Técnicos y Rutas</h2>
+              <div className="flex items-center gap-2">
+                <Select label="Técnico" selectedKeys={[selectedTech]} onSelectionChange={(k)=>setSelectedTech(Array.from(k as Set<string>)[0] || "E001")} className="min-w-48">
+                  {technicians.map((t)=> (
+                    <SelectItem key={t.id}>{t.name}</SelectItem>
+                  ))}
+                </Select>
+                <Button variant="flat" onPress={clearRoute} startContent={<Icon icon="lucide:eraser" />}>Limpiar</Button>
+                <Button color="primary" onPress={saveRoute} startContent={<Icon icon="lucide:save" />}>Guardar Ruta</Button>
+              </div>
             </CardHeader>
             <CardBody>
               <div className="flex flex-col md:flex-row gap-4">
@@ -62,7 +112,7 @@ export const MaintenancePage: React.FC = () => {
                   <h3 className="text-medium font-semibold mb-2">Técnicos Disponibles</h3>
                   <div className="space-y-2">
                     {technicians.map((tech) => (
-                      <Card key={tech.id} className="p-3">
+                      <Card key={tech.id} className={`p-3 ${selectedTech === tech.id ? "ring-1 ring-primary" : ""}`} onClick={()=>setSelectedTech(tech.id)}>
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white">
@@ -73,8 +123,8 @@ export const MaintenancePage: React.FC = () => {
                               <p className="text-tiny text-default-500">Zona: {tech.zone}</p>
                             </div>
                           </div>
-                          <Badge color={tech.availability === "Disponible" ? "success" : "warning"}>
-                            {tech.availability}
+                          <Badge color={techStatusById[tech.id] === "Disponible" ? "success" : "warning"}>
+                            {techStatusById[tech.id]}
                           </Badge>
                         </div>
                       </Card>
@@ -84,31 +134,30 @@ export const MaintenancePage: React.FC = () => {
                 
                 <div className="md:w-2/3">
                   <h3 className="text-medium font-semibold mb-2">Planificación de Rutas</h3>
-                  <div className="relative w-full h-[400px] bg-gray-100 rounded-lg overflow-hidden">
-                    <div 
-                      className="absolute inset-0 bg-cover bg-center"
-                      style={{
-                        backgroundImage: "url(https://img.heroui.chat/image/dashboard?w=800&h=400&u=3)"
-                      }}
-                    >
-                      {/* Route visualization would go here */}
-                      <div className="absolute bottom-2 left-2 p-2 bg-white/80 backdrop-blur-sm rounded-md">
-                        <div className="text-tiny font-medium mb-1">Leyenda</div>
-                        <div className="flex flex-col gap-1">
-                          <div className="flex items-center gap-1">
-                            <div className="w-3 h-3 rounded-full bg-primary"></div>
-                            <span className="text-tiny">Ruta actual</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <div className="w-3 h-3 rounded-full bg-success"></div>
-                            <span className="text-tiny">Completado</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <div className="w-3 h-3 rounded-full bg-warning"></div>
-                            <span className="text-tiny">Pendiente</span>
-                          </div>
-                        </div>
-                      </div>
+                  <div className="relative w-full h-[400px] rounded-lg overflow-hidden">
+                    <MapContainer center={quitoCenter} zoom={13} className="w-full h-full">
+                      {(() => {
+                        const Clicker: React.FC = () => {
+                          // @ts-ignore
+                          useMapEvent('click', (e:any) => addWaypoint(e.latlng.lat, e.latlng.lng));
+                          return null;
+                        };
+                        return <Clicker />;
+                      })()}
+                      <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution="&copy; OpenStreetMap" />
+                      {Object.entries(routesByTech).map(([id, points])=> (
+                        <>
+                          {points.length > 1 && (
+                            <Polyline key={`pl-${id}`} positions={points} pathOptions={{ color: id === selectedTech ? "#2563eb" : "#94a3b8", weight: 5 }} />
+                          )}
+                          {points.map(([lat,lng], idx)=> (
+                            <CircleMarker key={`pt-${id}-${idx}`} center={[lat,lng]} radius={6} pathOptions={{ color: id === selectedTech ? "#2563eb" : "#94a3b8", fillOpacity: 0.9 }} />
+                          ))}
+                        </>
+                      ))}
+                    </MapContainer>
+                    <div className="absolute bottom-2 left-2 p-2 bg-white/80 backdrop-blur-sm rounded-md">
+                      <div className="text-tiny">Clic en el mapa para agregar puntos a la ruta del técnico seleccionado</div>
                     </div>
                   </div>
                 </div>
@@ -211,24 +260,24 @@ export const MaintenancePage: React.FC = () => {
               <ModalBody>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <Select label="Tipo de Mantenimiento">
-                    <SelectItem key="preventivo" value="preventivo">Preventivo</SelectItem>
-                    <SelectItem key="correctivo" value="correctivo">Correctivo</SelectItem>
-                    <SelectItem key="emergencia" value="emergencia">Emergencia</SelectItem>
+                    <SelectItem key="preventivo">Preventivo</SelectItem>
+                    <SelectItem key="correctivo">Correctivo</SelectItem>
+                    <SelectItem key="emergencia">Emergencia</SelectItem>
                   </Select>
                   <Select label="Cliente">
-                    <SelectItem key="1" value="1">Edificio Torre Norte</SelectItem>
-                    <SelectItem key="2" value="2">Ministerio de Salud</SelectItem>
-                    <SelectItem key="3" value="3">Centro Comercial Plaza</SelectItem>
+                    <SelectItem key="1">Edificio Torre Norte</SelectItem>
+                    <SelectItem key="2">Ministerio de Salud</SelectItem>
+                    <SelectItem key="3">Centro Comercial Plaza</SelectItem>
                   </Select>
                   <Select label="Ascensor">
-                    <SelectItem key="A101" value="A101">A101</SelectItem>
-                    <SelectItem key="B205" value="B205">B205</SelectItem>
-                    <SelectItem key="C310" value="C310">C310</SelectItem>
+                    <SelectItem key="A101">A101</SelectItem>
+                    <SelectItem key="B205">B205</SelectItem>
+                    <SelectItem key="C310">C310</SelectItem>
                   </Select>
                   <Select label="Técnico">
-                    <SelectItem key="E001" value="E001">Juan Pérez</SelectItem>
-                    <SelectItem key="E002" value="E002">María López</SelectItem>
-                    <SelectItem key="E003" value="E003">Carlos Mendez</SelectItem>
+                    <SelectItem key="E001">Juan Pérez</SelectItem>
+                    <SelectItem key="E002">María López</SelectItem>
+                    <SelectItem key="E003">Carlos Mendez</SelectItem>
                   </Select>
                   <Input
                     type="date"
@@ -239,9 +288,9 @@ export const MaintenancePage: React.FC = () => {
                     label="Hora"
                   />
                   <Select label="Plantilla de Actividades" className="col-span-full">
-                    <SelectItem key="1" value="1">Mantenimiento Preventivo Estándar</SelectItem>
-                    <SelectItem key="2" value="2">Mantenimiento Ministerio</SelectItem>
-                    <SelectItem key="3" value="3">Mantenimiento Correctivo</SelectItem>
+                    <SelectItem key="1">Mantenimiento Preventivo Estándar</SelectItem>
+                    <SelectItem key="2">Mantenimiento Ministerio</SelectItem>
+                    <SelectItem key="3">Mantenimiento Correctivo</SelectItem>
                   </Select>
                   <Input
                     label="Observaciones"

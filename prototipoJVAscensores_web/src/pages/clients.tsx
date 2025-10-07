@@ -206,21 +206,21 @@ export const ClientsPage: React.FC = () => {
                   placeholder="Filtrar por cliente"
                   className="w-full md:w-64"
                 >
-                  <SelectItem key="all" value="all">Todos los clientes</SelectItem>
-                  <SelectItem key="1" value="1">Edificio Torre Norte</SelectItem>
-                  <SelectItem key="2" value="2">Ministerio de Salud</SelectItem>
-                  <SelectItem key="3" value="3">Centro Comercial Plaza</SelectItem>
-                  <SelectItem key="4" value="4">Hospital Central</SelectItem>
+                  <SelectItem key="all">Todos los clientes</SelectItem>
+                  <SelectItem key="1">Edificio Torre Norte</SelectItem>
+                  <SelectItem key="2">Ministerio de Salud</SelectItem>
+                  <SelectItem key="3">Centro Comercial Plaza</SelectItem>
+                  <SelectItem key="4">Hospital Central</SelectItem>
                 </Select>
                 <Select
                   placeholder="Filtrar por estado"
                   className="w-full md:w-48"
                 >
-                  <SelectItem key="all" value="all">Todos</SelectItem>
-                  <SelectItem key="Operativo" value="Operativo">Operativo</SelectItem>
-                  <SelectItem key="Alerta" value="Alerta">Alerta</SelectItem>
-                  <SelectItem key="En mantenimiento" value="En mantenimiento">En mantenimiento</SelectItem>
-                  <SelectItem key="Fuera de servicio" value="Fuera de servicio">Fuera de servicio</SelectItem>
+                  <SelectItem key="all">Todos</SelectItem>
+                  <SelectItem key="Operativo">Operativo</SelectItem>
+                  <SelectItem key="Alerta">Alerta</SelectItem>
+                  <SelectItem key="En mantenimiento">En mantenimiento</SelectItem>
+                  <SelectItem key="Fuera de servicio">Fuera de servicio</SelectItem>
                 </Select>
               </div>
               
@@ -278,10 +278,10 @@ export const ClientsPage: React.FC = () => {
                 placeholder="Seleccione un cliente"
                 className="mb-4 max-w-md"
               >
-                <SelectItem key="1" value="1">Edificio Torre Norte</SelectItem>
-                <SelectItem key="2" value="2">Ministerio de Salud</SelectItem>
-                <SelectItem key="3" value="3">Centro Comercial Plaza</SelectItem>
-                <SelectItem key="4" value="4">Hospital Central</SelectItem>
+                <SelectItem key="1">Edificio Torre Norte</SelectItem>
+                <SelectItem key="2">Ministerio de Salud</SelectItem>
+                <SelectItem key="3">Centro Comercial Plaza</SelectItem>
+                <SelectItem key="4">Hospital Central</SelectItem>
               </Select>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -424,18 +424,18 @@ export const ClientsPage: React.FC = () => {
                     <div>
                       <p className="font-medium mb-1">Periodicidad del mantenimiento preventivo</p>
                       <Select defaultSelectedKeys={["30"]}>
-                        <SelectItem key="15" value="15">Quincenal</SelectItem>
-                        <SelectItem key="30" value="30">Mensual</SelectItem>
-                        <SelectItem key="60" value="60">Bimestral</SelectItem>
-                        <SelectItem key="90" value="90">Trimestral</SelectItem>
+                        <SelectItem key="15">Quincenal</SelectItem>
+                        <SelectItem key="30">Mensual</SelectItem>
+                        <SelectItem key="60">Bimestral</SelectItem>
+                        <SelectItem key="90">Trimestral</SelectItem>
                       </Select>
                     </div>
                     <div>
                       <p className="font-medium mb-1">Ventana de tiempo preferida</p>
                       <Select defaultSelectedKeys={["morning"]}>
-                        <SelectItem key="morning" value="morning">Mañana (9:00 - 12:00)</SelectItem>
-                        <SelectItem key="afternoon" value="afternoon">Tarde (13:00 - 17:00)</SelectItem>
-                        <SelectItem key="any" value="any">Cualquier horario</SelectItem>
+                        <SelectItem key="morning">Mañana (9:00 - 12:00)</SelectItem>
+                        <SelectItem key="afternoon">Tarde (13:00 - 17:00)</SelectItem>
+                        <SelectItem key="any">Cualquier horario</SelectItem>
                       </Select>
                     </div>
                     <div>
@@ -516,10 +516,10 @@ export const ClientsPage: React.FC = () => {
                     type="number"
                   />
                   <Select label="Tipo de Cliente">
-                    <SelectItem key="residencial" value="residencial">Residencial</SelectItem>
-                    <SelectItem key="comercial" value="comercial">Comercial</SelectItem>
-                    <SelectItem key="gubernamental" value="gubernamental">Gubernamental</SelectItem>
-                    <SelectItem key="salud" value="salud">Salud</SelectItem>
+                    <SelectItem key="residencial">Residencial</SelectItem>
+                    <SelectItem key="comercial">Comercial</SelectItem>
+                    <SelectItem key="gubernamental">Gubernamental</SelectItem>
+                    <SelectItem key="salud">Salud</SelectItem>
                   </Select>
                 </div>
               </ModalBody>
