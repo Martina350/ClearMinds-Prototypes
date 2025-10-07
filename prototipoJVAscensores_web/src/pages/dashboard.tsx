@@ -1,38 +1,103 @@
 import React from "react";
-import { Card, CardHeader, CardBody, Progress } from "@heroui/react";
+import { Card, CardHeader, CardBody, Progress, Button } from "@heroui/react";
 import { Icon } from "@iconify/react";
 
 export const DashboardPage: React.FC = () => {
   // Sample data for dashboard
   const stats = [
-    { title: "Mantenimientos Programados", value: 24, icon: "lucide:calendar", color: "primary" },
-    { title: "Mantenimientos Completados", value: 18, icon: "lucide:check-circle", color: "success" },
-    { title: "Alertas Activas", value: 7, icon: "lucide:alert-triangle", color: "warning" },
-    { title: "Técnicos Activos", value: 6, icon: "lucide:users", color: "secondary" },
+    { 
+      title: "Mantenimientos Programados", 
+      value: 24, 
+      icon: "lucide:calendar", 
+      color: "blue",
+      bgColor: "#07ADDB",
+      change: "+12%",
+      changeType: "positive"
+    },
+    { 
+      title: "Mantenimientos Completados", 
+      value: 18, 
+      icon: "lucide:check-circle", 
+      color: "green",
+      bgColor: "#ABD9D3",
+      change: "+8%",
+      changeType: "positive"
+    },
+    { 
+      title: "Alertas Activas", 
+      value: 7, 
+      icon: "lucide:alert-triangle", 
+      color: "orange",
+      bgColor: "#f59e0b",
+      change: "-3%",
+      changeType: "negative"
+    },
+    { 
+      title: "Técnicos Activos", 
+      value: 6, 
+      icon: "lucide:users", 
+      color: "purple",
+      bgColor: "#4F90DB",
+      change: "+2%",
+      changeType: "positive"
+    },
   ];
 
   const recentActivities = [
-    { id: 1, action: "Mantenimiento completado", elevator: "A101", technician: "Juan Pérez", time: "Hace 30 minutos" },
-    { id: 2, action: "Nueva alerta", elevator: "B205", technician: "-", time: "Hace 1 hora" },
-    { id: 3, action: "Técnico asignado", elevator: "C310", technician: "María López", time: "Hace 2 horas" },
-    { id: 4, action: "Mantenimiento reprogramado", elevator: "D405", technician: "Carlos Mendez", time: "Hace 3 horas" },
+    { id: 1, action: "Mantenimiento completado", elevator: "A101", technician: "Juan Pérez", time: "Hace 30 minutos", type: "success" },
+    { id: 2, action: "Nueva alerta", elevator: "B205", technician: "-", time: "Hace 1 hora", type: "warning" },
+    { id: 3, action: "Técnico asignado", elevator: "C310", technician: "María López", time: "Hace 2 horas", type: "info" },
+    { id: 4, action: "Mantenimiento reprogramado", elevator: "D405", technician: "Carlos Mendez", time: "Hace 3 horas", type: "secondary" },
+  ];
+
+  const quickActions = [
+    { title: "Nuevo Mantenimiento", icon: "lucide:plus", color: "blue", bgColor: "#07ADDB" },
+    { title: "Registrar Emergencia", icon: "lucide:alert-triangle", color: "orange", bgColor: "#f59e0b" },
+    { title: "Generar Reporte", icon: "lucide:file-text", color: "green", bgColor: "#ABD9D3" },
+    { title: "Asignar Técnico", icon: "lucide:users", color: "purple", bgColor: "#4F90DB" },
   ];
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Dashboard</h1>
+    <div className="space-y-8 p-6 animate-fade-in-up">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gradient mb-2">Dashboard</h1>
+          <p className="text-slate-600">Resumen general del sistema de mantenimiento</p>
+        </div>
+        <div className="mt-4 md:mt-0">
+          <Button 
+            className="btn-modern bg-[#07ADDB] text-white hover:bg-[#076ADB]"
+            startContent={<Icon icon="lucide:refresh-cw" width={16} />}
+          >
+            Actualizar
+          </Button>
+        </div>
+      </div>
       
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat, index) => (
-          <Card key={index} className="p-4">
+          <Card 
+            key={index} 
+            className="card-modern p-6 animate-fade-in-up" 
+            style={{ animationDelay: `${index * 0.1}s` }}
+          >
             <div className="flex items-center justify-between">
-              <div>
-                <p className="text-small text-default-500">{stat.title}</p>
-                <p className="text-2xl font-bold">{stat.value}</p>
+              <div className="flex-1">
+                <p className="text-sm text-slate-600 mb-1">{stat.title}</p>
+                <p className="text-3xl font-bold text-slate-800 mb-2">{stat.value}</p>
+                <div className="flex items-center">
+                  <span className={`text-xs font-medium ${
+                    stat.changeType === 'positive' ? 'text-green-600' : 'text-red-600'
+                  }`}>
+                    {stat.change}
+                  </span>
+                  <span className="text-xs text-slate-500 ml-1">vs mes anterior</span>
+                </div>
               </div>
-              <div className={`p-2 rounded-full bg-${stat.color}-100`}>
-                <Icon icon={stat.icon} className={`text-${stat.color}`} width={24} />
+              <div className="p-4 rounded-2xl shadow-lg" style={{ backgroundColor: stat.bgColor }}>
+                <Icon icon={stat.icon} className="text-white" width={28} />
               </div>
             </div>
           </Card>
@@ -40,55 +105,108 @@ export const DashboardPage: React.FC = () => {
       </div>
 
       {/* Progress Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <h2 className="text-lg font-semibold">Cumplimiento de Mantenimientos</h2>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <Card className="card-modern">
+          <CardHeader className="pb-4">
+            <div className="flex items-center space-x-3">
+              <div className="p-2 rounded-lg bg-[#07ADDB]">
+                <Icon icon="lucide:trending-up" className="text-white" width={20} />
+              </div>
+              <h2 className="text-xl font-semibold">Cumplimiento de Mantenimientos</h2>
+            </div>
           </CardHeader>
           <CardBody>
-            <div className="space-y-4">
+            <div className="space-y-6">
               <div>
-                <div className="flex justify-between mb-1">
-                  <span className="text-small">Preventivos</span>
-                  <span className="text-small font-semibold">85%</span>
+                <div className="flex justify-between mb-2">
+                  <span className="text-sm font-medium text-slate-700">Preventivos</span>
+                  <span className="text-sm font-bold text-blue-600">85%</span>
                 </div>
-                <Progress value={85} color="primary" className="h-2" />
+                <Progress 
+                  value={85} 
+                  color="primary" 
+                  className="h-3"
+                  classNames={{
+                    track: "bg-blue-100",
+                    indicator: "bg-[#07ADDB]"
+                  }}
+                />
+                <p className="text-xs text-slate-500 mt-1">68 de 80 completados</p>
               </div>
               <div>
-                <div className="flex justify-between mb-1">
-                  <span className="text-small">Correctivos</span>
-                  <span className="text-small font-semibold">70%</span>
+                <div className="flex justify-between mb-2">
+                  <span className="text-sm font-medium text-slate-700">Correctivos</span>
+                  <span className="text-sm font-bold text-orange-600">70%</span>
                 </div>
-                <Progress value={70} color="secondary" className="h-2" />
+                <Progress 
+                  value={70} 
+                  color="warning" 
+                  className="h-3"
+                  classNames={{
+                    track: "bg-orange-100",
+                    indicator: "bg-orange-500"
+                  }}
+                />
+                <p className="text-xs text-slate-500 mt-1">21 de 30 completados</p>
               </div>
               <div>
-                <div className="flex justify-between mb-1">
-                  <span className="text-small">Emergencias</span>
-                  <span className="text-small font-semibold">95%</span>
+                <div className="flex justify-between mb-2">
+                  <span className="text-sm font-medium text-slate-700">Emergencias</span>
+                  <span className="text-sm font-bold text-green-600">95%</span>
                 </div>
-                <Progress value={95} color="success" className="h-2" />
+                <Progress 
+                  value={95} 
+                  color="success" 
+                  className="h-3"
+                  classNames={{
+                    track: "bg-green-100",
+                    indicator: "bg-green-500"
+                  }}
+                />
+                <p className="text-xs text-slate-500 mt-1">19 de 20 completados</p>
               </div>
             </div>
           </CardBody>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <h2 className="text-lg font-semibold">Actividad Reciente</h2>
+        <Card className="card-modern">
+          <CardHeader className="pb-4">
+            <div className="flex items-center space-x-3">
+              <div className="p-2 rounded-lg bg-[#ABD9D3]">
+                <Icon icon="lucide:activity" className="text-white" width={20} />
+              </div>
+              <h2 className="text-xl font-semibold">Actividad Reciente</h2>
+            </div>
           </CardHeader>
           <CardBody>
             <div className="space-y-4">
-              {recentActivities.map((activity) => (
-                <div key={activity.id} className="flex items-start gap-2 pb-2 border-b border-divider last:border-0">
-                  <div className="p-1 rounded-full bg-primary-100">
-                    <Icon icon="lucide:activity" className="text-primary" width={16} />
+              {recentActivities.map((activity, index) => (
+                <div 
+                  key={activity.id} 
+                  className="flex items-start gap-3 p-3 rounded-lg hover:bg-slate-50 transition-colors animate-fade-in-up"
+                  style={{ animationDelay: `${index * 0.1}s` }}
+                >
+                  <div className={`p-2 rounded-full ${
+                    activity.type === 'success' ? 'bg-green-100' :
+                    activity.type === 'warning' ? 'bg-orange-100' :
+                    activity.type === 'info' ? 'bg-blue-100' : 'bg-purple-100'
+                  }`}>
+                    <Icon 
+                      icon="lucide:activity" 
+                      className={`${
+                        activity.type === 'success' ? 'text-green-600' :
+                        activity.type === 'warning' ? 'text-orange-600' :
+                        activity.type === 'info' ? 'text-blue-600' : 'text-purple-600'
+                      }`} 
+                      width={16} 
+                    />
                   </div>
-                  <div>
-                    <p className="text-small font-medium">{activity.action}</p>
-                    <p className="text-tiny text-default-500">
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-slate-800">{activity.action}</p>
+                    <p className="text-xs text-slate-600 mt-1">
                       Ascensor: {activity.elevator} {activity.technician !== "-" && `• Técnico: ${activity.technician}`}
                     </p>
-                    <p className="text-tiny text-default-400">{activity.time}</p>
+                    <p className="text-xs text-slate-500 mt-1">{activity.time}</p>
                   </div>
                 </div>
               ))}
@@ -98,36 +216,29 @@ export const DashboardPage: React.FC = () => {
       </div>
 
       {/* Quick Actions */}
-      <Card>
-        <CardHeader>
-          <h2 className="text-lg font-semibold">Acciones Rápidas</h2>
+      <Card className="card-modern">
+        <CardHeader className="pb-4">
+          <div className="flex items-center space-x-3">
+            <div className="p-2 rounded-lg bg-[#4F90DB]">
+              <Icon icon="lucide:zap" className="text-white" width={20} />
+            </div>
+            <h2 className="text-xl font-semibold">Acciones Rápidas</h2>
+          </div>
         </CardHeader>
         <CardBody>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Card className="p-4 flex flex-col items-center justify-center cursor-pointer hover:bg-default-100">
-              <div className="p-2 rounded-full bg-primary-100 mb-2">
-                <Icon icon="lucide:plus" className="text-primary" width={20} />
-              </div>
-              <p className="text-small font-medium text-center">Nuevo Mantenimiento</p>
-            </Card>
-            <Card className="p-4 flex flex-col items-center justify-center cursor-pointer hover:bg-default-100">
-              <div className="p-2 rounded-full bg-warning-100 mb-2">
-                <Icon icon="lucide:alert-triangle" className="text-warning" width={20} />
-              </div>
-              <p className="text-small font-medium text-center">Registrar Emergencia</p>
-            </Card>
-            <Card className="p-4 flex flex-col items-center justify-center cursor-pointer hover:bg-default-100">
-              <div className="p-2 rounded-full bg-success-100 mb-2">
-                <Icon icon="lucide:file-text" className="text-success" width={20} />
-              </div>
-              <p className="text-small font-medium text-center">Generar Reporte</p>
-            </Card>
-            <Card className="p-4 flex flex-col items-center justify-center cursor-pointer hover:bg-default-100">
-              <div className="p-2 rounded-full bg-secondary-100 mb-2">
-                <Icon icon="lucide:users" className="text-secondary" width={20} />
-              </div>
-              <p className="text-small font-medium text-center">Asignar Técnico</p>
-            </Card>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {quickActions.map((action, index) => (
+              <Card 
+                key={index}
+                className="p-6 flex flex-col items-center justify-center cursor-pointer card-modern hover:scale-105 transition-all duration-200 animate-fade-in-up"
+                style={{ animationDelay: `${index * 0.1}s` }}
+              >
+                <div className="p-4 rounded-2xl mb-4 shadow-lg" style={{ backgroundColor: action.bgColor }}>
+                  <Icon icon={action.icon} className="text-white" width={24} />
+                </div>
+                <p className="text-sm font-medium text-center text-slate-700">{action.title}</p>
+              </Card>
+            ))}
           </div>
         </CardBody>
       </Card>

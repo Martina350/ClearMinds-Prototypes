@@ -106,10 +106,10 @@ export const MaintenanceTable: React.FC = () => {
             onChange={(e) => setStatusFilter(e.target.value)}
             className="w-full md:w-48"
           >
-            <SelectItem key="all" value="all">Todos</SelectItem>
-            <SelectItem key="Pendiente" value="Pendiente">Pendiente</SelectItem>
-            <SelectItem key="En Progreso" value="En Progreso">En Progreso</SelectItem>
-            <SelectItem key="Completado" value="Completado">Completado</SelectItem>
+            <SelectItem key="all">Todos</SelectItem>
+            <SelectItem key="Pendiente">Pendiente</SelectItem>
+            <SelectItem key="En Progreso">En Progreso</SelectItem>
+            <SelectItem key="Completado">Completado</SelectItem>
           </Select>
         </div>
 

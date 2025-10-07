@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, CardHeader, CardBody, Tabs, Tab, Button, Select, SelectItem, Input } from "@heroui/react";
+import { Card, CardHeader, CardBody, Tabs, Tab, Button, Select, SelectItem, Input, Badge } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import { MapView } from "../components/map-view";
 // @ts-ignore - tipos de react-leaflet se omiten hasta instalar dependencias
@@ -80,13 +80,18 @@ export const MapPage: React.FC = () => {
   };
   
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <h1 className="text-2xl font-bold">Mapa de Ascensores</h1>
-        <div className="flex gap-2">
+    <div className="space-y-8 p-6 animate-fade-in-up">
+      {/* Header */}
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+        <div>
+          <h1 className="text-3xl font-bold text-gradient mb-2">Mapa de Ascensores</h1>
+          <p className="text-slate-600">Monitoreo en tiempo real y gestión de rutas</p>
+        </div>
+        <div className="flex flex-col sm:flex-row gap-3">
           <Select
             placeholder="Filtrar por zona"
-            className="w-40"
+            className="input-modern w-48"
+            startContent={<Icon icon="lucide:map-pin" width={16} className="text-slate-400" />}
           >
             <SelectItem key="all">Todas las zonas</SelectItem>
             <SelectItem key="norte">Norte</SelectItem>
@@ -94,10 +99,62 @@ export const MapPage: React.FC = () => {
             <SelectItem key="este">Este</SelectItem>
             <SelectItem key="oeste">Oeste</SelectItem>
           </Select>
-          <Button color="primary" startContent={<Icon icon="lucide:refresh-cw" />}>
+          <Button 
+            color="primary" 
+            className="btn-modern"
+            startContent={<Icon icon="lucide:refresh-cw" width={16} />}
+          >
             Actualizar
           </Button>
         </div>
+      </div>
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <Card className="card-modern p-4">
+          <div className="flex items-center space-x-3">
+            <div className="p-3 rounded-xl bg-[#07ADDB]">
+              <Icon icon="lucide:elevator" className="text-white" width={20} />
+            </div>
+            <div>
+              <p className="text-sm text-slate-600">Ascensores Activos</p>
+              <p className="text-2xl font-bold text-slate-800">24</p>
+            </div>
+          </div>
+        </Card>
+        <Card className="card-modern p-4">
+          <div className="flex items-center space-x-3">
+            <div className="p-3 rounded-xl bg-[#ABD9D3]">
+              <Icon icon="lucide:users" className="text-white" width={20} />
+            </div>
+            <div>
+              <p className="text-sm text-slate-600">Técnicos Activos</p>
+              <p className="text-2xl font-bold text-slate-800">6</p>
+            </div>
+          </div>
+        </Card>
+        <Card className="card-modern p-4">
+          <div className="flex items-center space-x-3">
+            <div className="p-3 rounded-xl bg-orange-500">
+              <Icon icon="lucide:route" className="text-white" width={20} />
+            </div>
+            <div>
+              <p className="text-sm text-slate-600">Rutas Optimizadas</p>
+              <p className="text-2xl font-bold text-slate-800">12</p>
+            </div>
+          </div>
+        </Card>
+        <Card className="card-modern p-4">
+          <div className="flex items-center space-x-3">
+            <div className="p-3 rounded-xl bg-[#4F90DB]">
+              <Icon icon="lucide:clock" className="text-white" width={20} />
+            </div>
+            <div>
+              <p className="text-sm text-slate-600">Tiempo Promedio</p>
+              <p className="text-2xl font-bold text-slate-800">45m</p>
+            </div>
+          </div>
+        </Card>
       </div>
       
       <Tabs 
@@ -105,31 +162,81 @@ export const MapPage: React.FC = () => {
         selectedKey={activeTab}
         onSelectionChange={setActiveTab as any}
         className="w-full"
+        classNames={{
+          tabList: "bg-white/80 backdrop-blur-sm border border-white/20 rounded-xl p-1",
+          tab: "data-[selected=true]:bg-[#07ADDB] data-[selected=true]:text-white",
+          cursor: "hidden"
+        }}
       >
-        <Tab key="tiempo-real" title="Tiempo Real">
-          <Card className="mt-4">
+        <Tab 
+          key="tiempo-real" 
+          title={
+            <div className="flex items-center space-x-2">
+              <Icon icon="lucide:activity" width={16} />
+              <span>Tiempo Real</span>
+              <Badge color="primary" size="sm">24</Badge>
+            </div>
+          }
+        >
+          <Card className="card-modern mt-6">
+            <CardHeader className="pb-4">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 rounded-lg bg-[#ABD9D3]">
+                  <Icon icon="lucide:activity" className="text-white" width={20} />
+                </div>
+                <h2 className="text-xl font-semibold">Monitoreo en Tiempo Real</h2>
+              </div>
+            </CardHeader>
             <CardBody>
               <MapView />
             </CardBody>
           </Card>
         </Tab>
-        <Tab key="rutas" title="Rutas Optimizadas">
-          <Card className="mt-4">
-            <CardHeader className="flex justify-between items-center">
-              <h2 className="text-lg font-semibold">Rutas Optimizadas</h2>
-              <div className="flex gap-3 items-center">
-                <Select label="Técnico" selectedKeys={[selectedTechRoute]} onSelectionChange={(k)=>setSelectedTechRoute(Array.from(k as Set<string>)[0] || "all")} className="min-w-52">
-                  <SelectItem key="all">Todos los técnicos</SelectItem>
-                  <SelectItem key="E001">Juan Pérez</SelectItem>
-                  <SelectItem key="E002">María López</SelectItem>
-                  <SelectItem key="E003">Carlos Mendez</SelectItem>
-                  <SelectItem key="E004">Ana Gómez</SelectItem>
-                </Select>
-                <Button color="primary" startContent={<Icon icon="lucide:route" />}>Optimizar Ruta</Button>
-              </div>
+        <Tab 
+          key="rutas" 
+          title={
+            <div className="flex items-center space-x-2">
+              <Icon icon="lucide:route" width={16} />
+              <span>Rutas Optimizadas</span>
+              <Badge color="secondary" size="sm">12</Badge>
+            </div>
+          }
+        >
+          <Card className="card-modern mt-6">
+            <CardHeader className="pb-4">
+              <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+                <div className="flex items-center space-x-3">
+                  <div className="p-2 rounded-lg bg-[#07ADDB]">
+                    <Icon icon="lucide:route" className="text-white" width={20} />
+                    </div>
+                  <h2 className="text-xl font-semibold">Rutas Optimizadas</h2>
+                </div>
+                <div className="flex flex-col sm:flex-row gap-3 items-center">
+                  <Select 
+                    label="Técnico" 
+                    selectedKeys={[selectedTechRoute]} 
+                    onSelectionChange={(k)=>setSelectedTechRoute(Array.from(k as Set<string>)[0] || "all")} 
+                    className="input-modern min-w-52"
+                    startContent={<Icon icon="lucide:user" width={16} className="text-slate-400" />}
+                  >
+                    <SelectItem key="all">Todos los técnicos</SelectItem>
+                    <SelectItem key="E001">Juan Pérez</SelectItem>
+                    <SelectItem key="E002">María López</SelectItem>
+                    <SelectItem key="E003">Carlos Mendez</SelectItem>
+                    <SelectItem key="E004">Ana Gómez</SelectItem>
+                  </Select>
+                  <Button 
+                    color="primary" 
+                    className="btn-modern"
+                    startContent={<Icon icon="lucide:route" width={16} />}
+                  >
+                          Optimizar Ruta
+                        </Button>
+                      </div>
+                    </div>
             </CardHeader>
             <CardBody>
-              <div className="w-full h-[600px] rounded-lg overflow-hidden">
+              <div className="w-full h-[600px] rounded-xl overflow-hidden shadow-lg border border-white/20">
                 <MapContainer center={quitoCenter} zoom={13} className="w-full h-full">
                   <LayersControl position="topright">
                     <LayersControl.BaseLayer checked name="Mapa">
@@ -144,16 +251,42 @@ export const MapPage: React.FC = () => {
                     .filter(([id]) => selectedTechRoute === "all" || id === selectedTechRoute)
                     .map(([id, points]) => (
                       <React.Fragment key={id}>
-                        <Polyline positions={points} pathOptions={{ color: id === selectedTechRoute || selectedTechRoute === "all" ? "#2563eb" : "#94a3b8", weight: 5 }} />
+                        <Polyline 
+                          positions={points} 
+                          pathOptions={{ 
+                            color: id === selectedTechRoute || selectedTechRoute === "all" ? "#2563eb" : "#94a3b8", 
+                            weight: 5,
+                            opacity: 0.8
+                          }} 
+                        />
                         {points.map(([lat, lng], idx) => (
-                          <CircleMarker key={`${id}-${idx}`} center={[lat, lng]} radius={idx === 0 ? 6 : 5} pathOptions={{ color: idx === 0 ? "#22c55e" : idx === points.length - 1 ? "#ef4444" : "#2563eb", fillOpacity: 0.9 }} eventHandlers={{ click: () => openGoogleMaps(lat, lng) }}>
+                          <CircleMarker 
+                            key={`${id}-${idx}`} 
+                            center={[lat, lng]} 
+                            radius={idx === 0 ? 8 : 6} 
+                            pathOptions={{ 
+                              color: idx === 0 ? "#22c55e" : idx === points.length - 1 ? "#ef4444" : "#2563eb", 
+                              fillOpacity: 0.9,
+                              weight: 2
+                            }} 
+                            eventHandlers={{ click: () => openGoogleMaps(lat, lng) }}
+                          >
                             <Popup>
-                              <div>
-                                <p className="font-medium">{id} - Punto {idx + 1}</p>
-                                <Button size="sm" variant="flat" onPress={() => openGoogleMaps(lat, lng)}>
+                              <div className="p-2">
+                                <p className="font-medium text-slate-800">{id} - Punto {idx + 1}</p>
+                                <p className="text-sm text-slate-600 mb-2">
+                                  {idx === 0 ? "Punto de inicio" : idx === points.length - 1 ? "Punto final" : "Punto intermedio"}
+                                </p>
+                                <Button 
+                                  size="sm" 
+                                  variant="flat" 
+                                  color="primary"
+                                  className="btn-modern"
+                                  onPress={() => openGoogleMaps(lat, lng)}
+                                >
                                   <Icon icon="lucide:map-pin" className="mr-1" /> Abrir en Google Maps
                                 </Button>
-                              </div>
+                  </div>
                             </Popup>
                           </CircleMarker>
                         ))}
@@ -164,20 +297,42 @@ export const MapPage: React.FC = () => {
             </CardBody>
           </Card>
         </Tab>
-        <Tab key="historico" title="Histórico de Ubicaciones">
-          <Card className="mt-4">
-            <CardHeader className="flex justify-between items-center">
-              <h2 className="text-lg font-semibold">Histórico de Ubicaciones</h2>
-              <Select label="Técnico" selectedKeys={[selectedTechHistory]} onSelectionChange={(k)=>setSelectedTechHistory(Array.from(k as Set<string>)[0] || "all")} className="min-w-52">
-                <SelectItem key="all">Todos los técnicos</SelectItem>
-                <SelectItem key="E001">Juan Pérez</SelectItem>
-                <SelectItem key="E002">María López</SelectItem>
-                <SelectItem key="E003">Carlos Mendez</SelectItem>
-                <SelectItem key="E004">Ana Gómez</SelectItem>
-              </Select>
+        <Tab 
+          key="historico" 
+          title={
+            <div className="flex items-center space-x-2">
+              <Icon icon="lucide:history" width={16} />
+              <span>Histórico</span>
+              <Badge color="warning" size="sm">48h</Badge>
+            </div>
+          }
+        >
+          <Card className="card-modern mt-6">
+            <CardHeader className="pb-4">
+              <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+                <div className="flex items-center space-x-3">
+                  <div className="p-2 rounded-lg bg-orange-500">
+                    <Icon icon="lucide:history" className="text-white" width={20} />
+                  </div>
+                  <h2 className="text-xl font-semibold">Histórico de Ubicaciones</h2>
+                </div>
+                <Select 
+                  label="Técnico" 
+                  selectedKeys={[selectedTechHistory]} 
+                  onSelectionChange={(k)=>setSelectedTechHistory(Array.from(k as Set<string>)[0] || "all")} 
+                  className="input-modern min-w-52"
+                  startContent={<Icon icon="lucide:user" width={16} className="text-slate-400" />}
+                >
+                  <SelectItem key="all">Todos los técnicos</SelectItem>
+                  <SelectItem key="E001">Juan Pérez</SelectItem>
+                  <SelectItem key="E002">María López</SelectItem>
+                  <SelectItem key="E003">Carlos Mendez</SelectItem>
+                  <SelectItem key="E004">Ana Gómez</SelectItem>
+                </Select>
+              </div>
             </CardHeader>
             <CardBody>
-              <div className="w-full h-[600px] rounded-lg overflow-hidden">
+              <div className="w-full h-[600px] rounded-xl overflow-hidden shadow-lg border border-white/20">
                 <MapContainer center={quitoCenter} zoom={13} className="w-full h-full">
                   <LayersControl position="topright">
                     <LayersControl.BaseLayer checked name="Mapa">
@@ -192,16 +347,43 @@ export const MapPage: React.FC = () => {
                     .filter(([id]) => selectedTechHistory === "all" || id === selectedTechHistory)
                     .map(([id, points]) => (
                       <React.Fragment key={id}>
-                        <Polyline positions={points} pathOptions={{ color: "#0ea5e9", dashArray: "6 8", weight: 4 }} />
+                        <Polyline 
+                          positions={points} 
+                          pathOptions={{ 
+                            color: "#0ea5e9", 
+                            dashArray: "6 8", 
+                            weight: 4,
+                            opacity: 0.7
+                          }} 
+                        />
                         {points.map(([lat, lng], idx) => (
-                          <CircleMarker key={`${id}-h-${idx}`} center={[lat, lng]} radius={5} pathOptions={{ color: idx === 0 ? "#3b82f6" : idx === points.length - 1 ? "#22c55e" : "#0ea5e9", fillOpacity: 0.9 }} eventHandlers={{ click: () => openGoogleMaps(lat, lng) }}>
+                          <CircleMarker 
+                            key={`${id}-h-${idx}`} 
+                            center={[lat, lng]} 
+                            radius={6} 
+                            pathOptions={{ 
+                              color: idx === 0 ? "#3b82f6" : idx === points.length - 1 ? "#22c55e" : "#0ea5e9", 
+                              fillOpacity: 0.9,
+                              weight: 2
+                            }} 
+                            eventHandlers={{ click: () => openGoogleMaps(lat, lng) }}
+                          >
                             <Popup>
-                              <div>
-                                <p className="font-medium">{id} - Historial {idx + 1}</p>
-                                <Button size="sm" variant="flat" onPress={() => openGoogleMaps(lat, lng)}>
+                              <div className="p-2">
+                                <p className="font-medium text-slate-800">{id} - Historial {idx + 1}</p>
+                                <p className="text-sm text-slate-600 mb-2">
+                                  {idx === 0 ? "Ubicación inicial" : idx === points.length - 1 ? "Última ubicación" : "Punto intermedio"}
+                                </p>
+                                <Button 
+                                  size="sm" 
+                                  variant="flat" 
+                                  color="primary"
+                                  className="btn-modern"
+                                  onPress={() => openGoogleMaps(lat, lng)}
+                                >
                                   <Icon icon="lucide:map-pin" className="mr-1" /> Abrir en Google Maps
-                                </Button>
-                              </div>
+                          </Button>
+                        </div>
                             </Popup>
                           </CircleMarker>
                         ))}

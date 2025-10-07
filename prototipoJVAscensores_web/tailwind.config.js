@@ -43,17 +43,45 @@ export default {
         light: {
           colors: {
             primary: {
-              50: "#e6f0ff",
-              100: "#cce0ff",
-              200: "#99c2ff",
-              300: "#66a3ff",
-              400: "#3385ff",
-              500: "#0066ff", // Main brand color
-              600: "#0052cc",
-              700: "#003d99",
-              800: "#002966",
-              900: "#001433",
-              DEFAULT: "#0066ff",
+              50: "#f0f9ff",
+              100: "#e0f2fe",
+              200: "#bae6fd",
+              300: "#7dd3fc",
+              400: "#38bdf8",
+              500: "#07ADDB", // Cyan turquesa principal
+              600: "#076ADB", // Azul medio
+              700: "#0726DB", // Azul eléctrico
+              800: "#1e3a8a",
+              900: "#1e40af",
+              DEFAULT: "#07ADDB",
+              foreground: "#ffffff"
+            },
+            secondary: {
+              50: "#f8fafc",
+              100: "#f1f5f9",
+              200: "#e2e8f0",
+              300: "#cbd5e1",
+              400: "#94a3b8",
+              500: "#4F90DB", // Azul cielo
+              600: "#1e3a8a", // Azul marino oscuro
+              700: "#1e293b",
+              800: "#0f172a",
+              900: "#020617",
+              DEFAULT: "#4F90DB",
+              foreground: "#ffffff"
+            },
+            success: {
+              50: "#f0fdfa",
+              100: "#ccfbf1",
+              200: "#99f6e4",
+              300: "#5eead4",
+              400: "#2dd4bf",
+              500: "#ABD9D3", // Teal claro
+              600: "#0d9488",
+              700: "#0f766e",
+              800: "#115e59",
+              900: "#134e4a",
+              DEFAULT: "#ABD9D3",
               foreground: "#ffffff"
             }
           }

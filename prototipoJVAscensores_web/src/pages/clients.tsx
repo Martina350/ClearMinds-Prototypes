@@ -115,12 +115,71 @@ export const ClientsPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <h1 className="text-2xl font-bold">Gestión de Clientes</h1>
-        <Button color="primary" startContent={<Icon icon="lucide:plus" />} onPress={onOpen}>
+    <div className="space-y-8 p-6 animate-fade-in-up">
+      {/* Header */}
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+        <div>
+          <h1 className="text-3xl font-bold text-gradient mb-2">Gestión de Clientes</h1>
+          <p className="text-slate-600">Administración de clientes, ascensores y contratos</p>
+        </div>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <Button 
+            color="primary" 
+            className="btn-modern"
+            startContent={<Icon icon="lucide:plus" width={16} />} 
+            onPress={onOpen}
+          >
           Nuevo Cliente
         </Button>
+        </div>
+      </div>
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <Card className="card-modern p-4">
+          <div className="flex items-center space-x-3">
+            <div className="p-3 rounded-xl bg-[#07ADDB]">
+              <Icon icon="lucide:building" className="text-white" width={20} />
+            </div>
+            <div>
+              <p className="text-sm text-slate-600">Total Clientes</p>
+              <p className="text-2xl font-bold text-slate-800">24</p>
+            </div>
+          </div>
+        </Card>
+        <Card className="card-modern p-4">
+          <div className="flex items-center space-x-3">
+            <div className="p-3 rounded-xl bg-[#ABD9D3]">
+              <Icon icon="lucide:elevator" className="text-white" width={20} />
+            </div>
+            <div>
+              <p className="text-sm text-slate-600">Ascensores</p>
+              <p className="text-2xl font-bold text-slate-800">156</p>
+            </div>
+          </div>
+        </Card>
+        <Card className="card-modern p-4">
+          <div className="flex items-center space-x-3">
+            <div className="p-3 rounded-xl bg-orange-500">
+              <Icon icon="lucide:file-text" className="text-white" width={20} />
+            </div>
+            <div>
+              <p className="text-sm text-slate-600">Contratos Activos</p>
+              <p className="text-2xl font-bold text-slate-800">18</p>
+            </div>
+          </div>
+        </Card>
+        <Card className="card-modern p-4">
+          <div className="flex items-center space-x-3">
+            <div className="p-3 rounded-xl bg-[#4F90DB]">
+              <Icon icon="lucide:trending-up" className="text-white" width={20} />
+            </div>
+            <div>
+              <p className="text-sm text-slate-600">Crecimiento</p>
+              <p className="text-2xl font-bold text-slate-800">+12%</p>
+            </div>
+          </div>
+        </Card>
       </div>
       
       <Tabs 
@@ -128,22 +187,47 @@ export const ClientsPage: React.FC = () => {
         selectedKey={activeTab}
         onSelectionChange={setActiveTab as any}
         className="w-full"
+        classNames={{
+          tabList: "bg-white/80 backdrop-blur-sm border border-white/20 rounded-xl p-1",
+          tab: "data-[selected=true]:bg-[#07ADDB] data-[selected=true]:text-white",
+          cursor: "hidden"
+        }}
       >
-        <Tab key="clientes" title="Clientes">
-          <Card className="mt-4">
-            <CardHeader>
-              <h2 className="text-lg font-semibold">Directorio de Clientes</h2>
+        <Tab 
+          key="clientes" 
+          title={
+            <div className="flex items-center space-x-2">
+              <Icon icon="lucide:building" width={16} />
+              <span>Clientes</span>
+            </div>
+          }
+        >
+          <Card className="card-modern mt-6">
+            <CardHeader className="pb-4">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div className="flex items-center space-x-3">
+                  <div className="p-2 rounded-lg bg-[#07ADDB]">
+                    <Icon icon="lucide:building" className="text-white" width={20} />
+                  </div>
+                  <h2 className="text-xl font-semibold">Directorio de Clientes</h2>
+                </div>
+                <Input
+                  placeholder="Buscar cliente..."
+                  startContent={<Icon icon="lucide:search" className="text-slate-400" width={16} />}
+                  className="input-modern w-full sm:w-64"
+                />
+              </div>
             </CardHeader>
             <CardBody>
-              <Input
-                placeholder="Buscar cliente..."
-                startContent={<Icon icon="lucide:search" className="text-default-400" width={16} />}
-                className="mb-4 max-w-md"
-              />
-              
+              <div className="table-modern">
               <Table 
                 aria-label="Directorio de clientes"
                 removeWrapper
+                  classNames={{
+                    wrapper: "min-h-[400px]",
+                    th: "bg-slate-50 text-slate-700 font-semibold",
+                    td: "border-b border-slate-100"
+                  }}
               >
                 <TableHeader>
                   <TableColumn>CLIENTE</TableColumn>
@@ -154,32 +238,59 @@ export const ClientsPage: React.FC = () => {
                   <TableColumn>ACCIONES</TableColumn>
                 </TableHeader>
                 <TableBody>
-                  {clientsData.map((client) => (
-                    <TableRow key={client.id}>
+                  {clientsData.map((client, index) => (
+                    <TableRow key={client.id} className="hover:bg-slate-50 animate-fade-in-up" style={{ animationDelay: `${index * 0.1}s` }}>
                       <TableCell>
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-[#07ADDB] flex items-center justify-center text-white">
+                            <Icon icon="lucide:building" width={16} />
+                          </div>
                         <div>
-                          <p className="font-medium">{client.name}</p>
-                          <p className="text-tiny text-default-500">{client.email}</p>
+                            <p className="font-semibold text-slate-800">{client.name}</p>
+                            <p className="text-sm text-slate-500">{client.email}</p>
+                          </div>
                         </div>
                       </TableCell>
-                      <TableCell>{client.address}</TableCell>
                       <TableCell>
-                        <div>
-                          <p>{client.contact}</p>
-                          <p className="text-tiny text-default-500">{client.phone}</p>
+                        <div className="flex items-center gap-2">
+                          <Icon icon="lucide:map-pin" width={14} className="text-slate-400" />
+                          <span className="text-sm">{client.address}</span>
                         </div>
                       </TableCell>
-                      <TableCell>{client.elevators}</TableCell>
                       <TableCell>
-                        <Badge color="success">{client.status}</Badge>
+                        <div>
+                          <p className="font-medium text-slate-800">{client.contact}</p>
+                          <p className="text-sm text-slate-500">{client.phone}</p>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Icon icon="lucide:elevator" width={14} className="text-slate-400" />
+                          <Badge color="primary" variant="flat">{client.elevators}</Badge>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge color="success" className="font-medium">{client.status}</Badge>
                       </TableCell>
                       <TableCell>
                         <div className="flex gap-2">
-                          <Button isIconOnly size="sm" variant="light" aria-label="Ver detalles">
-                            <Icon icon="lucide:eye" width={16} />
+                          <Button 
+                            isIconOnly 
+                            size="sm" 
+                            variant="light" 
+                            className="hover:bg-blue-100"
+                            aria-label="Ver detalles"
+                          >
+                            <Icon icon="lucide:eye" width={16} className="text-blue-600" />
                           </Button>
-                          <Button isIconOnly size="sm" variant="light" aria-label="Editar">
-                            <Icon icon="lucide:edit" width={16} />
+                          <Button 
+                            isIconOnly 
+                            size="sm" 
+                            variant="light" 
+                            className="hover:bg-green-100"
+                            aria-label="Editar"
+                          >
+                            <Icon icon="lucide:edit" width={16} className="text-green-600" />
                           </Button>
                         </div>
                       </TableCell>
@@ -187,24 +298,39 @@ export const ClientsPage: React.FC = () => {
                   ))}
                 </TableBody>
               </Table>
+              </div>
             </CardBody>
           </Card>
         </Tab>
-        <Tab key="ascensores" title="Ascensores">
-          <Card className="mt-4">
-            <CardHeader>
-              <h2 className="text-lg font-semibold">Inventario de Ascensores</h2>
+        <Tab 
+          key="ascensores" 
+          title={
+            <div className="flex items-center space-x-2">
+              <Icon icon="lucide:elevator" width={16} />
+              <span>Ascensores</span>
+            </div>
+          }
+        >
+          <Card className="card-modern mt-6">
+            <CardHeader className="pb-4">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 rounded-lg bg-[#ABD9D3]">
+                  <Icon icon="lucide:elevator" className="text-white" width={20} />
+                </div>
+                <h2 className="text-xl font-semibold">Inventario de Ascensores</h2>
+              </div>
             </CardHeader>
             <CardBody>
-              <div className="flex flex-col md:flex-row gap-2 mb-4">
+              <div className="flex flex-col lg:flex-row gap-4 mb-6">
                 <Input
                   placeholder="Buscar ascensor..."
-                  startContent={<Icon icon="lucide:search" className="text-default-400" width={16} />}
-                  className="flex-1"
+                  startContent={<Icon icon="lucide:search" className="text-slate-400" width={16} />}
+                  className="input-modern flex-1"
                 />
                 <Select
                   placeholder="Filtrar por cliente"
-                  className="w-full md:w-64"
+                  className="input-modern w-full lg:w-64"
+                  startContent={<Icon icon="lucide:building" width={16} className="text-slate-400" />}
                 >
                   <SelectItem key="all">Todos los clientes</SelectItem>
                   <SelectItem key="1">Edificio Torre Norte</SelectItem>
@@ -214,7 +340,8 @@ export const ClientsPage: React.FC = () => {
                 </Select>
                 <Select
                   placeholder="Filtrar por estado"
-                  className="w-full md:w-48"
+                  className="input-modern w-full lg:w-48"
+                  startContent={<Icon icon="lucide:filter" width={16} className="text-slate-400" />}
                 >
                   <SelectItem key="all">Todos</SelectItem>
                   <SelectItem key="Operativo">Operativo</SelectItem>
@@ -224,9 +351,15 @@ export const ClientsPage: React.FC = () => {
                 </Select>
               </div>
               
+              <div className="table-modern">
               <Table 
                 aria-label="Inventario de ascensores"
                 removeWrapper
+                  classNames={{
+                    wrapper: "min-h-[400px]",
+                    th: "bg-slate-50 text-slate-700 font-semibold",
+                    td: "border-b border-slate-100"
+                  }}
               >
                 <TableHeader>
                   <TableColumn>ID</TableColumn>
@@ -239,24 +372,65 @@ export const ClientsPage: React.FC = () => {
                   <TableColumn>ACCIONES</TableColumn>
                 </TableHeader>
                 <TableBody>
-                  {elevatorsData.map((elevator) => (
-                    <TableRow key={elevator.id}>
-                      <TableCell>{elevator.id}</TableCell>
-                      <TableCell>{elevator.client}</TableCell>
-                      <TableCell>{elevator.location}</TableCell>
-                      <TableCell>{elevator.model}</TableCell>
-                      <TableCell>{elevator.installDate}</TableCell>
-                      <TableCell>{elevator.lastMaintenance}</TableCell>
+                  {elevatorsData.map((elevator, index) => (
+                    <TableRow key={elevator.id} className="hover:bg-slate-50 animate-fade-in-up" style={{ animationDelay: `${index * 0.1}s` }}>
                       <TableCell>
-                        <Badge color={getStatusColor(elevator.status) as any}>{elevator.status}</Badge>
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 rounded-lg bg-[#ABD9D3] flex items-center justify-center text-white">
+                            <Icon icon="lucide:elevator" width={14} />
+                          </div>
+                          <span className="font-semibold text-slate-800">{elevator.id}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Icon icon="lucide:building" width={14} className="text-slate-400" />
+                          <span className="text-sm">{elevator.client}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Icon icon="lucide:map-pin" width={14} className="text-slate-400" />
+                          <span className="text-sm">{elevator.location}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge color="secondary" variant="flat">{elevator.model}</Badge>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Icon icon="lucide:calendar" width={14} className="text-slate-400" />
+                          <span className="text-sm">{elevator.installDate}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Icon icon="lucide:wrench" width={14} className="text-slate-400" />
+                          <span className="text-sm">{elevator.lastMaintenance}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge color={getStatusColor(elevator.status) as any} className="font-medium">{elevator.status}</Badge>
                       </TableCell>
                       <TableCell>
                         <div className="flex gap-2">
-                          <Button isIconOnly size="sm" variant="light" aria-label="Ver detalles">
-                            <Icon icon="lucide:eye" width={16} />
+                          <Button 
+                            isIconOnly 
+                            size="sm" 
+                            variant="light" 
+                            className="hover:bg-blue-100"
+                            aria-label="Ver detalles"
+                          >
+                            <Icon icon="lucide:eye" width={16} className="text-blue-600" />
                           </Button>
-                          <Button isIconOnly size="sm" variant="light" aria-label="Editar">
-                            <Icon icon="lucide:edit" width={16} />
+                          <Button 
+                            isIconOnly 
+                            size="sm" 
+                            variant="light" 
+                            className="hover:bg-green-100"
+                            aria-label="Editar"
+                          >
+                            <Icon icon="lucide:edit" width={16} className="text-green-600" />
                           </Button>
                         </div>
                       </TableCell>
@@ -264,45 +438,70 @@ export const ClientsPage: React.FC = () => {
                   ))}
                 </TableBody>
               </Table>
+              </div>
             </CardBody>
           </Card>
         </Tab>
-        <Tab key="restricciones" title="Restricciones">
-          <Card className="mt-4">
-            <CardHeader>
-              <h2 className="text-lg font-semibold">Restricciones de Clientes</h2>
+        <Tab 
+          key="restricciones" 
+          title={
+            <div className="flex items-center space-x-2">
+              <Icon icon="lucide:shield" width={16} />
+              <span>Restricciones</span>
+            </div>
+          }
+        >
+          <Card className="card-modern mt-6">
+            <CardHeader className="pb-4">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div className="flex items-center space-x-3">
+                  <div className="p-2 rounded-lg bg-orange-500">
+                    <Icon icon="lucide:shield" className="text-white" width={20} />
+                  </div>
+                  <h2 className="text-xl font-semibold">Restricciones de Clientes</h2>
+                </div>
+                <Select
+                  label="Cliente"
+                  placeholder="Seleccione un cliente"
+                  className="input-modern w-full sm:w-64"
+                  startContent={<Icon icon="lucide:building" width={16} className="text-slate-400" />}
+                >
+                  <SelectItem key="1">Edificio Torre Norte</SelectItem>
+                  <SelectItem key="2">Ministerio de Salud</SelectItem>
+                  <SelectItem key="3">Centro Comercial Plaza</SelectItem>
+                  <SelectItem key="4">Hospital Central</SelectItem>
+                </Select>
+              </div>
             </CardHeader>
             <CardBody>
-              <Select
-                label="Cliente"
-                placeholder="Seleccione un cliente"
-                className="mb-4 max-w-md"
-              >
-                <SelectItem key="1">Edificio Torre Norte</SelectItem>
-                <SelectItem key="2">Ministerio de Salud</SelectItem>
-                <SelectItem key="3">Centro Comercial Plaza</SelectItem>
-                <SelectItem key="4">Hospital Central</SelectItem>
-              </Select>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <Card className="p-4">
-                  <h3 className="text-medium font-semibold mb-4">Horarios Permitidos</h3>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <Card className="card-modern p-6">
+                  <div className="flex items-center space-x-3 mb-6">
+                    <div className="p-2 rounded-lg bg-[#07ADDB]">
+                      <Icon icon="lucide:clock" className="text-white" width={18} />
+                    </div>
+                    <h3 className="text-lg font-semibold">Horarios Permitidos</h3>
+                  </div>
                   <div className="space-y-4">
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <p className="font-medium">Lunes</p>
-                      </div>
+                    <div className="flex justify-between items-center p-3 rounded-lg bg-slate-50">
                       <div className="flex items-center gap-2">
+                        <Icon icon="lucide:calendar" width={16} className="text-slate-500" />
+                        <p className="font-medium text-slate-700">Lunes</p>
+                      </div>
+                      <div className="flex items-center gap-3">
                         <Input
                           type="time"
                           defaultValue="09:00"
-                          className="w-24"
+                          className="input-modern w-28"
+                          size="sm"
                         />
-                        <span>a</span>
+                        <span className="text-slate-500">a</span>
                         <Input
                           type="time"
                           defaultValue="17:00"
-                          className="w-24"
+                          className="input-modern w-28"
+                          size="sm"
                         />
                       </div>
                     </div>
@@ -407,46 +606,73 @@ export const ClientsPage: React.FC = () => {
                   </div>
                 </Card>
                 
-                <Card className="p-4">
-                  <h3 className="text-medium font-semibold mb-4">Otras Restricciones</h3>
-                  <div className="space-y-4">
-                    <div>
-                      <p className="font-medium mb-1">Tiempo estimado por visita</p>
-                      <div className="flex items-center gap-2">
+                <Card className="card-modern p-6">
+                  <div className="flex items-center space-x-3 mb-6">
+                    <div className="p-2 rounded-lg bg-[#4F90DB]">
+                      <Icon icon="lucide:settings" className="text-white" width={18} />
+                    </div>
+                    <h3 className="text-lg font-semibold">Otras Restricciones</h3>
+                  </div>
+                  <div className="space-y-6">
+                    <div className="p-4 rounded-lg bg-slate-50">
+                      <div className="flex items-center gap-2 mb-3">
+                        <Icon icon="lucide:clock" width={16} className="text-slate-500" />
+                        <p className="font-semibold text-slate-700">Tiempo estimado por visita</p>
+                      </div>
+                      <div className="flex items-center gap-3">
                         <Input
                           type="number"
                           defaultValue="60"
-                          className="w-24"
+                          className="input-modern w-24"
+                          size="sm"
                         />
-                        <span>minutos</span>
+                        <span className="text-slate-600">minutos</span>
                       </div>
                     </div>
-                    <div>
-                      <p className="font-medium mb-1">Periodicidad del mantenimiento preventivo</p>
-                      <Select defaultSelectedKeys={["30"]}>
+                    <div className="p-4 rounded-lg bg-slate-50">
+                      <div className="flex items-center gap-2 mb-3">
+                        <Icon icon="lucide:calendar" width={16} className="text-slate-500" />
+                        <p className="font-semibold text-slate-700">Periodicidad del mantenimiento preventivo</p>
+                      </div>
+                      <Select 
+                        defaultSelectedKeys={["30"]}
+                        className="input-modern"
+                        startContent={<Icon icon="lucide:repeat" width={16} className="text-slate-400" />}
+                      >
                         <SelectItem key="15">Quincenal</SelectItem>
                         <SelectItem key="30">Mensual</SelectItem>
                         <SelectItem key="60">Bimestral</SelectItem>
                         <SelectItem key="90">Trimestral</SelectItem>
                       </Select>
                     </div>
-                    <div>
-                      <p className="font-medium mb-1">Ventana de tiempo preferida</p>
-                      <Select defaultSelectedKeys={["morning"]}>
+                    <div className="p-4 rounded-lg bg-slate-50">
+                      <div className="flex items-center gap-2 mb-3">
+                        <Icon icon="lucide:clock" width={16} className="text-slate-500" />
+                        <p className="font-semibold text-slate-700">Ventana de tiempo preferida</p>
+                      </div>
+                      <Select 
+                        defaultSelectedKeys={["morning"]}
+                        className="input-modern"
+                        startContent={<Icon icon="lucide:sun" width={16} className="text-slate-400" />}
+                      >
                         <SelectItem key="morning">Mañana (9:00 - 12:00)</SelectItem>
                         <SelectItem key="afternoon">Tarde (13:00 - 17:00)</SelectItem>
                         <SelectItem key="any">Cualquier horario</SelectItem>
                       </Select>
                     </div>
-                    <div>
-                      <p className="font-medium mb-1">Notificación previa requerida</p>
-                      <div className="flex items-center gap-2">
+                    <div className="p-4 rounded-lg bg-slate-50">
+                      <div className="flex items-center gap-2 mb-3">
+                        <Icon icon="lucide:bell" width={16} className="text-slate-500" />
+                        <p className="font-semibold text-slate-700">Notificación previa requerida</p>
+                      </div>
+                      <div className="flex items-center gap-3">
                         <Input
                           type="number"
                           defaultValue="24"
-                          className="w-24"
+                          className="input-modern w-24"
+                          size="sm"
                         />
-                        <span>horas</span>
+                        <span className="text-slate-600">horas</span>
                       </div>
                     </div>
                     <div className="flex justify-between items-center">

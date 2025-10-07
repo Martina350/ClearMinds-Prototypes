@@ -26,10 +26,10 @@ export const MaintenancePage: React.FC = () => {
   
   // Sample data for maintenance planning
   const technicians = [
-    { id: "E001", name: "Juan Pérez", zone: "Norte", availability: "Disponible" },
-    { id: "E002", name: "María López", zone: "Sur", availability: "Ocupado" },
-    { id: "E003", name: "Carlos Mendez", zone: "Este", availability: "Disponible" },
-    { id: "E004", name: "Ana Gómez", zone: "Oeste", availability: "Disponible" },
+    { id: "E001", name: "Juan Pérez", zone: "Norte", availability: "Disponible", color: "blue" },
+    { id: "E002", name: "María López", zone: "Sur", availability: "Ocupado", color: "red" },
+    { id: "E003", name: "Carlos Mendez", zone: "Este", availability: "Disponible", color: "green" },
+    { id: "E004", name: "Ana Gómez", zone: "Oeste", availability: "Disponible", color: "purple" },
   ];
 
   const handleOptimizeRoute = () => {
@@ -66,17 +66,79 @@ export const MaintenancePage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <h1 className="text-2xl font-bold">Planificación de Mantenimientos</h1>
-        <div className="flex gap-2">
-          <Button color="primary" startContent={<Icon icon="lucide:plus" />} onPress={onOpen}>
+    <div className="space-y-8 p-6 animate-fade-in-up">
+      {/* Header */}
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+        <div>
+          <h1 className="text-3xl font-bold text-gradient mb-2">Planificación de Mantenimientos</h1>
+          <p className="text-slate-600">Gestión de rutas, asignaciones y plantillas de mantenimiento</p>
+        </div>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <Button 
+            color="primary" 
+            className="btn-modern"
+            startContent={<Icon icon="lucide:plus" width={16} />} 
+            onPress={onOpen}
+          >
             Nuevo Mantenimiento
           </Button>
-          <Button color="secondary" startContent={<Icon icon="lucide:route" />} onPress={handleOptimizeRoute}>
+          <Button 
+            color="secondary" 
+            className="btn-modern"
+            startContent={<Icon icon="lucide:route" width={16} />} 
+            onPress={handleOptimizeRoute}
+          >
             Optimizar Rutas
           </Button>
         </div>
+      </div>
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <Card className="card-modern p-4">
+          <div className="flex items-center space-x-3">
+            <div className="p-3 rounded-xl bg-[#07ADDB]">
+              <Icon icon="lucide:calendar" className="text-white" width={20} />
+            </div>
+            <div>
+              <p className="text-sm text-slate-600">Programados</p>
+              <p className="text-2xl font-bold text-slate-800">24</p>
+            </div>
+          </div>
+        </Card>
+        <Card className="card-modern p-4">
+          <div className="flex items-center space-x-3">
+            <div className="p-3 rounded-xl bg-[#ABD9D3]">
+              <Icon icon="lucide:check-circle" className="text-white" width={20} />
+            </div>
+            <div>
+              <p className="text-sm text-slate-600">Completados</p>
+              <p className="text-2xl font-bold text-slate-800">18</p>
+            </div>
+          </div>
+        </Card>
+        <Card className="card-modern p-4">
+          <div className="flex items-center space-x-3">
+            <div className="p-3 rounded-xl bg-orange-500">
+              <Icon icon="lucide:users" className="text-white" width={20} />
+            </div>
+            <div>
+              <p className="text-sm text-slate-600">Técnicos Activos</p>
+              <p className="text-2xl font-bold text-slate-800">6</p>
+            </div>
+          </div>
+        </Card>
+        <Card className="card-modern p-4">
+          <div className="flex items-center space-x-3">
+            <div className="p-3 rounded-xl bg-[#4F90DB]">
+              <Icon icon="lucide:route" className="text-white" width={20} />
+            </div>
+            <div>
+              <p className="text-sm text-slate-600">Rutas Activas</p>
+              <p className="text-2xl font-bold text-slate-800">12</p>
+            </div>
+          </div>
+        </Card>
       </div>
       
       <Tabs 
@@ -84,46 +146,117 @@ export const MaintenancePage: React.FC = () => {
         selectedKey={activeTab}
         onSelectionChange={setActiveTab as any}
         className="w-full"
+        classNames={{
+          tabList: "bg-white/80 backdrop-blur-sm border border-white/20 rounded-xl p-1",
+          tab: "data-[selected=true]:bg-[#07ADDB] data-[selected=true]:text-white",
+          cursor: "hidden"
+        }}
       >
-        <Tab key="programados" title="Programados">
-          <Card className="mt-4">
+        <Tab 
+          key="programados" 
+          title={
+            <div className="flex items-center space-x-2">
+              <Icon icon="lucide:calendar" width={16} />
+              <span>Programados</span>
+            </div>
+          }
+        >
+          <Card className="card-modern mt-6">
+            <CardHeader className="pb-4">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 rounded-lg bg-[#07ADDB]">
+                  <Icon icon="lucide:calendar" className="text-white" width={20} />
+                </div>
+                <h2 className="text-xl font-semibold">Mantenimientos Programados</h2>
+              </div>
+            </CardHeader>
             <CardBody>
               <MaintenanceTable />
             </CardBody>
           </Card>
         </Tab>
-        <Tab key="rutas" title="Rutas y Asignaciones">
-          <Card className="mt-4">
-            <CardHeader className="flex items-center justify-between gap-3">
-              <h2 className="text-lg font-semibold">Asignación de Técnicos y Rutas</h2>
-              <div className="flex items-center gap-2">
-                <Select label="Técnico" selectedKeys={[selectedTech]} onSelectionChange={(k)=>setSelectedTech(Array.from(k as Set<string>)[0] || "E001")} className="min-w-48">
-                  {technicians.map((t)=> (
-                    <SelectItem key={t.id}>{t.name}</SelectItem>
-                  ))}
-                </Select>
-                <Button variant="flat" onPress={clearRoute} startContent={<Icon icon="lucide:eraser" />}>Limpiar</Button>
-                <Button color="primary" onPress={saveRoute} startContent={<Icon icon="lucide:save" />}>Guardar Ruta</Button>
+        <Tab 
+          key="rutas" 
+          title={
+            <div className="flex items-center space-x-2">
+              <Icon icon="lucide:route" width={16} />
+              <span>Rutas y Asignaciones</span>
+            </div>
+          }
+        >
+          <Card className="card-modern mt-6">
+            <CardHeader className="pb-4">
+              <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+                <div className="flex items-center space-x-3">
+                  <div className="p-2 rounded-lg bg-[#ABD9D3]">
+                    <Icon icon="lucide:route" className="text-white" width={20} />
+                  </div>
+                  <h2 className="text-xl font-semibold">Asignación de Técnicos y Rutas</h2>
+                </div>
+                <div className="flex flex-col sm:flex-row items-center gap-3">
+                  <Select 
+                    label="Técnico" 
+                    selectedKeys={[selectedTech]} 
+                    onSelectionChange={(k)=>setSelectedTech(Array.from(k as Set<string>)[0] || "E001")} 
+                    className="input-modern min-w-48"
+                    startContent={<Icon icon="lucide:user" width={16} className="text-slate-400" />}
+                  >
+                    {technicians.map((t)=> (
+                      <SelectItem key={t.id}>{t.name}</SelectItem>
+                    ))}
+                  </Select>
+                  <Button 
+                    variant="flat" 
+                    className="btn-modern"
+                    onPress={clearRoute} 
+                    startContent={<Icon icon="lucide:eraser" width={16} />}
+                  >
+                    Limpiar
+                  </Button>
+                  <Button 
+                    color="primary" 
+                    className="btn-modern"
+                    onPress={saveRoute} 
+                    startContent={<Icon icon="lucide:save" width={16} />}
+                  >
+                    Guardar Ruta
+                  </Button>
+                </div>
               </div>
             </CardHeader>
             <CardBody>
-              <div className="flex flex-col md:flex-row gap-4">
-                <div className="md:w-1/3">
-                  <h3 className="text-medium font-semibold mb-2">Técnicos Disponibles</h3>
-                  <div className="space-y-2">
-                    {technicians.map((tech) => (
-                      <Card key={tech.id} className={`p-3 ${selectedTech === tech.id ? "ring-1 ring-primary" : ""}`} onClick={()=>setSelectedTech(tech.id)}>
+              <div className="flex flex-col lg:flex-row gap-6">
+                <div className="lg:w-1/3">
+                  <h3 className="text-lg font-semibold mb-4 text-slate-800">Técnicos Disponibles</h3>
+                  <div className="space-y-3">
+                    {technicians.map((tech, index) => (
+                      <Card 
+                        key={tech.id} 
+                        className={`card-modern p-4 cursor-pointer transition-all duration-200 hover:scale-105 animate-fade-in-up ${
+                          selectedTech === tech.id ? "ring-2 ring-blue-500 bg-blue-50" : "hover:bg-slate-50"
+                        }`} 
+                        onClick={()=>setSelectedTech(tech.id)}
+                        style={{ animationDelay: `${index * 0.1}s` }}
+                      >
                         <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white">
-                              <Icon icon="lucide:user" width={16} />
+                          <div className="flex items-center gap-3">
+                            <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white shadow-lg ${
+                              tech.color === 'blue' ? 'bg-[#07ADDB]' :
+                              tech.color === 'red' ? 'bg-red-500' :
+                              tech.color === 'green' ? 'bg-[#ABD9D3]' :
+                              'bg-[#4F90DB]'
+                            }`}>
+                              <Icon icon="lucide:user" width={18} />
                             </div>
                             <div>
-                              <p className="font-medium">{tech.name}</p>
-                              <p className="text-tiny text-default-500">Zona: {tech.zone}</p>
+                              <p className="font-semibold text-slate-800">{tech.name}</p>
+                              <p className="text-sm text-slate-600">Zona: {tech.zone}</p>
                             </div>
                           </div>
-                          <Badge color={techStatusById[tech.id] === "Disponible" ? "success" : "warning"}>
+                          <Badge 
+                            color={techStatusById[tech.id] === "Disponible" ? "success" : "warning"}
+                            className="font-medium"
+                          >
                             {techStatusById[tech.id]}
                           </Badge>
                         </div>
@@ -132,9 +265,9 @@ export const MaintenancePage: React.FC = () => {
                   </div>
                 </div>
                 
-                <div className="md:w-2/3">
-                  <h3 className="text-medium font-semibold mb-2">Planificación de Rutas</h3>
-                  <div className="relative w-full h-[400px] rounded-lg overflow-hidden">
+                <div className="lg:w-2/3">
+                  <h3 className="text-lg font-semibold mb-4 text-slate-800">Planificación de Rutas</h3>
+                  <div className="relative w-full h-[500px] rounded-xl overflow-hidden shadow-lg border border-white/20">
                     <MapContainer center={quitoCenter} zoom={13} className="w-full h-full">
                       {(() => {
                         const Clicker: React.FC = () => {
@@ -148,16 +281,39 @@ export const MaintenancePage: React.FC = () => {
                       {Object.entries(routesByTech).map(([id, points])=> (
                         <>
                           {points.length > 1 && (
-                            <Polyline key={`pl-${id}`} positions={points} pathOptions={{ color: id === selectedTech ? "#2563eb" : "#94a3b8", weight: 5 }} />
+                            <Polyline 
+                              key={`pl-${id}`} 
+                              positions={points} 
+                              pathOptions={{ 
+                                color: id === selectedTech ? "#2563eb" : "#94a3b8", 
+                                weight: 5,
+                                opacity: 0.8
+                              }} 
+                            />
                           )}
                           {points.map(([lat,lng], idx)=> (
-                            <CircleMarker key={`pt-${id}-${idx}`} center={[lat,lng]} radius={6} pathOptions={{ color: id === selectedTech ? "#2563eb" : "#94a3b8", fillOpacity: 0.9 }} />
+                            <CircleMarker 
+                              key={`pt-${id}-${idx}`} 
+                              center={[lat,lng]} 
+                              radius={8} 
+                              pathOptions={{ 
+                                color: id === selectedTech ? "#2563eb" : "#94a3b8", 
+                                fillOpacity: 0.9,
+                                weight: 2
+                              }} 
+                            />
                           ))}
                         </>
                       ))}
                     </MapContainer>
-                    <div className="absolute bottom-2 left-2 p-2 bg-white/80 backdrop-blur-sm rounded-md">
-                      <div className="text-tiny">Clic en el mapa para agregar puntos a la ruta del técnico seleccionado</div>
+                    <div className="absolute bottom-4 left-4 p-3 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg border border-white/20">
+                      <div className="flex items-center gap-2">
+                        <Icon icon="lucide:info" width={16} className="text-blue-600" />
+                        <div className="text-sm text-slate-700">
+                          <p className="font-medium">Clic en el mapa para agregar puntos</p>
+                          <p className="text-xs text-slate-500">Técnico seleccionado: {technicians.find(t => t.id === selectedTech)?.name}</p>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -165,27 +321,50 @@ export const MaintenancePage: React.FC = () => {
             </CardBody>
           </Card>
         </Tab>
-        <Tab key="plantillas" title="Plantillas de Actividades">
-          <Card className="mt-4">
-            <CardHeader>
-              <h2 className="text-lg font-semibold">Plantillas de Actividades</h2>
-            </CardHeader>
-            <CardBody>
-              <div className="flex flex-col gap-4">
-                <div className="flex justify-between">
+        <Tab 
+          key="plantillas" 
+          title={
+            <div className="flex items-center space-x-2">
+              <Icon icon="lucide:file-text" width={16} />
+              <span>Plantillas</span>
+            </div>
+          }
+        >
+          <Card className="card-modern mt-6">
+            <CardHeader className="pb-4">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div className="flex items-center space-x-3">
+                  <div className="p-2 rounded-lg bg-[#4F90DB]">
+                    <Icon icon="lucide:file-text" className="text-white" width={20} />
+                  </div>
+                  <h2 className="text-xl font-semibold">Plantillas de Actividades</h2>
+                </div>
+                <div className="flex flex-col sm:flex-row gap-3">
                   <Input 
                     placeholder="Buscar plantilla..." 
-                    startContent={<Icon icon="lucide:search" className="text-default-400" width={16} />}
-                    className="w-full max-w-xs"
+                    startContent={<Icon icon="lucide:search" className="text-slate-400" width={16} />}
+                    className="input-modern w-full sm:w-64"
                   />
-                  <Button color="primary" startContent={<Icon icon="lucide:plus" />}>
+                  <Button 
+                    color="primary" 
+                    className="btn-modern"
+                    startContent={<Icon icon="lucide:plus" width={16} />}
+                  >
                     Nueva Plantilla
                   </Button>
                 </div>
-                
+              </div>
+            </CardHeader>
+            <CardBody>
+              <div className="table-modern">
                 <Table 
                   aria-label="Plantillas de actividades"
                   removeWrapper
+                  classNames={{
+                    wrapper: "min-h-[400px]",
+                    th: "bg-slate-50 text-slate-700 font-semibold",
+                    td: "border-b border-slate-100"
+                  }}
                 >
                   <TableHeader>
                     <TableColumn>NOMBRE</TableColumn>
@@ -195,50 +374,107 @@ export const MaintenancePage: React.FC = () => {
                     <TableColumn>ACCIONES</TableColumn>
                   </TableHeader>
                   <TableBody>
-                    <TableRow>
-                      <TableCell>Mantenimiento Preventivo Estándar</TableCell>
+                    <TableRow className="hover:bg-slate-50">
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Icon icon="lucide:file-text" className="text-blue-600" width={16} />
+                          <span className="font-medium">Mantenimiento Preventivo Estándar</span>
+                        </div>
+                      </TableCell>
                       <TableCell>General</TableCell>
-                      <TableCell>12 items</TableCell>
+                      <TableCell>
+                        <Badge color="primary" variant="flat">12 items</Badge>
+                      </TableCell>
                       <TableCell>10/05/2023</TableCell>
                       <TableCell>
                         <div className="flex gap-2">
-                          <Button isIconOnly size="sm" variant="light" aria-label="Editar">
-                            <Icon icon="lucide:edit" width={16} />
+                          <Button 
+                            isIconOnly 
+                            size="sm" 
+                            variant="light" 
+                            className="hover:bg-blue-100"
+                            aria-label="Editar"
+                          >
+                            <Icon icon="lucide:edit" width={16} className="text-blue-600" />
                           </Button>
-                          <Button isIconOnly size="sm" variant="light" aria-label="Duplicar">
-                            <Icon icon="lucide:copy" width={16} />
+                          <Button 
+                            isIconOnly 
+                            size="sm" 
+                            variant="light" 
+                            className="hover:bg-green-100"
+                            aria-label="Duplicar"
+                          >
+                            <Icon icon="lucide:copy" width={16} className="text-green-600" />
                           </Button>
                         </div>
                       </TableCell>
                     </TableRow>
-                    <TableRow>
-                      <TableCell>Mantenimiento Ministerio</TableCell>
+                    <TableRow className="hover:bg-slate-50">
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Icon icon="lucide:file-text" className="text-orange-600" width={16} />
+                          <span className="font-medium">Mantenimiento Ministerio</span>
+                        </div>
+                      </TableCell>
                       <TableCell>Ministerio de Salud</TableCell>
-                      <TableCell>18 items</TableCell>
+                      <TableCell>
+                        <Badge color="warning" variant="flat">18 items</Badge>
+                      </TableCell>
                       <TableCell>15/04/2023</TableCell>
                       <TableCell>
                         <div className="flex gap-2">
-                          <Button isIconOnly size="sm" variant="light" aria-label="Editar">
-                            <Icon icon="lucide:edit" width={16} />
+                          <Button 
+                            isIconOnly 
+                            size="sm" 
+                            variant="light" 
+                            className="hover:bg-blue-100"
+                            aria-label="Editar"
+                          >
+                            <Icon icon="lucide:edit" width={16} className="text-blue-600" />
                           </Button>
-                          <Button isIconOnly size="sm" variant="light" aria-label="Duplicar">
-                            <Icon icon="lucide:copy" width={16} />
+                          <Button 
+                            isIconOnly 
+                            size="sm" 
+                            variant="light" 
+                            className="hover:bg-green-100"
+                            aria-label="Duplicar"
+                          >
+                            <Icon icon="lucide:copy" width={16} className="text-green-600" />
                           </Button>
                         </div>
                       </TableCell>
                     </TableRow>
-                    <TableRow>
-                      <TableCell>Mantenimiento Correctivo</TableCell>
+                    <TableRow className="hover:bg-slate-50">
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Icon icon="lucide:file-text" className="text-red-600" width={16} />
+                          <span className="font-medium">Mantenimiento Correctivo</span>
+                        </div>
+                      </TableCell>
                       <TableCell>General</TableCell>
-                      <TableCell>8 items</TableCell>
+                      <TableCell>
+                        <Badge color="danger" variant="flat">8 items</Badge>
+                      </TableCell>
                       <TableCell>22/03/2023</TableCell>
                       <TableCell>
                         <div className="flex gap-2">
-                          <Button isIconOnly size="sm" variant="light" aria-label="Editar">
-                            <Icon icon="lucide:edit" width={16} />
+                          <Button 
+                            isIconOnly 
+                            size="sm" 
+                            variant="light" 
+                            className="hover:bg-blue-100"
+                            aria-label="Editar"
+                          >
+                            <Icon icon="lucide:edit" width={16} className="text-blue-600" />
                           </Button>
-                          <Button isIconOnly size="sm" variant="light" aria-label="Duplicar">
-                            <Icon icon="lucide:copy" width={16} />
+                          <Button 
+                            isIconOnly 
+                            size="sm" 
+                            variant="light" 
+                            className="hover:bg-green-100"
+                            aria-label="Duplicar"
+                          >
+                            <Icon icon="lucide:copy" width={16} className="text-green-600" />
                           </Button>
                         </div>
                       </TableCell>
@@ -252,29 +488,63 @@ export const MaintenancePage: React.FC = () => {
       </Tabs>
       
       {/* New Maintenance Modal */}
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="2xl">
+      <Modal 
+        isOpen={isOpen} 
+        onOpenChange={onOpenChange} 
+        size="2xl"
+        classNames={{
+          base: "bg-white/95 backdrop-blur-md border border-white/20",
+          header: "border-b border-slate-200",
+          body: "py-6",
+          footer: "border-t border-slate-200"
+        }}
+      >
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader className="flex flex-col gap-1">Nuevo Mantenimiento</ModalHeader>
+              <ModalHeader className="flex flex-col gap-1 pb-4">
+                <div className="flex items-center space-x-3">
+                  <div className="p-2 rounded-lg bg-[#07ADDB]">
+                    <Icon icon="lucide:plus" className="text-white" width={20} />
+                  </div>
+                  <h3 className="text-xl font-semibold">Nuevo Mantenimiento</h3>
+                </div>
+                <p className="text-sm text-slate-600">Complete la información para programar un nuevo mantenimiento</p>
+              </ModalHeader>
               <ModalBody>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Select label="Tipo de Mantenimiento">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <Select 
+                    label="Tipo de Mantenimiento"
+                    className="input-modern"
+                    startContent={<Icon icon="lucide:wrench" width={16} className="text-slate-400" />}
+                  >
                     <SelectItem key="preventivo">Preventivo</SelectItem>
                     <SelectItem key="correctivo">Correctivo</SelectItem>
                     <SelectItem key="emergencia">Emergencia</SelectItem>
                   </Select>
-                  <Select label="Cliente">
+                  <Select 
+                    label="Cliente"
+                    className="input-modern"
+                    startContent={<Icon icon="lucide:building" width={16} className="text-slate-400" />}
+                  >
                     <SelectItem key="1">Edificio Torre Norte</SelectItem>
                     <SelectItem key="2">Ministerio de Salud</SelectItem>
                     <SelectItem key="3">Centro Comercial Plaza</SelectItem>
                   </Select>
-                  <Select label="Ascensor">
+                  <Select 
+                    label="Ascensor"
+                    className="input-modern"
+                    startContent={<Icon icon="lucide:elevator" width={16} className="text-slate-400" />}
+                  >
                     <SelectItem key="A101">A101</SelectItem>
                     <SelectItem key="B205">B205</SelectItem>
                     <SelectItem key="C310">C310</SelectItem>
                   </Select>
-                  <Select label="Técnico">
+                  <Select 
+                    label="Técnico"
+                    className="input-modern"
+                    startContent={<Icon icon="lucide:user" width={16} className="text-slate-400" />}
+                  >
                     <SelectItem key="E001">Juan Pérez</SelectItem>
                     <SelectItem key="E002">María López</SelectItem>
                     <SelectItem key="E003">Carlos Mendez</SelectItem>
@@ -282,12 +552,20 @@ export const MaintenancePage: React.FC = () => {
                   <Input
                     type="date"
                     label="Fecha"
+                    className="input-modern"
+                    startContent={<Icon icon="lucide:calendar" width={16} className="text-slate-400" />}
                   />
                   <Input
                     type="time"
                     label="Hora"
+                    className="input-modern"
+                    startContent={<Icon icon="lucide:clock" width={16} className="text-slate-400" />}
                   />
-                  <Select label="Plantilla de Actividades" className="col-span-full">
+                  <Select 
+                    label="Plantilla de Actividades" 
+                    className="input-modern col-span-full"
+                    startContent={<Icon icon="lucide:file-text" width={16} className="text-slate-400" />}
+                  >
                     <SelectItem key="1">Mantenimiento Preventivo Estándar</SelectItem>
                     <SelectItem key="2">Mantenimiento Ministerio</SelectItem>
                     <SelectItem key="3">Mantenimiento Correctivo</SelectItem>
@@ -295,15 +573,27 @@ export const MaintenancePage: React.FC = () => {
                   <Input
                     label="Observaciones"
                     placeholder="Ingrese observaciones adicionales"
-                    className="col-span-full"
+                    className="input-modern col-span-full"
+                    startContent={<Icon icon="lucide:message-square" width={16} className="text-slate-400" />}
                   />
                 </div>
               </ModalBody>
-              <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
+              <ModalFooter className="pt-4">
+                <Button 
+                  color="danger" 
+                  variant="light" 
+                  className="btn-modern"
+                  onPress={onClose}
+                  startContent={<Icon icon="lucide:x" width={16} />}
+                >
                   Cancelar
                 </Button>
-                <Button color="primary" onPress={onClose}>
+                <Button 
+                  color="primary" 
+                  className="btn-modern"
+                  onPress={onClose}
+                  startContent={<Icon icon="lucide:save" width={16} />}
+                >
                   Guardar
                 </Button>
               </ModalFooter>

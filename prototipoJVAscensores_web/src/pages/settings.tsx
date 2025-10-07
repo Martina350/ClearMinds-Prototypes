@@ -15,10 +15,19 @@ export const SettingsPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <h1 className="text-2xl font-bold">Configuración del Sistema</h1>
-        <Button color="primary" startContent={<Icon icon="lucide:save" />} onPress={handleSaveSettings}>
+    <div className="space-y-8 p-6 animate-fade-in-up">
+      {/* Header */}
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+        <div>
+          <h1 className="text-3xl font-bold text-gradient mb-2">Configuración del Sistema</h1>
+          <p className="text-slate-600">Administre la configuración general y parámetros del sistema</p>
+        </div>
+        <Button 
+          color="primary" 
+          className="btn-modern"
+          startContent={<Icon icon="lucide:save" width={16} />} 
+          onPress={handleSaveSettings}
+        >
           Guardar Cambios
         </Button>
       </div>
@@ -28,11 +37,29 @@ export const SettingsPage: React.FC = () => {
         selectedKey={activeTab}
         onSelectionChange={setActiveTab as any}
         className="w-full"
+        classNames={{
+          tabList: "bg-white/80 backdrop-blur-sm border border-white/20 rounded-xl p-1",
+          tab: "data-[selected=true]:bg-[#07ADDB] data-[selected=true]:text-white",
+          cursor: "hidden"
+        }}
       >
-        <Tab key="general" title="General">
-          <Card className="mt-4">
-            <CardHeader>
-              <h2 className="text-lg font-semibold">Configuración General</h2>
+        <Tab 
+          key="general" 
+          title={
+            <div className="flex items-center space-x-2">
+              <Icon icon="lucide:settings" width={16} />
+              <span>General</span>
+            </div>
+          }
+        >
+          <Card className="card-modern mt-6">
+            <CardHeader className="pb-4">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 rounded-lg bg-[#07ADDB]">
+                  <Icon icon="lucide:settings" className="text-white" width={20} />
+                </div>
+                <h2 className="text-xl font-semibold">Configuración General</h2>
+              </div>
             </CardHeader>
             <CardBody>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -40,28 +67,36 @@ export const SettingsPage: React.FC = () => {
                   <Input
                     label="Nombre de la Empresa"
                     defaultValue="JBA ASENSORES"
+                    className="input-modern"
+                    startContent={<Icon icon="lucide:building" width={16} className="text-slate-400" />}
                   />
                   <Input
                     label="Correo Electrónico Principal"
                     defaultValue="contacto@jbaasensores.com"
                     type="email"
+                    className="input-modern"
+                    startContent={<Icon icon="lucide:mail" width={16} className="text-slate-400" />}
                   />
                   <Input
                     label="Teléfono"
                     defaultValue="+1 234 567 890"
+                    className="input-modern"
+                    startContent={<Icon icon="lucide:phone" width={16} className="text-slate-400" />}
                   />
                   <Input
                     label="Dirección"
                     defaultValue="Av. Principal 123, Ciudad"
+                    className="input-modern"
+                    startContent={<Icon icon="lucide:map-pin" width={16} className="text-slate-400" />}
                   />
                   <Select
                     label="Zona Horaria"
                     defaultSelectedKeys={["utc-5"]}
                   >
-                    <SelectItem key="utc-5" value="utc-5">UTC-5 (Hora del Este)</SelectItem>
-                    <SelectItem key="utc-6" value="utc-6">UTC-6 (Hora Central)</SelectItem>
-                    <SelectItem key="utc-7" value="utc-7">UTC-7 (Hora de la Montaña)</SelectItem>
-                    <SelectItem key="utc-8" value="utc-8">UTC-8 (Hora del Pacífico)</SelectItem>
+                    <SelectItem key="utc-5">UTC-5 (Hora del Este)</SelectItem>
+                    <SelectItem key="utc-6">UTC-6 (Hora Central)</SelectItem>
+                    <SelectItem key="utc-7">UTC-7 (Hora de la Montaña)</SelectItem>
+                    <SelectItem key="utc-8">UTC-8 (Hora del Pacífico)</SelectItem>
                   </Select>
                 </div>
                 
@@ -106,22 +141,44 @@ export const SettingsPage: React.FC = () => {
             </CardBody>
           </Card>
         </Tab>
-        <Tab key="usuarios" title="Usuarios y Permisos">
-          <Card className="mt-4">
-            <CardHeader>
-              <h2 className="text-lg font-semibold">Usuarios y Permisos</h2>
-            </CardHeader>
-            <CardBody>
-              <div className="flex justify-end mb-4">
-                <Button color="primary" startContent={<Icon icon="lucide:user-plus" />}>
+        <Tab 
+          key="usuarios" 
+          title={
+            <div className="flex items-center space-x-2">
+              <Icon icon="lucide:users" width={16} />
+              <span>Usuarios y Permisos</span>
+            </div>
+          }
+        >
+          <Card className="card-modern mt-6">
+            <CardHeader className="pb-4">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div className="flex items-center space-x-3">
+                  <div className="p-2 rounded-lg bg-[#ABD9D3]">
+                    <Icon icon="lucide:users" className="text-white" width={20} />
+                  </div>
+                  <h2 className="text-xl font-semibold">Usuarios y Permisos</h2>
+                </div>
+                <Button 
+                  color="primary" 
+                  className="btn-modern"
+                  startContent={<Icon icon="lucide:user-plus" width={16} />}
+                >
                   Nuevo Usuario
                 </Button>
               </div>
-              
-              <Table 
-                aria-label="Usuarios y permisos"
-                removeWrapper
-              >
+            </CardHeader>
+            <CardBody>
+              <div className="table-modern">
+                <Table 
+                  aria-label="Usuarios y permisos"
+                  removeWrapper
+                  classNames={{
+                    wrapper: "min-h-[400px]",
+                    th: "bg-slate-50 text-slate-700 font-semibold",
+                    td: "border-b border-slate-100"
+                  }}
+                >
                 <TableHeader>
                   <TableColumn>USUARIO</TableColumn>
                   <TableColumn>CORREO</TableColumn>
@@ -205,18 +262,37 @@ export const SettingsPage: React.FC = () => {
                   </TableRow>
                 </TableBody>
               </Table>
+              </div>
             </CardBody>
           </Card>
         </Tab>
-        <Tab key="notificaciones" title="Notificaciones">
-          <Card className="mt-4">
-            <CardHeader>
-              <h2 className="text-lg font-semibold">Configuración de Notificaciones</h2>
+        <Tab 
+          key="notificaciones" 
+          title={
+            <div className="flex items-center space-x-2">
+              <Icon icon="lucide:bell" width={16} />
+              <span>Notificaciones</span>
+            </div>
+          }
+        >
+          <Card className="card-modern mt-6">
+            <CardHeader className="pb-4">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 rounded-lg bg-orange-500">
+                  <Icon icon="lucide:bell" className="text-white" width={20} />
+                </div>
+                <h2 className="text-xl font-semibold">Configuración de Notificaciones</h2>
+              </div>
             </CardHeader>
             <CardBody>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <Card className="p-4">
-                  <h3 className="text-medium font-semibold mb-4">Notificaciones por Correo</h3>
+                <Card className="card-modern p-6">
+                  <div className="flex items-center space-x-3 mb-4">
+                    <div className="p-2 rounded-lg bg-[#07ADDB]">
+                      <Icon icon="lucide:mail" className="text-white" width={16} />
+                    </div>
+                    <h3 className="text-lg font-semibold text-slate-800">Notificaciones por Correo</h3>
+                  </div>
                   <div className="space-y-4">
                     <div className="flex justify-between items-center">
                       <div>
@@ -304,11 +380,11 @@ export const SettingsPage: React.FC = () => {
                       label="Plantilla"
                       className="mb-4"
                     >
-                      <SelectItem key="new_maintenance" value="new_maintenance">Nuevo Mantenimiento</SelectItem>
-                      <SelectItem key="completed_maintenance" value="completed_maintenance">Mantenimiento Completado</SelectItem>
-                      <SelectItem key="emergency_alert" value="emergency_alert">Alerta de Emergencia</SelectItem>
-                      <SelectItem key="daily_report" value="daily_report">Reporte Diario</SelectItem>
-                      <SelectItem key="weekly_report" value="weekly_report">Reporte Semanal</SelectItem>
+                      <SelectItem key="new_maintenance">Nuevo Mantenimiento</SelectItem>
+                      <SelectItem key="completed_maintenance">Mantenimiento Completado</SelectItem>
+                      <SelectItem key="emergency_alert">Alerta de Emergencia</SelectItem>
+                      <SelectItem key="daily_report">Reporte Diario</SelectItem>
+                      <SelectItem key="weekly_report">Reporte Semanal</SelectItem>
                     </Select>
                     <Input
                       label="Asunto"
@@ -412,9 +488,9 @@ export const SettingsPage: React.FC = () => {
                     <div>
                       <p className="font-medium mb-1">Prioridad de optimización</p>
                       <Select defaultSelectedKeys={["distance"]}>
-                        <SelectItem key="distance" value="distance">Distancia (minimizar desplazamientos)</SelectItem>
-                        <SelectItem key="time" value="time">Tiempo (minimizar tiempo total)</SelectItem>
-                        <SelectItem key="priority" value="priority">Prioridad del cliente</SelectItem>
+                        <SelectItem key="distance">Distancia (minimizar desplazamientos)</SelectItem>
+                        <SelectItem key="time">Tiempo (minimizar tiempo total)</SelectItem>
+                        <SelectItem key="priority">Prioridad del cliente</SelectItem>
                       </Select>
                       <p className="text-tiny text-default-500 mt-1">Factor principal para optimizar rutas</p>
                     </div>
@@ -465,18 +541,18 @@ export const SettingsPage: React.FC = () => {
                     <div>
                       <p className="font-medium mb-1">Frecuencia de copias de seguridad</p>
                       <Select defaultSelectedKeys={["daily"]}>
-                        <SelectItem key="daily" value="daily">Diaria</SelectItem>
-                        <SelectItem key="weekly" value="weekly">Semanal</SelectItem>
-                        <SelectItem key="monthly" value="monthly">Mensual</SelectItem>
+                        <SelectItem key="daily">Diaria</SelectItem>
+                        <SelectItem key="weekly">Semanal</SelectItem>
+                        <SelectItem key="monthly">Mensual</SelectItem>
                       </Select>
                     </div>
                     <div>
                       <p className="font-medium mb-1">Retención de datos</p>
                       <Select defaultSelectedKeys={["1year"]}>
-                        <SelectItem key="6months" value="6months">6 meses</SelectItem>
-                        <SelectItem key="1year" value="1year">1 año</SelectItem>
-                        <SelectItem key="2years" value="2years">2 años</SelectItem>
-                        <SelectItem key="5years" value="5years">5 años</SelectItem>
+                        <SelectItem key="6months">6 meses</SelectItem>
+                        <SelectItem key="1year">1 año</SelectItem>
+                        <SelectItem key="2years">2 años</SelectItem>
+                        <SelectItem key="5years">5 años</SelectItem>
                       </Select>
                       <p className="text-tiny text-default-500 mt-1">Tiempo de retención de datos históricos</p>
                     </div>
