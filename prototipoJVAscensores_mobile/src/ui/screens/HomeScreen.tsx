@@ -12,6 +12,7 @@ import { AppButton } from '../components/AppButton';
 import { FilterButton } from '../components/FilterButton';
 import { OtCard } from '../components/OtCard';
 import { Icon } from '../components/Icon';
+import { SwipeableNotification } from '../components/SwipeableNotification';
 import { getTheme } from '../theme/tokens';
 
 type Nav = NativeStackNavigationProp<RootStackParamList, 'Home'>;
@@ -29,20 +30,14 @@ export function HomeScreen() {
     <Screen>
       {/* Header */}
       
-      {/* Banner de notificaciones */}
+      {/* Notificación deslizable */}
       {banner && (
-        <View style={{ 
-          backgroundColor: banner.type === 'EMERGENCIA' ? theme.colors.urgent : theme.colors.warning,
-          marginHorizontal: theme.spacing.lg,
-          marginBottom: theme.spacing.md,
-          padding: theme.spacing.md,
-          borderRadius: theme.radii.md
-        }}>
-          <AppText style={{ color: theme.colors.card, marginBottom: theme.spacing.sm }}>
-            {banner.message}
-          </AppText>
-          <AppButton title="Ocultar" onPress={clearBanner} variant="outline" icon="close" size="sm" />
-        </View>
+        <SwipeableNotification
+          type={banner.type}
+          message={banner.message}
+          onDismiss={clearBanner}
+          isDark={isDark}
+        />
       )}
 
       {/* Mapa */}
