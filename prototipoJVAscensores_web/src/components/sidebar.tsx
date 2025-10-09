@@ -25,14 +25,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
   return (
     <aside
       className={`glass-effect border-r border-white/20 transition-all duration-300 ${
-        isOpen ? "w-64" : "w-0 md:w-16"
-      } overflow-hidden sticky top-0 h-screen`}
+        isOpen ? "w-64" : "w-16"
+      } sticky top-0 h-screen`}
     >
       <div className="flex flex-col h-full">
         {/* Logo */}
         <div className={`p-4 flex items-center ${isOpen ? "justify-start" : "justify-center"} animate-fade-in-up`}>
-          <div className="bg-[#07ADDB] rounded-xl p-3 text-white shadow-lg">
-            <Icon icon="lucide:elevator" width={24} height={24} />
+          <div className={`bg-[#07ADDB] rounded-xl text-white shadow-lg ${isOpen ? "p-3" : "p-2"}`}>
+            <Icon icon="lucide:elevator" width={isOpen ? 24 : 20} height={isOpen ? 24 : 20} />
           </div>
           {isOpen && (
             <div className="ml-3 h-8 flex items-center">
@@ -51,19 +51,18 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
                   <Button
                     as={Link}
                     to={item.path}
-                    variant={isActive ? "solid" : "light"}
-                    color={isActive ? "primary" : "default"}
-                    className={`w-full justify-start transition-all duration-200 ${
-                      !isOpen && "justify-center"
+                    variant="light"
+                    className={`w-full transition-all duration-200 ${
+                      isOpen ? "justify-start" : "justify-center"
                     } ${
                       isActive 
                         ? "bg-[#07ADDB] text-white shadow-lg" 
                         : "hover:bg-white/20 hover:scale-105"
                     }`}
-                    startContent={isOpen ? <Icon icon={item.icon} width={20} /> : undefined}
-                    size="md"
+                    size={isOpen ? "md" : "sm"}
                   >
-                    {!isOpen ? <Icon icon={item.icon} width={20} /> : item.label}
+                    <Icon icon={item.icon} width={isOpen ? 20 : 18} />
+                    {isOpen && <span className="ml-3">{item.label}</span>}
                   </Button>
                 </li>
               );
@@ -74,8 +73,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
         {/* User Profile */}
         <div className="p-4 border-t border-white/20 animate-fade-in-up">
           <div className={`flex items-center ${isOpen ? "justify-start" : "justify-center"}`}>
-            <div className="w-10 h-10 rounded-full bg-[#07ADDB] flex items-center justify-center text-white shadow-lg">
-              <Icon icon="lucide:user" width={18} />
+            <div className={`rounded-full bg-[#07ADDB] flex items-center justify-center text-white shadow-lg ${
+              isOpen ? "w-10 h-10" : "w-8 h-8"
+            }`}>
+              <Icon icon="lucide:user" width={isOpen ? 18 : 16} />
             </div>
             {isOpen && (
               <div className="ml-3">
