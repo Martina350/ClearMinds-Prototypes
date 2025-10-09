@@ -402,9 +402,10 @@ export const MaintenancePage: React.FC = () => {
                             size="sm" 
                             variant="light" 
                             className="hover:bg-green-100"
-                            aria-label="Duplicar"
+                            aria-label="Ver plantilla"
+                            onPress={() => window.open('/archive/REPORTE VACIO 2025 (1).pdf', '_blank')}
                           >
-                            <Icon icon="lucide:copy" width={16} className="text-green-600" />
+                            <Icon icon="lucide:eye" width={16} className="text-green-600" />
                           </Button>
                         </div>
                       </TableCell>
@@ -437,9 +438,9 @@ export const MaintenancePage: React.FC = () => {
                             size="sm" 
                             variant="light" 
                             className="hover:bg-green-100"
-                            aria-label="Duplicar"
+                            aria-label="Ver plantilla"
                           >
-                            <Icon icon="lucide:copy" width={16} className="text-green-600" />
+                            <Icon icon="lucide:eye" width={16} className="text-green-600" />
                           </Button>
                         </div>
                       </TableCell>
@@ -472,9 +473,9 @@ export const MaintenancePage: React.FC = () => {
                             size="sm" 
                             variant="light" 
                             className="hover:bg-green-100"
-                            aria-label="Duplicar"
+                            aria-label="Ver plantilla"
                           >
-                            <Icon icon="lucide:copy" width={16} className="text-green-600" />
+                            <Icon icon="lucide:eye" width={16} className="text-green-600" />
                           </Button>
                         </div>
                       </TableCell>

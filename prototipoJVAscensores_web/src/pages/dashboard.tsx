@@ -214,34 +214,6 @@ export const DashboardPage: React.FC = () => {
           </CardBody>
         </Card>
       </div>
-
-      {/* Quick Actions */}
-      <Card className="card-modern">
-        <CardHeader className="pb-4">
-          <div className="flex items-center space-x-3">
-            <div className="p-2 rounded-lg bg-[#4F90DB]">
-              <Icon icon="lucide:zap" className="text-white" width={20} />
-            </div>
-            <h2 className="text-xl font-semibold">Acciones Rápidas</h2>
-          </div>
-        </CardHeader>
-        <CardBody>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {quickActions.map((action, index) => (
-              <Card 
-                key={index}
-                className="p-6 flex flex-col items-center justify-center cursor-pointer card-modern hover:scale-105 transition-all duration-200 animate-fade-in-up"
-                style={{ animationDelay: `${index * 0.1}s` }}
-              >
-                <div className="p-4 rounded-2xl mb-4 shadow-lg" style={{ backgroundColor: action.bgColor }}>
-                  <Icon icon={action.icon} className="text-white" width={24} />
-                </div>
-                <p className="text-sm font-medium text-center text-slate-700">{action.title}</p>
-              </Card>
-            ))}
-          </div>
-        </CardBody>
-      </Card>
     </div>
   );
 };
