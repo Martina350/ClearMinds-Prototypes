@@ -66,13 +66,13 @@ export const SettingsPage: React.FC = () => {
                 <div className="space-y-4">
                   <Input
                     label="Nombre de la Empresa"
-                    defaultValue="JBA ASENSORES"
+                    defaultValue="JVASENSORES"
                     className="input-modern"
                     startContent={<Icon icon="lucide:building" width={16} className="text-slate-400" />}
                   />
                   <Input
                     label="Correo Electrónico Principal"
-                    defaultValue="contacto@jbaasensores.com"
+                    defaultValue="contacto@jvaasensores.com"
                     type="email"
                     className="input-modern"
                     startContent={<Icon icon="lucide:mail" width={16} className="text-slate-400" />}
@@ -89,15 +89,6 @@ export const SettingsPage: React.FC = () => {
                     className="input-modern"
                     startContent={<Icon icon="lucide:map-pin" width={16} className="text-slate-400" />}
                   />
-                  <Select
-                    label="Zona Horaria"
-                    defaultSelectedKeys={["utc-5"]}
-                  >
-                    <SelectItem key="utc-5">UTC-5 (Hora del Este)</SelectItem>
-                    <SelectItem key="utc-6">UTC-6 (Hora Central)</SelectItem>
-                    <SelectItem key="utc-7">UTC-7 (Hora de la Montaña)</SelectItem>
-                    <SelectItem key="utc-8">UTC-8 (Hora del Pacífico)</SelectItem>
-                  </Select>
                 </div>
                 
                 <div className="space-y-4">
@@ -197,7 +188,7 @@ export const SettingsPage: React.FC = () => {
                         <span>Admin</span>
                       </div>
                     </TableCell>
-                    <TableCell>admin@jbaasensores.com</TableCell>
+                    <TableCell>admin@jvaasensores.com</TableCell>
                     <TableCell><Badge color="primary">Administrador</Badge></TableCell>
                     <TableCell>Hoy, 10:30</TableCell>
                     <TableCell><Badge color="success">Activo</Badge></TableCell>
@@ -221,7 +212,7 @@ export const SettingsPage: React.FC = () => {
                         <span>Supervisor</span>
                       </div>
                     </TableCell>
-                    <TableCell>supervisor@jbaasensores.com</TableCell>
+                    <TableCell>supervisor@jvaasensores.com</TableCell>
                     <TableCell><Badge color="secondary">Supervisor</Badge></TableCell>
                     <TableCell>Ayer, 15:45</TableCell>
                     <TableCell><Badge color="success">Activo</Badge></TableCell>
@@ -245,7 +236,7 @@ export const SettingsPage: React.FC = () => {
                         <span>Operador</span>
                       </div>
                     </TableCell>
-                    <TableCell>operador@jbaasensores.com</TableCell>
+                    <TableCell>operador@jvaasensores.com</TableCell>
                     <TableCell><Badge color="default">Operador</Badge></TableCell>
                     <TableCell>15/10/2023, 09:20</TableCell>
                     <TableCell><Badge color="success">Activo</Badge></TableCell>
@@ -388,7 +379,7 @@ export const SettingsPage: React.FC = () => {
                     </Select>
                     <Input
                       label="Asunto"
-                      defaultValue="Reporte de Mantenimiento - JBA ASENSORES"
+                      defaultValue="Reporte de Mantenimiento - JVASENSORES"
                     />
                     <div>
                       <p className="text-small mb-2">Contenido</p>
@@ -404,7 +395,7 @@ export const SettingsPage: React.FC = () => {
                         <p>Observaciones: [OBSERVACIONES]</p>
                         <br />
                         <p>Atentamente,</p>
-                        <p>Equipo de JBA ASENSORES</p>
+                        <p>Equipo de JVASENSORES</p>
                       </div>
                     </div>
                     <div className="flex justify-end gap-2">

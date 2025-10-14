@@ -17,7 +17,7 @@ export const ReportsPage: React.FC = () => {
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
         <div>
           <h1 className="text-3xl font-bold text-gradient mb-2">Reportes y Análisis</h1>
-          <p className="text-slate-600">Visualiza KPIs y genera reportes descargables</p>
+          <p className="text-slate-600">Visualiza y genera reportes descargables</p>
         </div>
         <div className="flex flex-col sm:flex-row gap-3">
           <Button 
