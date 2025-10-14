@@ -14,6 +14,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
   const navItems = [
     { path: "/dashboard", icon: "lucide:layout-dashboard", label: "Dashboard", color: "blue" },
     { path: "/maintenance", icon: "lucide:wrench", label: "Mantenimiento", color: "orange" },
+    { path: "/schedule", icon: "lucide:calendar-clock", label: "Cronograma", color: "cyan" },
     { path: "/employees", icon: "lucide:users", label: "Empleados", color: "green" },
     { path: "/alerts", icon: "lucide:bell", label: "Alertas", color: "red" },
     { path: "/map", icon: "lucide:map-pin", label: "Mapa", color: "purple" },

@@ -19,6 +19,7 @@ import { MapPage } from "./pages/map";
 import { SettingsPage } from "./pages/settings";
 import { ClientsPage } from "./pages/clients";
 import { ReportsPage } from "./pages/reports";
+import { SchedulePage } from "./pages/schedule";
 
 export default function App() {
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(true);
@@ -43,6 +44,7 @@ export default function App() {
               <Switch>
                 <Route path="/dashboard" component={DashboardPage} />
                 <Route path="/maintenance" component={MaintenancePage} />
+                <Route path="/schedule" component={SchedulePage} />
                 <Route path="/employees" component={EmployeesPage} />
                 <Route path="/alerts" component={AlertsPage} />
                 <Route path="/map" component={MapPage} />
