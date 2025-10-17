@@ -22,7 +22,7 @@ export const AperturaInfantilScreen: React.FC<Props> = ({ navigation }) => {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={{ padding: theme.spacing.lg }}>
-      <Text style={styles.header}>Datos del Solicitante</Text>
+        <Text style={styles.header}>Datos del Solicitante</Text>
       <Input label="Nombres y Apellidos" placeholder="Ingresa tu nombre completo" value={solNombre} onChangeText={setSolNombre} />
       <Input label="Número de Cédula" placeholder="Ingresa tu número de cédula" value={solCedula} onChangeText={setSolCedula} />
       <Input label="Dirección" placeholder="Ingresa tu dirección" value={solDireccion} onChangeText={setSolDireccion} />

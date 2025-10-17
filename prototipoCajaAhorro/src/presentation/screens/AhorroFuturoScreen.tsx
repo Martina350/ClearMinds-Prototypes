@@ -20,7 +20,7 @@ export const AhorroFuturoScreen: React.FC<Props> = ({ navigation }) => {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={{ padding: theme.spacing.lg }}>
-      <Input label="Buscar cliente por cédula o número de cuenta" placeholder="Buscar cliente por cédula o número de" value={''} editable={false} />
+        <Input label="Buscar cliente por cédula o número de cuenta" placeholder="Buscar cliente por cédula o número de" value={''} editable={false} />
       <Text style={styles.header}>Información del Cliente</Text>
       <Input label="Nombre" placeholder="" value={nombre} onChangeText={setNombre} />
       <Input label="Cédula" placeholder="" value={cedula} onChangeText={setCedula} />

@@ -36,8 +36,7 @@ export const AperturaSeleccionScreen: React.FC<Props> = ({ navigation }) => {
         <Image source={require('../assets/ahorroFuturo.png')} style={styles.thumb} />
       </TouchableOpacity>
 
-      <View style={{ height: theme.spacing.xl }} />
-      <Button title="Continuar" onPress={() => navigation.goBack()} fullWidth />
+      <View style={{ height: theme.spacing.xl }} />     
     </ScrollView>
   );
 };

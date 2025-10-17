@@ -13,7 +13,7 @@ export const ConsultasClientesScreen: React.FC = () => {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={{ padding: theme.spacing.lg }}>
-      <Input label="Buscar por cédula, nombre o número de cuenta" placeholder="Buscar por cédula, nombre o número d" value={busqueda} onChangeText={setBusqueda} />
+        <Input label="Buscar por cédula, nombre o número de cuenta" placeholder="Buscar por cédula, nombre o número d" value={busqueda} onChangeText={setBusqueda} />
 
       <Text style={styles.header}>Resultados</Text>
       {resultados.map((r, i) => (

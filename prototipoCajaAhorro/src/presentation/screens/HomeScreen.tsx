@@ -48,19 +48,20 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
       <View style={styles.topBar}>
         <TouchableOpacity activeOpacity={0.7}>
         </TouchableOpacity>
-        <Text style={styles.topTitle}>Nuestros Servicios</Text>
+        { <View style={{ alignSelf: 'center' }}>
+          <Image
+            source={require('../assets/logoSantaTeresita2.png')}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+        </View> }
         <View style={{ width: 24 }} />
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* <View style={styles.logoContainer}>
-          <Image
-            source={require('../assets/logoSantaTeresita.png')}
-            style={styles.logo}
-            resizeMode="contain"
-          />
-        </View> */}
-
+        <Text style={styles.title}>Nuestros Servicios</Text>
+        <Text style={styles.subtitle}>Selecciona el servicio que deseas realizar</Text>
+        <View style={{ height: theme.spacing.lg }} />
         {services.map((s, idx) => (
           <Card key={idx}>
             <Image source={s.image} style={styles.hero} />
@@ -82,27 +83,16 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#FFEBEE' },
-  topBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingHorizontal: 16, paddingTop: 20, paddingBottom: 18, backgroundColor: theme.colors.background },
+  topBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingHorizontal: 8, paddingTop: 6, paddingBottom: 6, backgroundColor: theme.colors.background },
   topTitle: { fontSize: 18, fontWeight: '800', color: theme.colors.text },
+  title: { fontSize: 28, fontWeight: '900', color: theme.colors.primary, textAlign: 'center' },
+  subtitle: { textAlign: 'center', color: theme.colors.subtitle, marginTop: 4 },
   scrollContent: { padding: 16, paddingBottom: 24 }, 
   sectionTitle: { fontSize: 22, fontWeight: '800', color: theme.colors.text },
-  logoContainer: { 
-    width: 180, 
-    height: 180, 
-    alignSelf: 'center', 
-    marginTop: 20, 
-    marginBottom: 20, 
-    borderRadius: 90, 
-    backgroundColor: '#FFFFFF',
-    justifyContent: 'center',
-    alignItems: 'center',
-    overflow: 'hidden',
-    ...theme.shadows.card
-  },
-  logo: { width: 160, height: 200, resizeMode: 'cover' },
-  hero: { width: '100%', height: 190, borderRadius: 12, marginBottom: 12 },
+  logo: { width: 340, height: 36, resizeMode: 'contain', alignSelf: 'center' },
+  hero: { width: '100%', height: 160, borderRadius: 12, marginBottom: 0 },
   rowBetween: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  cardTitle: { fontSize: 16, fontWeight: '800', color: theme.colors.text, marginBottom: 6 },
+  cardTitle: { fontSize: 16, fontWeight: '800', color: theme.colors.text, marginBottom: 6, marginTop: 6 },
   cardSubtitle: { fontSize: 14, color: theme.colors.subtitle },
   pill: { backgroundColor: theme.colors.primary, paddingVertical: 10, paddingHorizontal: 18, borderRadius: 20, ...theme.shadows.card },
   pillText: { color: '#fff', fontWeight: '800' },

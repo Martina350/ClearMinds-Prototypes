@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
 import { theme } from '../theme/theme';
 import { Card } from '../components/Card';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -13,9 +13,23 @@ export const ActividadScreen: React.FC = () => {
   };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={{ padding: theme.spacing.lg }}>
-      <Text style={styles.title}>Dashboard de Actividad</Text>
-      <Text style={styles.subtitle}>Resumen de transacciones del día</Text>
+    <View style={styles.container}>
+      <View style={styles.topBar}>
+        <TouchableOpacity activeOpacity={0.7}>
+        </TouchableOpacity>
+        { <View style={{ alignSelf: 'center' }}>
+          <Image
+            source={require('../assets/logoSantaTeresita2.png')}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+        </View> }
+        <View style={{ width: 24 }} />
+      </View>
+
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <Text style={styles.title}>Dashboard de Actividad</Text>
+        <Text style={styles.subtitle}>Resumen de transacciones del día</Text>
 
       <View style={styles.grid}> 
         <View style={[styles.tile, styles.tileBeige]}> 
@@ -83,13 +97,18 @@ export const ActividadScreen: React.FC = () => {
           <Text style={[styles.consValue, styles.totalGeneralText]}>${kpis.total.toFixed(2)}</Text>
         </View>
       </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#FFEBEE' },
+  topBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingHorizontal: 8, paddingTop: 6, paddingBottom: 6, backgroundColor: theme.colors.background },
+  topTitle: { fontSize: 18, fontWeight: '800', color: theme.colors.text },
+  scrollContent: { padding: 16, paddingBottom: 24 },
   title: { fontSize: 28, fontWeight: '900', color: theme.colors.primary, textAlign: 'center' },
+  logo: { width: 340, height: 36, resizeMode: 'contain', alignSelf: 'center' },
   subtitle: { textAlign: 'center', color: theme.colors.subtitle, marginTop: 4, marginBottom: theme.spacing.lg },
   grid: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: theme.spacing.md },
   tile: { flex: 1, marginHorizontal: 6, borderRadius: 20, paddingVertical: theme.spacing.lg, paddingHorizontal: theme.spacing.md, ...theme.shadows.card },

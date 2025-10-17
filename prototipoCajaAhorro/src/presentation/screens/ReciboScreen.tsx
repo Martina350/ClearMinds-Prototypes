@@ -8,7 +8,7 @@ interface Props { navigation: any; }
 export const ReciboScreen: React.FC<Props> = () => {
   return (
     <ScrollView style={styles.container} contentContainerStyle={{ padding: theme.spacing.lg }}>
-      <Text style={styles.title}>Recibo e Impresión</Text>
+        <Text style={styles.title}>Recibo e Impresión</Text>
       <View style={styles.card}>
         <View style={styles.row}><Text style={styles.label}>Cliente</Text><Text style={styles.value}>1234567890</Text></View>
         <View style={styles.row}><Text style={styles.label}>Tipo de Transacción</Text><Text style={styles.value}>Depósito</Text></View>
