@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { ScrollView, StyleSheet, Text, Alert } from 'react-native';
+import { ScrollView, StyleSheet, Text, Alert, View } from 'react-native';
+import { WebView } from 'react-native-webview';
 import { Input, AddressPicker, DatePicker } from '../components';
 import { Button } from '../components/Button';
 import { theme } from '../theme/theme';
@@ -102,6 +103,7 @@ export const AperturaInfantilScreen: React.FC<Props> = ({ navigation }) => {
         }}
         required
       />
+
       <Input 
         label="Número de Celular" 
         placeholder="+593 9XXXXXXXXX" 

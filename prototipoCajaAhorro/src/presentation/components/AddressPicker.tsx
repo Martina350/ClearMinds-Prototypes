@@ -12,6 +12,7 @@ import {
   PanResponder,
   Animated,
 } from 'react-native';
+import { WebView } from 'react-native-webview';
 import { theme } from '../theme/theme';
 import { MaterialIcons } from '@expo/vector-icons';
 import * as Location from 'expo-location';
@@ -256,9 +257,10 @@ export const AddressPicker: React.FC<AddressPickerProps> = ({
       Vibration.vibrate(100);
       
       // Mostrar confirmación
+      const streetType = 'streetType' in addressData ? addressData.streetType : 'principal';
       Alert.alert(
         'Ubicación guardada',
-        `Calle Principal: ${addressData.streetType === 'principal' ? addressData.street : 'Calle Principal'}\nCalle Secundaria: ${addressData.streetType === 'secundaria' ? addressData.street : 'Calle Secundaria'}\nDirección: ${addressData.street}${addressData.streetNumber ? ` #${addressData.streetNumber}` : ''}, ${addressData.district}`,
+        `Calle Principal: ${streetType === 'principal' ? addressData.street : 'Calle Principal'}\nCalle Secundaria: ${streetType === 'secundaria' ? addressData.street : 'Calle Secundaria'}\nDirección: ${addressData.street}${addressData.streetNumber ? ` #${addressData.streetNumber}` : ''}, ${addressData.district}`,
         [{ text: 'Entendido' }]
       );
     } catch (error) {
@@ -277,14 +279,15 @@ export const AddressPicker: React.FC<AddressPickerProps> = ({
     setMarkerPosition({ x: width/2 - 16, y: height/3 - 16 });
   };
 
+
   // PanResponder para el mapa
   const panResponder = PanResponder.create({
     onStartShouldSetPanResponder: () => true,
     onMoveShouldSetPanResponder: () => true,
     onPanResponderGrant: () => {
       pan.setOffset({
-        x: pan.x._value,
-        y: pan.y._value,
+        x: (pan.x as any)._value,
+        y: (pan.y as any)._value,
       });
       pan.setValue({ x: 0, y: 0 });
     },
@@ -294,7 +297,7 @@ export const AddressPicker: React.FC<AddressPickerProps> = ({
     ),
     onPanResponderRelease: () => {
       pan.flattenOffset();
-      setMapOffset({ x: pan.x._value, y: pan.y._value });
+      setMapOffset({ x: (pan.x as any)._value, y: (pan.y as any)._value });
     },
   });
 
@@ -338,77 +341,88 @@ export const AddressPicker: React.FC<AddressPickerProps> = ({
             <View style={{ width: 24 }} />
           </View>
 
-          <View style={styles.mapContainer}>
-            <Animated.View
-              style={[
-                styles.map,
-                {
-                  transform: [
-                    { translateX: pan.x },
-                    { translateY: pan.y },
-                    { scale: scaleValue },
-                  ],
-                },
-              ]}
-              {...panResponder.panHandlers}
-            >
-              <TouchableOpacity
-                style={styles.mapContent}
-                activeOpacity={1}
-                onPress={handleMapPress}
-              >
-                {/* Grid del mapa más realista */}
-                <View style={styles.mapGrid}>
-                  {/* Líneas de calles principales (horizontales) */}
-                  <View style={[styles.streetLine, styles.principalStreet, { top: '20%' }]} />
-                  <View style={[styles.streetLine, styles.principalStreet, { top: '40%' }]} />
-                  <View style={[styles.streetLine, styles.principalStreet, { top: '60%' }]} />
-                  <View style={[styles.streetLine, styles.principalStreet, { top: '80%' }]} />
-                  
-                  {/* Líneas de calles secundarias (verticales) */}
-                  <View style={[styles.streetLine, styles.secundariaStreet, { left: '20%', top: 0, width: 2, height: '100%' }]} />
-                  <View style={[styles.streetLine, styles.secundariaStreet, { left: '40%', top: 0, width: 2, height: '100%' }]} />
-                  <View style={[styles.streetLine, styles.secundariaStreet, { left: '60%', top: 0, width: 2, height: '100%' }]} />
-                  <View style={[styles.streetLine, styles.secundariaStreet, { left: '80%', top: 0, width: 2, height: '100%' }]} />
-                  
-                  {/* Etiquetas de calles reales */}
-                  <Text style={[styles.streetLabel, { top: '18%', left: 10 }]}>Av. Amazonas</Text>
-                  <Text style={[styles.streetLabel, { top: '38%', left: 10 }]}>Av. 6 de Diciembre</Text>
-                  <Text style={[styles.streetLabel, { top: '58%', left: 10 }]}>Av. Colón</Text>
-                  <Text style={[styles.streetLabel, { top: '78%', left: 10 }]}>Av. 10 de Agosto</Text>
-                  
-                  <Text style={[styles.streetLabel, styles.verticalLabel, { left: '18%', top: 10 }]}>Calle Mera</Text>
-                  <Text style={[styles.streetLabel, styles.verticalLabel, { left: '38%', top: 10 }]}>Calle Victoria</Text>
-                  <Text style={[styles.streetLabel, styles.verticalLabel, { left: '58%', top: 10 }]}>Calle Washington</Text>
-                  <Text style={[styles.streetLabel, styles.verticalLabel, { left: '78%', top: 10 }]}>Calle Foch</Text>
-                  
-                  {/* Puntos de referencia */}
-                  <View style={[styles.landmark, { top: '25%', left: '30%' }]}>
-                    <MaterialIcons name="place" size={16} color={theme.colors.primary} />
-                  </View>
-                  <View style={[styles.landmark, { top: '45%', left: '70%' }]}>
-                    <MaterialIcons name="place" size={16} color={theme.colors.primary} />
-                  </View>
-                  <View style={[styles.landmark, { top: '65%', left: '25%' }]}>
-                    <MaterialIcons name="place" size={16} color={theme.colors.primary} />
-                  </View>
-                </View>
-                
-                {/* Marcador */}
-                <Animated.View style={[styles.marker, { left: markerPosition.x, top: markerPosition.y }]}>
-                  <MaterialIcons name="place" size={32} color={theme.colors.primary} />
-                </Animated.View>
-                
-                {/* Instrucciones */}
-                <View style={styles.instructions}>
-                  <Text style={styles.instructionsText}>
-                    Toca en el mapa para colocar el marcador
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            </Animated.View>
+          {/* Mapa Real de Quito con WebView */}
+          <View style={styles.realMapContainer}>
+            <WebView
+              style={styles.realMap}
+              originWhitelist={["*"]}
+              source={{ 
+                html: `<!doctype html>
+                  <html>
+                    <head>
+                      <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+                      <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+                    </head>
+                    <body style='margin:0'>
+                      <div id="map" style="width:100%;height:100vh"></div>
+                      <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+                      <script>
+                        var center=[-0.1807,-78.4678];
+                        var map=L.map('map').setView(center,12);
+                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(map);
+                        
+                        // Marcador de referencia en Quito
+                        var referenceMarker = L.marker(center).addTo(map);
+                        referenceMarker.bindPopup('Quito, Ecuador - Ubicación de Referencia');
+                        
+                        // Permitir marcar puntos en el mapa
+                        var selectedMarker = null;
+                        map.on('click', function(e) {
+                          if (selectedMarker) {
+                            map.removeLayer(selectedMarker);
+                          }
+                          selectedMarker = L.marker(e.latlng).addTo(map);
+                          selectedMarker.bindPopup('Ubicación: ' + e.latlng.lat.toFixed(6) + ', ' + e.latlng.lng.toFixed(6));
+                          
+                          // Enviar coordenadas al React Native
+                          window.ReactNativeWebView.postMessage(JSON.stringify({
+                            type: 'location_selected',
+                            lat: e.latlng.lat,
+                            lng: e.latlng.lng
+                          }));
+                        });
+                      </script>
+                    </body>
+                  </html>` 
+              }}
+              onMessage={(event) => {
+                try {
+                  const data = JSON.parse(event.nativeEvent.data);
+                  if (data.type === 'location_selected') {
+                    setSelectedLocation({ lat: data.lat, lng: data.lng });
+                    Vibration.vibrate(50);
+                    
+                    // Geocodificación real
+                    setLoading(true);
+                    getRealGeocoding(data.lat, data.lng).then(addressData => {
+                      const streetNumber = addressData.streetNumber ? ` #${addressData.streetNumber}` : '';
+                      const district = addressData.district ? `, ${addressData.district}` : '';
+                      const formatted = `${addressData.street}${streetNumber}${district}, ${addressData.city}`;
+                      setFormattedAddress(formatted);
+                      setLoading(false);
+                    }).catch(error => {
+                      console.log('Error en geocodificación:', error);
+                      setFormattedAddress(`Ubicación: ${data.lat.toFixed(6)}, ${data.lng.toFixed(6)}`);
+                      setLoading(false);
+                    });
+                  }
+                } catch (error) {
+                  console.log('Error parsing WebView message:', error);
+                }
+              }}
+            />
             
-            {selectedLocation && (
+            {/* Instrucciones superpuestas */}
+            <View style={styles.mapInstructions}>
+              <Text style={styles.mapInstructionsText}>
+                Toca en el mapa para colocar el marcador
+              </Text>
+            </View>
+          </View>
+
+          {/* Información de ubicación - Movida arriba para no ser tapada */}
+          {selectedLocation && (
+            <View style={styles.locationInfoContainer}>
               <View style={styles.locationInfo}>
                 <View style={styles.coordinatesDisplay}>
                   <View style={styles.coordinateItem}>
@@ -438,8 +452,8 @@ export const AddressPicker: React.FC<AddressPickerProps> = ({
                   </View>
                 )}
               </View>
-            )}
-          </View>
+            </View>
+          )}
 
           <View style={styles.modalFooter}>
             <TouchableOpacity
@@ -638,12 +652,13 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     textAlign: 'center',
   },
-  locationInfo: {
-    position: 'absolute',
-    bottom: 16,
-    left: 16,
-    right: 16,
+  locationInfoContainer: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
     backgroundColor: theme.colors.background,
+  },
+  locationInfo: {
+    backgroundColor: theme.colors.altBackground,
     padding: 16,
     borderRadius: 12,
     ...theme.shadows.card,
@@ -731,5 +746,34 @@ const styles = StyleSheet.create({
   },
   disabledText: {
     color: theme.colors.subtitle,
+  },
+  realMapContainer: {
+    flex: 1,
+    margin: 16,
+    borderRadius: 16,
+    overflow: 'hidden',
+    backgroundColor: theme.colors.altBackground,
+    position: 'relative',
+  },
+  realMap: {
+    flex: 1,
+  },
+  mapInstructions: {
+    position: 'absolute',
+    top: 16,
+    left: 16,
+    right: 16,
+    backgroundColor: 'rgba(255,255,255,0.95)',
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    ...theme.shadows.card,
+    zIndex: 10,
+  },
+  mapInstructionsText: {
+    fontSize: 14,
+    color: theme.colors.text,
+    fontWeight: '600',
+    textAlign: 'center',
   },
 });
