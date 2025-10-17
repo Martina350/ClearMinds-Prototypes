@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
   subtitle: { textAlign: 'center', color: theme.colors.subtitle, marginTop: 4, marginBottom: theme.spacing.lg },
   grid: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: theme.spacing.md },
   tile: { flex: 1, marginHorizontal: 6, borderRadius: 20, paddingVertical: theme.spacing.lg, paddingHorizontal: theme.spacing.md, ...theme.shadows.card },
-  tileBeige: { backgroundColor: theme.colors.altBackground },
+  tileBeige: { backgroundColor: '#FFFFFF' },
   tileRed: { backgroundColor: theme.colors.primary },
   tileTitle: { color: theme.colors.text, fontWeight: '900' },
   tileMini: { color: theme.colors.subtitle, marginTop: 6, fontWeight: '700' },

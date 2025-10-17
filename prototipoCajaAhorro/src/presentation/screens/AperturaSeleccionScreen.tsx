@@ -44,12 +44,7 @@ export const AperturaSeleccionScreen: React.FC<Props> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#FFEBEE' },
   content: { padding: theme.spacing.lg },
-  title: {
-    fontSize: 28,
-    fontWeight: '800',
-    color: theme.colors.text,
-    marginBottom: theme.spacing.lg,
-  },
+  title: { fontSize: 28, fontWeight: '900', color: theme.colors.primary, textAlign: 'left', marginBottom: theme.spacing.lg },
   row: {
     backgroundColor: theme.colors.background,
     borderRadius: theme.radii.lg,
