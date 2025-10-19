@@ -7,6 +7,14 @@ export enum EstadoCobranza {
   CANCELADA = 'CANCELADA',
 }
 
+export enum TipoCobranza {
+  PRESTAMO = 'PRESTAMO',
+  CUOTA_PRESTAMO = 'CUOTA_PRESTAMO',
+  MORA = 'MORA',
+  INTERES = 'INTERES',
+  OTRO = 'OTRO',
+}
+
 /**
  * Entidad Cobranza
  * Representa una deuda/cobro pendiente de un cliente
@@ -16,11 +24,18 @@ export class Cobranza {
     public readonly id: UUID,
     public readonly clienteId: UUID,
     public readonly cuentaId: UUID | null,
+    public readonly prestamoId: UUID | null,
+    public readonly cuotaId: UUID | null,
     public readonly montoPendiente: number,
     public readonly montoOriginal: number,
+    public readonly montoMora: number,
+    public readonly montoInteres: number,
     public readonly fechaVencimiento: Date,
     public readonly estado: EstadoCobranza,
+    public readonly tipo: TipoCobranza,
     public readonly concepto: string,
+    public readonly numeroCuota?: number,
+    public readonly diasMora: number = 0,
     public readonly fechaCreacion: Date = new Date(),
     public readonly createdAt: Date = new Date(),
     public readonly updatedAt: Date = new Date()
@@ -60,6 +75,34 @@ export class Cobranza {
    */
   get porcentajePagado(): number {
     return ((this.montoOriginal - this.montoPendiente) / this.montoOriginal) * 100;
+  }
+
+  /**
+   * Calcula el monto total a pagar (principal + mora + interés)
+   */
+  get montoTotal(): number {
+    return this.montoPendiente + this.montoMora + this.montoInteres;
+  }
+
+  /**
+   * Verifica si tiene mora
+   */
+  get tieneMora(): boolean {
+    return this.montoMora > 0 || this.diasMora > 0;
+  }
+
+  /**
+   * Obtiene la descripción detallada
+   */
+  get descripcionDetallada(): string {
+    let descripcion = this.concepto;
+    if (this.numeroCuota) {
+      descripcion += ` - Cuota ${this.numeroCuota}`;
+    }
+    if (this.tieneMora) {
+      descripcion += ` (${this.diasMora} días de mora)`;
+    }
+    return descripcion;
   }
 }
 

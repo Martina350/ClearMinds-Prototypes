@@ -1,31 +1,63 @@
+import { Transaccion } from '../entities/Transaccion';
+import { Cliente } from '../entities/Cliente';
+import { Cuenta } from '../entities/Cuenta';
+import { Cobranza } from '../entities/Cobranza';
+
 /**
  * Interfaz del servicio de sincronización
  * Maneja la sincronización de datos entre el dispositivo y el servidor
  */
 export interface ISyncService {
   /**
-   * Sincroniza todos los datos pendientes con el servidor
-   */
-  sincronizarTodo(): Promise<void>;
-
-  /**
-   * Sincroniza solo las transacciones pendientes
-   */
-  sincronizarTransacciones(): Promise<void>;
-
-  /**
    * Verifica si hay conexión a internet
    */
   verificarConexion(): Promise<boolean>;
 
   /**
-   * Obtiene la fecha de la última sincronización
+   * Sincroniza transacciones pendientes
    */
-  obtenerUltimaSincronizacion(): Promise<Date | null>;
+  sincronizarTransacciones(transacciones: Transaccion[]): Promise<boolean>;
 
   /**
-   * Cuenta cuántos registros están pendientes de sincronización
+   * Sincroniza clientes
    */
-  contarPendientes(): Promise<number>;
+  sincronizarClientes(clientes: Cliente[]): Promise<boolean>;
+
+  /**
+   * Sincroniza cuentas
+   */
+  sincronizarCuentas(cuentas: Cuenta[]): Promise<boolean>;
+
+  /**
+   * Sincroniza cobranzas
+   */
+  sincronizarCobranzas(cobranzas: Cobranza[]): Promise<boolean>;
+
+  /**
+   * Sincronización completa
+   */
+  sincronizarTodo(datos: {
+    transacciones: Transaccion[];
+    clientes: Cliente[];
+    cuentas: Cuenta[];
+    cobranzas: Cobranza[];
+  }): Promise<{
+    exitoso: boolean;
+    detalles: {
+      transacciones: boolean;
+      clientes: boolean;
+      cuentas: boolean;
+      cobranzas: boolean;
+    };
+  }>;
+
+  /**
+   * Obtiene datos del servidor
+   */
+  obtenerDatosDelServidor(): Promise<{
+    clientes: Cliente[];
+    cuentas: Cuenta[];
+    cobranzas: Cobranza[];
+  }>;
 }
 

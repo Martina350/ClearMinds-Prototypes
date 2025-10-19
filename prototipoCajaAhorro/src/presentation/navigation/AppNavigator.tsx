@@ -16,6 +16,7 @@ import { CobrosScreen } from '../screens/CobrosScreen';
 import { ReciboScreen } from '../screens/ReciboScreen';
 import { ConsultasClientesScreen } from '../screens/ConsultasClientesScreen';
 import { ActividadScreen } from '../screens/ActividadScreen';
+import { ImpresionRecibosScreen } from '../screens/ImpresionRecibosScreen';
 
 /**
  * Tipos de navegación
@@ -39,7 +40,7 @@ const Tab = createBottomTabNavigator();
 
 import { PerfilScreen } from '../screens/PerfilScreen';
 
-const PlaceholderImprimir = () => null;
+// Removed placeholder - using ImpresionRecibosScreen directly
 
 /**
  * Componente del logo para el header
@@ -108,7 +109,7 @@ export const AppNavigator: React.FC = () => {
       >
         <Tab.Screen name="Inicio" component={HomeStack} />
         <Tab.Screen name="Actividad" component={ActividadScreen} />
-        <Tab.Screen name="Imprimir" component={PlaceholderImprimir} />
+        <Tab.Screen name="Imprimir" component={ImpresionRecibosScreen} />
         <Tab.Screen name="Perfil" component={PerfilScreen} />
       </Tab.Navigator>
     </NavigationContainer>

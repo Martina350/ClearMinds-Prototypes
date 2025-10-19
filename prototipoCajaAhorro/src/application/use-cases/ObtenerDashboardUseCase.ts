@@ -7,7 +7,13 @@ import { TipoTransaccion, UUID } from '../../shared/types';
  */
 export interface DashboardData {
   fecha: Date;
+  // Métricas básicas
   cuentasAperturadas: number;
+  cuentasBasicasAperturadas: number;
+  cuentasInfantilesAperturadas: number;
+  cuentasFuturoAperturadas: number;
+  
+  // Métricas de transacciones
   totalDepositos: {
     cantidad: number;
     monto: number;
@@ -16,9 +22,37 @@ export interface DashboardData {
     cantidad: number;
     monto: number;
   };
+  
+  // Métricas de clientes
+  clientesNuevos: number;
+  clientesRecurrentes: number;
+  
+  // Métricas financieras
   montoTotalRecaudado: number;
+  promedioTransaccion: number;
+  montoMayorTransaccion: number;
+  montoMenorTransaccion: number;
+  
+  // Métricas de préstamos
+  prestamosCobrados: number;
+  montoPrestamosCobrados: number;
+  cuotasVencidas: number;
+  montoMoraRecaudado: number;
+  
+  // Métricas de rendimiento
+  eficienciaCobranza: number; // Porcentaje de cobranza exitosa
+  tiempoPromedioTransaccion: number; // En minutos
+  
+  // Historial detallado
   historial: Array<{
     tipo: TipoTransaccion;
+    cantidad: number;
+    monto: number;
+  }>;
+  
+  // Métricas por hora
+  transaccionesPorHora: Array<{
+    hora: number;
     cantidad: number;
     monto: number;
   }>;
