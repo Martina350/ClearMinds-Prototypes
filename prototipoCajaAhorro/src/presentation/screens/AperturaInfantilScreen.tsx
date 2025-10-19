@@ -13,8 +13,6 @@ export const AperturaInfantilScreen: React.FC<Props> = ({ navigation }) => {
   const [solDireccion, setSolDireccion] = useState('');
   const [solDireccionData, setSolDireccionData] = useState<any>(null);
   const [solCelular, setSolCelular] = useState('+593 ');
-  const [solNacimiento, setSolNacimiento] = useState('');
-  const [refs, setRefs] = useState('');
   const [menorNombre, setMenorNombre] = useState('');
   const [menorCedula, setMenorCedula] = useState('');
   const [menorNacimiento, setMenorNacimiento] = useState('');
@@ -84,11 +82,11 @@ export const AperturaInfantilScreen: React.FC<Props> = ({ navigation }) => {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={{ padding: theme.spacing.lg }}>
-        <Text style={styles.header}>Datos del Solicitante</Text>
-      <Input label="Nombres y Apellidos" placeholder="Ingresa tu nombre completo" value={solNombre} onChangeText={setSolNombre} />
+      <Text style={styles.header}>Datos del Menor</Text>
+      <Input label="Nombre del Menor" placeholder="Ingresa el nombre del menor" value={menorNombre} onChangeText={setMenorNombre} />
       <Input 
         label="Número de Cédula" 
-        placeholder="Ingresa tu número de cédula" 
+        placeholder="Ingresa la cédula/ID del menor" 
         value={solCedula} 
         onChangeText={handleCedulaChange}
         keyboardType="numeric"
@@ -103,25 +101,6 @@ export const AperturaInfantilScreen: React.FC<Props> = ({ navigation }) => {
         }}
         required
       />
-
-      <Input 
-        label="Número de Celular" 
-        placeholder="+593 9XXXXXXXXX" 
-        value={solCelular} 
-        onChangeText={handleCelularChange}
-        keyboardType="phone-pad"
-      />
-      <DatePicker 
-        label="Fecha de Nacimiento" 
-        placeholder="Selecciona tu fecha de nacimiento"
-        value={solNacimiento}
-        onDateSelect={setSolNacimiento}
-        required
-      />
-      <Input label="Referencias Personales" placeholder="Ingresa referencias personales" value={refs} onChangeText={setRefs} />
-
-      <Text style={styles.header}>Datos del Menor</Text>
-      <Input label="Nombre del Menor" placeholder="Ingresa el nombre del menor" value={menorNombre} onChangeText={setMenorNombre} />
       <DatePicker 
         label="Fecha de Nacimiento del Menor" 
         placeholder="Selecciona la fecha de nacimiento del menor"
@@ -129,22 +108,21 @@ export const AperturaInfantilScreen: React.FC<Props> = ({ navigation }) => {
         onDateSelect={setMenorNacimiento}
         required
       />
-      <Input 
-        label="Número de Cédula" 
-        placeholder="Ingresa la cédula/ID del menor" 
-        value={solCedula} 
-        onChangeText={handleCedulaChange}
-        keyboardType="numeric"
-      />
 
       <Text style={styles.header}>Datos del Adulto Responsable</Text>
       <Input label="Nombre del Adulto Responsable" placeholder="Ingresa el nombre del adulto responsable" value={adultoNombre} onChangeText={setAdultoNombre} />
       <Input 
         label="Cédula/ID del Adulto Responsable" 
         placeholder="Ingresa la cédula/ID del adulto responsable" 
-        value={adultoCedula} 
+        value={solCedula} 
         onChangeText={handleCedulaChange}
         keyboardType="numeric"
+      />
+      <Input 
+        label="Número de Celular" 
+        placeholder="+593 9XXXXXXXXX" 
+        value={solCelular} 
+        onChangeText={handleCelularChange}
       />
       <Input label="Relación" placeholder="Ingresa la relación con el menor" value={relacion} onChangeText={setRelacion} />
 
