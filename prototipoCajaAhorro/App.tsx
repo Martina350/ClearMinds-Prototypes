@@ -3,6 +3,7 @@ import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AppNavigator } from './src/presentation/navigation/AppNavigator';
 import { AppProvider } from './src/presentation/context/AppContext';
+import { AuthProvider } from './src/presentation/context/AuthContext';
 
 /**
  * Componente raíz de la aplicación
@@ -11,10 +12,12 @@ import { AppProvider } from './src/presentation/context/AppContext';
 export default function App() {
   return (
     <SafeAreaProvider>
-      <AppProvider>
-        <AppNavigator />
-        <StatusBar style="auto" />
-      </AppProvider>
+      <AuthProvider>
+        <AppProvider>
+          <AppNavigator />
+          <StatusBar style="auto" />
+        </AppProvider>
+      </AuthProvider>
     </SafeAreaProvider>
   );
 }

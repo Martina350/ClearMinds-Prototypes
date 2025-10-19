@@ -15,7 +15,7 @@ export const AperturaBasicaScreen: React.FC<Props> = ({ navigation }) => {
   const [celular, setCelular] = useState('+593 ');
   const [fecha, setFecha] = useState('');
   const [refNombre, setRefNombre] = useState('');
-  const [refTel, setRefTel] = useState('');
+  const [refTel, setRefTel] = useState('+593 ');
   const [refRel, setRefRel] = useState('');
 
   const handleCelularChange = (text: string) => {
@@ -40,6 +40,31 @@ export const AperturaBasicaScreen: React.FC<Props> = ({ navigation }) => {
         ? `+593 ${cleanText.substring(4)}`
         : '+593 ';
       setCelular(formatted);
+    }
+  };
+
+  const handleRefTelChange = (text: string) => {
+    // Asegurar que siempre empiece con +593
+    if (!text.startsWith('+593')) {
+      setRefTel('+593 ');
+      return;
+    }
+    
+    // Remover espacios y caracteres no numéricos excepto el + al inicio
+    const cleanText = text.replace(/[^\d+]/g, '');
+    
+    // Verificar que solo tenga números después del +593
+    if (cleanText.length > 4 && !/^\+\d+$/.test(cleanText)) {
+      return;
+    }
+    
+    // Limitar a 10 dígitos después del +593 (total 14 caracteres)
+    if (cleanText.length <= 14) {
+      // Formatear con espacio después del código de país
+      const formatted = cleanText.length > 4 
+        ? `+593 ${cleanText.substring(4)}`
+        : '+593 ';
+      setRefTel(formatted);
     }
   };
 
@@ -121,8 +146,8 @@ export const AperturaBasicaScreen: React.FC<Props> = ({ navigation }) => {
         <Input 
           label="Número de Celular" 
           placeholder="+593 9XXXXXXXXX" 
-          value={celular} 
-          onChangeText={handleCelularChange}
+          value={refTel} 
+          onChangeText={handleRefTelChange}
         />
         <Input label="Relación" placeholder="Relación con la referencia" value={refRel} onChangeText={setRefRel} />
 

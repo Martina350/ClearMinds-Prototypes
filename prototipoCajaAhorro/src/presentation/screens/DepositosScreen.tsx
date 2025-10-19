@@ -77,7 +77,7 @@ export const DepositosScreen: React.FC<Props> = ({ navigation }) => {
   };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={{ padding: theme.spacing.lg }}>
+    <ScrollView style={styles.container} contentContainerStyle={{ padding: theme.spacing.lg }} nestedScrollEnabled={true}>
       <ClienteSearch 
         onClienteSelect={handleClienteSelect}
         placeholder="Buscar cliente por cédula, nombre o número de cuenta"

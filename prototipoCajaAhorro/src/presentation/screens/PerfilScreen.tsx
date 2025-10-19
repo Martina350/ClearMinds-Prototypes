@@ -1,9 +1,23 @@
 import React from 'react';
-import { ScrollView, StyleSheet, Text, View, TouchableOpacity, Image} from 'react-native';
+import { ScrollView, StyleSheet, Text, View, TouchableOpacity, Image, Alert } from 'react-native';
 import { theme } from '../theme/theme';
 import { Button } from '../components/Button';
+import { useAuth } from '../context/AuthContext';
 
 export const PerfilScreen: React.FC = () => {
+  const { user, logout } = useAuth();
+
+  const handleLogout = () => {
+    Alert.alert(
+      'Cerrar Sesión',
+      '¿Estás seguro de que quieres cerrar sesión?',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        { text: 'Cerrar Sesión', style: 'destructive', onPress: logout }
+      ]
+    );
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.topBar}>
@@ -20,10 +34,11 @@ export const PerfilScreen: React.FC = () => {
       </View>
     <ScrollView style={styles.container} contentContainerStyle={{ padding: theme.spacing.lg }}>
       <View style={styles.header}> 
-        <View style={styles.avatar}><Text style={styles.avatarText}>AG</Text></View>
+        <View style={styles.avatar}><Text style={styles.avatarText}>{user?.nombre?.charAt(0)}{user?.apellidos?.charAt(0)}</Text></View>
         <View>
-          <Text style={styles.name}>Agente Gonzales</Text>
-          <Text style={styles.sub}>ID: 000123</Text>
+          <Text style={styles.name}>{user?.nombre} {user?.apellidos}</Text>
+          <Text style={styles.sub}>Código: {user?.codigoAgente}</Text>
+          <Text style={styles.sub}>Email: {user?.email}</Text>
         </View>
       </View>
 
@@ -34,7 +49,7 @@ export const PerfilScreen: React.FC = () => {
         <Text style={styles.row}>Teléfono: 0999999999</Text>
       </View>
 
-      <Button title="Cerrar Sesión" onPress={() => {}} fullWidth />
+      <Button title="Cerrar Sesión" onPress={handleLogout} fullWidth />
     </ScrollView>
     </View>
   );

@@ -3,10 +3,11 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { MaterialIcons } from '@expo/vector-icons';
-import { Image } from 'react-native';
+import { Image, View, ActivityIndicator } from 'react-native';
 import { theme } from '../theme/theme';
+import { useAuth } from '../context/AuthContext';
+import { AuthNavigator } from './AuthNavigator';
 import { HomeScreen } from '../screens/HomeScreen';
-import { DashboardScreen } from '../screens/DashboardScreen';
 import { AperturaSeleccionScreen } from '../screens/AperturaSeleccionScreen';
 import { AperturaBasicaScreen } from '../screens/AperturaBasicaScreen';
 import { AperturaInfantilScreen } from '../screens/AperturaInfantilScreen';
@@ -85,6 +86,24 @@ const HomeStack = () => (
  * Navegador principal de la aplicación
  */
 export const AppNavigator: React.FC = () => {
+  const { user, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#FFEBEE' }}>
+        <ActivityIndicator size="large" color={theme.colors.primary} />
+      </View>
+    );
+  }
+
+  if (!user) {
+    return (
+      <NavigationContainer>
+        <AuthNavigator />
+      </NavigationContainer>
+    );
+  }
+
   return (
     <NavigationContainer>
       <Tab.Navigator

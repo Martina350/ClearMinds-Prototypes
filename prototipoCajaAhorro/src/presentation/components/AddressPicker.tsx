@@ -361,9 +361,7 @@ export const AddressPicker: React.FC<AddressPickerProps> = ({
                         var map=L.map('map').setView(center,12);
                         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(map);
                         
-                        // Marcador de referencia en Quito
-                        var referenceMarker = L.marker(center).addTo(map);
-                        referenceMarker.bindPopup('Quito, Ecuador - Ubicación de Referencia');
+                        // Sin marcador inicial - solo aparece cuando el usuario toca el mapa
                         
                         // Permitir marcar puntos en el mapa
                         var selectedMarker = null;
