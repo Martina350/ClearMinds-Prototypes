@@ -17,7 +17,7 @@ export const AperturaSeleccionScreen: React.FC<Props> = ({ navigation }) => {
           <Text style={styles.itemTitle}>Cuenta de ahorro básica</Text>
           <Text style={styles.itemSubtitle}>Ideal para tus ahorros diarios.</Text>
         </View>
-        <Image source={require('../assets/ahorroBasico.png')} style={styles.thumb} />
+        <Image source={require('../assets/logoSantaTeresita.png')} style={styles.thumb} />
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.row} onPress={() => navigation.navigate('AperturaInfantil')}>
@@ -25,7 +25,7 @@ export const AperturaSeleccionScreen: React.FC<Props> = ({ navigation }) => {
           <Text style={styles.itemTitle}>Cuenta de ahorro infantil</Text>
           <Text style={styles.itemSubtitle}>Para el futuro de tus hijos.</Text>
         </View>
-        <Image source={require('../assets/ahorroInfantil.png')} style={styles.thumb} />
+        <Image source={require('../assets/logoSantaTeresita.png')} style={styles.thumb} />
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.row} onPress={() => navigation.navigate('AhorroFuturo')}>
@@ -33,7 +33,7 @@ export const AperturaSeleccionScreen: React.FC<Props> = ({ navigation }) => {
           <Text style={styles.itemTitle}>Cuenta de ahorro futuro</Text>
           <Text style={styles.itemSubtitle}>Planifica tus metas a largo plazo.</Text>
         </View>
-        <Image source={require('../assets/ahorroFuturo.png')} style={styles.thumb} />
+        <Image source={require('../assets/logoSantaTeresita.png')} style={styles.thumb} />
       </TouchableOpacity>
 
       <View style={{ height: theme.spacing.xl }} />     

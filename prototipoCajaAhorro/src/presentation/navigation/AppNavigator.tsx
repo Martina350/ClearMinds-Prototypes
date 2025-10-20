@@ -32,7 +32,6 @@ export type RootStackParamList = {
   Cobros: undefined;
   Recibo: undefined;
   Consultas: undefined;
-  Dashboard: undefined;
   Tabs: undefined;
 };
 

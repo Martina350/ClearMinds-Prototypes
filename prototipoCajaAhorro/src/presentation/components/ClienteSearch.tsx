@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Input } from './Input';
 import { Card } from './Card';
 import { theme } from '../theme/theme';
@@ -91,24 +91,6 @@ export const ClienteSearch: React.FC<ClienteSearchProps> = ({
     setResultados([]);
   };
 
-  const renderCliente = ({ item }: { item: Cliente }) => (
-    <TouchableOpacity onPress={() => handleClienteSelect(item)}>
-      <Card style={styles.clienteCard}>
-        <View style={styles.clienteInfo}>
-          <Text style={styles.clienteNombre}>{item.nombre} {item.apellidos}</Text>
-          <Text style={styles.clienteCedula}>Cédula: {item.cedula}</Text>
-          <Text style={styles.clienteCelular}>{item.celular}</Text>
-          {item.numeroCuenta && (
-            <Text style={styles.clienteCuenta}>Cuenta: {item.numeroCuenta}</Text>
-          )}
-          {item.saldo !== undefined && (
-            <Text style={styles.clienteSaldo}>Saldo: ${item.saldo.toFixed(2)}</Text>
-          )}
-        </View>
-      </Card>
-    </TouchableOpacity>
-  );
-
   return (
     <View style={styles.container}>
       <Input
@@ -131,13 +113,29 @@ export const ClienteSearch: React.FC<ClienteSearchProps> = ({
           <Text style={styles.resultadosTitle}>
             {resultados.length} resultado{resultados.length !== 1 ? 's' : ''} encontrado{resultados.length !== 1 ? 's' : ''}
           </Text>
-          <FlatList
-            data={resultados}
-            renderItem={renderCliente}
-            keyExtractor={(item) => item.id}
+          <ScrollView 
             style={styles.resultadosList}
+            nestedScrollEnabled={true}
             showsVerticalScrollIndicator={false}
-          />
+          >
+            {resultados.map((item) => (
+              <TouchableOpacity key={item.id} onPress={() => handleClienteSelect(item)}>
+                <Card style={styles.clienteCard}>
+                  <View style={styles.clienteInfo}>
+                    <Text style={styles.clienteNombre}>{item.nombre} {item.apellidos}</Text>
+                    <Text style={styles.clienteCedula}>Cédula: {item.cedula}</Text>
+                    <Text style={styles.clienteCelular}>{item.celular}</Text>
+                    {item.numeroCuenta && (
+                      <Text style={styles.clienteCuenta}>Cuenta: {item.numeroCuenta}</Text>
+                    )}
+                    {item.saldo !== undefined && (
+                      <Text style={styles.clienteSaldo}>Saldo: ${item.saldo.toFixed(2)}</Text>
+                    )}
+                  </View>
+                </Card>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
         </View>
       )}
 

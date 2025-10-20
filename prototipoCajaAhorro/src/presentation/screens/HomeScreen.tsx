@@ -15,30 +15,26 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const services = [
     {
       title: 'Apertura de Cuentas',
-      subtitle: 'Abre cuentas bancarias de forma rápida y segura.',
-      cta: 'Abrir',
-      image: require('../assets/aperturaCuenta.png'),
+      subtitle: 'Abre cuentas bancarias de forma rápida y segura',
+      icon: 'person-add-alt',
       onPress: () => navigation.navigate('AperturaCuentas'),
     },
     {
       title: 'Depósitos',
-      subtitle: 'Realiza depósitos en tus cuentas desde cualquier lugar.',
-      cta: 'Depo...',
-      image: require('../assets/depositos.png'),
+      subtitle: 'Realiza depósitos en tus cuentas desde cualquier lugar',
+      icon: 'account-balance-wallet',
       onPress: () => navigation.navigate('Depositos'),
     },
     {
       title: 'Cobros',
-      subtitle: 'Gestiona tus cobros de manera eficiente y sin complicaciones.',
-      cta: 'Cobrar',
-      image: require('../assets/cobros.png'),
+      subtitle: 'Gestiona tus cobros de manera eficiente y sin complicaciones',
+      icon: 'receipt-long',
       onPress: () => navigation.navigate('Cobros'),
     },
     {
       title: 'Consultas de Clientes',
-      subtitle: 'Accede a la información de tus clientes de forma segura.',
-      cta: 'Cons...',
-      image: require('../assets/consultaClientes.png'),
+      subtitle: 'Accede a la información de tus clientes de forma segura',
+      icon: 'search',
       onPress: () => navigation.navigate('Consultas'),
     },
   ];
@@ -62,19 +58,22 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         <Text style={styles.title}>Nuestros Servicios</Text>
         <Text style={styles.subtitle}>Selecciona el servicio que deseas realizar</Text>
         <View style={{ height: theme.spacing.lg }} />
-        {services.map((s, idx) => (
-          <Card key={idx}>
-            <Image source={s.image} style={styles.hero} />
-            <View style={styles.rowBetween}>
-              <View style={{ flex: 1, paddingRight: 12 }}>
-                <Text style={styles.cardTitle}>{s.title}</Text>
-                <Text style={styles.cardSubtitle}>{s.subtitle}</Text>
-              </View>
-              <TouchableOpacity style={styles.pill} onPress={s.onPress} activeOpacity={0.8}>
-                <Text style={styles.pillText}>{s.cta}</Text>
-              </TouchableOpacity>
+        {services.map((service, idx) => (
+          <TouchableOpacity 
+            key={idx} 
+            style={styles.serviceItem} 
+            onPress={service.onPress}
+            activeOpacity={0.7}
+          >
+            <View style={styles.serviceIcon}>
+              <MaterialIcons name={service.icon as any} size={24} color={theme.colors.primary} />
             </View>
-          </Card>
+            <View style={styles.serviceContent}>
+              <Text style={styles.serviceTitle}>{service.title}</Text>
+              <Text style={styles.serviceSubtitle}>{service.subtitle}</Text>
+            </View>
+            <MaterialIcons name="chevron-right" size={24} color={theme.colors.border} />
+          </TouchableOpacity>
         ))}
       </ScrollView>
     </View>
@@ -90,11 +89,39 @@ const styles = StyleSheet.create({
   scrollContent: { padding: 16, paddingBottom: 24 }, 
   sectionTitle: { fontSize: 22, fontWeight: '800', color: theme.colors.text },
   logo: { width: 340, height: 36, resizeMode: 'contain', alignSelf: 'center' },
-  hero: { width: '100%', height: 160, borderRadius: 12, marginBottom: 0 },
-  rowBetween: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  cardTitle: { fontSize: 16, fontWeight: '800', color: theme.colors.text, marginBottom: 6, marginTop: 6 },
-  cardSubtitle: { fontSize: 14, color: theme.colors.subtitle },
-  pill: { backgroundColor: theme.colors.primary, paddingVertical: 10, paddingHorizontal: 18, borderRadius: 20, ...theme.shadows.card },
-  pillText: { color: '#fff', fontWeight: '800' },
+  serviceItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: theme.colors.background,
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    marginBottom: 12,
+    borderRadius: 12,
+    ...theme.shadows.card,
+  },
+  serviceIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#FFEBEE',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 16,
+  },
+  serviceContent: {
+    flex: 1,
+    marginRight: 8,
+  },
+  serviceTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: theme.colors.text,
+    marginBottom: 4,
+  },
+  serviceSubtitle: {
+    fontSize: 14,
+    color: theme.colors.subtitle,
+    lineHeight: 18,
+  },
 });
 

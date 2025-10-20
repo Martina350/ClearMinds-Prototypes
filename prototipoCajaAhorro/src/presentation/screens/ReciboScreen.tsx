@@ -85,7 +85,7 @@ export const ReciboScreen: React.FC<Props> = ({ navigation, route }) => {
       [
         {
           text: 'Aceptar',
-          onPress: () => navigation.navigate('Dashboard')
+          onPress: () => navigation.navigate('Home')
         }
       ]
     );
