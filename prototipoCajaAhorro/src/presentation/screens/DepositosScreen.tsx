@@ -5,6 +5,7 @@ import { Input } from '../components/Input';
 import { Button } from '../components/Button';
 import { Card } from '../components/Card';
 import { theme } from '../theme/theme';
+import { mockDB, Transaccion, Recibo, TipoTransaccion, EstadoTransaccion } from '../../infrastructure/persistence/MockDatabase';
 
 interface Props { navigation: any; }
 
@@ -62,13 +63,82 @@ export const DepositosScreen: React.FC<Props> = ({ navigation }) => {
       return;
     }
 
-    // Navegar a la pantalla de recibo con los datos
-    navigation.navigate('Recibo', {
-      cliente: clienteSeleccionado,
-      monto: montoNumero,
-      notas: notas,
-      tipo: 'DEPOSITO'
-    });
+    // Obtener la cuenta del cliente
+    const cuentas = mockDB.getCuentasByCliente(clienteSeleccionado.id);
+    const cuentaBasica = cuentas.find(c => c.tipo === TipoCuenta.BASICA);
+    
+    if (!cuentaBasica) {
+      Alert.alert('Error', 'El cliente no tiene una cuenta activa');
+      return;
+    }
+
+    Alert.alert(
+      'Confirmar Depósito',
+      `¿Desea realizar un depósito de $${montoNumero.toFixed(2)} a la cuenta de ${clienteSeleccionado.nombre} ${clienteSeleccionado.apellidos}?`,
+      [
+        { text: 'Cancelar' },
+        {
+          text: 'Confirmar',
+          onPress: () => {
+            const ahora = new Date();
+            const fechaActual = ahora.toISOString().split('T')[0];
+            const horaActual = ahora.toLocaleTimeString('es-EC', { hour12: false });
+            
+            // Generar IDs
+            const transaccionId = `TRX${String(mockDB.getTransacciones().length + 1).padStart(3, '0')}`;
+            const reciboId = `REC${String(mockDB.getRecibos().length + 1).padStart(3, '0')}`;
+            const numeroTransaccion = mockDB.generarNumeroTransaccion();
+            
+            // Crear transacción de depósito
+            const nuevaTransaccion: Transaccion = {
+              id: transaccionId,
+              numero: numeroTransaccion,
+              cuentaId: cuentaBasica.id,
+              clienteId: clienteSeleccionado.id,
+              tipo: TipoTransaccion.DEPOSITO,
+              monto: montoNumero,
+              saldoAnterior: cuentaBasica.saldo,
+              saldoNuevo: cuentaBasica.saldo + montoNumero,
+              estado: EstadoTransaccion.COMPLETADA,
+              fecha: fechaActual,
+              hora: horaActual,
+              concepto: notas || 'Depósito en efectivo',
+              agenteId: 'AG001',
+              recibo: numeroTransaccion,
+              notas: notas,
+            };
+            
+            mockDB.agregarTransaccion(nuevaTransaccion); // Actualiza el saldo automáticamente
+            
+            // Crear recibo
+            const nuevoRecibo: Recibo = {
+              id: reciboId,
+              numero: numeroTransaccion,
+              transaccionId: transaccionId,
+              clienteId: clienteSeleccionado.id,
+              tipo: 'Depósito',
+              monto: montoNumero,
+              fecha: fechaActual,
+              hora: horaActual,
+              estado: 'IMPRESO',
+              agenteId: 'AG001',
+            };
+            
+            mockDB.agregarRecibo(nuevoRecibo);
+            
+            // Navegar a la pantalla de recibo con los datos
+            navigation.navigate('Recibo', {
+              cliente: clienteSeleccionado,
+              monto: montoNumero,
+              notas: notas,
+              tipo: 'DEPOSITO',
+              numeroRecibo: numeroTransaccion,
+              saldoNuevo: nuevaTransaccion.saldoNuevo,
+            });
+          }
+        }
+      ]
+    );
   };
 
   const validarMonto = () => {

@@ -7,6 +7,7 @@ import { Card } from '../components/Card';
 import { ClienteSearch } from '../components/ClienteSearch';
 import { theme } from '../theme/theme';
 import { MaterialIcons } from '@expo/vector-icons';
+import { mockDB, Cliente as ClienteDB, Cuenta, Transaccion, Recibo, TipoCuenta, EstadoCuenta, TipoTransaccion, EstadoTransaccion } from '../../infrastructure/persistence/MockDatabase';
 
 interface Props { navigation: any; }
 
@@ -453,7 +454,121 @@ export const AperturaInfantilScreen: React.FC<Props> = ({ navigation }) => {
               `Titular (menor): ${menorNombre} ${menorApellido}\nCédula menor: ${menorCedula}\n\nRepresentante: ${nombreCompleto} ${tipoAdulto}\nCédula adulto: ${adultoCedula}\nCelular: ${solCelular}\n\nMonto inicial: $${monto.toFixed(2)}\nCosto de apertura: $${costoApertura.toFixed(2)}\nTotal a cobrar: $${total}`,
               [
                 { text: 'Cancelar' },
-                { text: 'Confirmar', onPress: () => navigation.goBack() }
+                { 
+                  text: 'Confirmar', 
+                  onPress: () => {
+                    const ahora = new Date();
+                    const fechaActual = ahora.toISOString().split('T')[0];
+                    const horaActual = ahora.toLocaleTimeString('es-EC', { hour12: false });
+                    
+                    let responsableId = '';
+                    
+                    // Si es cliente existente, usar su ID
+                    if (modoAdulto === 'existente' && adultoSeleccionado) {
+                      responsableId = adultoSeleccionado.id;
+                    } else {
+                      // Crear nuevo cliente adulto
+                      const clienteId = `CLI${String(mockDB.getClientes().length + 1).padStart(3, '0')}`;
+                      responsableId = clienteId;
+                      
+                      const nuevoAdulto: ClienteDB = {
+                        id: clienteId,
+                        cedula: adultoCedula,
+                        nombre: adultoNombre,
+                        apellidos: adultoApellido,
+                        fechaNacimiento: '',
+                        celular: solCelular,
+                        direccion: solDireccion,
+                        coordenadas: solDireccionData ? {
+                          latitud: solDireccionData.latitude || 0,
+                          longitud: solDireccionData.longitude || 0,
+                        } : undefined,
+                        fechaRegistro: `${fechaActual} ${horaActual}`,
+                        agente: 'AG001',
+                      };
+                      
+                      mockDB.agregarCliente(nuevoAdulto);
+                    }
+                    
+                    // Generar IDs
+                    const cuentaId = `CTA${String(mockDB.getCuentas().length + 1).padStart(3, '0')}`;
+                    const transaccionId = `TRX${String(mockDB.getTransacciones().length + 1).padStart(3, '0')}`;
+                    const reciboId = `REC${String(mockDB.getRecibos().length + 1).padStart(3, '0')}`;
+                    const numeroCuenta = mockDB.generarNumeroCuenta(TipoCuenta.INFANTIL);
+                    
+                    // Crear cuenta infantil
+                    const nuevaCuenta: Cuenta = {
+                      id: cuentaId,
+                      numeroCuenta: numeroCuenta,
+                      clienteId: responsableId, // El cliente es el responsable
+                      tipo: TipoCuenta.INFANTIL,
+                      saldo: monto,
+                      saldoDisponible: monto,
+                      estado: EstadoCuenta.ACTIVA,
+                      fechaApertura: fechaActual,
+                      montoInicial: monto,
+                      titularMenor: {
+                        cedula: menorCedula,
+                        nombre: menorNombre,
+                        apellidos: menorApellido,
+                        fechaNacimiento: menorNacimiento,
+                      },
+                      responsableId: responsableId,
+                      relacion: relacion,
+                    };
+                    
+                    mockDB.cuentas.push(nuevaCuenta);
+                    
+                    // Crear transacción
+                    const numeroTransaccion = mockDB.generarNumeroTransaccion();
+                    const nuevaTransaccion: Transaccion = {
+                      id: transaccionId,
+                      numero: numeroTransaccion,
+                      cuentaId: cuentaId,
+                      clienteId: responsableId,
+                      tipo: TipoTransaccion.APERTURA,
+                      monto: monto,
+                      saldoAnterior: 0,
+                      saldoNuevo: monto,
+                      estado: EstadoTransaccion.COMPLETADA,
+                      fecha: fechaActual,
+                      hora: horaActual,
+                      concepto: `Apertura de cuenta infantil - Menor: ${menorNombre} ${menorApellido}`,
+                      agenteId: 'AG001',
+                      recibo: numeroTransaccion,
+                    };
+                    
+                    mockDB.agregarTransaccion(nuevaTransaccion);
+                    
+                    // Crear recibo
+                    const nuevoRecibo: Recibo = {
+                      id: reciboId,
+                      numero: numeroTransaccion,
+                      transaccionId: transaccionId,
+                      clienteId: responsableId,
+                      tipo: 'Apertura de Cuenta Infantil',
+                      monto: monto,
+                      fecha: fechaActual,
+                      hora: horaActual,
+                      estado: 'IMPRESO',
+                      agenteId: 'AG001',
+                    };
+                    
+                    mockDB.agregarRecibo(nuevoRecibo);
+                    
+                    // Mostrar éxito
+                    Alert.alert(
+                      '¡Éxito!',
+                      `Cuenta infantil creada exitosamente\n\nMenor: ${menorNombre} ${menorApellido}\nResponsable: ${nombreCompleto}\nCuenta: ${numeroCuenta}\nSaldo: $${monto.toFixed(2)}`,
+                      [
+                        {
+                          text: 'Aceptar',
+                          onPress: () => navigation.goBack()
+                        }
+                      ]
+                    );
+                  }
+                }
               ]
             );
           }

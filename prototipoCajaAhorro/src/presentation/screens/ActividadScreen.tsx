@@ -3,6 +3,7 @@ import { ScrollView, StyleSheet, Text, View, TouchableOpacity, Image, ActivityIn
 import { theme } from '../theme/theme';
 import { Card } from '../components/Card';
 import { MaterialIcons } from '@expo/vector-icons';
+import { mockDB } from '../../infrastructure/persistence/MockDatabase';
 
 interface DashboardData {
   fecha: Date;
@@ -39,26 +40,59 @@ export const ActividadScreen: React.FC = () => {
     try {
       setLoading(true);
       // Simular carga de datos
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Obtener fecha actual
+      const hoy = new Date().toISOString().split('T')[0];
+      
+      // Obtener datos reales del dashboard (puedes cambiar la fecha para ver otros datos)
+      // Usar fecha de ejemplo donde hay datos: '2024-01-15'
+      const fechaDemo = '2024-01-15';
+      const dashboardData = mockDB.getDashboardData(fechaDemo, 'AG001');
+      
+      // Obtener cuentas para desglose
+      const todasCuentas = mockDB.getCuentas();
+      const cuentasBasicas = todasCuentas.filter(c => c.tipo === 'BASICA').length;
+      const cuentasInfantiles = todasCuentas.filter(c => c.tipo === 'INFANTIL').length;
+      const cuentasFuturo = todasCuentas.filter(c => c.tipo === 'AHORRO_FUTURO').length;
+      
+      // Obtener información de cobros
+      const cobranzasPendientes = mockDB.getCobranzasPendientes();
+      const cobranzasConMora = mockDB.getCobranzasConMora();
+      const totalMora = cobranzasConMora.reduce((sum, c) => sum + c.montoMora, 0);
+      
+      // Obtener préstamos
+      const prestamosActivos = mockDB.getPrestamosActivos();
+      const totalPrestamosCobrados = prestamosActivos.reduce((sum, p) => sum + (p.montoTotal - p.saldoPendiente), 0);
+      
+      // Calcular promedios
+      const todasTransacciones = dashboardData.transacciones || [];
+      const promedioTransaccion = todasTransacciones.length > 0 
+        ? dashboardData.montoTotalRecaudado / todasTransacciones.length 
+        : 0;
+      
+      const montos = todasTransacciones.map(t => t.monto);
+      const montoMayor = montos.length > 0 ? Math.max(...montos) : 0;
+      const montoMenor = montos.length > 0 ? Math.min(...montos) : 0;
 
       const mockData: DashboardData = {
-        fecha: new Date(),
-        cuentasAperturadas: 5,
-        cuentasBasicasAperturadas: 3,
-        cuentasInfantilesAperturadas: 1,
-        cuentasFuturoAperturadas: 1,
-        totalDepositos: { cantidad: 12, monto: 850 },
-        totalCobros: { cantidad: 8, monto: 400 },
-        clientesNuevos: 3,
-        clientesRecurrentes: 2,
-        montoTotalRecaudado: 1250,
-        promedioTransaccion: 62.5,
-        montoMayorTransaccion: 200,
-        montoMenorTransaccion: 25,
-        prestamosCobrados: 2,
-        montoPrestamosCobrados: 300,
-        cuotasVencidas: 1,
-        montoMoraRecaudado: 15.50,
+        fecha: new Date(fechaDemo),
+        cuentasAperturadas: dashboardData.cuentasAperturadas,
+        cuentasBasicasAperturadas: cuentasBasicas,
+        cuentasInfantilesAperturadas: cuentasInfantiles,
+        cuentasFuturoAperturadas: cuentasFuturo,
+        totalDepositos: dashboardData.totalDepositos,
+        totalCobros: dashboardData.totalCobros,
+        clientesNuevos: dashboardData.cuentasAperturadas,
+        clientesRecurrentes: dashboardData.totalDepositos.cantidad - dashboardData.cuentasAperturadas,
+        montoTotalRecaudado: dashboardData.montoTotalRecaudado,
+        promedioTransaccion: promedioTransaccion,
+        montoMayorTransaccion: montoMayor,
+        montoMenorTransaccion: montoMenor,
+        prestamosCobrados: prestamosActivos.length,
+        montoPrestamosCobrados: totalPrestamosCobrados,
+        cuotasVencidas: cobranzasConMora.length,
+        montoMoraRecaudado: totalMora,
         eficienciaCobranza: 85.5,
         tiempoPromedioTransaccion: 3.2,
       };

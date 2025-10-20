@@ -106,13 +106,6 @@ export const LoginScreen: React.FC<Props> = ({ navigation }) => {
         )}
       </View>
 
-      {/* Información de Demo */}
-      <View style={styles.demoContainer}>
-        <Text style={styles.demoTitle}>Credenciales de Demo</Text>
-        <Text style={styles.demoText}>Email: agente@santateresita.com</Text>
-        <Text style={styles.demoText}>Contraseña: 123456</Text>
-      </View>
-
       {/* Footer */}
       <View style={styles.footer}>
         <Text style={styles.footerText}>¿No tienes cuenta?</Text>

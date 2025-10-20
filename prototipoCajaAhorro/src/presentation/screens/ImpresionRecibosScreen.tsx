@@ -3,6 +3,7 @@ import { ScrollView, StyleSheet, Text, View, TouchableOpacity, Image, ActivityIn
 import { Card } from '../components/Card';
 import { theme } from '../theme/theme';
 import { MaterialIcons } from '@expo/vector-icons';
+import { mockDB, Recibo as ReciboDB } from '../../infrastructure/persistence/MockDatabase';
 
 interface Recibo {
   id: string;
@@ -27,82 +28,33 @@ export const ImpresionRecibosScreen: React.FC = () => {
     setLoading(true);
     try {
       // Simular carga de recibos impresos
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise(resolve => setTimeout(resolve, 500));
       
-      const mockRecibos: Recibo[] = [
-        {
-          id: '1',
-          numero: 'R-001-2024',
-          fecha: '2024-01-15 10:30',
-          cliente: 'María Rodríguez',
-          tipo: 'Depósito',
-          monto: 150.50,
-          estado: 'IMPRESO',
-          fechaImpresion: '2024-01-15 10:35'
-        },
-        {
-          id: '2',
-          numero: 'R-002-2024',
-          fecha: '2024-01-15 11:15',
-          cliente: 'Carlos Pérez',
-          tipo: 'Cobro',
-          monto: 275.75,
-          estado: 'IMPRESO',
-          fechaImpresion: '2024-01-15 11:20'
-        },
-        {
-          id: '3',
-          numero: 'R-003-2024',
-          fecha: '2024-01-15 12:00',
-          cliente: 'Ana García',
-          tipo: 'Depósito',
-          monto: 89.25,
-          estado: 'IMPRESO',
-          fechaImpresion: '2024-01-15 12:05'
-        },
-        {
-          id: '4',
-          numero: 'R-004-2024',
-          fecha: '2024-01-15 14:30',
-          cliente: 'Luis Martínez',
-          tipo: 'Apertura de Cuenta',
-          monto: 1.00,
-          estado: 'ENVIADO',
-          fechaImpresion: '2024-01-15 14:35'
-        },
-        {
-          id: '5',
-          numero: 'R-005-2024',
-          fecha: '2024-01-15 15:45',
-          cliente: 'Carmen López',
-          tipo: 'Cobro',
-          monto: 125.30,
-          estado: 'IMPRESO',
-          fechaImpresion: '2024-01-15 15:50'
-        },
-        {
-          id: '6',
-          numero: 'R-006-2024',
-          fecha: '2024-01-14 16:20',
-          cliente: 'Roberto Silva',
-          tipo: 'Depósito',
-          monto: 200.00,
-          estado: 'IMPRESO',
-          fechaImpresion: '2024-01-14 16:25'
-        },
-        {
-          id: '7',
-          numero: 'R-007-2024',
-          fecha: '2024-01-14 09:15',
-          cliente: 'Elena Vargas',
-          tipo: 'Cobro',
-          monto: 75.50,
-          estado: 'ENVIADO',
-          fechaImpresion: '2024-01-14 09:20'
-        }
-      ];
+      // Obtener recibos reales de la base de datos
+      const recibosDB = mockDB.getRecibos();
       
-      setRecibos(mockRecibos);
+      // Convertir al formato de la interfaz
+      const recibosConvertidos: Recibo[] = recibosDB.map((r: ReciboDB) => {
+        // Obtener información del cliente
+        const cliente = mockDB.getClienteById(r.clienteId);
+        const nombreCliente = cliente ? `${cliente.nombre} ${cliente.apellidos}` : 'Cliente Desconocido';
+        
+        return {
+          id: r.id,
+          numero: r.numero,
+          fecha: `${r.fecha} ${r.hora}`,
+          cliente: nombreCliente,
+          tipo: r.tipo,
+          monto: r.monto,
+          estado: r.estado,
+          fechaImpresion: `${r.fecha} ${r.hora}`,
+        };
+      });
+      
+      // Ordenar por fecha más reciente primero
+      recibosConvertidos.sort((a, b) => b.fecha.localeCompare(a.fecha));
+      
+      setRecibos(recibosConvertidos);
     } catch (error) {
       console.error('Error cargando recibos:', error);
     } finally {

@@ -3,6 +3,7 @@ import { ScrollView, StyleSheet, Text, View, Image, Modal, TouchableOpacity } fr
 import { Input } from '../components/Input';
 import { theme } from '../theme/theme';
 import { MaterialIcons } from '@expo/vector-icons';
+import { mockDB } from '../../infrastructure/persistence/MockDatabase';
 
 interface Cliente {
   id: string;
@@ -20,59 +21,23 @@ export const ConsultasClientesScreen: React.FC = () => {
   const [clienteSeleccionado, setClienteSeleccionado] = useState<Cliente | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
   
-  // Base de datos de clientes más completa
-  const clientes: Cliente[] = [
-    { 
-      id: '1', 
-      nombre: 'María', 
-      apellidos: 'Rodríguez', 
-      cedula: '1234567890', 
-      telefono: '0987654321',
-      numeroCuenta: 'CA-001-2024',
-      saldo: 150.50,
-      avatar: require('../assets/icon.png') 
-    },
-    { 
-      id: '2', 
-      nombre: 'Carlos', 
-      apellidos: 'Pérez', 
-      cedula: '0987654321', 
-      telefono: '0998765432',
-      numeroCuenta: 'CA-002-2024',
-      saldo: 275.75,
-      avatar: require('../assets/icon.png') 
-    },
-    { 
-      id: '3', 
-      nombre: 'Ana', 
-      apellidos: 'García', 
-      cedula: '1122334455', 
-      telefono: '0976543210',
-      numeroCuenta: 'CA-003-2024',
-      saldo: 89.25,
-      avatar: require('../assets/icon.png') 
-    },
-    { 
-      id: '4', 
-      nombre: 'Luis', 
-      apellidos: 'Martínez', 
-      cedula: '5566778899', 
-      telefono: '0965432109',
-      numeroCuenta: 'CA-004-2024',
-      saldo: 420.00,
-      avatar: require('../assets/icon.png') 
-    },
-    { 
-      id: '5', 
-      nombre: 'Carmen', 
-      apellidos: 'López', 
-      cedula: '9988776655', 
-      telefono: '0954321098',
-      numeroCuenta: 'CA-005-2024',
-      saldo: 125.30,
-      avatar: require('../assets/icon.png') 
-    },
-  ];
+  // Obtener clientes de la base de datos mock
+  const clientesDB = mockDB.getClientes();
+  const clientes: Cliente[] = clientesDB.map(clienteDB => {
+    const cuentas = mockDB.getCuentasByCliente(clienteDB.id);
+    const cuentaPrincipal = cuentas.find(c => c.tipo === 'BASICA') || cuentas[0];
+    
+    return {
+      id: clienteDB.id,
+      nombre: clienteDB.nombre,
+      apellidos: clienteDB.apellidos,
+      cedula: clienteDB.cedula,
+      telefono: clienteDB.celular,
+      numeroCuenta: cuentaPrincipal?.numeroCuenta,
+      saldo: cuentaPrincipal?.saldo,
+      avatar: require('../assets/icon.png'),
+    };
+  });
 
   // Filtrar clientes basado en la búsqueda
   const resultados = useMemo(() => {
@@ -97,72 +62,38 @@ export const ConsultasClientesScreen: React.FC = () => {
     setModalVisible(true);
   };
 
-  // Datos de ejemplo para el historial del cliente
+  // Obtener historial real del cliente desde la base de datos
   const obtenerHistorialCliente = (clienteId: string) => {
-    const historiales = {
-      '1': {
-        depositos: [
-          { fecha: '2024-01-15', monto: 50.00, concepto: 'Depósito inicial' },
-          { fecha: '2024-01-20', monto: 25.00, concepto: 'Ahorro semanal' },
-          { fecha: '2024-01-25', monto: 75.50, concepto: 'Depósito adicional' }
-        ],
-        cobros: [
-          { fecha: '2024-01-10', monto: 15.00, concepto: 'Cuota préstamo' },
-          { fecha: '2024-01-18', monto: 8.50, concepto: 'Mora préstamo' }
-        ],
-        prestamos: [
-          { fecha: '2024-01-05', monto: 200.00, saldo: 150.00, estado: 'Activo' }
-        ]
-      },
-      '2': {
-        depositos: [
-          { fecha: '2024-01-12', monto: 100.00, concepto: 'Depósito inicial' },
-          { fecha: '2024-01-22', monto: 50.00, concepto: 'Ahorro mensual' },
-          { fecha: '2024-01-28', monto: 125.75, concepto: 'Depósito adicional' }
-        ],
-        cobros: [
-          { fecha: '2024-01-08', monto: 30.00, concepto: 'Cuota préstamo' },
-          { fecha: '2024-01-20', monto: 12.00, concepto: 'Mora préstamo' }
-        ],
-        prestamos: [
-          { fecha: '2024-01-03', monto: 500.00, saldo: 275.00, estado: 'Activo' }
-        ]
-      },
-      '3': {
-        depositos: [
-          { fecha: '2024-01-18', monto: 30.00, concepto: 'Depósito inicial' },
-          { fecha: '2024-01-25', monto: 59.25, concepto: 'Ahorro semanal' }
-        ],
-        cobros: [],
-        prestamos: []
-      },
-      '4': {
-        depositos: [
-          { fecha: '2024-01-10', monto: 200.00, concepto: 'Depósito inicial' },
-          { fecha: '2024-01-20', monto: 100.00, concepto: 'Ahorro mensual' },
-          { fecha: '2024-01-30', monto: 120.00, concepto: 'Depósito adicional' }
-        ],
-        cobros: [
-          { fecha: '2024-01-15', monto: 45.00, concepto: 'Cuota préstamo' }
-        ],
-        prestamos: [
-          { fecha: '2024-01-08', monto: 800.00, saldo: 420.00, estado: 'Activo' }
-        ]
-      },
-      '5': {
-        depositos: [
-          { fecha: '2024-01-14', monto: 75.00, concepto: 'Depósito inicial' },
-          { fecha: '2024-01-24', monto: 50.30, concepto: 'Ahorro quincenal' }
-        ],
-        cobros: [
-          { fecha: '2024-01-12', monto: 20.00, concepto: 'Cuota préstamo' }
-        ],
-        prestamos: [
-          { fecha: '2024-01-06', monto: 300.00, saldo: 125.00, estado: 'Activo' }
-        ]
-      }
-    };
-    return historiales[clienteId as keyof typeof historiales] || { depositos: [], cobros: [], prestamos: [] };
+    // Obtener transacciones del cliente
+    const transacciones = mockDB.getTransaccionesByCliente(clienteId);
+    
+    // Separar por tipo
+    const depositos = transacciones
+      .filter(t => t.tipo === 'DEPOSITO')
+      .map(t => ({
+        fecha: t.fecha,
+        monto: t.monto,
+        concepto: t.concepto,
+      }));
+    
+    const cobros = transacciones
+      .filter(t => t.tipo === 'COBRO')
+      .map(t => ({
+        fecha: t.fecha,
+        monto: t.monto,
+        concepto: t.concepto,
+      }));
+    
+    // Obtener préstamos del cliente
+    const prestamosDB = mockDB.getPrestamosByCliente(clienteId);
+    const prestamos = prestamosDB.map(p => ({
+      fecha: p.fechaInicio,
+      monto: p.montoTotal,
+      saldo: p.saldoPendiente,
+      estado: p.estado === 'ACTIVO' ? 'Activo' : p.estado === 'PAGADO' ? 'Pagado' : 'Vencido',
+    }));
+    
+    return { depositos, cobros, prestamos };
   };
 
   return (

@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator
 import { Input } from './Input';
 import { Card } from './Card';
 import { theme } from '../theme/theme';
+import { mockDB, Cliente as ClienteDB, Cuenta } from '../../infrastructure/persistence/MockDatabase';
 
 interface Cliente {
   id: string;
@@ -29,37 +30,6 @@ export const ClienteSearch: React.FC<ClienteSearchProps> = ({
   const [resultados, setResultados] = useState<Cliente[]>([]);
   const [loading, setLoading] = useState(false);
 
-  // Datos de ejemplo - en producción vendría de un servicio
-  const clientesEjemplo: Cliente[] = [
-    {
-      id: '1',
-      cedula: '1234567890',
-      nombre: 'Juan Carlos',
-      apellidos: 'Pérez González',
-      celular: '+593 987654321',
-      numeroCuenta: 'AH-001-2024',
-      saldo: 150.50
-    },
-    {
-      id: '2',
-      cedula: '0987654321',
-      nombre: 'María Elena',
-      apellidos: 'Gómez Rodríguez',
-      celular: '+593 912345678',
-      numeroCuenta: 'AH-002-2024',
-      saldo: 75.25
-    },
-    {
-      id: '3',
-      cedula: '1122334455',
-      nombre: 'Carlos Alberto',
-      apellidos: 'Martínez López',
-      celular: '+593 998877665',
-      numeroCuenta: 'AH-003-2024',
-      saldo: 200.00
-    }
-  ];
-
   useEffect(() => {
     if (busqueda.length >= 3) {
       buscarClientes();
@@ -71,18 +41,50 @@ export const ClienteSearch: React.FC<ClienteSearchProps> = ({
   const buscarClientes = async () => {
     setLoading(true);
     
-    // Simular búsqueda con delay
+    // Simular búsqueda con delay para mejor UX
     setTimeout(() => {
-      const resultadosFiltrados = clientesEjemplo.filter(cliente => 
-        cliente.cedula.includes(busqueda) ||
-        cliente.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
-        cliente.apellidos.toLowerCase().includes(busqueda.toLowerCase()) ||
-        cliente.numeroCuenta?.includes(busqueda)
-      );
+      // Buscar clientes en la base de datos mock
+      const clientesDB = mockDB.buscarClientes(busqueda);
       
-      setResultados(resultadosFiltrados);
+      // Convertir clientes de DB a formato de la interfaz
+      const clientesConCuentas = clientesDB.map((clienteDB: ClienteDB) => {
+        // Obtener cuenta principal del cliente
+        const cuentas = mockDB.getCuentasByCliente(clienteDB.id);
+        const cuentaPrincipal = cuentas.find((c: Cuenta) => c.tipo === 'BASICA') || cuentas[0];
+        
+        return {
+          id: clienteDB.id,
+          cedula: clienteDB.cedula,
+          nombre: clienteDB.nombre,
+          apellidos: clienteDB.apellidos,
+          celular: clienteDB.celular,
+          numeroCuenta: cuentaPrincipal?.numeroCuenta,
+          saldo: cuentaPrincipal?.saldo,
+        };
+      });
+      
+      // También buscar por número de cuenta
+      if (busqueda.startsWith('AH') || busqueda.startsWith('AI') || busqueda.startsWith('AF')) {
+        const cuenta = mockDB.getCuentaByNumero(busqueda);
+        if (cuenta) {
+          const cliente = mockDB.getClienteById(cuenta.clienteId);
+          if (cliente && !clientesConCuentas.find((c: Cliente) => c.id === cliente.id)) {
+            clientesConCuentas.push({
+              id: cliente.id,
+              cedula: cliente.cedula,
+              nombre: cliente.nombre,
+              apellidos: cliente.apellidos,
+              celular: cliente.celular,
+              numeroCuenta: cuenta.numeroCuenta,
+              saldo: cuenta.saldo,
+            });
+          }
+        }
+      }
+      
+      setResultados(clientesConCuentas);
       setLoading(false);
-    }, 500);
+    }, 300);
   };
 
   const handleClienteSelect = (cliente: Cliente) => {

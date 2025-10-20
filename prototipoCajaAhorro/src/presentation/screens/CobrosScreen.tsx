@@ -4,6 +4,7 @@ import { ClienteSearch } from '../components/ClienteSearch';
 import { Button } from '../components/Button';
 import { Card } from '../components/Card';
 import { theme } from '../theme/theme';
+import { mockDB, Cobranza as CobranzaDB } from '../../infrastructure/persistence/MockDatabase';
 
 interface Props { navigation: any; }
 
@@ -35,35 +36,31 @@ export const CobrosScreen: React.FC<Props> = ({ navigation }) => {
   const [montoSeleccionado, setMontoSeleccionado] = useState<number>(0);
   const [cobranzaSeleccionada, setCobranzaSeleccionada] = useState<string | null>(null);
 
-  // Datos de ejemplo de cobranzas
-  const cobranzasEjemplo: Cobranza[] = [
-    {
-      id: '1',
-      concepto: 'Préstamo Personal',
-      montoPendiente: 150.00,
-      montoMora: 25.50,
-      montoInteres: 12.00,
-      fechaVencimiento: '2024-01-15',
-      diasMora: 5,
-      numeroCuota: 3,
-      tipo: 'CUOTA_PRESTAMO'
-    },
-    {
-      id: '2',
-      concepto: 'Préstamo Personal',
-      montoPendiente: 150.00,
-      montoMora: 0,
-      montoInteres: 12.00,
-      fechaVencimiento: '2024-02-15',
-      diasMora: 0,
-      numeroCuota: 4,
-      tipo: 'CUOTA_PRESTAMO'
-    }
-  ];
-
   const handleClienteSelect = (cliente: Cliente) => {
     setClienteSeleccionado(cliente);
-    setCobranzas(cobranzasEjemplo);
+    
+    // Obtener cobranzas reales del cliente desde la base de datos
+    const cobranzasDB = mockDB.getCobranzasByCliente(cliente.id);
+    const cobranzasPendientes = cobranzasDB.filter((c: CobranzaDB) => !c.pagado);
+    
+    // Convertir al formato de la interfaz
+    const cobranzasConvertidas: Cobranza[] = cobranzasPendientes.map((c: CobranzaDB) => {
+      const prestamo = mockDB.getPrestamos().find(p => p.id === c.prestamoId);
+      
+      return {
+        id: c.id,
+        concepto: prestamo ? `Préstamo ${prestamo.numero}` : 'Préstamo Personal',
+        montoPendiente: c.montoCuota,
+        montoMora: c.montoMora,
+        montoInteres: c.montoInteres,
+        fechaVencimiento: c.fechaVencimiento,
+        diasMora: c.diasMora,
+        numeroCuota: c.numeroCuota,
+        tipo: 'CUOTA_PRESTAMO',
+      };
+    });
+    
+    setCobranzas(cobranzasConvertidas);
     setCobranzaSeleccionada(null);
     setMontoSeleccionado(0);
   };
@@ -90,13 +87,91 @@ export const CobrosScreen: React.FC<Props> = ({ navigation }) => {
       return;
     }
 
-    // Navegar a la pantalla de recibo con los datos
-    navigation.navigate('Recibo', {
-      cliente: clienteSeleccionado,
-      cobranza: cobranzas.find(c => c.id === cobranzaSeleccionada),
-      monto: montoSeleccionado,
-      tipo: 'COBRO'
-    });
+    const cobranzaAPagar = cobranzas.find(c => c.id === cobranzaSeleccionada);
+    if (!cobranzaAPagar) return;
+
+    Alert.alert(
+      'Confirmar Cobro',
+      `¿Desea registrar el pago de $${montoSeleccionado.toFixed(2)} para ${clienteSeleccionado.nombre} ${clienteSeleccionado.apellidos}?\n\nCuota ${cobranzaAPagar.numeroCuota}\nMonto: $${cobranzaAPagar.montoPendiente.toFixed(2)}\nInterés: $${cobranzaAPagar.montoInteres.toFixed(2)}\nMora: $${cobranzaAPagar.montoMora.toFixed(2)}\nTotal: $${montoSeleccionado.toFixed(2)}`,
+      [
+        { text: 'Cancelar' },
+        {
+          text: 'Confirmar',
+          onPress: () => {
+            const ahora = new Date();
+            const fechaActual = ahora.toISOString().split('T')[0];
+            const horaActual = ahora.toLocaleTimeString('es-EC', { hour12: false });
+            
+            // Obtener cuenta del cliente
+            const cuentas = mockDB.getCuentasByCliente(clienteSeleccionado.id);
+            const cuentaBasica = cuentas.find(c => c.tipo === TipoCuenta.BASICA);
+            
+            if (!cuentaBasica) {
+              Alert.alert('Error', 'El cliente no tiene cuenta');
+              return;
+            }
+            
+            // Generar IDs
+            const transaccionId = `TRX${String(mockDB.getTransacciones().length + 1).padStart(3, '0')}`;
+            const reciboId = `REC${String(mockDB.getRecibos().length + 1).padStart(3, '0')}`;
+            const numeroTransaccion = mockDB.generarNumeroTransaccion();
+            
+            // Crear transacción de cobro
+            const nuevaTransaccion: Transaccion = {
+              id: transaccionId,
+              numero: numeroTransaccion,
+              cuentaId: cuentaBasica.id,
+              clienteId: clienteSeleccionado.id,
+              tipo: TipoTransaccion.COBRO,
+              monto: montoSeleccionado,
+              saldoAnterior: cuentaBasica.saldo,
+              saldoNuevo: cuentaBasica.saldo - montoSeleccionado,
+              estado: EstadoTransaccion.COMPLETADA,
+              fecha: fechaActual,
+              hora: horaActual,
+              concepto: `Pago cuota ${cobranzaAPagar.numeroCuota} - ${cobranzaAPagar.concepto}`,
+              agenteId: 'AG001',
+              recibo: numeroTransaccion,
+            };
+            
+            mockDB.agregarTransaccion(nuevaTransaccion);
+            
+            // Marcar cobranza como pagada
+            const cobranzaDB = mockDB.getCobranzas().find(c => c.id === cobranzaSeleccionada);
+            if (cobranzaDB) {
+              cobranzaDB.pagado = true;
+              cobranzaDB.fechaPago = fechaActual;
+            }
+            
+            // Crear recibo
+            const nuevoRecibo: Recibo = {
+              id: reciboId,
+              numero: numeroTransaccion,
+              transaccionId: transaccionId,
+              clienteId: clienteSeleccionado.id,
+              tipo: 'Cobro',
+              monto: montoSeleccionado,
+              fecha: fechaActual,
+              hora: horaActual,
+              estado: 'IMPRESO',
+              agenteId: 'AG001',
+            };
+            
+            mockDB.agregarRecibo(nuevoRecibo);
+            
+            // Navegar a la pantalla de recibo con los datos
+            navigation.navigate('Recibo', {
+              cliente: clienteSeleccionado,
+              cobranza: cobranzaAPagar,
+              monto: montoSeleccionado,
+              tipo: 'COBRO',
+              numeroRecibo: numeroTransaccion,
+              saldoNuevo: nuevaTransaccion.saldoNuevo,
+            });
+          }
+        }
+      ]
+    );
   };
 
   const calcularTotalCobranzas = () => {

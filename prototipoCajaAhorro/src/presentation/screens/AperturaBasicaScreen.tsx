@@ -6,6 +6,7 @@ import { Button } from '../components/Button';
 import { Card } from '../components/Card';
 import { theme } from '../theme/theme';
 import { MaterialIcons } from '@expo/vector-icons';
+import { mockDB, Cliente, Cuenta, Transaccion, Recibo, TipoCuenta, EstadoCuenta, TipoTransaccion, EstadoTransaccion, ReferenciaPersonal as RefPersonalDB } from '../../infrastructure/persistence/MockDatabase';
 
 interface Props { navigation: any; }
 
@@ -326,12 +327,126 @@ export const AperturaBasicaScreen: React.FC<Props> = ({ navigation }) => {
               const monto = parseFloat((montoInicial || '').replace(/,/g, '.'));
               const costoApertura = 1;
               const total = (monto + costoApertura).toFixed(2);
+              
               Alert.alert(
                 'Apertura de Cuenta',
                 `Titular: ${nombre} ${apellido}\nMonto inicial: $${monto.toFixed(2)}\nCosto de apertura: $${costoApertura.toFixed(2)}\nTotal a cobrar: $${total}`,
                 [
                   { text: 'Cancelar' },
-                  { text: 'Confirmar', onPress: () => navigation.goBack() }
+                  { 
+                    text: 'Confirmar', 
+                    onPress: () => {
+                      // Generar IDs
+                      const clienteId = `CLI${String(mockDB.getClientes().length + 1).padStart(3, '0')}`;
+                      const cuentaId = `CTA${String(mockDB.getCuentas().length + 1).padStart(3, '0')}`;
+                      const transaccionId = `TRX${String(mockDB.getTransacciones().length + 1).padStart(3, '0')}`;
+                      const reciboId = `REC${String(mockDB.getRecibos().length + 1).padStart(3, '0')}`;
+                      
+                      const ahora = new Date();
+                      const fechaActual = ahora.toISOString().split('T')[0];
+                      const horaActual = ahora.toLocaleTimeString('es-EC', { hour12: false });
+                      
+                      // Crear cliente
+                      const nuevoCliente: Cliente = {
+                        id: clienteId,
+                        cedula: cedula,
+                        nombre: nombre,
+                        apellidos: apellido,
+                        fechaNacimiento: fecha,
+                        celular: celular,
+                        direccion: direccion,
+                        coordenadas: direccionData ? {
+                          latitud: direccionData.latitude || 0,
+                          longitud: direccionData.longitude || 0,
+                        } : undefined,
+                        fechaRegistro: `${fechaActual} ${horaActual}`,
+                        agente: 'AG001', // Agente por defecto
+                      };
+                      
+                      mockDB.agregarCliente(nuevoCliente);
+                      
+                      // Agregar referencias personales
+                      referencias.forEach(ref => {
+                        const referenciaDB: RefPersonalDB = {
+                          id: `REF${String(mockDB.getClientes().length + referencias.indexOf(ref) + 1).padStart(3, '0')}`,
+                          clienteId: clienteId,
+                          nombre: ref.nombre,
+                          telefono: ref.telefono,
+                          parentesco: ref.relacion,
+                        };
+                        mockDB.referencias.push(referenciaDB);
+                      });
+                      
+                      // Generar número de cuenta
+                      const numeroCuenta = mockDB.generarNumeroCuenta(TipoCuenta.BASICA);
+                      
+                      // Crear cuenta
+                      const nuevaCuenta: Cuenta = {
+                        id: cuentaId,
+                        numeroCuenta: numeroCuenta,
+                        clienteId: clienteId,
+                        tipo: TipoCuenta.BASICA,
+                        saldo: monto,
+                        saldoDisponible: monto,
+                        estado: EstadoCuenta.ACTIVA,
+                        fechaApertura: fechaActual,
+                        montoInicial: monto,
+                      };
+                      
+                      mockDB.cuentas.push(nuevaCuenta);
+                      
+                      // Generar número de transacción
+                      const numeroTransaccion = mockDB.generarNumeroTransaccion();
+                      
+                      // Crear transacción
+                      const nuevaTransaccion: Transaccion = {
+                        id: transaccionId,
+                        numero: numeroTransaccion,
+                        cuentaId: cuentaId,
+                        clienteId: clienteId,
+                        tipo: TipoTransaccion.APERTURA,
+                        monto: monto,
+                        saldoAnterior: 0,
+                        saldoNuevo: monto,
+                        estado: EstadoTransaccion.COMPLETADA,
+                        fecha: fechaActual,
+                        hora: horaActual,
+                        concepto: 'Apertura de cuenta de ahorro básica',
+                        agenteId: 'AG001',
+                        recibo: numeroTransaccion,
+                      };
+                      
+                      mockDB.agregarTransaccion(nuevaTransaccion);
+                      
+                      // Crear recibo
+                      const nuevoRecibo: Recibo = {
+                        id: reciboId,
+                        numero: numeroTransaccion,
+                        transaccionId: transaccionId,
+                        clienteId: clienteId,
+                        tipo: 'Apertura de Cuenta',
+                        monto: monto,
+                        fecha: fechaActual,
+                        hora: horaActual,
+                        estado: 'IMPRESO',
+                        agenteId: 'AG001',
+                      };
+                      
+                      mockDB.agregarRecibo(nuevoRecibo);
+                      
+                      // Mostrar éxito
+                      Alert.alert(
+                        '¡Éxito!',
+                        `Cuenta creada exitosamente\n\nCliente: ${nombre} ${apellido}\nCuenta: ${numeroCuenta}\nSaldo: $${monto.toFixed(2)}`,
+                        [
+                          {
+                            text: 'Aceptar',
+                            onPress: () => navigation.goBack()
+                          }
+                        ]
+                      );
+                    }
+                  }
                 ]
               );
             }
