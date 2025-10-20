@@ -57,8 +57,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <Text style={styles.title}>Nuestros Servicios</Text>
         <Text style={styles.subtitle}>Selecciona el servicio que deseas realizar</Text>
-        <View style={{ height: theme.spacing.lg }} />
-        {services.map((service, idx) => (
+        <View style={styles.servicesContainer}>
+          {services.map((service, idx) => (
           <TouchableOpacity 
             key={idx} 
             style={styles.serviceItem} 
@@ -74,7 +74,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
             </View>
             <MaterialIcons name="chevron-right" size={24} color={theme.colors.border} />
           </TouchableOpacity>
-        ))}
+          ))}
+        </View>
       </ScrollView>
     </View>
   );
@@ -86,9 +87,13 @@ const styles = StyleSheet.create({
   topTitle: { fontSize: 18, fontWeight: '800', color: theme.colors.text },
   title: { fontSize: 28, fontWeight: '900', color: theme.colors.primary, textAlign: 'center' },
   subtitle: { textAlign: 'center', color: theme.colors.subtitle, marginTop: 4 },
-  scrollContent: { padding: 16, paddingBottom: 24 }, 
+  scrollContent: { padding: 16, paddingBottom: 24, flexGrow: 1 }, 
   sectionTitle: { fontSize: 22, fontWeight: '800', color: theme.colors.text },
   logo: { width: 340, height: 36, resizeMode: 'contain', alignSelf: 'center' },
+  servicesContainer: {
+    marginTop: 25,
+    paddingHorizontal: 8,
+  },
   serviceItem: {
     flexDirection: 'row',
     alignItems: 'center',
