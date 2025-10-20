@@ -18,11 +18,14 @@ interface ReferenciaPersonal {
 
 export const AperturaBasicaScreen: React.FC<Props> = ({ navigation }) => {
   const [nombre, setNombre] = useState('');
+  const [apellido, setApellido] = useState('');
   const [cedula, setCedula] = useState('');
   const [direccion, setDireccion] = useState('');
   const [direccionData, setDireccionData] = useState<any>(null);
+  const [direccionManual, setDireccionManual] = useState(false);
   const [celular, setCelular] = useState('+593 ');
   const [fecha, setFecha] = useState('');
+  const [montoInicial, setMontoInicial] = useState('');
   const [referencias, setReferencias] = useState<ReferenciaPersonal[]>([]);
   const [refNombre, setRefNombre] = useState('');
   const [refTel, setRefTel] = useState('+593 ');
@@ -113,6 +116,31 @@ export const AperturaBasicaScreen: React.FC<Props> = ({ navigation }) => {
     return true;
   };
 
+  const validateNombreApellido = () => {
+    if (!nombre.trim() || !apellido.trim()) {
+      Alert.alert('Error de validación', 'Nombres y Apellidos son requeridos', [{ text: 'Aceptar' }]);
+      return false;
+    }
+    if (nombre.length > 100 || apellido.length > 100) {
+      Alert.alert('Error de validación', 'Nombres y Apellidos no deben superar 100 caracteres', [{ text: 'Aceptar' }]);
+      return false;
+    }
+    return true;
+  };
+
+  const validateMontoInicial = () => {
+    const parsed = parseFloat((montoInicial || '').replace(/,/g, '.'));
+    if (isNaN(parsed) || parsed < 10) {
+      Alert.alert(
+        'Monto inicial inválido',
+        'El monto inicial debe ser al menos $10.00',
+        [{ text: 'Aceptar' }]
+      );
+      return false;
+    }
+    return true;
+  };
+
   const validateRefTel = () => {
     const phoneNumber = refTel.replace(/[^\d]/g, '');
     if (phoneNumber.length !== 13) { // +593 + 10 dígitos
@@ -168,7 +196,8 @@ export const AperturaBasicaScreen: React.FC<Props> = ({ navigation }) => {
       <ScrollView contentContainerStyle={styles.content}>
         <Text style={styles.title}>Cuenta de Ahorro Básica</Text>
 
-        <Input label="Nombres y Apellidos" placeholder="Ingrese su nombre completo" value={nombre} onChangeText={setNombre} />
+        <Input label="Nombres" placeholder="Ingrese sus nombres" value={nombre} onChangeText={(t)=> t.length<=100 && setNombre(t)} />
+        <Input label="Apellidos" placeholder="Ingrese sus apellidos" value={apellido} onChangeText={(t)=> t.length<=100 && setApellido(t)} />
         <Input 
           label="Número de Cédula" 
           placeholder="Ingrese su número de cédula" 
@@ -176,22 +205,58 @@ export const AperturaBasicaScreen: React.FC<Props> = ({ navigation }) => {
           onChangeText={handleCedulaChange}
           keyboardType="numeric"
         />
-        <AddressPicker 
-          label="Dirección" 
-          placeholder="Seleccionar ubicación en el mapa"
-          value={direccion}
-          onAddressSelect={(addressData) => {
-            setDireccionData(addressData);
-            setDireccion(addressData.formattedAddress);
-          }}
-          required
-        />
+        <View style={styles.direccionContainer}>
+          <Text style={styles.direccionLabel}>Dirección</Text>
+          <View style={styles.direccionOptions}>
+            <TouchableOpacity 
+              style={[styles.direccionOption, !direccionManual && styles.direccionOptionSelected]}
+              onPress={() => setDireccionManual(false)}
+            >
+              <MaterialIcons name="map" size={20} color={!direccionManual ? '#fff' : theme.colors.primary} />
+              <Text style={[styles.direccionOptionText, !direccionManual && styles.direccionOptionTextSelected]}>
+                Mapa
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={[styles.direccionOption, direccionManual && styles.direccionOptionSelected]}
+              onPress={() => setDireccionManual(true)}
+            >
+              <MaterialIcons name="edit" size={20} color={direccionManual ? '#fff' : theme.colors.primary} />
+              <Text style={[styles.direccionOptionText, direccionManual && styles.direccionOptionTextSelected]}>
+                Manual
+              </Text>
+            </TouchableOpacity>
+          </View>
+          
+          {!direccionManual ? (
+            <AddressPicker 
+              label=""
+              placeholder="Seleccionar ubicación en el mapa"
+              value={direccion}
+              onAddressSelect={(addressData) => {
+                setDireccionData(addressData);
+                setDireccion(addressData.formattedAddress);
+              }}
+              required
+            />
+          ) : (
+            <Input 
+              label=""
+              placeholder="Ingrese su dirección completa"
+              value={direccion}
+              onChangeText={setDireccion}
+              multiline
+              numberOfLines={3}
+            />
+          )}
+        </View>
 
         <Input 
           label="Número de Celular" 
           placeholder="+593 9XXXXXXXXX" 
           value={celular} 
           onChangeText={handleCelularChange}
+          keyboardType="numeric"
         />
         <DatePicker 
           label="Fecha de Nacimiento" 
@@ -199,6 +264,14 @@ export const AperturaBasicaScreen: React.FC<Props> = ({ navigation }) => {
           value={fecha}
           onDateSelect={setFecha}
           required
+        />
+
+        <Input 
+          label="Monto Inicial ($)" 
+          placeholder="10.00" 
+          value={montoInicial}
+          onChangeText={setMontoInicial}
+          keyboardType="numeric"
         />
 
         <Text style={styles.section}>Referencias Personales</Text>
@@ -233,6 +306,7 @@ export const AperturaBasicaScreen: React.FC<Props> = ({ navigation }) => {
               placeholder="+593 9XXXXXXXXX" 
               value={refTel} 
               onChangeText={handleRefTelChange}
+              keyboardType="numeric"
             />
             <Input label="Relación" placeholder="Relación con la referencia" value={refRel} onChangeText={setRefRel} />
             <Button 
@@ -248,8 +322,18 @@ export const AperturaBasicaScreen: React.FC<Props> = ({ navigation }) => {
         <Button 
           title="Guardar" 
           onPress={() => {
-            if (validateCedula() && validateCelular()) {
-              navigation.goBack();
+            if (validateCedula() && validateCelular() && validateNombreApellido() && validateMontoInicial()) {
+              const monto = parseFloat((montoInicial || '').replace(/,/g, '.'));
+              const costoApertura = 1;
+              const total = (monto + costoApertura).toFixed(2);
+              Alert.alert(
+                'Apertura de Cuenta',
+                `Titular: ${nombre} ${apellido}\nMonto inicial: $${monto.toFixed(2)}\nCosto de apertura: $${costoApertura.toFixed(2)}\nTotal a cobrar: $${total}`,
+                [
+                  { text: 'Cancelar' },
+                  { text: 'Confirmar', onPress: () => navigation.goBack() }
+                ]
+              );
             }
           }} 
           fullWidth 
@@ -301,6 +385,45 @@ const styles = StyleSheet.create({
     color: theme.colors.text,
     marginBottom: theme.spacing.md,
     textAlign: 'center',
+  },
+  direccionContainer: {
+    marginBottom: theme.spacing.md,
+  },
+  direccionLabel: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: theme.colors.text,
+    marginBottom: 8,
+  },
+  direccionOptions: {
+    flexDirection: 'row',
+    marginBottom: theme.spacing.sm,
+  },
+  direccionOption: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    marginHorizontal: 4,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.background,
+  },
+  direccionOptionSelected: {
+    backgroundColor: theme.colors.primary,
+    borderColor: theme.colors.primary,
+  },
+  direccionOptionText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: theme.colors.text,
+    marginLeft: 6,
+  },
+  direccionOptionTextSelected: {
+    color: '#fff',
   },
 });
 

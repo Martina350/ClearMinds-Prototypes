@@ -118,7 +118,7 @@ export const AhorroFuturoScreen: React.FC<Props> = ({ navigation }) => {
           onPress={() => setTipoPago('mensualizado')}
         />
         <PagoOption
-          label="Vencimiento Intereses"
+          label="Vencimiento de Intereses"
           selected={tipoPago === 'vencimiento'}
           onPress={() => setTipoPago('vencimiento')}
         />

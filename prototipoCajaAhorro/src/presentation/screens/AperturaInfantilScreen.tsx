@@ -11,14 +11,19 @@ interface Props { navigation: any; }
 
 export const AperturaInfantilScreen: React.FC<Props> = ({ navigation }) => {
   const [solNombre, setSolNombre] = useState('');
+  const [solApellido, setSolApellido] = useState('');
   const [solCedula, setSolCedula] = useState('');
   const [solDireccion, setSolDireccion] = useState('');
   const [solDireccionData, setSolDireccionData] = useState<any>(null);
+  const [direccionManual, setDireccionManual] = useState(false);
   const [solCelular, setSolCelular] = useState('+593 ');
+  const [montoInicial, setMontoInicial] = useState('');
   const [menorNombre, setMenorNombre] = useState('');
+  const [menorApellido, setMenorApellido] = useState('');
   const [menorCedula, setMenorCedula] = useState('');
   const [menorNacimiento, setMenorNacimiento] = useState('');
   const [adultoNombre, setAdultoNombre] = useState('');
+  const [adultoApellido, setAdultoApellido] = useState('');
   const [adultoCedula, setAdultoCedula] = useState('');
   const [relacion, setRelacion] = useState('');
   const [showRelacionDropdown, setShowRelacionDropdown] = useState(false);
@@ -78,11 +83,36 @@ export const AperturaInfantilScreen: React.FC<Props> = ({ navigation }) => {
     return true;
   };
 
+  const validateNombresApellidos = () => {
+    if (!menorNombre.trim() || !menorApellido.trim() || !adultoNombre.trim() || !adultoApellido.trim()) {
+      Alert.alert('Error de validación', 'Todos los nombres y apellidos son requeridos', [{ text: 'Aceptar' }]);
+      return false;
+    }
+    if (menorNombre.length > 100 || menorApellido.length > 100 || adultoNombre.length > 100 || adultoApellido.length > 100) {
+      Alert.alert('Error de validación', 'Cada campo de nombres y apellidos no debe superar 100 caracteres', [{ text: 'Aceptar' }]);
+      return false;
+    }
+    return true;
+  };
+
   const validateCedula = () => {
     if (solCedula.length !== 10) {
       Alert.alert(
         'Error de validación',
         'El número de cédula debe tener exactamente 10 dígitos',
+        [{ text: 'Aceptar' }]
+      );
+      return false;
+    }
+    return true;
+  };
+
+  const validateMontoInicial = () => {
+    const parsed = parseFloat((montoInicial || '').replace(/,/g, '.'));
+    if (isNaN(parsed) || parsed < 10) {
+      Alert.alert(
+        'Monto inicial inválido',
+        'El monto inicial debe ser al menos $10.00',
         [{ text: 'Aceptar' }]
       );
       return false;
@@ -116,7 +146,8 @@ export const AperturaInfantilScreen: React.FC<Props> = ({ navigation }) => {
   return (
     <ScrollView style={styles.container} contentContainerStyle={{ padding: theme.spacing.lg }}>
       <Text style={styles.header}>Datos del Menor</Text>
-      <Input label="Nombre del Menor" placeholder="Ingresa el nombre del menor" value={menorNombre} onChangeText={setMenorNombre} />
+      <Input label="Nombres del Menor" placeholder="Ingresa los nombres del menor" value={menorNombre} onChangeText={(t)=> t.length<=100 && setMenorNombre(t)} />
+      <Input label="Apellidos del Menor" placeholder="Ingresa los apellidos del menor" value={menorApellido} onChangeText={(t)=> t.length<=100 && setMenorApellido(t)} />
       <Input 
         label="Número de Cédula" 
         placeholder="Ingresa la cédula/ID del menor" 
@@ -124,16 +155,51 @@ export const AperturaInfantilScreen: React.FC<Props> = ({ navigation }) => {
         onChangeText={handleCedulaChange}
         keyboardType="numeric"
       />
-      <AddressPicker 
-        label="Dirección" 
-        placeholder="Seleccionar ubicación en el mapa"
-        value={solDireccion}
-        onAddressSelect={(addressData) => {
-          setSolDireccionData(addressData);
-          setSolDireccion(addressData.formattedAddress);
-        }}
-        required
-      />
+      <View style={styles.direccionContainer}>
+        <Text style={styles.direccionLabel}>Dirección</Text>
+        <View style={styles.direccionOptions}>
+          <TouchableOpacity 
+            style={[styles.direccionOption, !direccionManual && styles.direccionOptionSelected]}
+            onPress={() => setDireccionManual(false)}
+          >
+            <MaterialIcons name="map" size={20} color={!direccionManual ? '#fff' : theme.colors.primary} />
+            <Text style={[styles.direccionOptionText, !direccionManual && styles.direccionOptionTextSelected]}>
+              Mapa
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={[styles.direccionOption, direccionManual && styles.direccionOptionSelected]}
+            onPress={() => setDireccionManual(true)}
+          >
+            <MaterialIcons name="edit" size={20} color={direccionManual ? '#fff' : theme.colors.primary} />
+            <Text style={[styles.direccionOptionText, direccionManual && styles.direccionOptionTextSelected]}>
+              Manual
+            </Text>
+          </TouchableOpacity>
+        </View>
+        
+        {!direccionManual ? (
+          <AddressPicker 
+            label=""
+            placeholder="Seleccionar ubicación en el mapa"
+            value={solDireccion}
+            onAddressSelect={(addressData) => {
+              setSolDireccionData(addressData);
+              setSolDireccion(addressData.formattedAddress);
+            }}
+            required
+          />
+        ) : (
+          <Input 
+            label=""
+            placeholder="Ingrese la dirección completa"
+            value={solDireccion}
+            onChangeText={setSolDireccion}
+            multiline
+            numberOfLines={3}
+          />
+        )}
+      </View>
       <DatePicker 
         label="Fecha de Nacimiento del Menor" 
         placeholder="Selecciona la fecha de nacimiento del menor"
@@ -143,7 +209,8 @@ export const AperturaInfantilScreen: React.FC<Props> = ({ navigation }) => {
       />
 
       <Text style={styles.header}>Datos del Adulto Responsable</Text>
-      <Input label="Nombre del Adulto Responsable" placeholder="Ingresa el nombre del adulto responsable" value={adultoNombre} onChangeText={setAdultoNombre} />
+      <Input label="Nombres del Adulto Responsable" placeholder="Ingresa los nombres del adulto responsable" value={adultoNombre} onChangeText={(t)=> t.length<=100 && setAdultoNombre(t)} />
+      <Input label="Apellidos del Adulto Responsable" placeholder="Ingresa los apellidos del adulto responsable" value={adultoApellido} onChangeText={(t)=> t.length<=100 && setAdultoApellido(t)} />
       <Input 
         label="Cédula/ID del Adulto Responsable" 
         placeholder="Ingresa la cédula/ID del adulto responsable" 
@@ -156,6 +223,14 @@ export const AperturaInfantilScreen: React.FC<Props> = ({ navigation }) => {
         placeholder="+593 9XXXXXXXXX" 
         value={solCelular} 
         onChangeText={handleCelularChange}
+        keyboardType="numeric"
+      />
+      <Input 
+        label="Monto Inicial ($)" 
+        placeholder="10.00" 
+        value={montoInicial}
+        onChangeText={setMontoInicial}
+        keyboardType="numeric"
       />
       <View style={styles.relacionContainer}>
         <Text style={styles.relacionLabel}>Relación con el menor</Text>
@@ -206,8 +281,18 @@ export const AperturaInfantilScreen: React.FC<Props> = ({ navigation }) => {
       <Button 
         title="Guardar" 
         onPress={() => {
-          if (validateCelular()) {
-            navigation.goBack();
+          if (validateCelular() && validateMontoInicial() && validateNombresApellidos()) {
+            const monto = parseFloat((montoInicial || '').replace(/,/g, '.'));
+            const costoApertura = 1;
+            const total = (monto + costoApertura).toFixed(2);
+            Alert.alert(
+              'Apertura de Cuenta Infantil',
+              `Titular (menor): ${menorNombre} ${menorApellido}\nRepresentante: ${adultoNombre} ${adultoApellido}\nMonto inicial: $${monto.toFixed(2)}\nCosto de apertura: $${costoApertura.toFixed(2)}\nTotal a cobrar: $${total}`,
+              [
+                { text: 'Cancelar' },
+                { text: 'Confirmar', onPress: () => navigation.goBack() }
+              ]
+            );
           }
         }} 
         fullWidth 
@@ -284,6 +369,45 @@ const styles = StyleSheet.create({
     color: theme.colors.text,
     marginTop: 0,
     marginBottom: 0,
+  },
+  direccionContainer: {
+    marginBottom: theme.spacing.md,
+  },
+  direccionLabel: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: theme.colors.text,
+    marginBottom: 8,
+  },
+  direccionOptions: {
+    flexDirection: 'row',
+    marginBottom: theme.spacing.sm,
+  },
+  direccionOption: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    marginHorizontal: 4,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.background,
+  },
+  direccionOptionSelected: {
+    backgroundColor: theme.colors.primary,
+    borderColor: theme.colors.primary,
+  },
+  direccionOptionText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: theme.colors.text,
+    marginLeft: 6,
+  },
+  direccionOptionTextSelected: {
+    color: '#fff',
   },
 });
 

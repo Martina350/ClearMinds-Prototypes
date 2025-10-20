@@ -305,7 +305,7 @@ export const AddressPicker: React.FC<AddressPickerProps> = ({
     <View style={styles.container}>
       <Text style={styles.label}>
         {label}
-        {required && <Text style={styles.required}> *</Text>}
+        {required && <Text style={styles.required}></Text>}
       </Text>
       
       <TouchableOpacity
