@@ -12,7 +12,7 @@ interface Cliente {
   telefono: string;
   numeroCuenta?: string;
   saldo?: number;
-  avatar: string;
+  avatar: any;
 }
 
 export const ConsultasClientesScreen: React.FC = () => {
@@ -30,7 +30,7 @@ export const ConsultasClientesScreen: React.FC = () => {
       telefono: '0987654321',
       numeroCuenta: 'CA-001-2024',
       saldo: 150.50,
-      avatar: 'https://dummyimage.com/80x80/fbe9e7/ffffff&text=👩' 
+      avatar: require('../assets/icon.png') 
     },
     { 
       id: '2', 
@@ -40,7 +40,7 @@ export const ConsultasClientesScreen: React.FC = () => {
       telefono: '0998765432',
       numeroCuenta: 'CA-002-2024',
       saldo: 275.75,
-      avatar: 'https://dummyimage.com/80x80/e3f2fd/ffffff&text=👨' 
+      avatar: require('../assets/icon.png') 
     },
     { 
       id: '3', 
@@ -50,7 +50,7 @@ export const ConsultasClientesScreen: React.FC = () => {
       telefono: '0976543210',
       numeroCuenta: 'CA-003-2024',
       saldo: 89.25,
-      avatar: 'https://dummyimage.com/80x80/fff3e0/ffffff&text=👩' 
+      avatar: require('../assets/icon.png') 
     },
     { 
       id: '4', 
@@ -60,7 +60,7 @@ export const ConsultasClientesScreen: React.FC = () => {
       telefono: '0965432109',
       numeroCuenta: 'CA-004-2024',
       saldo: 420.00,
-      avatar: 'https://dummyimage.com/80x80/e8f5e8/ffffff&text=👨' 
+      avatar: require('../assets/icon.png') 
     },
     { 
       id: '5', 
@@ -70,7 +70,7 @@ export const ConsultasClientesScreen: React.FC = () => {
       telefono: '0954321098',
       numeroCuenta: 'CA-005-2024',
       saldo: 125.30,
-      avatar: 'https://dummyimage.com/80x80/f3e5f5/ffffff&text=👩' 
+      avatar: require('../assets/icon.png') 
     },
   ];
 
@@ -192,7 +192,7 @@ export const ConsultasClientesScreen: React.FC = () => {
             onPress={() => abrirModalCliente(cliente)}
             activeOpacity={0.7}
           >
-            <Image source={{ uri: cliente.avatar }} style={styles.avatar} />
+            <Image source={cliente.avatar} style={styles.avatar} />
             <View style={styles.clienteInfo}>
               <Text style={styles.name}>{cliente.nombre} {cliente.apellidos}</Text>
               <Text style={styles.sub}>Cédula: {cliente.cedula}</Text>
@@ -224,7 +224,7 @@ export const ConsultasClientesScreen: React.FC = () => {
               {/* Header del modal */}
               <View style={styles.modalHeader}>
                 <View style={styles.modalHeaderInfo}>
-                  <Image source={{ uri: clienteSeleccionado.avatar }} style={styles.modalAvatar} />
+                  <Image source={clienteSeleccionado.avatar} style={styles.modalAvatar} />
                   <View style={styles.modalHeaderText}>
                     <Text style={styles.modalTitle}>{clienteSeleccionado.nombre} {clienteSeleccionado.apellidos}</Text>
                     <Text style={styles.modalSubtitle}>Cédula: {clienteSeleccionado.cedula}</Text>
