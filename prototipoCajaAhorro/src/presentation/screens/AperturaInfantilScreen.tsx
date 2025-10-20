@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { ScrollView, StyleSheet, Text, Alert, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, Alert, View, TouchableOpacity, TextInput } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { Input, AddressPicker, DatePicker } from '../components';
 import { Button } from '../components/Button';
+import { Card } from '../components/Card';
 import { theme } from '../theme/theme';
+import { MaterialIcons } from '@expo/vector-icons';
 
 interface Props { navigation: any; }
 
@@ -19,6 +21,14 @@ export const AperturaInfantilScreen: React.FC<Props> = ({ navigation }) => {
   const [adultoNombre, setAdultoNombre] = useState('');
   const [adultoCedula, setAdultoCedula] = useState('');
   const [relacion, setRelacion] = useState('');
+  const [showRelacionDropdown, setShowRelacionDropdown] = useState(false);
+  const [isCustomRelacion, setIsCustomRelacion] = useState(false);
+
+  const opcionesRelacion = [
+    { id: 'madre', label: 'Madre' },
+    { id: 'padre', label: 'Padre' },
+    { id: 'otro', label: 'Otro' },
+  ];
 
   const handleCelularChange = (text: string) => {
     // Asegurar que siempre empiece con +593
@@ -80,6 +90,29 @@ export const AperturaInfantilScreen: React.FC<Props> = ({ navigation }) => {
     return true;
   };
 
+  const handleRelacionSelect = (opcion: { id: string; label: string }) => {
+    if (opcion.id === 'otro') {
+      setIsCustomRelacion(true);
+      setRelacion(''); // Limpiar el campo para que aparezca vacío
+    } else {
+      setRelacion(opcion.label);
+      setIsCustomRelacion(false);
+    }
+    setShowRelacionDropdown(false);
+  };
+
+  const toggleRelacionDropdown = () => {
+    setShowRelacionDropdown(!showRelacionDropdown);
+  };
+
+  const handleRelacionChange = (text: string) => {
+    setRelacion(text);
+    // Mantener el modo personalizado mientras se escribe
+    if (!isCustomRelacion) {
+      setIsCustomRelacion(true);
+    }
+  };
+
   return (
     <ScrollView style={styles.container} contentContainerStyle={{ padding: theme.spacing.lg }}>
       <Text style={styles.header}>Datos del Menor</Text>
@@ -124,7 +157,51 @@ export const AperturaInfantilScreen: React.FC<Props> = ({ navigation }) => {
         value={solCelular} 
         onChangeText={handleCelularChange}
       />
-      <Input label="Relación" placeholder="Ingresa la relación con el menor" value={relacion} onChangeText={setRelacion} />
+      <View style={styles.relacionContainer}>
+        <Text style={styles.relacionLabel}>Relación con el menor</Text>
+        {!isCustomRelacion ? (
+          <TouchableOpacity 
+            style={styles.relacionSelector}
+            onPress={toggleRelacionDropdown}
+            activeOpacity={0.7}
+          >
+            <Text style={[styles.relacionText, !relacion && styles.relacionPlaceholder]}>
+              {relacion || 'Selecciona la relación'}
+            </Text>
+            <MaterialIcons 
+              name={showRelacionDropdown ? "keyboard-arrow-up" : "keyboard-arrow-down"} 
+              size={24} 
+              color={theme.colors.primary} 
+            />
+          </TouchableOpacity>
+        ) : (
+          <TextInput
+            placeholder="Ingresa la relación con el menor"
+            value={relacion}
+            onChangeText={handleRelacionChange}
+            style={styles.customRelacionInput}
+            placeholderTextColor={theme.colors.subtitle}
+          />
+        )}
+
+        {/* Dropdown de opciones */}
+        {showRelacionDropdown && !isCustomRelacion && (
+          <View style={styles.dropdownContainer}>
+            {opcionesRelacion.map((opcion) => (
+              <TouchableOpacity
+                key={opcion.id}
+                style={styles.dropdownItem}
+                onPress={() => handleRelacionSelect(opcion)}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.dropdownText}>{opcion.label}</Text>
+                <MaterialIcons name="chevron-right" size={20} color={theme.colors.border} />
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+
+      </View>
 
       <Button 
         title="Guardar" 
@@ -135,6 +212,7 @@ export const AperturaInfantilScreen: React.FC<Props> = ({ navigation }) => {
         }} 
         fullWidth 
       />
+
     </ScrollView>
   );
 };
@@ -142,6 +220,71 @@ export const AperturaInfantilScreen: React.FC<Props> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#FFEBEE' },
   header: { fontSize: 18, fontWeight: '800', color: theme.colors.text, marginTop: theme.spacing.lg, marginBottom: theme.spacing.sm },
+  relacionContainer: {
+    marginBottom: theme.spacing.md,
+  },
+  relacionLabel: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: theme.colors.text,
+    marginBottom: 6,
+  },
+  relacionSelector: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderRadius: 16,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    backgroundColor: theme.colors.background,
+    minHeight: 52,
+  },
+  relacionText: {
+    fontSize: 16,
+    color: theme.colors.text,
+    flex: 1,
+  },
+  relacionPlaceholder: {
+    color: theme.colors.subtitle,
+  },
+  // Estilos del dropdown
+  dropdownContainer: {
+    marginTop: 8,
+    backgroundColor: theme.colors.background,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    ...theme.shadows.card,
+  },
+  dropdownItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border,
+  },
+  dropdownText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: theme.colors.text,
+  },
+  customRelacionInput: {
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderRadius: 16,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    backgroundColor: theme.colors.background,
+    minHeight: 52,
+    fontSize: 16,
+    color: theme.colors.text,
+    marginTop: 0,
+    marginBottom: 0,
+  },
 });
 
 

@@ -1,11 +1,20 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Alert, TouchableOpacity } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { Input, AddressPicker, DatePicker } from '../components';
 import { Button } from '../components/Button';
+import { Card } from '../components/Card';
 import { theme } from '../theme/theme';
+import { MaterialIcons } from '@expo/vector-icons';
 
 interface Props { navigation: any; }
+
+interface ReferenciaPersonal {
+  id: string;
+  nombre: string;
+  telefono: string;
+  relacion: string;
+}
 
 export const AperturaBasicaScreen: React.FC<Props> = ({ navigation }) => {
   const [nombre, setNombre] = useState('');
@@ -14,6 +23,7 @@ export const AperturaBasicaScreen: React.FC<Props> = ({ navigation }) => {
   const [direccionData, setDireccionData] = useState<any>(null);
   const [celular, setCelular] = useState('+593 ');
   const [fecha, setFecha] = useState('');
+  const [referencias, setReferencias] = useState<ReferenciaPersonal[]>([]);
   const [refNombre, setRefNombre] = useState('');
   const [refTel, setRefTel] = useState('+593 ');
   const [refRel, setRefRel] = useState('');
@@ -103,6 +113,56 @@ export const AperturaBasicaScreen: React.FC<Props> = ({ navigation }) => {
     return true;
   };
 
+  const validateRefTel = () => {
+    const phoneNumber = refTel.replace(/[^\d]/g, '');
+    if (phoneNumber.length !== 13) { // +593 + 10 dígitos
+      Alert.alert(
+        'Error de validación',
+        'El número de teléfono de la referencia debe tener exactamente 10 dígitos después del código de país (+593)',
+        [{ text: 'Aceptar' }]
+      );
+      return false;
+    }
+    return true;
+  };
+
+  const agregarReferencia = () => {
+    if (!refNombre.trim()) {
+      Alert.alert('Error', 'El nombre de la referencia es requerido');
+      return;
+    }
+    
+    if (!validateRefTel()) {
+      return;
+    }
+    
+    if (!refRel.trim()) {
+      Alert.alert('Error', 'La relación con la referencia es requerida');
+      return;
+    }
+
+    if (referencias.length >= 2) {
+      Alert.alert('Error', 'Solo se pueden agregar máximo 2 referencias personales');
+      return;
+    }
+
+    const nuevaReferencia: ReferenciaPersonal = {
+      id: Date.now().toString(),
+      nombre: refNombre.trim(),
+      telefono: refTel,
+      relacion: refRel.trim(),
+    };
+
+    setReferencias([...referencias, nuevaReferencia]);
+    setRefNombre('');
+    setRefTel('+593 ');
+    setRefRel('');
+  };
+
+  const eliminarReferencia = (id: string) => {
+    setReferencias(referencias.filter(ref => ref.id !== id));
+  };
+
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.content}>
@@ -142,14 +202,47 @@ export const AperturaBasicaScreen: React.FC<Props> = ({ navigation }) => {
         />
 
         <Text style={styles.section}>Referencias Personales</Text>
-        <Input label="Nombre" placeholder="Nombre de la referencia" value={refNombre} onChangeText={setRefNombre} />
-        <Input 
-          label="Número de Celular" 
-          placeholder="+593 9XXXXXXXXX" 
-          value={refTel} 
-          onChangeText={handleRefTelChange}
-        />
-        <Input label="Relación" placeholder="Relación con la referencia" value={refRel} onChangeText={setRefRel} />
+        
+        {/* Lista de referencias agregadas */}
+        {referencias.map((referencia, index) => (
+          <Card key={referencia.id} style={styles.referenciaCard}>
+            <View style={styles.referenciaHeader}>
+              <Text style={styles.referenciaTitle}>Referencia {index + 1}</Text>
+              <TouchableOpacity 
+                onPress={() => eliminarReferencia(referencia.id)}
+                style={styles.deleteButton}
+              >
+                <MaterialIcons name="delete" size={20} color={theme.colors.primary} />
+              </TouchableOpacity>
+            </View>
+            <Text style={styles.referenciaInfo}>Nombre: {referencia.nombre}</Text>
+            <Text style={styles.referenciaInfo}>Teléfono: {referencia.telefono}</Text>
+            <Text style={styles.referenciaInfo}>Relación: {referencia.relacion}</Text>
+          </Card>
+        ))}
+
+        {/* Formulario para agregar nueva referencia */}
+        {referencias.length < 2 && (
+          <View style={styles.nuevaReferenciaContainer}>
+            <Text style={styles.nuevaReferenciaTitle}>
+              {referencias.length === 0 ? 'Agregar Referencia Personal' : 'Agregar Segunda Referencia'}
+            </Text>
+            <Input label="Nombre" placeholder="Nombre de la referencia" value={refNombre} onChangeText={setRefNombre} />
+            <Input 
+              label="Número de Celular" 
+              placeholder="+593 9XXXXXXXXX" 
+              value={refTel} 
+              onChangeText={handleRefTelChange}
+            />
+            <Input label="Relación" placeholder="Relación con la referencia" value={refRel} onChangeText={setRefRel} />
+            <Button 
+              title="Agregar Referencia" 
+              onPress={agregarReferencia}
+              fullWidth 
+              variant="primary"
+            />
+          </View>
+        )}
 
         <View style={{ height: theme.spacing.lg }} />
         <Button 
@@ -172,6 +265,43 @@ const styles = StyleSheet.create({
   content: { padding: theme.spacing.lg },
   title: { fontSize: 22, fontWeight: '800', color: theme.colors.text, marginBottom: theme.spacing.md },
   section: { fontSize: 18, fontWeight: '800', color: theme.colors.text, marginTop: theme.spacing.lg, marginBottom: theme.spacing.sm },
+  referenciaCard: {
+    marginBottom: theme.spacing.md,
+    padding: theme.spacing.md,
+  },
+  referenciaHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: theme.spacing.sm,
+  },
+  referenciaTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: theme.colors.text,
+  },
+  deleteButton: {
+    padding: 4,
+  },
+  referenciaInfo: {
+    fontSize: 14,
+    color: theme.colors.text,
+    marginBottom: 4,
+  },
+  nuevaReferenciaContainer: {
+    marginTop: theme.spacing.md,
+    padding: theme.spacing.md,
+    backgroundColor: theme.colors.background,
+    borderRadius: 12,
+    ...theme.shadows.card,
+  },
+  nuevaReferenciaTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: theme.colors.text,
+    marginBottom: theme.spacing.md,
+    textAlign: 'center',
+  },
 });
 
 
