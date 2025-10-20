@@ -57,7 +57,7 @@ export const PerfilScreen: React.FC = () => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#FFEBEE' },
-  topBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingHorizontal: 8, paddingTop: 6, paddingBottom: 6, backgroundColor: theme.colors.background },
+  topBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingHorizontal: 8, paddingTop: 15, paddingBottom: 15, backgroundColor: theme.colors.background },
   logo: { width: 340, height: 36, resizeMode: 'contain', alignSelf: 'center' },
   header: { flexDirection: 'row', alignItems: 'center', marginBottom: theme.spacing.lg },
   avatar: { width: 64, height: 64, borderRadius: 32, backgroundColor: theme.colors.primary, alignItems: 'center', justifyContent: 'center', marginRight: theme.spacing.md },

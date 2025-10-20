@@ -159,6 +159,7 @@ export const ImpresionRecibosScreen: React.FC = () => {
 
         {/* Lista de Recibos */}
         <Text style={styles.sectionTitle}>Recibos Procesados</Text>
+        <Text style={styles.sectionSubtitle}>Los recibos aparecerán aquí después de imprimir transacciones</Text>
         {recibos.map((recibo) => (
           <Card key={recibo.id} style={styles.reciboCard}>
             <View style={styles.reciboItem}>
@@ -211,8 +212,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 8,
-    paddingTop: 6,
-    paddingBottom: 6,
+    paddingTop: 15,
+    paddingBottom: 15,
     backgroundColor: theme.colors.background,
   },
   logo: {
@@ -342,4 +343,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: theme.spacing.sm,
   },
+  sectionSubtitle: {
+    textAlign: 'center', color: theme.colors.subtitle, marginTop: 4 
+  }
 });
