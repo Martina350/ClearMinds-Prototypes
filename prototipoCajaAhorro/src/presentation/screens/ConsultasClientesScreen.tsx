@@ -45,6 +45,22 @@ export const ConsultasClientesScreen: React.FC = () => {
     setClientes(clientesMapeados);
   };
 
+  // Función para obtener información detallada de cuentas del cliente
+  const obtenerCuentasCliente = (clienteId: string) => {
+    const cuentas = mockDB.getCuentasByCliente(clienteId);
+    
+    const cuentaBasica = cuentas.find(c => c.tipo === 'BASICA');
+    const cuentaInfantil = cuentas.find(c => c.tipo === 'INFANTIL');
+    const cuentaFuturo = cuentas.find(c => c.tipo === 'AHORRO_FUTURO');
+    
+    return {
+      cuentaBasica,
+      cuentaInfantil,
+      cuentaFuturo,
+      todasLasCuentas: cuentas
+    };
+  };
+
   // Recargar clientes cuando la pantalla recibe el foco
   useEffect(() => {
     if (isFocused) {
@@ -187,19 +203,130 @@ export const ConsultasClientesScreen: React.FC = () => {
                     <Text style={styles.infoLabel}>Teléfono:</Text>
                     <Text style={styles.infoValue}>{clienteSeleccionado.telefono}</Text>
                   </View>
-                  {clienteSeleccionado.numeroCuenta && (
-                    <View style={styles.infoRow}>
-                      <Text style={styles.infoLabel}>Cuenta:</Text>
-                      <Text style={styles.infoValue}>{clienteSeleccionado.numeroCuenta}</Text>
-                    </View>
-                  )}
-                  {clienteSeleccionado.saldo !== undefined && (
-                    <View style={styles.infoRow}>
-                      <Text style={styles.infoLabel}>Saldo Actual:</Text>
-                      <Text style={[styles.infoValue, styles.saldoValue]}>${clienteSeleccionado.saldo.toFixed(2)}</Text>
-                    </View>
-                  )}
                 </View>
+
+                {/* Información de Cuentas */}
+                {(() => {
+                  const cuentasInfo = obtenerCuentasCliente(clienteSeleccionado.id);
+                  return (
+                    <View style={styles.modalSection}>
+                      <Text style={styles.sectionTitle}>Cuentas del Cliente</Text>
+                      
+                      {/* Cuenta Básica */}
+                      {cuentasInfo.cuentaBasica && (
+                        <View style={styles.cuentaCard}>
+                          <View style={styles.cuentaHeader}>
+                            <Text style={styles.cuentaTipo}>Cuenta Básica</Text>
+                            <View style={[styles.tipoBadge, styles.basicaBadge]}>
+                              <Text style={styles.tipoBadgeText}>BÁSICA</Text>
+                            </View>
+                          </View>
+                          <View style={styles.infoRow}>
+                            <Text style={styles.infoLabel}>Número:</Text>
+                            <Text style={styles.infoValue}>{cuentasInfo.cuentaBasica.numeroCuenta}</Text>
+                          </View>
+                          <View style={styles.infoRow}>
+                            <Text style={styles.infoLabel}>Saldo:</Text>
+                            <Text style={[styles.infoValue, styles.saldoValue]}>${cuentasInfo.cuentaBasica.saldo.toFixed(2)}</Text>
+                          </View>
+                          <View style={styles.infoRow}>
+                            <Text style={styles.infoLabel}>Estado:</Text>
+                            <Text style={[styles.infoValue, { color: cuentasInfo.cuentaBasica.estado === 'ACTIVA' ? '#4CAF50' : '#F44336' }]}>
+                              {cuentasInfo.cuentaBasica.estado}
+                            </Text>
+                          </View>
+                          <View style={styles.infoRow}>
+                            <Text style={styles.infoLabel}>Fecha Apertura:</Text>
+                            <Text style={styles.infoValue}>{cuentasInfo.cuentaBasica.fechaApertura}</Text>
+                          </View>
+                        </View>
+                      )}
+
+                      {/* Cuenta Infantil */}
+                      {cuentasInfo.cuentaInfantil && (
+                        <View style={styles.cuentaCard}>
+                          <View style={styles.cuentaHeader}>
+                            <Text style={styles.cuentaTipo}>Cuenta Infantil</Text>
+                            <View style={[styles.tipoBadge, styles.infantilBadge]}>
+                              <Text style={styles.tipoBadgeText}>INFANTIL</Text>
+                            </View>
+                          </View>
+                          <View style={styles.infoRow}>
+                            <Text style={styles.infoLabel}>Número:</Text>
+                            <Text style={styles.infoValue}>{cuentasInfo.cuentaInfantil.numeroCuenta}</Text>
+                          </View>
+                          <View style={styles.infoRow}>
+                            <Text style={styles.infoLabel}>Saldo:</Text>
+                            <Text style={[styles.infoValue, styles.saldoValue]}>${cuentasInfo.cuentaInfantil.saldo.toFixed(2)}</Text>
+                          </View>
+                          {cuentasInfo.cuentaInfantil.titularMenor && (
+                            <View style={styles.infoRow}>
+                              <Text style={styles.infoLabel}>Titular (Menor):</Text>
+                              <Text style={styles.infoValue}>
+                                {cuentasInfo.cuentaInfantil.titularMenor.nombre} {cuentasInfo.cuentaInfantil.titularMenor.apellidos}
+                              </Text>
+                            </View>
+                          )}
+                          <View style={styles.infoRow}>
+                            <Text style={styles.infoLabel}>Relación:</Text>
+                            <Text style={styles.infoValue}>{cuentasInfo.cuentaInfantil.relacion || 'No especificada'}</Text>
+                          </View>
+                          <View style={styles.infoRow}>
+                            <Text style={styles.infoLabel}>Estado:</Text>
+                            <Text style={[styles.infoValue, { color: cuentasInfo.cuentaInfantil.estado === 'ACTIVA' ? '#4CAF50' : '#F44336' }]}>
+                              {cuentasInfo.cuentaInfantil.estado}
+                            </Text>
+                          </View>
+                        </View>
+                      )}
+
+                      {/* Cuenta Ahorro Futuro */}
+                      {cuentasInfo.cuentaFuturo && (
+                        <View style={styles.cuentaCard}>
+                          <View style={styles.cuentaHeader}>
+                            <Text style={styles.cuentaTipo}>Ahorro Futuro</Text>
+                            <View style={[styles.tipoBadge, styles.futuroBadge]}>
+                              <Text style={styles.tipoBadgeText}>FUTURO</Text>
+                            </View>
+                          </View>
+                          <View style={styles.infoRow}>
+                            <Text style={styles.infoLabel}>Número:</Text>
+                            <Text style={styles.infoValue}>{cuentasInfo.cuentaFuturo.numeroCuenta}</Text>
+                          </View>
+                          <View style={styles.infoRow}>
+                            <Text style={styles.infoLabel}>Monto Invertido:</Text>
+                            <Text style={[styles.infoValue, styles.saldoValue]}>${cuentasInfo.cuentaFuturo.saldo.toFixed(2)}</Text>
+                          </View>
+                          <View style={styles.infoRow}>
+                            <Text style={styles.infoLabel}>Plazo:</Text>
+                            <Text style={styles.infoValue}>{cuentasInfo.cuentaFuturo.plazo} días</Text>
+                          </View>
+                          <View style={styles.infoRow}>
+                            <Text style={styles.infoLabel}>Tasa de Interés:</Text>
+                            <Text style={styles.infoValue}>{cuentasInfo.cuentaFuturo.tasaInteres}%</Text>
+                          </View>
+                          <View style={styles.infoRow}>
+                            <Text style={styles.infoLabel}>Fecha Vencimiento:</Text>
+                            <Text style={styles.infoValue}>{cuentasInfo.cuentaFuturo.fechaVencimiento}</Text>
+                          </View>
+                          <View style={styles.infoRow}>
+                            <Text style={styles.infoLabel}>Estado:</Text>
+                            <Text style={[styles.infoValue, { color: cuentasInfo.cuentaFuturo.estado === 'ACTIVA' ? '#4CAF50' : '#F44336' }]}>
+                              {cuentasInfo.cuentaFuturo.estado}
+                            </Text>
+                          </View>
+                        </View>
+                      )}
+
+                      {/* Si no tiene cuentas */}
+                      {cuentasInfo.todasLasCuentas.length === 0 && (
+                        <View style={styles.noCuentasCard}>
+                          <Text style={styles.noCuentasText}>El cliente no tiene cuentas registradas</Text>
+                        </View>
+                      )}
+                    </View>
+                  );
+                })()}
 
                 {/* Historial de depósitos */}
                 {(() => {
@@ -464,6 +591,59 @@ const styles = StyleSheet.create({
   prestamoEstado: {
     fontSize: 14,
     color: theme.colors.primaryLight,
+  },
+  // Estilos para las cuentas
+  cuentaCard: {
+    backgroundColor: '#F8F9FA',
+    borderRadius: 12,
+    padding: theme.spacing.md,
+    marginBottom: theme.spacing.md,
+    borderLeftWidth: 4,
+    borderLeftColor: theme.colors.primary,
+  },
+  cuentaHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: theme.spacing.sm,
+  },
+  cuentaTipo: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: theme.colors.text,
+  },
+  tipoBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  basicaBadge: {
+    backgroundColor: '#E3F2FD',
+  },
+  infantilBadge: {
+    backgroundColor: '#FFF3E0',
+  },
+  futuroBadge: {
+    backgroundColor: '#E8F5E8',
+  },
+  tipoBadgeText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: theme.colors.text,
+  },
+  noCuentasCard: {
+    backgroundColor: '#FFF3E0',
+    borderRadius: 12,
+    padding: theme.spacing.lg,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#FFB74D',
+  },
+  noCuentasText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#F57C00',
+    textAlign: 'center',
   },
 });
 
