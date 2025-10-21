@@ -131,14 +131,14 @@ export const validarEmail = (email: string): boolean => {
  * Valida que un campo no esté vacío
  */
 export const validarCampoRequerido = (valor: string): boolean => {
-  return valor && valor.trim().length > 0;
+  return Boolean(valor && valor.trim().length > 0);
 };
 
 /**
  * Valida la longitud mínima de un texto
  */
 export const validarLongitudMinima = (texto: string, longitudMinima: number): boolean => {
-  return texto && texto.trim().length >= longitudMinima;
+  return Boolean(texto && texto.trim().length >= longitudMinima);
 };
 
 /**
