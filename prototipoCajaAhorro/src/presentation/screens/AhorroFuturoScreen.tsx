@@ -201,20 +201,25 @@ export const AhorroFuturoScreen: React.FC<Props> = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#FFEBEE' },
+  container: { 
+    flex: 1, 
+    backgroundColor: theme.colors.backgroundApp 
+  },
   title: {
-    fontSize: 24,
-    fontWeight: '900',
+    fontSize: theme.typography.sizes.xxl,
+    fontWeight: theme.typography.weights.black,
     color: theme.colors.primary,
     textAlign: 'center',
-    marginBottom: theme.spacing.lg
+    marginBottom: theme.spacing.xl,
+    letterSpacing: 0.5,
   },
   header: {
-    fontSize: 20,
-    fontWeight: '800',
+    fontSize: theme.typography.sizes.xl,
+    fontWeight: theme.typography.weights.extrabold,
     color: theme.colors.text,
-    marginTop: theme.spacing.lg,
-    marginBottom: theme.spacing.sm
+    marginTop: theme.spacing.xl,
+    marginBottom: theme.spacing.md,
+    letterSpacing: 0.3,
   },
   row: { 
     flexDirection: 'row', 
@@ -234,41 +239,48 @@ const styles = StyleSheet.create({
     marginTop: theme.spacing.xs,
   },
   chip: {
-    borderWidth: 1,
+    borderWidth: 2,
     borderColor: theme.colors.border,
-    paddingVertical: 14,
-    paddingHorizontal: 24,
-    borderRadius: 16,
-    backgroundColor: theme.colors.background
+    paddingVertical: theme.spacing.lg,
+    paddingHorizontal: theme.spacing.xl,
+    borderRadius: theme.radii.lg,
+    backgroundColor: theme.colors.background,
   },
   chipSelected: {
     backgroundColor: theme.colors.primary,
-    borderColor: theme.colors.primary
+    borderColor: theme.colors.primary,
+    ...theme.shadows.sm,
   },
   chipText: {
     color: theme.colors.text,
-    fontWeight: '700',
+    fontWeight: theme.typography.weights.bold,
     textAlign: 'center',
-    lineHeight: 18,
+    lineHeight: theme.typography.lineHeights.normal * theme.typography.sizes.sm,
+    fontSize: theme.typography.sizes.sm,
   },
   chipTextSelected: {
     color: '#fff',
-    fontWeight: '700',
+    fontWeight: theme.typography.weights.bold,
   },
   clienteCard: {
-    marginBottom: theme.spacing.md,
-    padding: theme.spacing.md,
+    marginBottom: theme.spacing.lg,
+    padding: theme.spacing.lg,
+    backgroundColor: theme.colors.infoLight,
+    borderLeftWidth: 4,
+    borderLeftColor: theme.colors.info,
   },
   clienteTitle: {
-    fontSize: 16,
-    fontWeight: '700',
+    fontSize: theme.typography.sizes.md,
+    fontWeight: theme.typography.weights.bold,
     color: theme.colors.primary,
-    marginBottom: theme.spacing.sm,
+    marginBottom: theme.spacing.md,
+    letterSpacing: 0.3,
   },
   clienteInfo: {
-    fontSize: 14,
+    fontSize: theme.typography.sizes.sm,
     color: theme.colors.text,
-    marginBottom: 4,
+    marginBottom: theme.spacing.xs,
+    fontWeight: theme.typography.weights.medium,
   },
   pagoOptionsContainer: {
     marginBottom: theme.spacing.md,

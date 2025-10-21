@@ -42,22 +42,53 @@ export const AperturaSeleccionScreen: React.FC<Props> = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#FFEBEE' },
-  content: { padding: theme.spacing.lg },
-  title: { fontSize: 28, fontWeight: '900', color: theme.colors.primary, textAlign: 'left', marginBottom: theme.spacing.lg },
+  container: { 
+    flex: 1, 
+    backgroundColor: theme.colors.backgroundApp 
+  },
+  content: { 
+    padding: theme.spacing.xl 
+  },
+  title: { 
+    fontSize: theme.typography.sizes.xxxl, 
+    fontWeight: theme.typography.weights.black, 
+    color: theme.colors.primary, 
+    textAlign: 'left', 
+    marginBottom: theme.spacing.xl,
+    letterSpacing: 0.5,
+  },
   row: {
     backgroundColor: theme.colors.background,
-    borderRadius: theme.radii.lg,
-    padding: theme.spacing.md,
-    marginBottom: theme.spacing.md,
+    borderRadius: theme.radii.xl,
+    padding: theme.spacing.lg,
+    marginBottom: theme.spacing.lg,
     flexDirection: 'row',
     alignItems: 'center',
     ...theme.shadows.card,
   },
-  texts: { flex: 1, paddingRight: theme.spacing.md },
-  itemTitle: { fontSize: 20, fontWeight: '800', color: theme.colors.text, marginBottom: 4 },
-  itemSubtitle: { fontSize: 14, color: theme.colors.primaryLight },
-  thumb: { width: 120, height: 90, borderRadius: theme.radii.md },
+  texts: { 
+    flex: 1, 
+    paddingRight: theme.spacing.lg 
+  },
+  itemTitle: { 
+    fontSize: theme.typography.sizes.xl, 
+    fontWeight: theme.typography.weights.extrabold, 
+    color: theme.colors.text, 
+    marginBottom: theme.spacing.xs,
+    letterSpacing: 0.3,
+  },
+  itemSubtitle: { 
+    fontSize: theme.typography.sizes.sm, 
+    color: theme.colors.textLight,
+    fontWeight: theme.typography.weights.medium,
+    lineHeight: theme.typography.lineHeights.normal * theme.typography.sizes.sm,
+  },
+  thumb: { 
+    width: 120, 
+    height: 90, 
+    borderRadius: theme.radii.lg,
+    ...theme.shadows.sm,
+  },
 });
 
 

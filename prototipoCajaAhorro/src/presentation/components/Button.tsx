@@ -47,12 +47,12 @@ export const Button: React.FC<ButtonProps> = ({
 
 const styles = StyleSheet.create({
   button: {
-    paddingVertical: 14,
-    paddingHorizontal: 24,
+    paddingVertical: 16,
+    paddingHorizontal: 28,
     borderRadius: theme.radii.md,
     alignItems: 'center',
     justifyContent: 'center',
-    minHeight: 52,
+    minHeight: 54,
     ...theme.shadows.card,
   },
   primary: {
@@ -60,23 +60,24 @@ const styles = StyleSheet.create({
   },
   secondary: {
     backgroundColor: theme.colors.background,
-    borderWidth: 1,
+    borderWidth: 2,
     borderColor: theme.colors.primary,
   },
   danger: {
-    backgroundColor: theme.colors.primaryDark,
+    backgroundColor: theme.colors.error,
   },
   disabled: {
     backgroundColor: theme.colors.border,
-    opacity: 0.6,
+    opacity: 0.5,
   },
   fullWidth: {
     width: '100%',
   },
   text: {
     color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '700',
+    fontSize: theme.typography.sizes.md,
+    fontWeight: theme.typography.weights.bold,
+    letterSpacing: 0.5,
   },
 });
 
