@@ -35,38 +35,34 @@ export const Input: React.FC<InputProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    marginVertical: 10,
+    marginVertical: 8,
   },
   label: {
-    fontSize: theme.typography.sizes.sm,
-    fontWeight: theme.typography.weights.bold,
+    fontSize: 14,
+    fontWeight: '700',
     color: theme.colors.text,
-    marginBottom: 8,
-    letterSpacing: 0.2,
+    marginBottom: 6,
   },
   required: {
-    color: theme.colors.error,
+    color: theme.colors.primaryDark,
   },
   input: {
-    borderWidth: 1.5,
+    borderWidth: 1,
     borderColor: theme.colors.border,
-    borderRadius: theme.radii.md,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    fontSize: theme.typography.sizes.md,
-    color: theme.colors.text,
+    borderRadius: 16,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    fontSize: 16,
     backgroundColor: theme.colors.background,
-    minHeight: 54,
+    minHeight: 52,
   },
   inputError: {
-    borderColor: theme.colors.error,
-    borderWidth: 2,
+    borderColor: theme.colors.primary,
   },
   errorText: {
-    color: theme.colors.error,
-    fontSize: theme.typography.sizes.xs,
-    marginTop: 6,
-    fontWeight: theme.typography.weights.medium,
+    color: theme.colors.primary,
+    fontSize: 12,
+    marginTop: 4,
   },
 });
 

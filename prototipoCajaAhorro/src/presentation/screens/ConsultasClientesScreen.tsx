@@ -393,75 +393,66 @@ export const ConsultasClientesScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { 
-    flex: 1, 
-    backgroundColor: theme.colors.backgroundApp 
-  },
+  container: { flex: 1, backgroundColor: '#FFEBEE' },
   header: { 
-    fontSize: theme.typography.sizes.lg, 
-    fontWeight: theme.typography.weights.extrabold, 
+    fontSize: 18, 
+    fontWeight: '800', 
     color: theme.colors.text, 
-    marginVertical: theme.spacing.lg,
-    letterSpacing: 0.3,
+    marginVertical: theme.spacing.md 
   },
   item: { 
     flexDirection: 'row', 
     alignItems: 'flex-start', 
     backgroundColor: theme.colors.background, 
     borderRadius: theme.radii.lg, 
-    padding: theme.spacing.lg, 
-    marginBottom: theme.spacing.md, 
+    padding: theme.spacing.md, 
+    marginBottom: theme.spacing.sm, 
     ...theme.shadows.card 
   },
   avatar: { 
-    width: 60, 
-    height: 60, 
-    borderRadius: theme.radii.round,
-    ...theme.shadows.sm,
+    width: 56, 
+    height: 56, 
+    borderRadius: 28 
   },
   clienteInfo: {
     flex: 1,
-    marginLeft: theme.spacing.lg,
+    marginLeft: theme.spacing.md,
   },
   name: { 
-    fontSize: theme.typography.sizes.lg, 
-    fontWeight: theme.typography.weights.extrabold, 
+    fontSize: 18, 
+    fontWeight: '800', 
     color: theme.colors.text,
-    marginBottom: theme.spacing.xs,
-    letterSpacing: 0.2,
+    marginBottom: 4
   },
   sub: { 
-    color: theme.colors.textLight, 
-    fontSize: theme.typography.sizes.sm,
-    marginBottom: theme.spacing.xxs,
-    fontWeight: theme.typography.weights.medium,
+    color: theme.colors.primaryLight, 
+    fontSize: 14,
+    marginBottom: 2
   },
   saldo: {
     color: theme.colors.primary,
-    fontSize: theme.typography.sizes.md,
-    fontWeight: theme.typography.weights.bold,
-    marginTop: theme.spacing.xs,
+    fontSize: 16,
+    fontWeight: '700',
+    marginTop: 4
   },
   noResults: {
     alignItems: 'center',
-    padding: theme.spacing.xxl,
-    backgroundColor: theme.colors.warningLight,
-    borderRadius: theme.radii.xl,
-    marginTop: theme.spacing.lg,
+    padding: theme.spacing.xl,
+    backgroundColor: theme.colors.background,
+    borderRadius: theme.radii.lg,
+    marginTop: theme.spacing.md,
     ...theme.shadows.card
   },
   noResultsText: {
-    fontSize: theme.typography.sizes.lg,
-    fontWeight: theme.typography.weights.bold,
+    fontSize: 18,
+    fontWeight: '600',
     color: theme.colors.text,
-    marginBottom: theme.spacing.md,
-    letterSpacing: 0.2,
+    marginBottom: theme.spacing.sm
   },
   noResultsSub: {
-    fontSize: theme.typography.sizes.sm,
-    color: theme.colors.textLight,
-    textAlign: 'center',
-    fontWeight: theme.typography.weights.medium,
+    fontSize: 14,
+    color: theme.colors.primaryLight,
+    textAlign: 'center'
   },
   // Estilos para el modal
   modalOverlay: {

@@ -82,95 +82,51 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { 
-    flex: 1, 
-    backgroundColor: theme.colors.backgroundApp 
-  },
-  topBar: { 
-    flexDirection: 'row', 
-    alignItems: 'center', 
-    justifyContent: 'center', 
-    paddingHorizontal: theme.spacing.md, 
-    paddingTop: theme.spacing.lg, 
-    paddingBottom: theme.spacing.lg, 
-    backgroundColor: theme.colors.background,
-    ...theme.shadows.sm,
-  },
-  topTitle: { 
-    fontSize: theme.typography.sizes.lg, 
-    fontWeight: theme.typography.weights.extrabold, 
-    color: theme.colors.text 
-  },
-  title: { 
-    fontSize: theme.typography.sizes.xxxl, 
-    fontWeight: theme.typography.weights.black, 
-    color: theme.colors.primary, 
-    textAlign: 'center',
-    letterSpacing: 0.5,
-  },
-  subtitle: { 
-    textAlign: 'center', 
-    color: theme.colors.subtitle, 
-    fontSize: theme.typography.sizes.sm,
-    marginTop: theme.spacing.xs,
-    fontWeight: theme.typography.weights.medium,
-  },
-  scrollContent: { 
-    padding: theme.spacing.xl, 
-    paddingBottom: theme.spacing.xxl, 
-    flexGrow: 1 
-  }, 
-  sectionTitle: { 
-    fontSize: theme.typography.sizes.xxl, 
-    fontWeight: theme.typography.weights.extrabold, 
-    color: theme.colors.text 
-  },
-  logo: { 
-    width: 340, 
-    height: 36, 
-    resizeMode: 'contain', 
-    alignSelf: 'center' 
-  },
+  container: { flex: 1, backgroundColor: '#FFEBEE' },
+  topBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingHorizontal: 8, paddingTop: 15, paddingBottom: 15, backgroundColor: theme.colors.background },
+  topTitle: { fontSize: 18, fontWeight: '800', color: theme.colors.text },
+  title: { fontSize: 28, fontWeight: '900', color: theme.colors.primary, textAlign: 'center' },
+  subtitle: { textAlign: 'center', color: theme.colors.subtitle, marginTop: 4 },
+  scrollContent: { padding: 16, paddingBottom: 24, flexGrow: 1 }, 
+  sectionTitle: { fontSize: 22, fontWeight: '800', color: theme.colors.text },
+  logo: { width: 340, height: 36, resizeMode: 'contain', alignSelf: 'center' },
   servicesContainer: {
-    marginTop: theme.spacing.xl,
-    paddingHorizontal: theme.spacing.xs,
+    marginTop: 25,
+    paddingHorizontal: 8,
   },
   serviceItem: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: theme.colors.background,
-    paddingVertical: theme.spacing.lg,
-    paddingHorizontal: theme.spacing.lg,
-    marginBottom: theme.spacing.md,
-    borderRadius: theme.radii.lg,
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    marginBottom: 12,
+    borderRadius: 12,
     ...theme.shadows.card,
   },
   serviceIcon: {
-    width: 50,
-    height: 50,
-    borderRadius: theme.radii.round,
-    backgroundColor: theme.colors.backgroundApp,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#FFEBEE',
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: theme.spacing.lg,
-    ...theme.shadows.sm,
+    marginRight: 16,
   },
   serviceContent: {
     flex: 1,
-    marginRight: theme.spacing.sm,
+    marginRight: 8,
   },
   serviceTitle: {
-    fontSize: theme.typography.sizes.md,
-    fontWeight: theme.typography.weights.bold,
+    fontSize: 16,
+    fontWeight: '700',
     color: theme.colors.text,
-    marginBottom: theme.spacing.xs,
-    letterSpacing: 0.2,
+    marginBottom: 4,
   },
   serviceSubtitle: {
-    fontSize: theme.typography.sizes.sm,
-    color: theme.colors.textLight,
-    lineHeight: theme.typography.lineHeights.normal * theme.typography.sizes.sm,
-    fontWeight: theme.typography.weights.regular,
+    fontSize: 14,
+    color: theme.colors.subtitle,
+    lineHeight: 18,
   },
 });
 

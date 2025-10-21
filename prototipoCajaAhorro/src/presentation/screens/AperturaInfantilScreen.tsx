@@ -581,18 +581,8 @@ export const AperturaInfantilScreen: React.FC<Props> = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { 
-    flex: 1, 
-    backgroundColor: theme.colors.backgroundApp 
-  },
-  header: { 
-    fontSize: theme.typography.sizes.lg, 
-    fontWeight: theme.typography.weights.extrabold, 
-    color: theme.colors.text, 
-    marginTop: theme.spacing.xl, 
-    marginBottom: theme.spacing.md,
-    letterSpacing: 0.3,
-  },
+  container: { flex: 1, backgroundColor: '#FFEBEE' },
+  header: { fontSize: 18, fontWeight: '800', color: theme.colors.text, marginTop: theme.spacing.lg, marginBottom: theme.spacing.sm },
   // Estilos para selector de modo (Existente/Nuevo)
   modoSelector: {
     flexDirection: 'row',

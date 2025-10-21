@@ -145,7 +145,7 @@ export const AhorroFuturoScreen: React.FC<Props> = ({ navigation }) => {
   return (
     <ScrollView style={styles.container} contentContainerStyle={{ padding: theme.spacing.lg }}>
       {/* Búsqueda de Cliente */}
-      <Text style={styles.header}>Buscar Cliente</Text>
+      <Text style={styles.header}>Datos del Cliente</Text>
       <ClienteSearch
         onClienteSelect={handleClienteSelect}
         placeholder="Buscar por cédula, nombre, apellido o número de cuenta"
@@ -201,25 +201,20 @@ export const AhorroFuturoScreen: React.FC<Props> = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { 
-    flex: 1, 
-    backgroundColor: theme.colors.backgroundApp 
-  },
+  container: { flex: 1, backgroundColor: '#FFEBEE' },
   title: {
-    fontSize: theme.typography.sizes.xxl,
-    fontWeight: theme.typography.weights.black,
+    fontSize: 24,
+    fontWeight: '900',
     color: theme.colors.primary,
     textAlign: 'center',
-    marginBottom: theme.spacing.xl,
-    letterSpacing: 0.5,
+    marginBottom: theme.spacing.lg
   },
   header: {
-    fontSize: theme.typography.sizes.xl,
-    fontWeight: theme.typography.weights.extrabold,
+    fontSize: 20,
+    fontWeight: '800',
     color: theme.colors.text,
-    marginTop: theme.spacing.xl,
-    marginBottom: theme.spacing.md,
-    letterSpacing: 0.3,
+    marginTop: theme.spacing.lg,
+    marginBottom: theme.spacing.sm
   },
   row: { 
     flexDirection: 'row', 
@@ -239,48 +234,41 @@ const styles = StyleSheet.create({
     marginTop: theme.spacing.xs,
   },
   chip: {
-    borderWidth: 2,
+    borderWidth: 1,
     borderColor: theme.colors.border,
-    paddingVertical: theme.spacing.lg,
-    paddingHorizontal: theme.spacing.xl,
-    borderRadius: theme.radii.lg,
-    backgroundColor: theme.colors.background,
+    paddingVertical: 14,
+    paddingHorizontal: 24,
+    borderRadius: 16,
+    backgroundColor: theme.colors.background
   },
   chipSelected: {
     backgroundColor: theme.colors.primary,
-    borderColor: theme.colors.primary,
-    ...theme.shadows.sm,
+    borderColor: theme.colors.primary
   },
   chipText: {
     color: theme.colors.text,
-    fontWeight: theme.typography.weights.bold,
+    fontWeight: '700',
     textAlign: 'center',
-    lineHeight: theme.typography.lineHeights.normal * theme.typography.sizes.sm,
-    fontSize: theme.typography.sizes.sm,
+    lineHeight: 18,
   },
   chipTextSelected: {
     color: '#fff',
-    fontWeight: theme.typography.weights.bold,
+    fontWeight: '700',
   },
   clienteCard: {
-    marginBottom: theme.spacing.lg,
-    padding: theme.spacing.lg,
-    backgroundColor: theme.colors.infoLight,
-    borderLeftWidth: 4,
-    borderLeftColor: theme.colors.info,
+    marginBottom: theme.spacing.md,
+    padding: theme.spacing.md,
   },
   clienteTitle: {
-    fontSize: theme.typography.sizes.md,
-    fontWeight: theme.typography.weights.bold,
+    fontSize: 16,
+    fontWeight: '700',
     color: theme.colors.primary,
-    marginBottom: theme.spacing.md,
-    letterSpacing: 0.3,
+    marginBottom: theme.spacing.sm,
   },
   clienteInfo: {
-    fontSize: theme.typography.sizes.sm,
+    fontSize: 14,
     color: theme.colors.text,
-    marginBottom: theme.spacing.xs,
-    fontWeight: theme.typography.weights.medium,
+    marginBottom: 4,
   },
   pagoOptionsContainer: {
     marginBottom: theme.spacing.md,

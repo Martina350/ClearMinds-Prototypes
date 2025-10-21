@@ -18,7 +18,7 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: theme.colors.background,
     borderRadius: theme.radii.lg,
-    padding: theme.spacing.lg,
+    padding: theme.spacing.md,
     marginVertical: theme.spacing.sm,
     ...theme.shadows.card,
   },
