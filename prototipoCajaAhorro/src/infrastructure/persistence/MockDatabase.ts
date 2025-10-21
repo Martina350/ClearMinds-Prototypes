@@ -199,7 +199,7 @@ class MockDatabase {
       nombre: 'Carlos',
       apellidos: 'Mendoza López',
       email: 'carlos.mendoza@santateresita.ec',
-      celular: '+593 998765432',
+      celular: '+593 098765432',
       usuario: 'cmendoza',
       password: '123456', // En producción: bcrypt hash
       fechaIngreso: '2023-01-15',
@@ -212,7 +212,7 @@ class MockDatabase {
       nombre: 'María',
       apellidos: 'Rodríguez Castro',
       email: 'maria.rodriguez@santateresita.ec',
-      celular: '+593 987654321',
+      celular: '+593 097654321',
       usuario: 'mrodriguez',
       password: '123456',
       fechaIngreso: '2023-03-20',
@@ -229,7 +229,7 @@ class MockDatabase {
       nombre: 'Juan Carlos',
       apellidos: 'Pérez González',
       fechaNacimiento: '1985-06-15',
-      celular: '+593 987654321',
+      celular: '+593 097654322',
       email: 'juan.perez@email.com',
       direccion: 'Av. Amazonas N24-123 y Coruña, La Mariscal, Quito',
       coordenadas: {
@@ -245,7 +245,7 @@ class MockDatabase {
       nombre: 'María Elena',
       apellidos: 'Gómez Rodríguez',
       fechaNacimiento: '1990-03-22',
-      celular: '+593 912345678',
+      celular: '+593 092345678',
       email: 'maria.gomez@email.com',
       direccion: 'Calle Juan León Mera N23-45, La Floresta, Quito',
       coordenadas: {
@@ -261,7 +261,7 @@ class MockDatabase {
       nombre: 'Roberto',
       apellidos: 'Martínez Silva',
       fechaNacimiento: '1978-11-08',
-      celular: '+593 998877665',
+      celular: '+593 098877665',
       email: 'roberto.martinez@email.com',
       direccion: 'Av. 6 de Diciembre N34-456, La Carolina, Quito',
       coordenadas: {
@@ -277,7 +277,7 @@ class MockDatabase {
       nombre: 'Ana Patricia',
       apellidos: 'López Vargas',
       fechaNacimiento: '1992-07-30',
-      celular: '+593 976543210',
+      celular: '+593 096543210',
       email: 'ana.lopez@email.com',
       direccion: 'Av. 10 de Agosto S12-234, San Juan, Quito',
       coordenadas: {
@@ -293,7 +293,7 @@ class MockDatabase {
       nombre: 'Luis Fernando',
       apellidos: 'Castro Morales',
       fechaNacimiento: '1988-02-14',
-      celular: '+593 965432109',
+      celular: '+593 095432109',
       email: 'luis.castro@email.com',
       direccion: 'Calle Wilson E4-567, Quito Norte',
       coordenadas: {
@@ -309,7 +309,7 @@ class MockDatabase {
       nombre: 'Carmen Rosa',
       apellidos: 'Jiménez Páez',
       fechaNacimiento: '1995-09-25',
-      celular: '+593 954321098',
+      celular: '+593 094321098',
       email: 'carmen.jimenez@email.com',
       direccion: 'Av. Colón E6-789, Centro, Quito',
       coordenadas: {
@@ -327,28 +327,28 @@ class MockDatabase {
       id: 'REF001',
       clienteId: 'CLI001',
       nombre: 'Pedro Pérez',
-      telefono: '+593 999888777',
+      telefono: '+593 099888777',
       parentesco: 'Hermano',
     },
     {
       id: 'REF002',
       clienteId: 'CLI001',
       nombre: 'Rosa González',
-      telefono: '+593 988777666',
+      telefono: '+593 098777666',
       parentesco: 'Madre',
     },
     {
       id: 'REF003',
       clienteId: 'CLI002',
       nombre: 'Jorge Gómez',
-      telefono: '+593 977666555',
+      telefono: '+593 097666555',
       parentesco: 'Padre',
     },
     {
       id: 'REF004',
       clienteId: 'CLI002',
       nombre: 'Lucía Rodríguez',
-      telefono: '+593 966555444',
+      telefono: '+593 096555444',
       parentesco: 'Hermana',
     },
   ];
@@ -967,4 +967,5 @@ export const mockDB = new MockDatabase();
 
 // Exportar clase para testing
 export default MockDatabase;
+
 
