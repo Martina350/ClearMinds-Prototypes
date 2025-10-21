@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ScrollView, StyleSheet, Text, View, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
+import { useIsFocused } from '@react-navigation/native';
 import { Card } from '../components/Card';
 import { theme } from '../theme/theme';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -19,10 +20,13 @@ interface Recibo {
 export const ImpresionRecibosScreen: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [recibos, setRecibos] = useState<Recibo[]>([]);
+  const isFocused = useIsFocused();
 
   useEffect(() => {
-    cargarRecibos();
-  }, []);
+    if (isFocused) {
+      cargarRecibos();
+    }
+  }, [isFocused]);
 
   const cargarRecibos = async () => {
     setLoading(true);

@@ -1,5 +1,6 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { ScrollView, StyleSheet, Text, View, Image, Modal, TouchableOpacity } from 'react-native';
+import { useIsFocused } from '@react-navigation/native';
 import { Input } from '../components/Input';
 import { theme } from '../theme/theme';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -20,24 +21,36 @@ export const ConsultasClientesScreen: React.FC = () => {
   const [busqueda, setBusqueda] = useState('');
   const [clienteSeleccionado, setClienteSeleccionado] = useState<Cliente | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
+  const [clientes, setClientes] = useState<Cliente[]>([]);
+  const isFocused = useIsFocused();
   
-  // Obtener clientes de la base de datos mock
-  const clientesDB = mockDB.getClientes();
-  const clientes: Cliente[] = clientesDB.map(clienteDB => {
-    const cuentas = mockDB.getCuentasByCliente(clienteDB.id);
-    const cuentaPrincipal = cuentas.find(c => c.tipo === 'BASICA') || cuentas[0];
-    
-    return {
-      id: clienteDB.id,
-      nombre: clienteDB.nombre,
-      apellidos: clienteDB.apellidos,
-      cedula: clienteDB.cedula,
-      telefono: clienteDB.celular,
-      numeroCuenta: cuentaPrincipal?.numeroCuenta,
-      saldo: cuentaPrincipal?.saldo,
-      avatar: require('../assets/icon.png'),
-    };
-  });
+  // Función para cargar clientes
+  const cargarClientes = () => {
+    const clientesDB = mockDB.getClientes();
+    const clientesMapeados: Cliente[] = clientesDB.map(clienteDB => {
+      const cuentas = mockDB.getCuentasByCliente(clienteDB.id);
+      const cuentaPrincipal = cuentas.find(c => c.tipo === 'BASICA') || cuentas[0];
+      
+      return {
+        id: clienteDB.id,
+        nombre: clienteDB.nombre,
+        apellidos: clienteDB.apellidos,
+        cedula: clienteDB.cedula,
+        telefono: clienteDB.celular,
+        numeroCuenta: cuentaPrincipal?.numeroCuenta,
+        saldo: cuentaPrincipal?.saldo,
+        avatar: require('../assets/icon.png'),
+      };
+    });
+    setClientes(clientesMapeados);
+  };
+
+  // Recargar clientes cuando la pantalla recibe el foco
+  useEffect(() => {
+    if (isFocused) {
+      cargarClientes();
+    }
+  }, [isFocused]);
 
   // Filtrar clientes basado en la búsqueda
   const resultados = useMemo(() => {

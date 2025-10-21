@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ScrollView, StyleSheet, Text, View, TouchableOpacity, Image, ActivityIndicator, Modal } from 'react-native';
+import { useIsFocused } from '@react-navigation/native';
 import { theme } from '../theme/theme';
 import { Card } from '../components/Card';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -31,10 +32,13 @@ export const ActividadScreen: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<DashboardData | null>(null);
   const [modalVisible, setModalVisible] = useState<string | null>(null);
+  const isFocused = useIsFocused();
 
   useEffect(() => {
-    cargarDatos();
-  }, []);
+    if (isFocused) {
+      cargarDatos();
+    }
+  }, [isFocused]);
 
   const cargarDatos = async () => {
     try {
@@ -45,10 +49,8 @@ export const ActividadScreen: React.FC = () => {
       // Obtener fecha actual
       const hoy = new Date().toISOString().split('T')[0];
       
-      // Obtener datos reales del dashboard (puedes cambiar la fecha para ver otros datos)
-      // Usar fecha de ejemplo donde hay datos: '2024-01-15'
-      const fechaDemo = '2024-01-15';
-      const dashboardData = mockDB.getDashboardData(fechaDemo, 'AG001');
+      // Obtener datos reales del dashboard para el día actual
+      const dashboardData = mockDB.getDashboardData(hoy, 'AG001');
       
       // Obtener cuentas para desglose
       const todasCuentas = mockDB.getCuentas();
@@ -76,7 +78,7 @@ export const ActividadScreen: React.FC = () => {
       const montoMenor = montos.length > 0 ? Math.min(...montos) : 0;
 
       const mockData: DashboardData = {
-        fecha: new Date(fechaDemo),
+        fecha: new Date(hoy),
         cuentasAperturadas: dashboardData.cuentasAperturadas,
         cuentasBasicasAperturadas: cuentasBasicas,
         cuentasInfantilesAperturadas: cuentasInfantiles,

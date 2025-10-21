@@ -4,7 +4,7 @@ import { ClienteSearch } from '../components/ClienteSearch';
 import { Button } from '../components/Button';
 import { Card } from '../components/Card';
 import { theme } from '../theme/theme';
-import { mockDB, Cobranza as CobranzaDB } from '../../infrastructure/persistence/MockDatabase';
+import { mockDB, Cobranza as CobranzaDB, TipoCuenta, Transaccion, TipoTransaccion, EstadoTransaccion, Recibo } from '../../infrastructure/persistence/MockDatabase';
 
 interface Props { navigation: any; }
 

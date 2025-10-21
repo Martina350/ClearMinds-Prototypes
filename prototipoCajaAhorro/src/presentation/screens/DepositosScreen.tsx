@@ -5,7 +5,7 @@ import { Input } from '../components/Input';
 import { Button } from '../components/Button';
 import { Card } from '../components/Card';
 import { theme } from '../theme/theme';
-import { mockDB, Transaccion, Recibo, TipoTransaccion, EstadoTransaccion } from '../../infrastructure/persistence/MockDatabase';
+import { mockDB, Transaccion, Recibo, TipoTransaccion, EstadoTransaccion, TipoCuenta } from '../../infrastructure/persistence/MockDatabase';
 
 interface Props { navigation: any; }
 
