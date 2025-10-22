@@ -8,10 +8,19 @@ import { IPrintService, DatosRecibo } from '../../domain/services/IPrintService'
 export class PrintServiceImpl implements IPrintService {
   async imprimirRecibo(datos: DatosRecibo): Promise<void> {
     try {
+      // Verificar si hay impresora conectada
+      const impresoraConectada = await this.verificarImpresoraConectada();
+      if (!impresoraConectada) {
+        throw new Error('PRINTER_NOT_CONNECTED');
+      }
+
       const html = this.generarHTMLRecibo(datos);
       await Print.printAsync({ html });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error al imprimir recibo:', error);
+      if (error.message === 'PRINTER_NOT_CONNECTED') {
+        throw error;
+      }
       throw new Error('No se pudo imprimir el recibo');
     }
   }
@@ -43,9 +52,10 @@ export class PrintServiceImpl implements IPrintService {
 
   async verificarImpresoraConectada(): Promise<boolean> {
     try {
-      // Expo Print no tiene una forma directa de verificar impresoras
-      // Retornamos true ya que la impresión se maneja a nivel del sistema
-      return true;
+      // Simular verificación de impresora (para prototipo)
+      // 20% de probabilidad de que no esté conectada para demostrar funcionalidad
+      const estaConectada = Math.random() > 0.2;
+      return estaConectada;
     } catch (error) {
       return false;
     }

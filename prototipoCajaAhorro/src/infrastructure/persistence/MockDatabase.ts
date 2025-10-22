@@ -182,8 +182,10 @@ export interface Recibo {
   monto: number;
   fecha: string;
   hora: string;
-  estado: 'IMPRESO' | 'ENVIADO';
+  estado: 'IMPRESO' | 'ENVIADO' | 'NO_IMPRESO';
   agenteId: string;
+  intentosImpresion?: number;
+  ultimoIntentoImpresion?: string;
 }
 
 // ============================================================================
@@ -768,6 +770,35 @@ class MockDatabase {
       estado: 'IMPRESO',
       agenteId: 'AG001',
     },
+    // Recibos con error de impresión
+    {
+      id: 'REC008',
+      numero: 'R-2024-008',
+      transaccionId: 'TRX008',
+      clienteId: 'CLI001',
+      tipo: 'Depósito',
+      monto: 1400.00,
+      fecha: '2024-04-05',
+      hora: '09:10:25',
+      estado: 'NO_IMPRESO',
+      agenteId: 'AG001',
+      intentosImpresion: 1,
+      ultimoIntentoImpresion: '2024-04-05 09:11:00',
+    },
+    {
+      id: 'REC009',
+      numero: 'R-2024-009',
+      transaccionId: 'TRX006',
+      clienteId: 'CLI001',
+      tipo: 'Cobro',
+      monto: 472.50,
+      fecha: '2024-04-10',
+      hora: '16:45:30',
+      estado: 'NO_IMPRESO',
+      agenteId: 'AG001',
+      intentosImpresion: 2,
+      ultimoIntentoImpresion: '2024-04-10 16:50:15',
+    },
   ];
 
   // ============================================================================
@@ -894,6 +925,34 @@ class MockDatabase {
 
   agregarRecibo(recibo: Recibo): void {
     this.recibos.push(recibo);
+  }
+
+  getReciboById(id: string): Recibo | undefined {
+    return this.recibos.find(r => r.id === id);
+  }
+
+  actualizarEstadoRecibo(id: string, estado: 'IMPRESO' | 'ENVIADO' | 'NO_IMPRESO'): void {
+    const recibo = this.recibos.find(r => r.id === id);
+    if (recibo) {
+      recibo.estado = estado;
+      if (estado === 'IMPRESO') {
+        const ahora = new Date();
+        recibo.ultimoIntentoImpresion = `${ahora.toISOString().slice(0, 10)} ${ahora.toTimeString().slice(0, 8)}`;
+      }
+    }
+  }
+
+  incrementarIntentosImpresion(id: string): void {
+    const recibo = this.recibos.find(r => r.id === id);
+    if (recibo) {
+      recibo.intentosImpresion = (recibo.intentosImpresion || 0) + 1;
+      const ahora = new Date();
+      recibo.ultimoIntentoImpresion = `${ahora.toISOString().slice(0, 10)} ${ahora.toTimeString().slice(0, 8)}`;
+    }
+  }
+
+  getTransaccionById(id: string): Transaccion | undefined {
+    return this.transacciones.find(t => t.id === id);
   }
 
   // ----------- AGENTES -----------
