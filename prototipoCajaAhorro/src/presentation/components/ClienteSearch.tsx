@@ -48,9 +48,11 @@ export const ClienteSearch: React.FC<ClienteSearchProps> = ({
       
       // Convertir clientes de DB a formato de la interfaz
       const clientesConCuentas = clientesDB.map((clienteDB: ClienteDB) => {
-        // Obtener cuenta principal del cliente
+        // Obtener cuenta principal del cliente (básica, infantil o primera disponible)
         const cuentas = mockDB.getCuentasByCliente(clienteDB.id);
-        const cuentaPrincipal = cuentas.find((c: Cuenta) => c.tipo === 'BASICA') || cuentas[0];
+        const cuentaPrincipal = cuentas.find((c: Cuenta) => 
+          (c.tipo === 'BASICA' || c.tipo === 'INFANTIL') && c.estado === 'ACTIVA'
+        ) || cuentas.find((c: Cuenta) => c.estado === 'ACTIVA') || cuentas[0];
         
         return {
           id: clienteDB.id,

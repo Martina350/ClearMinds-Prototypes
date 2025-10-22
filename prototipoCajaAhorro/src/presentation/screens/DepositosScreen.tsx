@@ -65,10 +65,14 @@ export const DepositosScreen: React.FC<Props> = ({ navigation }) => {
 
     // Obtener la cuenta del cliente
     const cuentas = mockDB.getCuentasByCliente(clienteSeleccionado.id);
-    const cuentaBasica = cuentas.find(c => c.tipo === TipoCuenta.BASICA);
+    // Buscar cuenta básica o infantil activa
+    const cuentaActiva = cuentas.find(c => 
+      (c.tipo === TipoCuenta.BASICA || c.tipo === TipoCuenta.INFANTIL) && 
+      c.estado === 'ACTIVA'
+    );
     
-    if (!cuentaBasica) {
-      Alert.alert('Error', 'El cliente no tiene una cuenta activa');
+    if (!cuentaActiva) {
+      Alert.alert('Error', 'El cliente no tiene una cuenta activa para realizar depósitos');
       return;
     }
 
@@ -93,12 +97,12 @@ export const DepositosScreen: React.FC<Props> = ({ navigation }) => {
             const nuevaTransaccion: Transaccion = {
               id: transaccionId,
               numero: numeroTransaccion,
-              cuentaId: cuentaBasica.id,
+              cuentaId: cuentaActiva.id,
               clienteId: clienteSeleccionado.id,
               tipo: TipoTransaccion.DEPOSITO,
               monto: montoNumero,
-              saldoAnterior: cuentaBasica.saldo,
-              saldoNuevo: cuentaBasica.saldo + montoNumero,
+              saldoAnterior: cuentaActiva.saldo,
+              saldoNuevo: cuentaActiva.saldo + montoNumero,
               estado: EstadoTransaccion.COMPLETADA,
               fecha: fechaActual,
               hora: horaActual,

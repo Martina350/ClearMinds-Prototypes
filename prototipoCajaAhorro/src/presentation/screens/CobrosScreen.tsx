@@ -104,10 +104,14 @@ export const CobrosScreen: React.FC<Props> = ({ navigation }) => {
             
             // Obtener cuenta del cliente
             const cuentas = mockDB.getCuentasByCliente(clienteSeleccionado.id);
-            const cuentaBasica = cuentas.find(c => c.tipo === TipoCuenta.BASICA);
+            // Buscar cuenta básica o infantil activa
+            const cuentaActiva = cuentas.find(c => 
+              (c.tipo === TipoCuenta.BASICA || c.tipo === TipoCuenta.INFANTIL) && 
+              c.estado === 'ACTIVA'
+            );
             
-            if (!cuentaBasica) {
-              Alert.alert('Error', 'El cliente no tiene cuenta');
+            if (!cuentaActiva) {
+              Alert.alert('Error', 'El cliente no tiene una cuenta activa para realizar cobros');
               return;
             }
             
@@ -120,12 +124,12 @@ export const CobrosScreen: React.FC<Props> = ({ navigation }) => {
             const nuevaTransaccion: Transaccion = {
               id: transaccionId,
               numero: numeroTransaccion,
-              cuentaId: cuentaBasica.id,
+              cuentaId: cuentaActiva.id,
               clienteId: clienteSeleccionado.id,
               tipo: TipoTransaccion.COBRO,
               monto: montoSeleccionado,
-              saldoAnterior: cuentaBasica.saldo,
-              saldoNuevo: cuentaBasica.saldo - montoSeleccionado,
+              saldoAnterior: cuentaActiva.saldo,
+              saldoNuevo: cuentaActiva.saldo - montoSeleccionado,
               estado: EstadoTransaccion.COMPLETADA,
               fecha: fechaActual,
               hora: horaActual,
