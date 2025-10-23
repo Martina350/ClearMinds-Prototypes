@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ScrollView, StyleSheet, View, Text, Alert } from 'react-native';
 import { ClienteSearch } from '../components/ClienteSearch';
 import { Input } from '../components/Input';
+import { Picker } from '../components/Picker';
 import { Button } from '../components/Button';
 import { Card } from '../components/Card';
 import { theme } from '../theme/theme';
-import { mockDB, Transaccion, Recibo, TipoTransaccion, EstadoTransaccion, TipoCuenta } from '../../infrastructure/persistence/MockDatabase';
+import { mockDB, Transaccion, Recibo, TipoTransaccion, EstadoTransaccion, TipoCuenta, Cuenta } from '../../infrastructure/persistence/MockDatabase';
 
 interface Props { navigation: any; }
 
@@ -21,11 +22,53 @@ interface Cliente {
 
 export const DepositosScreen: React.FC<Props> = ({ navigation }) => {
   const [clienteSeleccionado, setClienteSeleccionado] = useState<Cliente | null>(null);
+  const [cuentasDisponibles, setCuentasDisponibles] = useState<Cuenta[]>([]);
+  const [cuentaSeleccionada, setCuentaSeleccionada] = useState<Cuenta | null>(null);
   const [monto, setMonto] = useState('');
   const [notas, setNotas] = useState('');
 
   const handleClienteSelect = (cliente: Cliente) => {
     setClienteSeleccionado(cliente);
+    // Resetear cuenta seleccionada y monto al cambiar de cliente
+    setCuentaSeleccionada(null);
+    setMonto('');
+    setNotas('');
+  };
+
+  // Efecto para cargar las cuentas del cliente cuando se selecciona
+  useEffect(() => {
+    if (clienteSeleccionado) {
+      const cuentas = mockDB.getCuentasByCliente(clienteSeleccionado.id);
+      // Filtrar solo cuentas activas que permitan depósitos (BASICA, INFANTIL, AHORRO_FUTURO)
+      const cuentasActivas = cuentas.filter(c => 
+        (c.tipo === TipoCuenta.BASICA || c.tipo === TipoCuenta.INFANTIL || c.tipo === TipoCuenta.AHORRO_FUTURO) && 
+        c.estado === 'ACTIVA'
+      );
+      setCuentasDisponibles(cuentasActivas);
+      
+      // Si solo hay una cuenta, seleccionarla automáticamente
+      if (cuentasActivas.length === 1) {
+        setCuentaSeleccionada(cuentasActivas[0]);
+      } else {
+        setCuentaSeleccionada(null);
+      }
+    } else {
+      setCuentasDisponibles([]);
+      setCuentaSeleccionada(null);
+    }
+  }, [clienteSeleccionado]);
+
+  const getTipoCuentaLabel = (tipo: TipoCuenta): string => {
+    switch (tipo) {
+      case TipoCuenta.BASICA:
+        return 'Cuenta de Ahorro Básica';
+      case TipoCuenta.INFANTIL:
+        return 'Cuenta de Ahorro Infantil';
+      case TipoCuenta.AHORRO_FUTURO:
+        return 'Cuenta de Ahorro Futuro';
+      default:
+        return 'Cuenta';
+    }
   };
 
   const handleMontoChange = (text: string) => {
@@ -51,6 +94,11 @@ export const DepositosScreen: React.FC<Props> = ({ navigation }) => {
       Alert.alert('Error', 'Debe seleccionar un cliente primero');
       return;
     }
+
+    if (!cuentaSeleccionada) {
+      Alert.alert('Error', 'Debe seleccionar una cuenta para realizar el depósito');
+      return;
+    }
     
     const montoNumero = parseFloat(monto);
     if (isNaN(montoNumero) || montoNumero <= 0) {
@@ -63,22 +111,9 @@ export const DepositosScreen: React.FC<Props> = ({ navigation }) => {
       return;
     }
 
-    // Obtener la cuenta del cliente
-    const cuentas = mockDB.getCuentasByCliente(clienteSeleccionado.id);
-    // Buscar cuenta básica o infantil activa
-    const cuentaActiva = cuentas.find(c => 
-      (c.tipo === TipoCuenta.BASICA || c.tipo === TipoCuenta.INFANTIL) && 
-      c.estado === 'ACTIVA'
-    );
-    
-    if (!cuentaActiva) {
-      Alert.alert('Error', 'El cliente no tiene una cuenta activa para realizar depósitos');
-      return;
-    }
-
     Alert.alert(
       'Confirmar Depósito',
-      `¿Desea realizar un depósito de $${montoNumero.toFixed(2)} a la cuenta de ${clienteSeleccionado.nombre} ${clienteSeleccionado.apellidos}?`,
+      `¿Desea realizar un depósito de $${montoNumero.toFixed(2)} a la ${getTipoCuentaLabel(cuentaSeleccionada.tipo)} (${cuentaSeleccionada.numeroCuenta}) de ${clienteSeleccionado.nombre} ${clienteSeleccionado.apellidos}?`,
       [
         { text: 'Cancelar' },
         {
@@ -97,12 +132,12 @@ export const DepositosScreen: React.FC<Props> = ({ navigation }) => {
             const nuevaTransaccion: Transaccion = {
               id: transaccionId,
               numero: numeroTransaccion,
-              cuentaId: cuentaActiva.id,
+              cuentaId: cuentaSeleccionada.id,
               clienteId: clienteSeleccionado.id,
               tipo: TipoTransaccion.DEPOSITO,
               monto: montoNumero,
-              saldoAnterior: cuentaActiva.saldo,
-              saldoNuevo: cuentaActiva.saldo + montoNumero,
+              saldoAnterior: cuentaSeleccionada.saldo,
+              saldoNuevo: cuentaSeleccionada.saldo + montoNumero,
               estado: EstadoTransaccion.COMPLETADA,
               fecha: fechaActual,
               hora: horaActual,
@@ -133,6 +168,11 @@ export const DepositosScreen: React.FC<Props> = ({ navigation }) => {
             // Navegar a la pantalla de recibo con los datos
             navigation.navigate('Recibo', {
               cliente: clienteSeleccionado,
+              cuenta: {
+                numeroCuenta: cuentaSeleccionada.numeroCuenta,
+                tipo: cuentaSeleccionada.tipo,
+                saldoAnterior: cuentaSeleccionada.saldo,
+              },
               monto: montoNumero,
               notas: notas,
               tipo: 'DEPOSITO',
@@ -164,17 +204,40 @@ export const DepositosScreen: React.FC<Props> = ({ navigation }) => {
           </Text>
           <Text style={styles.clienteCedula}>Cédula: {clienteSeleccionado.cedula}</Text>
           <Text style={styles.clienteCelular}>{clienteSeleccionado.celular}</Text>
-          {clienteSeleccionado.numeroCuenta && (
-            <Text style={styles.clienteCuenta}>Cuenta: {clienteSeleccionado.numeroCuenta}</Text>
-          )}
-          {clienteSeleccionado.saldo !== undefined && (
-            <Text style={styles.clienteSaldo}>Saldo actual: ${clienteSeleccionado.saldo.toFixed(2)}</Text>
+          
+          {cuentasDisponibles.length > 0 && (
+            <View style={styles.cuentasContainer}>
+              <Text style={styles.cuentasTitle}>Cuentas disponibles: {cuentasDisponibles.length}</Text>
+              {cuentasDisponibles.map((cuenta) => (
+                <View key={cuenta.id} style={styles.cuentaItem}>
+                  <Text style={styles.cuentaTipo}>{getTipoCuentaLabel(cuenta.tipo)}</Text>
+                  <Text style={styles.cuentaNumero}>{cuenta.numeroCuenta}</Text>
+                  <Text style={styles.cuentaSaldo}>Saldo: ${cuenta.saldo.toFixed(2)}</Text>
+                </View>
+              ))}
+            </View>
           )}
         </Card>
       )}
 
-      {clienteSeleccionado && (
+      {clienteSeleccionado && cuentasDisponibles.length > 0 && (
         <>
+          {cuentasDisponibles.length > 1 && (
+            <Picker
+              label="Seleccione la cuenta para el depósito"
+              selectedValue={cuentaSeleccionada?.id || ''}
+              onValueChange={(value) => {
+                const cuenta = cuentasDisponibles.find(c => c.id === value);
+                setCuentaSeleccionada(cuenta || null);
+              }}
+              items={cuentasDisponibles.map(cuenta => ({
+                label: `${getTipoCuentaLabel(cuenta.tipo)} - ${cuenta.numeroCuenta}`,
+                value: cuenta.id,
+              }))}
+              required
+            />
+          )}
+
           <Input 
             label="Monto del depósito" 
             placeholder="Ingrese el monto a depositar" 
@@ -193,7 +256,7 @@ export const DepositosScreen: React.FC<Props> = ({ navigation }) => {
             numberOfLines={3}
           />
 
-          {monto && validarMonto() && (
+          {monto && validarMonto() && cuentaSeleccionada && (
             <Card style={styles.resumenCard}>
               <Text style={styles.resumenTitle}>Resumen del Depósito</Text>
               <View style={styles.resumenRow}>
@@ -203,8 +266,26 @@ export const DepositosScreen: React.FC<Props> = ({ navigation }) => {
                 </Text>
               </View>
               <View style={styles.resumenRow}>
+                <Text style={styles.resumenLabel}>Cuenta:</Text>
+                <Text style={styles.resumenValue}>
+                  {getTipoCuentaLabel(cuentaSeleccionada.tipo)}
+                </Text>
+              </View>
+              <View style={styles.resumenRow}>
+                <Text style={styles.resumenLabel}>Número:</Text>
+                <Text style={styles.resumenValue}>{cuentaSeleccionada.numeroCuenta}</Text>
+              </View>
+              <View style={styles.resumenRow}>
+                <Text style={styles.resumenLabel}>Saldo Actual:</Text>
+                <Text style={styles.resumenValue}>${cuentaSeleccionada.saldo.toFixed(2)}</Text>
+              </View>
+              <View style={styles.resumenRow}>
                 <Text style={styles.resumenLabel}>Monto:</Text>
                 <Text style={styles.resumenMonto}>${parseFloat(monto).toFixed(2)}</Text>
+              </View>
+              <View style={styles.resumenRow}>
+                <Text style={styles.resumenLabel}>Nuevo Saldo:</Text>
+                <Text style={styles.resumenMonto}>${(cuentaSeleccionada.saldo + parseFloat(monto)).toFixed(2)}</Text>
               </View>
               {notas && (
                 <View style={styles.resumenRow}>
@@ -219,7 +300,7 @@ export const DepositosScreen: React.FC<Props> = ({ navigation }) => {
             title="Realizar Depósito" 
             onPress={handleRealizarDeposito} 
             fullWidth 
-            disabled={!validarMonto()}
+            disabled={!validarMonto() || !cuentaSeleccionada}
           />
         </>
       )}
@@ -257,6 +338,36 @@ const styles = StyleSheet.create({
   },
   clienteSaldo: {
     fontSize: 14,
+    color: '#4CAF50',
+    fontWeight: '600',
+  },
+  cuentasContainer: {
+    marginTop: theme.spacing.sm,
+    paddingTop: theme.spacing.sm,
+    borderTopWidth: 1,
+    borderTopColor: '#E0E0E0',
+  },
+  cuentasTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: theme.colors.text,
+    marginBottom: theme.spacing.xs,
+  },
+  cuentaItem: {
+    paddingVertical: 6,
+    paddingLeft: theme.spacing.sm,
+  },
+  cuentaTipo: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: theme.colors.primary,
+  },
+  cuentaNumero: {
+    fontSize: 12,
+    color: theme.colors.primaryLight,
+  },
+  cuentaSaldo: {
+    fontSize: 12,
     color: '#4CAF50',
     fontWeight: '600',
   },

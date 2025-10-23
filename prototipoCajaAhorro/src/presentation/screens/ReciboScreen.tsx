@@ -3,16 +3,23 @@ import { ScrollView, StyleSheet, Text, View, Alert, ActivityIndicator, Image } f
 import { Button } from '../components/Button';
 import { Card } from '../components/Card';
 import { theme } from '../theme/theme';
+import { TipoCuenta } from '../../infrastructure/persistence/MockDatabase';
 
 interface Props {
   navigation: any;
   route?: {
     params?: {
       cliente?: any;
+      cuenta?: {
+        numeroCuenta: string;
+        tipo: TipoCuenta;
+        saldoAnterior: number;
+      };
       cobranza?: any;
       monto?: number;
       notas?: string;
       tipo?: string;
+      saldoNuevo?: number;
     };
   };
 }
@@ -23,7 +30,21 @@ export const ReciboScreen: React.FC<Props> = ({ navigation, route }) => {
   const [fechaHora, setFechaHora] = useState('');
 
   const params = route?.params || {};
-  const { cliente, cobranza, monto, notas, tipo } = params;
+  const { cliente, cuenta, cobranza, monto, notas, tipo, saldoNuevo } = params;
+
+  const getTipoCuentaLabel = (tipoCuenta?: TipoCuenta): string => {
+    if (!tipoCuenta) return 'Cuenta';
+    switch (tipoCuenta) {
+      case TipoCuenta.BASICA:
+        return 'Cuenta de Ahorro Básica';
+      case TipoCuenta.INFANTIL:
+        return 'Cuenta de Ahorro Infantil';
+      case TipoCuenta.AHORRO_FUTURO:
+        return 'Cuenta de Ahorro Futuro';
+      default:
+        return 'Cuenta';
+    }
+  };
 
   useEffect(() => {
     // Generar número de recibo
@@ -142,7 +163,19 @@ export const ReciboScreen: React.FC<Props> = ({ navigation, route }) => {
                 <Text style={styles.label}>Cédula:</Text>
                 <Text style={styles.value}>{cliente.cedula}</Text>
               </View>
-              {cliente.numeroCuenta && (
+              {cuenta && (
+                <>
+                  <View style={styles.row}>
+                    <Text style={styles.label}>Tipo de Cuenta:</Text>
+                    <Text style={styles.value}>{getTipoCuentaLabel(cuenta.tipo)}</Text>
+                  </View>
+                  <View style={styles.row}>
+                    <Text style={styles.label}>Número de Cuenta:</Text>
+                    <Text style={styles.value}>{cuenta.numeroCuenta}</Text>
+                  </View>
+                </>
+              )}
+              {!cuenta && cliente.numeroCuenta && (
                 <View style={styles.row}>
                   <Text style={styles.label}>Cuenta:</Text>
                   <Text style={styles.value}>{cliente.numeroCuenta}</Text>
@@ -188,6 +221,19 @@ export const ReciboScreen: React.FC<Props> = ({ navigation, route }) => {
             <Text style={styles.totalLabel}>TOTAL:</Text>
             <Text style={styles.totalValue}>${monto?.toFixed(2) || '0.00'}</Text>
           </View>
+
+          {tipo === 'DEPOSITO' && cuenta && saldoNuevo !== undefined && (
+            <View style={styles.saldoInfo}>
+              <View style={styles.row}>
+                <Text style={styles.label}>Saldo Anterior:</Text>
+                <Text style={styles.value}>${cuenta.saldoAnterior.toFixed(2)}</Text>
+              </View>
+              <View style={styles.row}>
+                <Text style={styles.label}>Saldo Nuevo:</Text>
+                <Text style={[styles.value, styles.saldoNuevo]}>${saldoNuevo.toFixed(2)}</Text>
+              </View>
+            </View>
+          )}
         </View>
 
         <View style={styles.footer}>
@@ -337,6 +383,16 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   logo: { width: 340, height: 36, resizeMode: 'contain', alignSelf: 'center' },
+  saldoInfo: {
+    marginTop: theme.spacing.sm,
+    paddingTop: theme.spacing.sm,
+    borderTopWidth: 1,
+    borderTopColor: '#E0E0E0',
+  },
+  saldoNuevo: {
+    color: '#4CAF50',
+    fontWeight: '700',
+  },
 });
 
 
