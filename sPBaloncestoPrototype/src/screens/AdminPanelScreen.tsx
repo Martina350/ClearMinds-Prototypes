@@ -1,0 +1,629 @@
+// Panel Administrativo Móvil
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  FlatList,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView,
+  Alert,
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { useApp } from '../context/AppContext';
+import { Payment, Student, Championship, Match } from '../types';
+
+export const AdminPanelScreen: React.FC = () => {
+  const { students, payments, championships } = useApp();
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'payments' | 'championships'>('dashboard');
+
+  // Cálculos para el dashboard
+  const totalStudents = students.length;
+  const studentsUpToDate = students.filter(student => {
+    const studentPayments = payments.filter(payment => payment.studentId === student.id);
+    const pendingPayments = studentPayments.filter(payment => 
+      payment.status === 'pending' || payment.status === 'overdue'
+    );
+    return pendingPayments.length === 0;
+  }).length;
+  
+  const studentsInDebt = totalStudents - studentsUpToDate;
+  const pendingTransfers = payments.filter(payment => payment.status === 'under_review');
+  const totalDebt = payments
+    .filter(payment => payment.status === 'pending' || payment.status === 'overdue')
+    .reduce((sum, payment) => sum + payment.amount, 0);
+
+  const renderDashboard = () => (
+    <ScrollView style={styles.tabContent}>
+      <View style={styles.summaryCards}>
+        <View style={styles.summaryCard}>
+          <Ionicons name="people-outline" size={30} color="#3498db" />
+          <Text style={styles.summaryNumber}>{totalStudents}</Text>
+          <Text style={styles.summaryLabel}>Total Estudiantes</Text>
+        </View>
+        
+        <View style={styles.summaryCard}>
+          <Ionicons name="checkmark-circle-outline" size={30} color="#27ae60" />
+          <Text style={styles.summaryNumber}>{studentsUpToDate}</Text>
+          <Text style={styles.summaryLabel}>Al Día</Text>
+        </View>
+        
+        <View style={styles.summaryCard}>
+          <Ionicons name="warning-outline" size={30} color="#e74c3c" />
+          <Text style={styles.summaryNumber}>{studentsInDebt}</Text>
+          <Text style={styles.summaryLabel}>En Mora</Text>
+        </View>
+        
+        <View style={styles.summaryCard}>
+          <Ionicons name="cash-outline" size={30} color="#f39c12" />
+          <Text style={styles.summaryNumber}>${totalDebt}</Text>
+          <Text style={styles.summaryLabel}>Deuda Total</Text>
+        </View>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Transferencias Pendientes</Text>
+        {pendingTransfers.length > 0 ? (
+          <FlatList
+            data={pendingTransfers.slice(0, 5)}
+            renderItem={({ item }) => (
+              <View style={styles.transferCard}>
+                <View style={styles.transferInfo}>
+                  <Text style={styles.transferStudent}>
+                    {students.find(s => s.id === item.studentId)?.name}
+                  </Text>
+                  <Text style={styles.transferAmount}>${item.amount}</Text>
+                </View>
+                <Text style={styles.transferDescription}>{item.description}</Text>
+                <View style={styles.transferActions}>
+                  <TouchableOpacity 
+                    style={styles.approveButton}
+                    onPress={() => handleTransferAction(item.id, 'approve')}
+                  >
+                    <Text style={styles.approveButtonText}>Aprobar</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity 
+                    style={styles.rejectButton}
+                    onPress={() => handleTransferAction(item.id, 'reject')}
+                  >
+                    <Text style={styles.rejectButtonText}>Rechazar</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            )}
+            keyExtractor={(item) => item.id}
+            scrollEnabled={false}
+          />
+        ) : (
+          <Text style={styles.emptyText}>No hay transferencias pendientes</Text>
+        )}
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Estudiantes en Mora</Text>
+        {studentsInDebt > 0 ? (
+          <FlatList
+            data={students.filter(student => {
+              const studentPayments = payments.filter(payment => payment.studentId === student.id);
+              const pendingPayments = studentPayments.filter(payment => 
+                payment.status === 'pending' || payment.status === 'overdue'
+              );
+              return pendingPayments.length > 0;
+            }).slice(0, 5)}
+            renderItem={({ item }) => {
+              const studentPayments = payments.filter(payment => payment.studentId === item.id);
+              const pendingPayments = studentPayments.filter(payment => 
+                payment.status === 'pending' || payment.status === 'overdue'
+              );
+              const totalDebt = pendingPayments.reduce((sum, payment) => sum + payment.amount, 0);
+              
+              return (
+                <View style={styles.debtCard}>
+                  <Text style={styles.debtStudent}>{item.name}</Text>
+                  <Text style={styles.debtAmount}>${totalDebt}</Text>
+                  <Text style={styles.debtCount}>
+                    {pendingPayments.length} pago{pendingPayments.length !== 1 ? 's' : ''} pendiente{pendingPayments.length !== 1 ? 's' : ''}
+                  </Text>
+                </View>
+              );
+            }}
+            keyExtractor={(item) => item.id}
+            scrollEnabled={false}
+          />
+        ) : (
+          <Text style={styles.emptyText}>¡Todos los estudiantes están al día!</Text>
+        )}
+      </View>
+    </ScrollView>
+  );
+
+  const renderPayments = () => (
+    <ScrollView style={styles.tabContent}>
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Gestión de Pagos</Text>
+        
+        <TouchableOpacity style={styles.actionButton}>
+          <Ionicons name="card-outline" size={20} color="white" />
+          <Text style={styles.actionButtonText}>Ver Pagos por Tarjeta</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity style={styles.actionButton}>
+          <Ionicons name="swap-horizontal-outline" size={20} color="white" />
+          <Text style={styles.actionButtonText}>Revisar Transferencias</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity style={styles.actionButton}>
+          <Ionicons name="document-text-outline" size={20} color="white" />
+          <Text style={styles.actionButtonText}>Reporte de Pagos</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Transferencias por Revisar</Text>
+        {pendingTransfers.length > 0 ? (
+          <FlatList
+            data={pendingTransfers}
+            renderItem={({ item }) => (
+              <View style={styles.paymentCard}>
+                <View style={styles.paymentHeader}>
+                  <Text style={styles.paymentStudent}>
+                    {students.find(s => s.id === item.studentId)?.name}
+                  </Text>
+                  <Text style={styles.paymentAmount}>${item.amount}</Text>
+                </View>
+                <Text style={styles.paymentDescription}>{item.description}</Text>
+                <Text style={styles.paymentDate}>Subido: {item.createdAt}</Text>
+                {item.receiptImage && (
+                  <Text style={styles.receiptInfo}>Comprobante: {item.receiptImage}</Text>
+                )}
+                <View style={styles.paymentActions}>
+                  <TouchableOpacity 
+                    style={styles.approveButton}
+                    onPress={() => handleTransferAction(item.id, 'approve')}
+                  >
+                    <Text style={styles.approveButtonText}>Aprobar</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity 
+                    style={styles.rejectButton}
+                    onPress={() => handleTransferAction(item.id, 'reject')}
+                  >
+                    <Text style={styles.rejectButtonText}>Rechazar</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            )}
+            keyExtractor={(item) => item.id}
+            scrollEnabled={false}
+          />
+        ) : (
+          <Text style={styles.emptyText}>No hay transferencias pendientes</Text>
+        )}
+      </View>
+    </ScrollView>
+  );
+
+  const renderChampionships = () => (
+    <ScrollView style={styles.tabContent}>
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Gestión de Campeonatos</Text>
+        
+        <TouchableOpacity style={styles.actionButton}>
+          <Ionicons name="add-outline" size={20} color="white" />
+          <Text style={styles.actionButtonText}>Crear Campeonato</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity style={styles.actionButton}>
+          <Ionicons name="calendar-outline" size={20} color="white" />
+          <Text style={styles.actionButtonText}>Programar Partido</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity style={styles.actionButton}>
+          <Ionicons name="trophy-outline" size={20} color="white" />
+          <Text style={styles.actionButtonText}>Registrar Resultado</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Campeonatos Activos</Text>
+        {championships.filter(c => c.isActive).length > 0 ? (
+          <FlatList
+            data={championships.filter(c => c.isActive)}
+            renderItem={({ item }) => (
+              <View style={styles.championshipCard}>
+                <Text style={styles.championshipName}>{item.name}</Text>
+                <Text style={styles.championshipCategory}>
+                  {item.category} - {item.gender}
+                </Text>
+                <Text style={styles.championshipMatches}>
+                  {item.matches.length} partidos programados
+                </Text>
+                <View style={styles.championshipActions}>
+                  <TouchableOpacity style={styles.editButton}>
+                    <Text style={styles.editButtonText}>Editar</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.viewButton}>
+                    <Text style={styles.viewButtonText}>Ver Detalle</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            )}
+            keyExtractor={(item) => item.id}
+            scrollEnabled={false}
+          />
+        ) : (
+          <Text style={styles.emptyText}>No hay campeonatos activos</Text>
+        )}
+      </View>
+    </ScrollView>
+  );
+
+  const handleTransferAction = (paymentId: string, action: 'approve' | 'reject') => {
+    Alert.alert(
+      action === 'approve' ? 'Aprobar Transferencia' : 'Rechazar Transferencia',
+      `¿Estás seguro de ${action === 'approve' ? 'aprobar' : 'rechazar'} esta transferencia?`,
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        { 
+          text: action === 'approve' ? 'Aprobar' : 'Rechazar', 
+          onPress: () => {
+            Alert.alert(
+              'Acción Completada',
+              `La transferencia ha sido ${action === 'approve' ? 'aprobada' : 'rechazada'}.`
+            );
+          }
+        }
+      ]
+    );
+  };
+
+  return (
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Panel Administrativo</Text>
+        <Text style={styles.headerSubtitle}>Escuela de Baloncesto San Pedro</Text>
+      </View>
+
+      <View style={styles.tabContainer}>
+        <TouchableOpacity
+          style={[styles.tab, activeTab === 'dashboard' && styles.activeTab]}
+          onPress={() => setActiveTab('dashboard')}
+        >
+          <Ionicons 
+            name="analytics-outline" 
+            size={20} 
+            color={activeTab === 'dashboard' ? '#e74c3c' : '#7f8c8d'} 
+          />
+          <Text style={[styles.tabText, activeTab === 'dashboard' && styles.activeTabText]}>
+            Dashboard
+          </Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity
+          style={[styles.tab, activeTab === 'payments' && styles.activeTab]}
+          onPress={() => setActiveTab('payments')}
+        >
+          <Ionicons 
+            name="card-outline" 
+            size={20} 
+            color={activeTab === 'payments' ? '#e74c3c' : '#7f8c8d'} 
+          />
+          <Text style={[styles.tabText, activeTab === 'payments' && styles.activeTabText]}>
+            Pagos
+          </Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity
+          style={[styles.tab, activeTab === 'championships' && styles.activeTab]}
+          onPress={() => setActiveTab('championships')}
+        >
+          <Ionicons 
+            name="trophy-outline" 
+            size={20} 
+            color={activeTab === 'championships' ? '#e74c3c' : '#7f8c8d'} 
+          />
+          <Text style={[styles.tabText, activeTab === 'championships' && styles.activeTabText]}>
+            Campeonatos
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      {activeTab === 'dashboard' && renderDashboard()}
+      {activeTab === 'payments' && renderPayments()}
+      {activeTab === 'championships' && renderChampionships()}
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#f5f5f5',
+  },
+  header: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ecf0f1',
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#2c3e50',
+  },
+  headerSubtitle: {
+    fontSize: 14,
+    color: '#7f8c8d',
+    marginTop: 5,
+  },
+  tabContainer: {
+    flexDirection: 'row',
+    backgroundColor: 'white',
+    borderBottomWidth: 1,
+    borderBottomColor: '#ecf0f1',
+  },
+  tab: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 15,
+    borderBottomWidth: 2,
+    borderBottomColor: 'transparent',
+  },
+  activeTab: {
+    borderBottomColor: '#e74c3c',
+  },
+  tabText: {
+    fontSize: 14,
+    color: '#7f8c8d',
+    fontWeight: '500',
+    marginLeft: 5,
+  },
+  activeTabText: {
+    color: '#e74c3c',
+    fontWeight: 'bold',
+  },
+  tabContent: {
+    flex: 1,
+    padding: 15,
+  },
+  summaryCards: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+  },
+  summaryCard: {
+    backgroundColor: 'white',
+    borderRadius: 12,
+    padding: 15,
+    alignItems: 'center',
+    width: '48%',
+    marginBottom: 10,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  summaryNumber: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#2c3e50',
+    marginTop: 10,
+  },
+  summaryLabel: {
+    fontSize: 12,
+    color: '#7f8c8d',
+    marginTop: 5,
+    textAlign: 'center',
+  },
+  section: {
+    backgroundColor: 'white',
+    borderRadius: 12,
+    padding: 15,
+    marginBottom: 15,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#2c3e50',
+    marginBottom: 15,
+  },
+  actionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#e74c3c',
+    borderRadius: 8,
+    padding: 15,
+    marginBottom: 10,
+  },
+  actionButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginLeft: 8,
+  },
+  transferCard: {
+    backgroundColor: '#f8f9fa',
+    borderRadius: 8,
+    padding: 15,
+    marginBottom: 10,
+  },
+  transferInfo: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 5,
+  },
+  transferStudent: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#2c3e50',
+  },
+  transferAmount: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#e74c3c',
+  },
+  transferDescription: {
+    fontSize: 14,
+    color: '#7f8c8d',
+    marginBottom: 10,
+  },
+  transferActions: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+  },
+  approveButton: {
+    backgroundColor: '#27ae60',
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+    borderRadius: 6,
+  },
+  approveButtonText: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  rejectButton: {
+    backgroundColor: '#e74c3c',
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+    borderRadius: 6,
+  },
+  rejectButtonText: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  debtCard: {
+    backgroundColor: '#f8f9fa',
+    borderRadius: 8,
+    padding: 15,
+    marginBottom: 10,
+  },
+  debtStudent: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#2c3e50',
+    marginBottom: 5,
+  },
+  debtAmount: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#e74c3c',
+    marginBottom: 5,
+  },
+  debtCount: {
+    fontSize: 12,
+    color: '#7f8c8d',
+  },
+  paymentCard: {
+    backgroundColor: '#f8f9fa',
+    borderRadius: 8,
+    padding: 15,
+    marginBottom: 10,
+  },
+  paymentHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 5,
+  },
+  paymentStudent: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#2c3e50',
+  },
+  paymentAmount: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#e74c3c',
+  },
+  paymentDescription: {
+    fontSize: 14,
+    color: '#7f8c8d',
+    marginBottom: 5,
+  },
+  paymentDate: {
+    fontSize: 12,
+    color: '#95a5a6',
+    marginBottom: 5,
+  },
+  receiptInfo: {
+    fontSize: 12,
+    color: '#3498db',
+    marginBottom: 10,
+  },
+  paymentActions: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+  },
+  championshipCard: {
+    backgroundColor: '#f8f9fa',
+    borderRadius: 8,
+    padding: 15,
+    marginBottom: 10,
+  },
+  championshipName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#2c3e50',
+    marginBottom: 5,
+  },
+  championshipCategory: {
+    fontSize: 14,
+    color: '#7f8c8d',
+    marginBottom: 5,
+  },
+  championshipMatches: {
+    fontSize: 12,
+    color: '#95a5a6',
+    marginBottom: 10,
+  },
+  championshipActions: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+  },
+  editButton: {
+    backgroundColor: '#3498db',
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+    borderRadius: 6,
+  },
+  editButtonText: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  viewButton: {
+    backgroundColor: '#27ae60',
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+    borderRadius: 6,
+  },
+  viewButtonText: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  emptyText: {
+    fontSize: 14,
+    color: '#7f8c8d',
+    textAlign: 'center',
+    fontStyle: 'italic',
+    paddingVertical: 20,
+  },
+});
