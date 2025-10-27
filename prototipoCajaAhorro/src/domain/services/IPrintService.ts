@@ -33,5 +33,11 @@ export interface IPrintService {
    * Verifica si hay una impresora conectada
    */
   verificarImpresoraConectada(): Promise<boolean>;
+
+  /**
+   * Verifica si debe simular falla de impresión para un cliente específico
+   * Para pruebas de funcionalidad de reimpresión
+   */
+  simularFallaImpresion(nombreCliente: string): Promise<boolean>;
 }
 

@@ -4,6 +4,7 @@ import { Button } from '../components/Button';
 import { Card } from '../components/Card';
 import { theme } from '../theme/theme';
 import { TipoCuenta } from '../../infrastructure/persistence/MockDatabase';
+import { MaterialIcons } from '@expo/vector-icons';
 
 interface Props {
   navigation: any;
@@ -20,6 +21,7 @@ interface Props {
       notas?: string;
       tipo?: string;
       saldoNuevo?: number;
+      estadoImpresion?: 'IMPRESO' | 'NO_IMPRESO';
     };
   };
 }
@@ -28,9 +30,11 @@ export const ReciboScreen: React.FC<Props> = ({ navigation, route }) => {
   const [loading, setLoading] = useState(false);
   const [numeroRecibo, setNumeroRecibo] = useState('');
   const [fechaHora, setFechaHora] = useState('');
+  const [mostrarErrorImpresion, setMostrarErrorImpresion] = useState(false);
+  const [errorImpresionResuelto, setErrorImpresionResuelto] = useState(false);
 
   const params = route?.params || {};
-  const { cliente, cuenta, cobranza, monto, notas, tipo, saldoNuevo } = params;
+  const { cliente, cuenta, cobranza, monto, notas, tipo, saldoNuevo, estadoImpresion } = params;
 
   const getTipoCuentaLabel = (tipoCuenta?: TipoCuenta): string => {
     if (!tipoCuenta) return 'Cuenta';
@@ -66,14 +70,53 @@ export const ReciboScreen: React.FC<Props> = ({ navigation, route }) => {
   const handleImprimir = async () => {
     setLoading(true);
     try {
+      // Verificar si debe simular falla de impresión
+      const nombreCompleto = cliente ? `${cliente.nombre} ${cliente.apellidos}` : '';
+      const esCarmenRosa = nombreCompleto.includes('Carmen Rosa') || nombreCompleto.includes('Jiménez');
+      
       // Simular impresión
       await new Promise(resolve => setTimeout(resolve, 2000));
 
-      Alert.alert(
-        'Recibo Impreso',
-        'El recibo ha sido enviado a la impresora conectada',
-        [{ text: 'Aceptar' }]
-      );
+      // Verificar estado de impresión (priorizar el estado pasado como parámetro)
+      const tieneErrorImpresion = estadoImpresion === 'NO_IMPRESO' || esCarmenRosa;
+
+      if (tieneErrorImpresion && !errorImpresionResuelto) {
+        // Mostrar el badge de error en el recibo
+        setMostrarErrorImpresion(true);
+        
+        Alert.alert(
+          'Error de Impresión',
+          'No se pudo imprimir el recibo. El recibo quedará registrado para reimprimir más tarde.',
+          [
+            {
+              text: 'Aceptar',
+              style: 'default'
+            },
+            {
+              text: 'Reintentar',
+              style: 'default',
+              onPress: () => {
+                // Al reintentar, simular que ahora sí funciona
+                setErrorImpresionResuelto(true);
+                setMostrarErrorImpresion(false);
+                
+                Alert.alert(
+                  'Recibo Impreso',
+                  'Recibo reimpreso correctamente',
+                  [{ text: 'Aceptar' }]
+                );
+              }
+            }
+          ]
+        );
+      } else {
+        // Si el error ya fue resuelto o no hay error, mostrar mensaje de éxito
+        Alert.alert(
+          'Recibo Impreso',
+          'El recibo ha sido enviado a la impresora conectada',
+          [{ text: 'Aceptar' }]
+        );
+      }
     } catch (error) {
       Alert.alert('Error', 'No se pudo imprimir el recibo');
     } finally {
@@ -131,6 +174,11 @@ export const ReciboScreen: React.FC<Props> = ({ navigation, route }) => {
     return getTipoTransaccion();
   };
 
+  const debeMostrarErrorImpresion = () => {
+    // Solo mostrar el badge si hay un error activo y no ha sido resuelto
+    return mostrarErrorImpresion && !errorImpresionResuelto;
+  };
+
   return (
     <ScrollView style={styles.container} contentContainerStyle={{ padding: theme.spacing.lg }}>
       <Text style={styles.title}>Recibo de Transacción</Text>
@@ -145,6 +193,13 @@ export const ReciboScreen: React.FC<Props> = ({ navigation, route }) => {
             />
           </View>}
           <Text style={styles.numeroRecibo}>N° {numeroRecibo}</Text>
+          
+          {debeMostrarErrorImpresion() && (
+            <View style={styles.errorImpresionBadge}>
+              <MaterialIcons name="error" size={20} color="#FFF" />
+              <Text style={styles.errorImpresionText}>Error de Impresión</Text>
+            </View>
+          )}
         </View>
 
         <View style={styles.content}>
@@ -392,6 +447,22 @@ const styles = StyleSheet.create({
   saldoNuevo: {
     color: '#4CAF50',
     fontWeight: '700',
+  },
+  errorImpresionBadge: {
+    backgroundColor: '#F44336',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    marginTop: 8,
+  },
+  errorImpresionText: {
+    color: '#FFF',
+    fontWeight: '700',
+    fontSize: 14,
+    marginLeft: 8,
   },
 });
 

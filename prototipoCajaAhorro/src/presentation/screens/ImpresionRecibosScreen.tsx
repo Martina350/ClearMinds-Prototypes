@@ -176,8 +176,8 @@ export const ImpresionRecibosScreen: React.FC = () => {
       mockDB.actualizarEstadoRecibo(reciboSeleccionado.id, 'IMPRESO');
       
       Alert.alert(
-        'Éxito',
-        'Recibo reimpreso correctamente. Estado actualizado a "Impreso".',
+        'Recibo Impreso',
+        'Recibo reimpreso correctamente',
         [{ 
           text: 'Aceptar',
           onPress: () => {

@@ -301,7 +301,7 @@ export const AperturaBasicaScreen: React.FC<Props> = ({ navigation }) => {
             <Text style={styles.nuevaReferenciaTitle}>
               {referencias.length === 0 ? 'Agregar Referencia Personal' : 'Agregar Segunda Referencia'}
             </Text>
-            <Input label="Nombre" placeholder="Nombre de la referencia" value={refNombre} onChangeText={setRefNombre} />
+            <Input label="Nombres y Apellidos" placeholder="Nombre de la referencia" value={refNombre} onChangeText={setRefNombre} />
             <Input 
               label="Número de Celular" 
               placeholder="+593 9XXXXXXXXX" 

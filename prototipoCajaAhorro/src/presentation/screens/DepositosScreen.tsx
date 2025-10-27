@@ -149,7 +149,11 @@ export const DepositosScreen: React.FC<Props> = ({ navigation }) => {
             
             mockDB.agregarTransaccion(nuevaTransaccion); // Actualiza el saldo automáticamente
             
-            // Crear recibo
+            // Simular verificación de impresión para Carmen Rosa
+            const nombreCompleto = `${clienteSeleccionado.nombre} ${clienteSeleccionado.apellidos}`;
+            const esCarmenRosa = nombreCompleto.includes('Carmen Rosa') || nombreCompleto.includes('Jiménez');
+            
+            // Crear recibo con estado basado en simulación de impresión
             const nuevoRecibo: Recibo = {
               id: reciboId,
               numero: numeroTransaccion,
@@ -159,8 +163,10 @@ export const DepositosScreen: React.FC<Props> = ({ navigation }) => {
               monto: montoNumero,
               fecha: fechaActual,
               hora: horaActual,
-              estado: 'IMPRESO',
+              estado: esCarmenRosa ? 'NO_IMPRESO' : 'IMPRESO',
               agenteId: 'AG001',
+              intentosImpresion: esCarmenRosa ? 1 : undefined,
+              ultimoIntentoImpresion: esCarmenRosa ? `${fechaActual} ${horaActual}` : undefined,
             };
             
             mockDB.agregarRecibo(nuevoRecibo);
@@ -178,6 +184,7 @@ export const DepositosScreen: React.FC<Props> = ({ navigation }) => {
               tipo: 'DEPOSITO',
               numeroRecibo: numeroTransaccion,
               saldoNuevo: nuevaTransaccion.saldoNuevo,
+              estadoImpresion: esCarmenRosa ? 'NO_IMPRESO' : 'IMPRESO',
             });
           }
         }

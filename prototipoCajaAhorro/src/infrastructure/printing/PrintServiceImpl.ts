@@ -61,6 +61,21 @@ export class PrintServiceImpl implements IPrintService {
     }
   }
 
+  /**
+   * Verifica si debe simular falla de impresión para un cliente específico
+   * Para pruebas de funcionalidad de reimpresión
+   */
+  async simularFallaImpresion(nombreCliente: string): Promise<boolean> {
+    // Simular falla de impresión específicamente para Carmen Rosa Jiménez
+    // para poder probar la funcionalidad de reimpresión
+    if (nombreCliente.includes('Carmen Rosa') || nombreCliente.includes('Jiménez')) {
+      return true; // Siempre falla para este cliente
+    }
+    
+    // Para otros clientes, comportamiento normal
+    return false;
+  }
+
   private generarHTMLRecibo(datos: DatosRecibo): string {
     const fechaFormateada = datos.fecha.toLocaleDateString('es-EC', {
       year: 'numeric',

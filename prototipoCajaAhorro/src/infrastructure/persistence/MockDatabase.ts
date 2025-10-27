@@ -448,8 +448,8 @@ class MockDatabase {
       numeroCuenta: 'AH-005-2024',
       clienteId: 'CLI006',
       tipo: TipoCuenta.BASICA,
-      saldo: 1125.30,
-      saldoDisponible: 1125.30,
+      saldo: 1375.30,
+      saldoDisponible: 1375.30,
       estado: EstadoCuenta.ACTIVA,
       fechaApertura: '2024-01-22',
       montoInicial: 75.00,
@@ -682,6 +682,24 @@ class MockDatabase {
       agenteId: 'AG001',
       recibo: 'R-2024-008',
     },
+    // Transacción con falla de impresión - Carmen Rosa Jiménez
+    {
+      id: 'TRX009',
+      numero: 'R-2024-009',
+      cuentaId: 'CTA007',
+      clienteId: 'CLI006',
+      tipo: TipoTransaccion.DEPOSITO,
+      monto: 250.00,
+      saldoAnterior: 1125.30,
+      saldoNuevo: 1375.30,
+      estado: EstadoTransaccion.COMPLETADA,
+      fecha: '2024-04-15',
+      hora: '14:30:45',
+      concepto: 'Depósito mensual - Ahorro',
+      agenteId: 'AG002',
+      recibo: 'R-2024-009',
+      notas: 'Falla de impresión - Error de conexión con impresora',
+    },
   ];
 
   // Recibos
@@ -798,6 +816,21 @@ class MockDatabase {
       agenteId: 'AG001',
       intentosImpresion: 2,
       ultimoIntentoImpresion: '2024-04-10 16:50:15',
+    },
+    // Recibo con falla de impresión - Carmen Rosa Jiménez (CLI006)
+    {
+      id: 'REC010',
+      numero: 'R-2024-009',
+      transaccionId: 'TRX009',
+      clienteId: 'CLI006',
+      tipo: 'Depósito',
+      monto: 250.00,
+      fecha: '2024-04-15',
+      hora: '14:30:45',
+      estado: 'NO_IMPRESO',
+      agenteId: 'AG002',
+      intentosImpresion: 3,
+      ultimoIntentoImpresion: '2024-04-15 14:35:20',
     },
   ];
 
