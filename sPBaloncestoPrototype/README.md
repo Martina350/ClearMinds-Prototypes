@@ -158,14 +158,31 @@ cd sPBaloncestoPrototype
 npm install
 ```
 
-3. **Iniciar el servidor de desarrollo**
+3. **Si hay problemas con WebView, limpiar caché**
+```bash
+npm cache clean --force
+npx expo start --clear
+```
+
+4. **Iniciar el servidor de desarrollo**
 ```bash
 npm start
 ```
 
-4. **Ejecutar en dispositivo**
+5. **Ejecutar en dispositivo**
 - Escanear QR con Expo Go (Android/iOS)
 - O usar emulador: `npm run android` / `npm run ios`
+
+### ⚠️ Solución de Problemas con WebView
+
+Si encuentras el error `RNCWebViewModule.default.shouldStartLoadWithLockIdentifier is not a function`:
+
+1. **Verificar versión de WebView**: Usamos `react-native-webview@13.6.4`
+2. **Limpiar caché**: `npm cache clean --force`
+3. **Reinstalar**: `rm -rf node_modules && npm install`
+4. **Alternativa**: Usar `HomeScreenAlternative.tsx` que abre el sitio en navegador externo
+
+Ver archivo `WEBVIEW_TROUBLESHOOTING.md` para más detalles.
 
 ## 🔑 Credenciales de Prueba
 
