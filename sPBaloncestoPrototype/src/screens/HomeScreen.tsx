@@ -106,12 +106,8 @@ export const HomeScreen: React.FC = () => {
         onHttpError={handleError}
         userAgent={WEBVIEW_CONFIG.USER_AGENT}
         {...WEBVIEW_CONFIG.WEBVIEW_PROPS}
-        onShouldStartLoadWithRequest={(request) => {
-          // Permitir navegación dentro del mismo dominio
-          return request.url.startsWith(websiteUrl) || 
-                 request.url.startsWith('https://www.google.com') ||
-                 request.url.startsWith('https://google.com');
-        }}
+        originWhitelist={['https://*', 'http://*']}
+        setSupportMultipleWindows={false}
       />
     </View>
   );

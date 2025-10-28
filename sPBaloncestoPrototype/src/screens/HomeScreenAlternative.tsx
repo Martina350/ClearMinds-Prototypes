@@ -11,7 +11,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 
 export const HomeScreenAlternative: React.FC = () => {
-  const websiteUrl = 'https://www.sanpedrobaloncesto.edu.co';
+  const websiteUrl = 'https://sanpedrobaloncesto.com';
 
   const handleOpenWebsite = async () => {
     try {

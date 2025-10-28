@@ -206,9 +206,9 @@ export const PaymentMethodScreen: React.FC<PaymentMethodScreenProps> = ({ naviga
           
           <View style={styles.bankInfo}>
             <Text style={styles.bankTitle}>Datos para la transferencia:</Text>
-            <Text style={styles.bankData}>Banco: Banco de Bogotá</Text>
+            <Text style={styles.bankData}>Banco: Banco Pichincha</Text>
             <Text style={styles.bankData}>Cuenta: 1234567890</Text>
-            <Text style={styles.bankData}>Titular: Escuela de Baloncesto San Pedro</Text>
+            <Text style={styles.bankData}>Titular: San Pedro Baloncesto</Text>
             <Text style={styles.bankData}>Concepto: {payment.description}</Text>
           </View>
 

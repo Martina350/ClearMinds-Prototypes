@@ -27,21 +27,22 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  useEffect(() => {
-    checkAuthStatus();
-  }, []);
+  // Comentado para que siempre muestre el login primero
+  // useEffect(() => {
+  //   checkAuthStatus();
+  // }, []);
 
-  const checkAuthStatus = async () => {
-    try {
-      const savedUser = await AsyncStorage.getItem('user');
-      if (savedUser) {
-        setUser(JSON.parse(savedUser));
-        setIsAuthenticated(true);
-      }
-    } catch (error) {
-      console.error('Error checking auth status:', error);
-    }
-  };
+  // const checkAuthStatus = async () => {
+  //   try {
+  //     const savedUser = await AsyncStorage.getItem('user');
+  //     if (savedUser) {
+  //       setUser(JSON.parse(savedUser));
+  //       setIsAuthenticated(true);
+  //     }
+  //   } catch (error) {
+  //     console.error('Error checking auth status:', error);
+  //   }
+  // };
 
   const login = async (username: string, password: string): Promise<boolean> => {
     try {

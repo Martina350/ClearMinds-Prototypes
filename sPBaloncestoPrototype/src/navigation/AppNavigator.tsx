@@ -4,6 +4,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { Ionicons } from '@expo/vector-icons';
+import { TouchableOpacity } from 'react-native';
 import { useAuth } from '../context/AppContext';
 
 // Importar pantallas
@@ -58,7 +59,7 @@ const PaymentsStack = () => (
 
 // Tabs principales
 const MainTabs = () => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
 
   return (
     <Tab.Navigator
@@ -97,6 +98,16 @@ const MainTabs = () => {
         headerTitleStyle: {
           fontWeight: 'bold',
         },
+        headerRight: () => (
+          <TouchableOpacity
+            onPress={logout}
+            style={{ marginRight: 12 }}
+            accessibilityRole="button"
+            accessibilityLabel="Cerrar sesión"
+          >
+            <Ionicons name="log-out-outline" size={22} color="#ffffff" />
+          </TouchableOpacity>
+        ),
       })}
     >
       <Tab.Screen 

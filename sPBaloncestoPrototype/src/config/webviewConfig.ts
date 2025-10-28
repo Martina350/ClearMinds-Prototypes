@@ -7,8 +7,8 @@ export const WEBVIEW_CONFIG = {
     GITHUB: 'https://github.com',
   },
   
-  // URL del sitio institucional (cambiar por la real)
-  INSTITUTIONAL_URL: 'https://www.google.com',
+  // URL del sitio institucional (dominio real)
+  INSTITUTIONAL_URL: 'https://sanpedrobaloncesto.com',
   
   // Configuración del User Agent
   USER_AGENT: 'Mozilla/5.0 (Linux; Android 10; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.120 Mobile Safari/537.36',
