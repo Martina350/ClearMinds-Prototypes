@@ -18,6 +18,10 @@ import { PaymentMethodScreen } from '../screens/PaymentMethodScreen';
 import { AdminPanelScreen } from '../screens/AdminPanelScreen';
 import { ManageChampionshipScreen } from '../screens/ManageChampionshipScreen';
 import { ReviewPaymentScreen } from '../screens/ReviewPaymentScreen';
+import { CardPaymentsScreen } from '../screens/CardPaymentsScreen';
+import { PaymentReportScreen } from '../screens/PaymentReportScreen';
+import { CreateChampionshipScreen } from '../screens/CreateChampionshipScreen';
+import { RegisterResultScreen } from '../screens/RegisterResultScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -245,6 +249,74 @@ export const AppNavigator = () => {
               options={{
                 headerShown: true,
                 title: 'Revisar Pago',
+                headerStyle: {
+                  backgroundColor: '#E62026',
+                },
+                headerTintColor: '#FFFFFF',
+                headerTitleStyle: {
+                  fontWeight: 'bold',
+                  fontSize: 18,
+                },
+                headerBackTitleVisible: false, // Ocultar texto junto a la flecha
+              }}
+            />
+            <Stack.Screen 
+              name="CardPayments" 
+              component={CardPaymentsScreen}
+              options={{
+                headerShown: true,
+                title: 'Pagos por Tarjeta',
+                headerStyle: {
+                  backgroundColor: '#E62026',
+                },
+                headerTintColor: '#FFFFFF',
+                headerTitleStyle: {
+                  fontWeight: 'bold',
+                  fontSize: 18,
+                },
+                headerBackTitleVisible: false, // Ocultar texto junto a la flecha
+              }}
+            />
+            <Stack.Screen 
+              name="PaymentReport" 
+              component={PaymentReportScreen}
+              options={{
+                headerShown: true,
+                title: 'Reporte de Pagos',
+                headerStyle: {
+                  backgroundColor: '#E62026',
+                },
+                headerTintColor: '#FFFFFF',
+                headerTitleStyle: {
+                  fontWeight: 'bold',
+                  fontSize: 18,
+                },
+                headerBackTitleVisible: false, // Ocultar texto junto a la flecha
+              }}
+            />
+            <Stack.Screen 
+              name="CreateChampionship" 
+              component={CreateChampionshipScreen}
+              options={{
+                headerShown: true,
+                title: 'Crear Campeonato',
+                headerStyle: {
+                  backgroundColor: '#E62026',
+                },
+                headerTintColor: '#FFFFFF',
+                headerTitleStyle: {
+                  fontWeight: 'bold',
+                  fontSize: 18,
+                },
+                headerBackTitleVisible: false, // Ocultar texto junto a la flecha
+              }}
+            />
+            <Stack.Screen 
+              name="RegisterResult" 
+              component={RegisterResultScreen}
+              options={{
+                headerShown: true,
+                title: 'Registrar Resultado',
                 headerStyle: {
                   backgroundColor: '#E62026',
                 },

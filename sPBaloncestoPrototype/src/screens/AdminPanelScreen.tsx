@@ -146,7 +146,10 @@ export const AdminPanelScreen: React.FC<AdminPanelScreenProps> = ({ navigation }
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Gestión de Pagos</Text>
         
-        <TouchableOpacity style={styles.actionButton}>
+        <TouchableOpacity 
+          style={styles.actionButton}
+          onPress={() => navigation.navigate('CardPayments')}
+        >
           <Ionicons name="card-outline" size={20} color="white" />
           <Text style={styles.actionButtonText}>Ver Pagos por Tarjeta</Text>
         </TouchableOpacity>
@@ -159,7 +162,10 @@ export const AdminPanelScreen: React.FC<AdminPanelScreenProps> = ({ navigation }
           <Text style={styles.actionButtonText}>Revisar Transferencias</Text>
         </TouchableOpacity>
         
-        <TouchableOpacity style={styles.actionButton}>
+        <TouchableOpacity 
+          style={styles.actionButton}
+          onPress={() => navigation.navigate('PaymentReport')}
+        >
           <Ionicons name="document-text-outline" size={20} color="white" />
           <Text style={styles.actionButtonText}>Reporte de Pagos</Text>
         </TouchableOpacity>
@@ -214,7 +220,10 @@ export const AdminPanelScreen: React.FC<AdminPanelScreenProps> = ({ navigation }
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Gestión de Campeonatos</Text>
         
-        <TouchableOpacity style={styles.actionButton}>
+        <TouchableOpacity 
+          style={styles.actionButton}
+          onPress={() => navigation.navigate('CreateChampionship')}
+        >
           <Ionicons name="add-outline" size={20} color="white" />
           <Text style={styles.actionButtonText}>Crear Campeonato</Text>
         </TouchableOpacity>
@@ -227,7 +236,10 @@ export const AdminPanelScreen: React.FC<AdminPanelScreenProps> = ({ navigation }
           <Text style={styles.actionButtonText}>Gestionar Campeonato</Text>
         </TouchableOpacity>
         
-        <TouchableOpacity style={styles.actionButton}>
+        <TouchableOpacity 
+          style={styles.actionButton}
+          onPress={() => navigation.navigate('RegisterResult')}
+        >
           <Ionicons name="trophy-outline" size={20} color="white" />
           <Text style={styles.actionButtonText}>Registrar Resultado</Text>
         </TouchableOpacity>
@@ -350,7 +362,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#0A0D14', // Negro profundo/azul marino oscuro
   },
   header: {
-    backgroundColor: '#E62026', // Header rojo para contraste
+    backgroundColor: '#0A0D14', // Header rojo para contraste
     padding: 20,
     borderBottomWidth: 0,
   },
