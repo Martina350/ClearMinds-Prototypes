@@ -159,18 +159,17 @@ export const ChampionshipDetailScreen: React.FC<ChampionshipDetailScreenProps> =
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#0A0D14',
   },
   header: {
-    backgroundColor: 'white',
+    backgroundColor: '#E62026',
     padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ecf0f1',
+    borderBottomWidth: 0,
   },
   championshipTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#2c3e50',
+    color: '#FFFFFF',
     marginBottom: 15,
   },
   championshipMeta: {
@@ -183,14 +182,14 @@ const styles = StyleSheet.create({
   metaText: {
     marginTop: 5,
     fontSize: 12,
-    color: '#7f8c8d',
-    fontWeight: '500',
+    color: '#FFFFFF',
+    fontWeight: '600',
   },
   tabContainer: {
     flexDirection: 'row',
-    backgroundColor: 'white',
+    backgroundColor: '#0A0D14',
     borderBottomWidth: 1,
-    borderBottomColor: '#ecf0f1',
+    borderBottomColor: '#E5E5E5',
   },
   tab: {
     flex: 1,
@@ -200,15 +199,15 @@ const styles = StyleSheet.create({
     borderBottomColor: 'transparent',
   },
   activeTab: {
-    borderBottomColor: '#e74c3c',
+    borderBottomColor: '#E62026',
   },
   tabText: {
     fontSize: 14,
-    color: '#7f8c8d',
+    color: '#B3B3B3',
     fontWeight: '500',
   },
   activeTabText: {
-    color: '#e74c3c',
+    color: '#E62026',
     fontWeight: 'bold',
   },
   content: {
@@ -216,7 +215,7 @@ const styles = StyleSheet.create({
     padding: 15,
   },
   matchCard: {
-    backgroundColor: 'white',
+    backgroundColor: '#1A1D24',
     borderRadius: 12,
     padding: 15,
     marginBottom: 15,
@@ -235,12 +234,12 @@ const styles = StyleSheet.create({
   matchTeams: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#2c3e50',
+    color: '#FFFFFF',
     marginBottom: 5,
   },
   matchCategory: {
     fontSize: 14,
-    color: '#7f8c8d',
+    color: '#B3B3B3',
   },
   matchDetails: {
     flexDirection: 'row',
@@ -254,13 +253,13 @@ const styles = StyleSheet.create({
   matchInfoText: {
     marginLeft: 5,
     fontSize: 14,
-    color: '#7f8c8d',
+    color: '#B3B3B3',
   },
   scoreContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#2A2D34',
     borderRadius: 8,
     padding: 15,
   },
@@ -271,11 +270,11 @@ const styles = StyleSheet.create({
   scoreText: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: '#e74c3c',
+    color: '#E62026',
   },
   scoreLabel: {
     fontSize: 12,
-    color: '#7f8c8d',
+    color: '#B3B3B3',
     marginTop: 5,
   },
   scoreSeparator: {
@@ -284,20 +283,20 @@ const styles = StyleSheet.create({
   scoreSeparatorText: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#bdc3c7',
+    color: '#B3B3B3',
   },
   upcomingBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#fff3cd',
+    backgroundColor: '#2A2D34',
     borderRadius: 8,
     padding: 10,
   },
   upcomingText: {
     marginLeft: 5,
     fontSize: 14,
-    color: '#e74c3c',
+    color: '#E62026',
     fontWeight: '600',
   },
   emptyState: {

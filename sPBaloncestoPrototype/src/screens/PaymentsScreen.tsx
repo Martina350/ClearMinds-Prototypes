@@ -152,26 +152,26 @@ export const PaymentsScreen: React.FC<PaymentsScreenProps> = ({ navigation }) =>
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#0A0D14', // Negro profundo/azul marino oscuro
   },
   summaryCard: {
-    backgroundColor: 'white',
+    backgroundColor: '#1A1D24', // Card oscuro
     margin: 15,
     borderRadius: 12,
     padding: 20,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 4,
     },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 8,
   },
   summaryTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#2c3e50',
+    color: '#FFFFFF', // Blanco
     marginBottom: 15,
     textAlign: 'center',
   },
@@ -186,17 +186,17 @@ const styles = StyleSheet.create({
   statNumber: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#2c3e50',
+    color: '#FFFFFF', // Blanco
   },
   statLabel: {
     fontSize: 12,
-    color: '#7f8c8d',
+    color: '#B3B3B3', // Gris medio
     marginTop: 5,
   },
   statDivider: {
     width: 1,
     height: 40,
-    backgroundColor: '#ecf0f1',
+    backgroundColor: '#E5E5E5', // Gris claro
   },
   studentsHeader: {
     paddingHorizontal: 15,
@@ -205,29 +205,29 @@ const styles = StyleSheet.create({
   studentsTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#2c3e50',
+    color: '#FFFFFF', // Blanco neutro
   },
   studentsSubtitle: {
     fontSize: 14,
-    color: '#7f8c8d',
+    color: '#B3B3B3', // Gris medio
     marginTop: 5,
   },
   listContainer: {
     paddingHorizontal: 15,
   },
   studentCard: {
-    backgroundColor: 'white',
+    backgroundColor: '#1A1D24', // Card oscuro
     borderRadius: 12,
     padding: 15,
     marginBottom: 15,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 4,
     },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 8,
   },
   studentHeader: {
     flexDirection: 'row',
@@ -241,12 +241,12 @@ const styles = StyleSheet.create({
   studentName: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#2c3e50',
+    color: '#FFFFFF', // Blanco
     marginBottom: 5,
   },
   studentCategory: {
     fontSize: 14,
-    color: '#7f8c8d',
+    color: '#B3B3B3', // Gris medio
   },
   statusContainer: {
     alignItems: 'center',
@@ -256,7 +256,7 @@ const styles = StyleSheet.create({
   },
   statusTextUpToDate: {
     fontSize: 12,
-    color: '#27ae60',
+    color: '#24C36B', // Verde éxito
     fontWeight: 'bold',
     marginTop: 5,
   },
@@ -265,7 +265,7 @@ const styles = StyleSheet.create({
   },
   statusTextPending: {
     fontSize: 12,
-    color: '#e74c3c',
+    color: '#E62026', // Rojo competitivo
     fontWeight: 'bold',
     marginTop: 5,
     textAlign: 'center',
@@ -275,7 +275,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     borderTopWidth: 1,
-    borderTopColor: '#ecf0f1',
+    borderTopColor: '#E5E5E5', // Gris claro
     paddingTop: 10,
   },
   footerInfo: {
@@ -285,7 +285,7 @@ const styles = StyleSheet.create({
   footerText: {
     marginLeft: 5,
     fontSize: 14,
-    color: '#7f8c8d',
+    color: '#B3B3B3', // Gris medio
   },
   emptyState: {
     flex: 1,
@@ -296,13 +296,13 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#7f8c8d',
+    color: '#B3B3B3', // Gris medio
     marginTop: 15,
     marginBottom: 10,
   },
   emptyText: {
     fontSize: 14,
-    color: '#95a5a6',
+    color: '#B3B3B3', // Gris medio
     textAlign: 'center',
     lineHeight: 20,
   },

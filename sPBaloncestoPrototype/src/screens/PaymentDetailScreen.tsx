@@ -148,68 +148,61 @@ export const PaymentDetailScreen: React.FC<PaymentDetailScreenProps> = ({ naviga
   return (
     <ScrollView style={styles.container}>
       <View style={styles.studentHeader}>
-        <Text style={styles.studentName}>{student.name}</Text>
+        <Text style={styles.studentName}>Pagos de {student.name}</Text>
         <Text style={styles.studentCategory}>
           {student.category} - {student.gender}
         </Text>
       </View>
 
-      <View style={styles.tabContainer}>
-        <TouchableOpacity
-          style={[styles.tab, activeTab === 'pending' && styles.activeTab]}
-          onPress={() => setActiveTab('pending')}
-        >
-          <Text style={[styles.tabText, activeTab === 'pending' && styles.activeTabText]}>
-            Pendientes ({pendingPayments.length})
-          </Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity
-          style={[styles.tab, activeTab === 'history' && styles.activeTab]}
-          onPress={() => setActiveTab('history')}
-        >
-          <Text style={[styles.tabText, activeTab === 'history' && styles.activeTabText]}>
-            Historial ({studentPaymentHistory.length})
-          </Text>
-        </TouchableOpacity>
+      {/* Sección A: Historial de pagos realizados */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Historial de Pagos Realizados</Text>
+        {studentPaymentHistory.length > 0 ? (
+          <FlatList
+            data={studentPaymentHistory}
+            renderItem={renderHistoryItem}
+            keyExtractor={(item) => item.id}
+            scrollEnabled={false}
+          />
+        ) : (
+          <View style={styles.emptyHistory}>
+            <Ionicons name="time-outline" size={40} color="#B3B3B3" />
+            <Text style={styles.emptyHistoryText}>Sin historial de pagos</Text>
+          </View>
+        )}
       </View>
 
-      <View style={styles.content}>
-        {activeTab === 'pending' ? (
-          pendingPayments.length > 0 ? (
-            <FlatList
-              data={pendingPayments}
-              renderItem={renderPaymentItem}
-              keyExtractor={(item) => item.id}
-              scrollEnabled={false}
-            />
-          ) : (
-            <View style={styles.emptyState}>
-              <Ionicons name="checkmark-circle-outline" size={60} color="#27ae60" />
-              <Text style={styles.emptyTitle}>¡Todos los pagos al día!</Text>
-              <Text style={styles.emptyText}>
-                No tienes pagos pendientes para este estudiante.
-              </Text>
-            </View>
-          )
+      {/* Sección B: Pagos pendientes */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Pagos Pendientes</Text>
+        {pendingPayments.length > 0 ? (
+          <FlatList
+            data={pendingPayments}
+            renderItem={renderPaymentItem}
+            keyExtractor={(item) => item.id}
+            scrollEnabled={false}
+          />
         ) : (
-          studentPaymentHistory.length > 0 ? (
-            <FlatList
-              data={studentPaymentHistory}
-              renderItem={renderHistoryItem}
-              keyExtractor={(item) => item.id}
-              scrollEnabled={false}
-            />
-          ) : (
-            <View style={styles.emptyState}>
-              <Ionicons name="time-outline" size={60} color="#bdc3c7" />
-              <Text style={styles.emptyTitle}>Sin historial de pagos</Text>
-              <Text style={styles.emptyText}>
-                El historial de pagos aparecerá aquí.
-              </Text>
-            </View>
-          )
+          <View style={styles.emptyPending}>
+            <Ionicons name="checkmark-circle" size={40} color="#24C36B" />
+            <Text style={styles.emptyPendingText}>¡Todos los pagos al día!</Text>
+          </View>
         )}
+      </View>
+
+      {/* Sección C: Pagar por transferencia */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Pagar por Transferencia</Text>
+        <View style={styles.transferCard}>
+          <Ionicons name="document-text-outline" size={40} color="#E62026" />
+          <Text style={styles.transferTitle}>Adjunta el comprobante de pago</Text>
+          <Text style={styles.transferDescription}>
+            Sube una foto o PDF del recibo para verificar tu pago.
+          </Text>
+          <TouchableOpacity style={styles.selectFileButton}>
+            <Text style={styles.selectFileText}>Seleccionar archivo</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </ScrollView>
   );
@@ -218,66 +211,49 @@ export const PaymentDetailScreen: React.FC<PaymentDetailScreenProps> = ({ naviga
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#0A0D14', // Negro profundo/azul marino oscuro
   },
   studentHeader: {
-    backgroundColor: 'white',
+    backgroundColor: '#0A0D14', // Negro profundo/azul marino oscuro
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#ecf0f1',
+    borderBottomColor: '#E5E5E5', // Gris claro
   },
   studentName: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#2c3e50',
+    color: '#FFFFFF', // Blanco neutro
     marginBottom: 5,
   },
   studentCategory: {
     fontSize: 16,
-    color: '#7f8c8d',
+    color: '#B3B3B3', // Gris medio
   },
-  tabContainer: {
-    flexDirection: 'row',
-    backgroundColor: 'white',
-    borderBottomWidth: 1,
-    borderBottomColor: '#ecf0f1',
+  section: {
+    marginBottom: 30,
+    paddingHorizontal: 15,
   },
-  tab: {
-    flex: 1,
-    paddingVertical: 15,
-    alignItems: 'center',
-    borderBottomWidth: 2,
-    borderBottomColor: 'transparent',
-  },
-  activeTab: {
-    borderBottomColor: '#e74c3c',
-  },
-  tabText: {
-    fontSize: 14,
-    color: '#7f8c8d',
-    fontWeight: '500',
-  },
-  activeTabText: {
-    color: '#e74c3c',
+  sectionTitle: {
+    fontSize: 18,
     fontWeight: 'bold',
-  },
-  content: {
-    flex: 1,
-    padding: 15,
+    color: '#FFFFFF', // Blanco neutro
+    marginBottom: 15,
   },
   paymentCard: {
-    backgroundColor: 'white',
+    backgroundColor: '#1A1D24', // Card oscuro
     borderRadius: 12,
     padding: 15,
     marginBottom: 15,
+    borderWidth: 1,
+    borderColor: '#E62026', // Rojo competitivo para deudas
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 4,
     },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 8,
   },
   paymentHeader: {
     flexDirection: 'row',
@@ -288,7 +264,7 @@ const styles = StyleSheet.create({
   paymentDescription: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#2c3e50',
+    color: '#FFFFFF', // Blanco
     flex: 1,
   },
   statusBadge: {
@@ -313,28 +289,36 @@ const styles = StyleSheet.create({
     marginLeft: 8,
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#2c3e50',
+    color: '#FFFFFF', // Blanco
   },
   paymentDate: {
     marginLeft: 8,
     fontSize: 14,
-    color: '#7f8c8d',
+    color: '#B3B3B3', // Gris medio
   },
   paymentMethod: {
     marginLeft: 8,
     fontSize: 14,
-    color: '#7f8c8d',
+    color: '#B3B3B3', // Gris medio
   },
   payButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#e74c3c',
+    backgroundColor: '#E62026', // Rojo competitivo
     borderRadius: 8,
     paddingVertical: 12,
+    shadowColor: '#E62026',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4,
   },
   payButtonText: {
-    color: 'white',
+    color: '#FFFFFF', // Blanco neutro
     fontSize: 16,
     fontWeight: 'bold',
     marginLeft: 8,
@@ -343,29 +327,29 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#e3f2fd',
+    backgroundColor: '#F2AB16', // Amarillo alerta suave
     borderRadius: 8,
     paddingVertical: 10,
   },
   reviewText: {
     marginLeft: 5,
     fontSize: 14,
-    color: '#3498db',
+    color: '#0A0D14', // Negro profundo
     fontWeight: '600',
   },
   historyCard: {
-    backgroundColor: 'white',
+    backgroundColor: '#1A1D24', // Card oscuro
     borderRadius: 12,
     padding: 15,
     marginBottom: 15,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 4,
     },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 8,
   },
   historyHeader: {
     flexDirection: 'row',
@@ -376,7 +360,7 @@ const styles = StyleSheet.create({
   historyDescription: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#2c3e50',
+    color: '#FFFFFF', // Blanco
     flex: 1,
   },
   historyDetails: {
@@ -391,34 +375,80 @@ const styles = StyleSheet.create({
     marginLeft: 8,
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#2c3e50',
+    color: '#FFFFFF', // Blanco
   },
   historyDate: {
     marginLeft: 8,
     fontSize: 14,
-    color: '#7f8c8d',
+    color: '#B3B3B3', // Gris medio
   },
   historyMethod: {
     marginLeft: 8,
     fontSize: 14,
-    color: '#7f8c8d',
+    color: '#B3B3B3', // Gris medio
   },
-  emptyState: {
+  transferCard: {
+    backgroundColor: '#1A1D24', // Card oscuro
+    borderRadius: 12,
+    padding: 20,
     alignItems: 'center',
-    paddingVertical: 60,
+    borderWidth: 2,
+    borderColor: '#E5E5E5', // Gris claro
+    borderStyle: 'dashed',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 8,
   },
-  emptyTitle: {
-    fontSize: 18,
+  transferTitle: {
+    fontSize: 16,
     fontWeight: 'bold',
-    color: '#7f8c8d',
-    marginTop: 15,
-    marginBottom: 10,
-  },
-  emptyText: {
-    fontSize: 14,
-    color: '#95a5a6',
+    color: '#0A0D14', // Negro profundo
+    marginTop: 10,
+    marginBottom: 5,
     textAlign: 'center',
+  },
+  transferDescription: {
+    fontSize: 14,
+    color: '#B3B3B3', // Gris medio
+    textAlign: 'center',
+    marginBottom: 20,
     lineHeight: 20,
+  },
+  selectFileButton: {
+    borderWidth: 2,
+    borderColor: '#E62026', // Rojo competitivo
+    borderRadius: 8,
     paddingHorizontal: 20,
+    paddingVertical: 10,
+    backgroundColor: 'transparent',
+  },
+  selectFileText: {
+    color: '#E62026', // Rojo competitivo
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  emptyHistory: {
+    alignItems: 'center',
+    paddingVertical: 40,
+  },
+  emptyHistoryText: {
+    fontSize: 14,
+    color: '#B3B3B3', // Gris medio
+    marginTop: 10,
+  },
+  emptyPending: {
+    alignItems: 'center',
+    paddingVertical: 40,
+  },
+  emptyPendingText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#24C36B', // Verde éxito
+    marginTop: 10,
   },
 });

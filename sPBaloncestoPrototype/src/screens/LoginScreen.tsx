@@ -10,7 +10,9 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  Image,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../context/AppContext';
 
 interface LoginScreenProps {
@@ -20,6 +22,7 @@ interface LoginScreenProps {
 export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
 
@@ -51,9 +54,11 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
     >
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.logoContainer}>
-          <Text style={styles.logo}>🏀</Text>
-          <Text style={styles.title}>Escuela de Baloncesto</Text>
-          <Text style={styles.subtitle}>San Pedro</Text>
+          <Image 
+            source={require('../assets/logoBalonsesto.png')} 
+            style={styles.logo}
+            resizeMode="contain"
+          />
         </View>
 
         <View style={styles.formContainer}>
@@ -66,6 +71,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
               value={username}
               onChangeText={setUsername}
               placeholder="Ingresa tu usuario"
+              placeholderTextColor="#B3B3B3"
               autoCapitalize="none"
               autoCorrect={false}
             />
@@ -73,15 +79,28 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
 
           <View style={styles.inputContainer}>
             <Text style={styles.inputLabel}>Contraseña</Text>
-            <TextInput
-              style={styles.input}
-              value={password}
-              onChangeText={setPassword}
-              placeholder="Ingresa tu contraseña"
-              secureTextEntry
-              autoCapitalize="none"
-              autoCorrect={false}
-            />
+            <View style={styles.passwordContainer}>
+              <TextInput
+                style={styles.passwordInput}
+                value={password}
+                onChangeText={setPassword}
+                placeholder="Ingresa tu contraseña"
+                placeholderTextColor="#B3B3B3"
+                secureTextEntry={!showPassword}
+                autoCapitalize="none"
+                autoCorrect={false}
+              />
+              <TouchableOpacity
+                style={styles.eyeButton}
+                onPress={() => setShowPassword(!showPassword)}
+              >
+                <Ionicons
+                  name={showPassword ? 'eye-off' : 'eye'}
+                  size={20}
+                  color="#B3B3B3"
+                />
+              </TouchableOpacity>
+            </View>
           </View>
 
           <TouchableOpacity
@@ -109,7 +128,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#0A0D14', // Negro profundo/azul marino oscuro
   },
   scrollContainer: {
     flexGrow: 1,
@@ -118,41 +137,30 @@ const styles = StyleSheet.create({
   },
   logoContainer: {
     alignItems: 'center',
-    marginBottom: 40,
+    marginBottom: 20,
   },
   logo: {
-    fontSize: 80,
-    marginBottom: 10,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#2c3e50',
-    textAlign: 'center',
-  },
-  subtitle: {
-    fontSize: 20,
-    color: '#e74c3c',
-    fontWeight: '600',
-    marginTop: 5,
+    width: 150,
+    height: 150,
+    marginBottom: 0,
   },
   formContainer: {
-    backgroundColor: 'white',
-    borderRadius: 15,
+    backgroundColor: '#1A1D24', // Card oscuro
+    borderRadius: 12,
     padding: 30,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 4,
     },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 8,
   },
   formTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#2c3e50',
+    color: '#FFFFFF', // Blanco
     textAlign: 'center',
     marginBottom: 30,
   },
@@ -162,47 +170,70 @@ const styles = StyleSheet.create({
   inputLabel: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#34495e',
+    color: '#B3B3B3', // Gris medio
     marginBottom: 8,
   },
   input: {
-    borderWidth: 1,
-    borderColor: '#bdc3c7',
+    backgroundColor: '#2A2D34', // Fondo oscuro
     borderRadius: 8,
     padding: 15,
     fontSize: 16,
-    backgroundColor: '#f8f9fa',
+    color: '#FFFFFF', // Texto blanco
+  },
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#2A2D34', // Fondo oscuro
+    borderRadius: 8,
+    paddingHorizontal: 15,
+  },
+  passwordInput: {
+    flex: 1,
+    paddingVertical: 15,
+    fontSize: 16,
+    color: '#FFFFFF', // Texto blanco
+  },
+  eyeButton: {
+    padding: 5,
   },
   loginButton: {
-    backgroundColor: '#e74c3c',
+    backgroundColor: '#E62026', // Rojo competitivo
     borderRadius: 8,
     padding: 15,
     alignItems: 'center',
     marginTop: 10,
+    shadowColor: '#E62026',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4,
   },
   loginButtonDisabled: {
-    backgroundColor: '#bdc3c7',
+    backgroundColor: '#B3B3B3', // Gris medio
   },
   loginButtonText: {
-    color: 'white',
+    color: '#FFFFFF', // Blanco neutro
     fontSize: 18,
     fontWeight: 'bold',
   },
   demoCredentials: {
     marginTop: 30,
     padding: 15,
-    backgroundColor: '#ecf0f1',
+    backgroundColor: '#E5E5E5', // Gris claro
     borderRadius: 8,
   },
   demoTitle: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: '#2c3e50',
+    color: '#0A0D14', // Negro profundo
     marginBottom: 8,
   },
   demoText: {
     fontSize: 12,
-    color: '#7f8c8d',
+    color: '#B3B3B3', // Gris medio
     marginBottom: 2,
   },
 });

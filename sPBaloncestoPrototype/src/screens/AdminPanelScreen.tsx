@@ -13,7 +13,11 @@ import { Ionicons } from '@expo/vector-icons';
 import { useApp } from '../context/AppContext';
 import { Payment, Student, Championship, Match } from '../types';
 
-export const AdminPanelScreen: React.FC = () => {
+interface AdminPanelScreenProps {
+  navigation: any;
+}
+
+export const AdminPanelScreen: React.FC<AdminPanelScreenProps> = ({ navigation }) => {
   const { students, payments, championships } = useApp();
   const [activeTab, setActiveTab] = useState<'dashboard' | 'payments' | 'championships'>('dashboard');
 
@@ -147,7 +151,10 @@ export const AdminPanelScreen: React.FC = () => {
           <Text style={styles.actionButtonText}>Ver Pagos por Tarjeta</Text>
         </TouchableOpacity>
         
-        <TouchableOpacity style={styles.actionButton}>
+        <TouchableOpacity 
+          style={styles.actionButton}
+          onPress={() => navigation.navigate('ReviewPayment', { payment: pendingTransfers[0] })}
+        >
           <Ionicons name="swap-horizontal-outline" size={20} color="white" />
           <Text style={styles.actionButtonText}>Revisar Transferencias</Text>
         </TouchableOpacity>
@@ -212,9 +219,12 @@ export const AdminPanelScreen: React.FC = () => {
           <Text style={styles.actionButtonText}>Crear Campeonato</Text>
         </TouchableOpacity>
         
-        <TouchableOpacity style={styles.actionButton}>
+        <TouchableOpacity 
+          style={styles.actionButton}
+          onPress={() => navigation.navigate('ManageChampionship', { championship: championships[0] })}
+        >
           <Ionicons name="calendar-outline" size={20} color="white" />
-          <Text style={styles.actionButtonText}>Programar Partido</Text>
+          <Text style={styles.actionButtonText}>Gestionar Campeonato</Text>
         </TouchableOpacity>
         
         <TouchableOpacity style={styles.actionButton}>
@@ -337,29 +347,29 @@ export const AdminPanelScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#0A0D14', // Negro profundo/azul marino oscuro
   },
   header: {
-    backgroundColor: 'white',
+    backgroundColor: '#E62026', // Header rojo para contraste
     padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ecf0f1',
+    borderBottomWidth: 0,
   },
   headerTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#2c3e50',
+    color: '#FFFFFF', // Blanco neutro
   },
   headerSubtitle: {
     fontSize: 14,
-    color: '#7f8c8d',
+    color: '#FFFFFF', // Blanco para mejor lectura sobre rojo
+    opacity: 0.85,
     marginTop: 5,
   },
   tabContainer: {
     flexDirection: 'row',
-    backgroundColor: 'white',
+    backgroundColor: '#0A0D14', // Negro profundo/azul marino oscuro
     borderBottomWidth: 1,
-    borderBottomColor: '#ecf0f1',
+    borderBottomColor: '#E5E5E5', // Gris claro
   },
   tab: {
     flex: 1,
@@ -371,16 +381,16 @@ const styles = StyleSheet.create({
     borderBottomColor: 'transparent',
   },
   activeTab: {
-    borderBottomColor: '#e74c3c',
+    borderBottomColor: '#E62026', // Rojo competitivo
   },
   tabText: {
     fontSize: 14,
-    color: '#7f8c8d',
+    color: '#B3B3B3', // Gris medio
     fontWeight: '500',
     marginLeft: 5,
   },
   activeTabText: {
-    color: '#e74c3c',
+    color: '#E62026', // Rojo competitivo
     fontWeight: 'bold',
   },
   tabContent: {
@@ -394,7 +404,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   summaryCard: {
-    backgroundColor: 'white',
+    backgroundColor: '#FFFFFF', // Blanco neutro
     borderRadius: 12,
     padding: 15,
     alignItems: 'center',
@@ -403,60 +413,68 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 4,
     },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 8,
   },
   summaryNumber: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#2c3e50',
+    color: '#0A0D14', // Negro profundo
     marginTop: 10,
   },
   summaryLabel: {
     fontSize: 12,
-    color: '#7f8c8d',
+    color: '#B3B3B3', // Gris medio
     marginTop: 5,
     textAlign: 'center',
   },
   section: {
-    backgroundColor: 'white',
+    backgroundColor: '#1A1D24', // Gris oscuro para tarjetas
     borderRadius: 12,
     padding: 15,
     marginBottom: 15,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 4,
     },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 8,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#2c3e50',
+    color: '#FFFFFF', // Blanco neutro
     marginBottom: 15,
   },
   actionButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#e74c3c',
+    backgroundColor: '#E62026', // Rojo competitivo
     borderRadius: 8,
     padding: 15,
     marginBottom: 10,
+    shadowColor: '#E62026',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4,
   },
   actionButtonText: {
-    color: 'white',
+    color: '#FFFFFF', // Blanco neutro
     fontSize: 16,
     fontWeight: 'bold',
     marginLeft: 8,
   },
   transferCard: {
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#2A2D34', // Gris más oscuro
     borderRadius: 8,
     padding: 15,
     marginBottom: 10,
@@ -470,16 +488,16 @@ const styles = StyleSheet.create({
   transferStudent: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#2c3e50',
+    color: '#FFFFFF', // Blanco neutro
   },
   transferAmount: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#e74c3c',
+    color: '#E62026', // Rojo competitivo
   },
   transferDescription: {
     fontSize: 14,
-    color: '#7f8c8d',
+    color: '#B3B3B3', // Gris medio
     marginBottom: 10,
   },
   transferActions: {
@@ -487,29 +505,29 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
   },
   approveButton: {
-    backgroundColor: '#27ae60',
+    backgroundColor: '#24C36B', // Verde éxito
     paddingHorizontal: 15,
     paddingVertical: 8,
     borderRadius: 6,
   },
   approveButtonText: {
-    color: 'white',
+    color: '#FFFFFF', // Blanco neutro
     fontSize: 12,
     fontWeight: 'bold',
   },
   rejectButton: {
-    backgroundColor: '#e74c3c',
+    backgroundColor: '#E62026', // Rojo competitivo
     paddingHorizontal: 15,
     paddingVertical: 8,
     borderRadius: 6,
   },
   rejectButtonText: {
-    color: 'white',
+    color: '#FFFFFF', // Blanco neutro
     fontSize: 12,
     fontWeight: 'bold',
   },
   debtCard: {
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#2A2D34', // Gris más oscuro
     borderRadius: 8,
     padding: 15,
     marginBottom: 10,
@@ -517,21 +535,21 @@ const styles = StyleSheet.create({
   debtStudent: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#2c3e50',
+    color: '#FFFFFF', // Blanco neutro
     marginBottom: 5,
   },
   debtAmount: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#e74c3c',
+    color: '#E62026', // Rojo competitivo
     marginBottom: 5,
   },
   debtCount: {
     fontSize: 12,
-    color: '#7f8c8d',
+    color: '#B3B3B3', // Gris medio
   },
   paymentCard: {
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#2A2D34', // Gris más oscuro
     borderRadius: 8,
     padding: 15,
     marginBottom: 10,
@@ -545,26 +563,26 @@ const styles = StyleSheet.create({
   paymentStudent: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#2c3e50',
+    color: '#FFFFFF', // Blanco neutro
   },
   paymentAmount: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#e74c3c',
+    color: '#E62026', // Rojo competitivo
   },
   paymentDescription: {
     fontSize: 14,
-    color: '#7f8c8d',
+    color: '#B3B3B3', // Gris medio
     marginBottom: 5,
   },
   paymentDate: {
     fontSize: 12,
-    color: '#95a5a6',
+    color: '#B3B3B3', // Gris medio
     marginBottom: 5,
   },
   receiptInfo: {
     fontSize: 12,
-    color: '#3498db',
+    color: '#E62026', // Rojo competitivo
     marginBottom: 10,
   },
   paymentActions: {
@@ -572,7 +590,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
   },
   championshipCard: {
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#2A2D34', // Gris más oscuro
     borderRadius: 8,
     padding: 15,
     marginBottom: 10,
@@ -580,17 +598,17 @@ const styles = StyleSheet.create({
   championshipName: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#2c3e50',
+    color: '#FFFFFF', // Blanco neutro
     marginBottom: 5,
   },
   championshipCategory: {
     fontSize: 14,
-    color: '#7f8c8d',
+    color: '#B3B3B3', // Gris medio
     marginBottom: 5,
   },
   championshipMatches: {
     fontSize: 12,
-    color: '#95a5a6',
+    color: '#B3B3B3', // Gris medio
     marginBottom: 10,
   },
   championshipActions: {
@@ -598,30 +616,30 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
   },
   editButton: {
-    backgroundColor: '#3498db',
+    backgroundColor: '#E62026', // Rojo competitivo
     paddingHorizontal: 15,
     paddingVertical: 8,
     borderRadius: 6,
   },
   editButtonText: {
-    color: 'white',
+    color: '#FFFFFF', // Blanco neutro
     fontSize: 12,
     fontWeight: 'bold',
   },
   viewButton: {
-    backgroundColor: '#27ae60',
+    backgroundColor: '#24C36B', // Verde éxito
     paddingHorizontal: 15,
     paddingVertical: 8,
     borderRadius: 6,
   },
   viewButtonText: {
-    color: 'white',
+    color: '#FFFFFF', // Blanco neutro
     fontSize: 12,
     fontWeight: 'bold',
   },
   emptyText: {
     fontSize: 14,
-    color: '#7f8c8d',
+    color: '#B3B3B3', // Gris medio
     textAlign: 'center',
     fontStyle: 'italic',
     paddingVertical: 20,

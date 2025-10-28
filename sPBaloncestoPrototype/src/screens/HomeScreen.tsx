@@ -116,7 +116,7 @@ export const HomeScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#0A0D14', // Negro profundo/azul marino oscuro
   },
   webview: {
     flex: 1,
@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    backgroundColor: 'rgba(10, 13, 20, 0.9)', // Negro profundo con transparencia
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 1,
@@ -135,31 +135,31 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 10,
     fontSize: 16,
-    color: '#7f8c8d',
+    color: '#FFFFFF', // Blanco neutro
   },
   errorContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 30,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#0A0D14', // Negro profundo/azul marino oscuro
   },
   errorTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#2c3e50',
+    color: '#FFFFFF', // Blanco neutro
     marginTop: 20,
     marginBottom: 10,
   },
   errorMessage: {
     fontSize: 16,
-    color: '#7f8c8d',
+    color: '#B3B3B3', // Gris medio
     textAlign: 'center',
     marginBottom: 5,
   },
   errorSubMessage: {
     fontSize: 14,
-    color: '#95a5a6',
+    color: '#B3B3B3', // Gris medio
     textAlign: 'center',
     marginBottom: 30,
   },
@@ -172,13 +172,21 @@ const styles = StyleSheet.create({
   retryButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#e74c3c',
+    backgroundColor: '#E62026', // Rojo competitivo
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderRadius: 8,
+    shadowColor: '#E62026',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4,
   },
   retryButtonText: {
-    color: 'white',
+    color: '#FFFFFF', // Blanco neutro
     fontSize: 16,
     fontWeight: 'bold',
     marginLeft: 8,
@@ -186,43 +194,43 @@ const styles = StyleSheet.create({
   browserButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'white',
+    backgroundColor: 'transparent',
     borderWidth: 2,
-    borderColor: '#e74c3c',
+    borderColor: '#E62026', // Rojo competitivo
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderRadius: 8,
   },
   browserButtonText: {
-    color: '#e74c3c',
+    color: '#E62026', // Rojo competitivo
     fontSize: 16,
     fontWeight: 'bold',
     marginLeft: 8,
   },
   offlineInfo: {
-    backgroundColor: 'white',
+    backgroundColor: '#1A1D24', // Card oscuro
     padding: 20,
-    borderRadius: 10,
+    borderRadius: 12,
     width: '100%',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 4,
     },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 8,
   },
   offlineTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#2c3e50',
+    color: '#FFFFFF', // Blanco
     marginBottom: 15,
     textAlign: 'center',
   },
   offlineText: {
     fontSize: 14,
-    color: '#7f8c8d',
+    color: '#B3B3B3', // Gris medio
     marginBottom: 8,
     lineHeight: 20,
   },

@@ -151,19 +151,19 @@ export const ChampionshipsScreen: React.FC<ChampionshipsScreenProps> = ({ naviga
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#0A0D14', // Negro profundo/azul marino oscuro
   },
   searchContainer: {
-    backgroundColor: 'white',
+    backgroundColor: '#0A0D14', // Negro profundo/azul marino oscuro
     paddingHorizontal: 15,
     paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#ecf0f1',
+    borderBottomColor: '#E5E5E5', // Gris claro
   },
   searchInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#1A1D24', // Card oscuro
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 8,
@@ -172,19 +172,19 @@ const styles = StyleSheet.create({
     flex: 1,
     marginLeft: 8,
     fontSize: 16,
-    color: '#2c3e50',
+    color: '#0A0D14', // Negro profundo
   },
   filtersContainer: {
-    backgroundColor: 'white',
+    backgroundColor: '#0A0D14', // Negro profundo/azul marino oscuro
     paddingHorizontal: 15,
     paddingVertical: 15,
     borderBottomWidth: 1,
-    borderBottomColor: '#ecf0f1',
+    borderBottomColor: '#E5E5E5', // Gris claro
   },
   filterTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#2c3e50',
+    color: '#FFFFFF', // Blanco neutro
     marginBottom: 10,
   },
   categoryButtons: {
@@ -195,37 +195,37 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 15,
-    backgroundColor: '#ecf0f1',
+    backgroundColor: '#E5E5E5', // Gris claro
     marginRight: 8,
     marginBottom: 8,
   },
   categoryButtonActive: {
-    backgroundColor: '#e74c3c',
+    backgroundColor: '#E62026', // Rojo competitivo
   },
   categoryButtonText: {
     fontSize: 14,
-    color: '#7f8c8d',
+    color: '#B3B3B3', // Gris medio
     fontWeight: '500',
   },
   categoryButtonTextActive: {
-    color: 'white',
+    color: '#FFFFFF', // Blanco neutro
   },
   listContainer: {
     padding: 15,
   },
   championshipCard: {
-    backgroundColor: 'white',
+    backgroundColor: '#1A1D24', // Card oscuro
     borderRadius: 12,
     padding: 15,
     marginBottom: 15,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 4,
     },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 8,
   },
   championshipHeader: {
     flexDirection: 'row',
@@ -236,17 +236,17 @@ const styles = StyleSheet.create({
   championshipName: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#2c3e50',
+    color: '#E62026', // Rojo competitivo
     flex: 1,
   },
   statusBadge: {
-    backgroundColor: '#27ae60',
+    backgroundColor: '#F2AB16', // Amarillo alerta suave
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 12,
   },
   statusText: {
-    color: 'white',
+    color: '#0A0D14', // Negro profundo
     fontSize: 12,
     fontWeight: 'bold',
   },
@@ -261,11 +261,12 @@ const styles = StyleSheet.create({
   infoText: {
     marginLeft: 8,
     fontSize: 14,
-    color: '#7f8c8d',
+    color: '#FFFFFF', // Blanco
+    fontWeight: '600',
   },
   matchesPreview: {
     borderTopWidth: 1,
-    borderTopColor: '#ecf0f1',
+    borderTopColor: '#E5E5E5', // Gris claro
     paddingTop: 10,
   },
   matchPreview: {
@@ -274,16 +275,16 @@ const styles = StyleSheet.create({
   matchText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#2c3e50',
+    color: '#FFFFFF', // Blanco
   },
   matchStatus: {
     fontSize: 12,
-    color: '#7f8c8d',
+    color: '#B3B3B3', // Gris medio
     marginLeft: 10,
   },
   moreMatches: {
     fontSize: 12,
-    color: '#e74c3c',
+    color: '#E62026', // Rojo competitivo
     fontStyle: 'italic',
     marginTop: 5,
   },

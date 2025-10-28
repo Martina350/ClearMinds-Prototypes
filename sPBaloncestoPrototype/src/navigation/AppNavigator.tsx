@@ -16,46 +16,111 @@ import { PaymentsScreen } from '../screens/PaymentsScreen';
 import { PaymentDetailScreen } from '../screens/PaymentDetailScreen';
 import { PaymentMethodScreen } from '../screens/PaymentMethodScreen';
 import { AdminPanelScreen } from '../screens/AdminPanelScreen';
+import { ManageChampionshipScreen } from '../screens/ManageChampionshipScreen';
+import { ReviewPaymentScreen } from '../screens/ReviewPaymentScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
 // Stack de Campeonatos
-const ChampionshipsStack = () => (
-  <Stack.Navigator>
-    <Stack.Screen 
-      name="ChampionshipsList" 
-      component={ChampionshipsScreen}
-      options={{ title: 'Campeonatos' }}
-    />
-    <Stack.Screen 
-      name="ChampionshipDetail" 
-      component={ChampionshipDetailScreen}
-      options={{ title: 'Detalle del Campeonato' }}
-    />
-  </Stack.Navigator>
-);
+const ChampionshipsStack = () => {
+  const { logout } = useAuth();
+  
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: '#E62026',
+        },
+        headerTintColor: '#FFFFFF',
+        headerTitleStyle: {
+          fontWeight: 'bold',
+          fontSize: 18,
+        },
+      }}
+    >
+      <Stack.Screen 
+        name="ChampionshipsList" 
+        component={ChampionshipsScreen}
+        options={{ 
+          title: 'Campeonatos',
+          headerRight: () => (
+            <TouchableOpacity
+              onPress={logout}
+              style={{ marginRight: 12 }}
+              accessibilityRole="button"
+              accessibilityLabel="Cerrar sesión"
+            >
+              <Ionicons name="log-out-outline" size={22} color="#ffffff" />
+            </TouchableOpacity>
+          ),
+        }}
+      />
+      <Stack.Screen 
+        name="ChampionshipDetail" 
+        component={ChampionshipDetailScreen}
+        options={{ 
+          title: 'Detalle del Campeonato',
+          headerBackTitleVisible: false // Ocultar texto junto a la flecha
+        }}
+      />
+    </Stack.Navigator>
+  );
+};
 
 // Stack de Pagos
-const PaymentsStack = () => (
-  <Stack.Navigator>
-    <Stack.Screen 
-      name="PaymentsList" 
-      component={PaymentsScreen}
-      options={{ title: 'Estado de Pagos' }}
-    />
-    <Stack.Screen 
-      name="PaymentDetail" 
-      component={PaymentDetailScreen}
-      options={{ title: 'Detalle de Pagos' }}
-    />
-    <Stack.Screen 
-      name="PaymentMethod" 
-      component={PaymentMethodScreen}
-      options={{ title: 'Método de Pago' }}
-    />
-  </Stack.Navigator>
-);
+const PaymentsStack = () => {
+  const { logout } = useAuth();
+  
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: '#E62026',
+        },
+        headerTintColor: '#FFFFFF',
+        headerTitleStyle: {
+          fontWeight: 'bold',
+          fontSize: 18,
+        },
+      }}
+    >
+      <Stack.Screen 
+        name="PaymentsList" 
+        component={PaymentsScreen}
+        options={{ 
+          title: 'Estado de Pagos',
+          headerRight: () => (
+            <TouchableOpacity
+              onPress={logout}
+              style={{ marginRight: 12 }}
+              accessibilityRole="button"
+              accessibilityLabel="Cerrar sesión"
+            >
+              <Ionicons name="log-out-outline" size={22} color="#ffffff" />
+            </TouchableOpacity>
+          ),
+        }}
+      />
+      <Stack.Screen 
+        name="PaymentDetail" 
+        component={PaymentDetailScreen}
+        options={{ 
+          title: 'Detalle de Pagos',
+          headerBackTitleVisible: false // Ocultar texto junto a la flecha
+        }}
+      />
+      <Stack.Screen 
+        name="PaymentMethod" 
+        component={PaymentMethodScreen}
+        options={{ 
+          title: 'Método de Pago',
+          headerBackTitleVisible: false // Ocultar texto junto a la flecha
+        }}
+      />
+    </Stack.Navigator>
+  );
+};
 
 // Tabs principales
 const MainTabs = () => {
@@ -81,22 +146,23 @@ const MainTabs = () => {
 
           return <Ionicons name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: '#e74c3c',
-        tabBarInactiveTintColor: '#7f8c8d',
+        tabBarActiveTintColor: '#E62026', // Rojo competitivo
+        tabBarInactiveTintColor: '#FFFFFF', // Blanco neutro con 60% opacidad
         tabBarStyle: {
-          backgroundColor: 'white',
+          backgroundColor: '#0A0D14', // Negro profundo/azul marino oscuro
           borderTopWidth: 1,
-          borderTopColor: '#ecf0f1',
-          paddingBottom: 5,
-          paddingTop: 5,
-          height: 60,
+          borderTopColor: '#E5E5E5', // Gris claro
+          paddingBottom: 8,
+          paddingTop: 8,
+          height: 64,
         },
         headerStyle: {
-          backgroundColor: '#e74c3c',
+          backgroundColor: '#E62026', // Rojo competitivo para todos los headers
         },
-        headerTintColor: 'white',
+        headerTintColor: '#FFFFFF', // Blanco neutro
         headerTitleStyle: {
           fontWeight: 'bold',
+          fontSize: 18,
         },
         headerRight: () => (
           <TouchableOpacity
@@ -118,12 +184,18 @@ const MainTabs = () => {
       <Tab.Screen 
         name="Championships" 
         component={ChampionshipsStack}
-        options={{ title: 'Campeonatos', headerShown: false }}
+        options={{ 
+          title: 'Campeonatos',
+          headerShown: false // Ocultar header del tab para que use el del stack
+        }}
       />
       <Tab.Screen 
         name="Payments" 
         component={PaymentsStack}
-        options={{ title: 'Pagos', headerShown: false }}
+        options={{ 
+          title: 'Pagos',
+          headerShown: false // Ocultar header del tab para que use el del stack
+        }}
       />
       {user?.role === 'admin' && (
         <Tab.Screen 
@@ -142,9 +214,49 @@ export const AppNavigator = () => {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Navigator 
+        screenOptions={{ 
+          headerShown: false,
+        }}
+      >
         {isAuthenticated ? (
-          <Stack.Screen name="MainTabs" component={MainTabs} />
+          <>
+            <Stack.Screen name="MainTabs" component={MainTabs} />
+            <Stack.Screen 
+              name="ManageChampionship" 
+              component={ManageChampionshipScreen}
+              options={{
+                headerShown: true,
+                title: 'Gestionar Campeonato',
+                headerStyle: {
+                  backgroundColor: '#E62026',
+                },
+                headerTintColor: '#FFFFFF',
+                headerTitleStyle: {
+                  fontWeight: 'bold',
+                  fontSize: 18,
+                },
+                headerBackTitleVisible: false, // Ocultar texto junto a la flecha
+              }}
+            />
+            <Stack.Screen 
+              name="ReviewPayment" 
+              component={ReviewPaymentScreen}
+              options={{
+                headerShown: true,
+                title: 'Revisar Pago',
+                headerStyle: {
+                  backgroundColor: '#E62026',
+                },
+                headerTintColor: '#FFFFFF',
+                headerTitleStyle: {
+                  fontWeight: 'bold',
+                  fontSize: 18,
+                },
+                headerBackTitleVisible: false, // Ocultar texto junto a la flecha
+              }}
+            />
+          </>
         ) : (
           <Stack.Screen name="Login" component={LoginScreen} />
         )}

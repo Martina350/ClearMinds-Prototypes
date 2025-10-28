@@ -250,10 +250,10 @@ export const PaymentMethodScreen: React.FC<PaymentMethodScreenProps> = ({ naviga
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#0A0D14', // Oscuro
   },
   paymentInfo: {
-    backgroundColor: 'white',
+    backgroundColor: '#1A1D24', // Card oscuro
     margin: 15,
     borderRadius: 12,
     padding: 20,
@@ -269,18 +269,18 @@ const styles = StyleSheet.create({
   paymentTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#2c3e50',
+    color: '#FFFFFF',
     marginBottom: 15,
   },
   paymentCard: {
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#2A2D34',
     borderRadius: 8,
     padding: 15,
   },
   paymentDescription: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#2c3e50',
+    color: '#FFFFFF',
     marginBottom: 5,
   },
   paymentAmount: {
@@ -291,12 +291,12 @@ const styles = StyleSheet.create({
   },
   paymentStudent: {
     fontSize: 14,
-    color: '#7f8c8d',
+    color: '#B3B3B3',
     marginBottom: 5,
   },
   paymentDueDate: {
     fontSize: 14,
-    color: '#7f8c8d',
+    color: '#B3B3B3',
   },
   methodsContainer: {
     paddingHorizontal: 15,
@@ -305,11 +305,11 @@ const styles = StyleSheet.create({
   methodsTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#2c3e50',
+    color: '#FFFFFF',
     marginBottom: 15,
   },
   methodCard: {
-    backgroundColor: 'white',
+    backgroundColor: '#1A1D24',
     borderRadius: 12,
     padding: 15,
     marginBottom: 15,
@@ -338,12 +338,12 @@ const styles = StyleSheet.create({
   methodTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#2c3e50',
+    color: '#FFFFFF',
     marginBottom: 5,
   },
   methodDescription: {
     fontSize: 14,
-    color: '#7f8c8d',
+    color: '#B3B3B3',
   },
   radioButton: {
     width: 20,
@@ -364,7 +364,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#e74c3c',
   },
   cardPaymentContainer: {
-    backgroundColor: 'white',
+    backgroundColor: '#1A1D24',
     margin: 15,
     borderRadius: 12,
     padding: 20,
@@ -380,7 +380,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#2c3e50',
+    color: '#FFFFFF',
     marginBottom: 15,
   },
   cardInfo: {
@@ -388,7 +388,7 @@ const styles = StyleSheet.create({
   },
   cardInfoText: {
     fontSize: 14,
-    color: '#7f8c8d',
+    color: '#B3B3B3',
     marginBottom: 5,
     lineHeight: 20,
   },
@@ -407,7 +407,7 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   transferPaymentContainer: {
-    backgroundColor: 'white',
+    backgroundColor: '#1A1D24',
     margin: 15,
     borderRadius: 12,
     padding: 20,
@@ -421,7 +421,7 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   bankInfo: {
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#2A2D34',
     borderRadius: 8,
     padding: 15,
     marginBottom: 20,
@@ -429,12 +429,12 @@ const styles = StyleSheet.create({
   bankTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#2c3e50',
+    color: '#FFFFFF',
     marginBottom: 10,
   },
   bankData: {
     fontSize: 14,
-    color: '#7f8c8d',
+    color: '#B3B3B3',
     marginBottom: 5,
     fontFamily: 'monospace',
   },
@@ -444,7 +444,7 @@ const styles = StyleSheet.create({
   receiptTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#2c3e50',
+    color: '#FFFFFF',
     marginBottom: 10,
   },
   receiptImage: {
@@ -464,7 +464,7 @@ const styles = StyleSheet.create({
   },
   uploadButton: {
     alignItems: 'center',
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#2A2D34',
     borderRadius: 8,
     padding: 30,
     marginBottom: 20,
@@ -480,7 +480,7 @@ const styles = StyleSheet.create({
   },
   uploadButtonSubtext: {
     fontSize: 12,
-    color: '#7f8c8d',
+    color: '#B3B3B3',
     marginTop: 5,
     textAlign: 'center',
   },
