@@ -1,8 +1,8 @@
 // Contextos de autenticación y datos de la aplicación
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { User, Student, Championship, Payment, PaymentHistory, AuthContextType, AppContextType } from '../types';
-import { mockUsers, mockStudents, mockChampionships, mockPayments, mockPaymentHistory } from '../data/mockData';
+import { User, Deportista, Championship, Payment, PaymentHistory, AuthContextType, AppContextType } from '../types';
+import { mockUsers, mockDeportistas, mockChampionships, mockPayments, mockPaymentHistory } from '../data/mockData';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -78,7 +78,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 };
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [students, setStudents] = useState<Student[]>(mockStudents);
+  const [deportistas, setDeportistas] = useState<Deportista[]>(mockDeportistas);
   const [championships, setChampionships] = useState<Championship[]>(mockChampionships);
   const [payments, setPayments] = useState<Payment[]>(mockPayments);
   const [paymentHistory, setPaymentHistory] = useState<PaymentHistory[]>(mockPaymentHistory);
@@ -86,7 +86,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const refreshData = async () => {
     // En una implementación real, aquí se harían llamadas a la API
     // Por ahora mantenemos los datos mock
-    setStudents(mockStudents);
+    setDeportistas(mockDeportistas);
     setChampionships(mockChampionships);
     setPayments(mockPayments);
     setPaymentHistory(mockPaymentHistory);
@@ -94,7 +94,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   return (
     <AppContext.Provider value={{ 
-      students, 
+      deportistas,
+      students: deportistas, // Alias para compatibilidad
       championships, 
       payments, 
       paymentHistory, 

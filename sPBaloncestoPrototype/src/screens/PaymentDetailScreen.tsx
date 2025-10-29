@@ -23,13 +23,13 @@ export const PaymentDetailScreen: React.FC<PaymentDetailScreenProps> = ({ naviga
   const { payments, paymentHistory } = useApp();
   const [activeTab, setActiveTab] = useState<'pending' | 'history'>('pending');
 
-  const studentPayments = payments.filter(payment => payment.studentId === student.id);
-  const studentPaymentHistory = paymentHistory.filter(payment => payment.studentId === student.id);
+  const deportistaPayments = payments.filter(payment => payment.deportistaId === student.id);
+  const deportistaPaymentHistory = paymentHistory.filter(payment => payment.deportistaId === student.id);
 
-  const pendingPayments = studentPayments.filter(payment => 
+  const pendingPayments = deportistaPayments.filter(payment => 
     payment.status === 'pending' || payment.status === 'overdue'
   );
-  const paidPayments = studentPayments.filter(payment => payment.status === 'paid');
+  const paidPayments = deportistaPayments.filter(payment => payment.status === 'paid');
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -51,6 +51,24 @@ export const PaymentDetailScreen: React.FC<PaymentDetailScreenProps> = ({ naviga
     }
   };
 
+  const getPaymentTypeText = (type: string) => {
+    switch (type) {
+      case 'mensualidad': return 'Mensualidad';
+      case 'inscripcion_torneo': return 'Inscripción Torneo';
+      case 'inscripcion_evento': return 'Inscripción Evento';
+      default: return 'Pago';
+    }
+  };
+
+  const getPaymentTypeIcon = (type: string) => {
+    switch (type) {
+      case 'mensualidad': return 'calendar-outline';
+      case 'inscripcion_torneo': return 'trophy-outline';
+      case 'inscripcion_evento': return 'star-outline';
+      default: return 'cash-outline';
+    }
+  };
+
   const handlePayment = (payment: Payment) => {
     navigation.navigate('PaymentMethod', { payment, student });
   };
@@ -58,7 +76,13 @@ export const PaymentDetailScreen: React.FC<PaymentDetailScreenProps> = ({ naviga
   const renderPaymentItem = ({ item }: { item: Payment }) => (
     <View style={styles.paymentCard}>
       <View style={styles.paymentHeader}>
-        <Text style={styles.paymentDescription}>{item.description}</Text>
+        <View style={styles.paymentTitleContainer}>
+          <View style={styles.paymentTypeContainer}>
+            <Ionicons name={getPaymentTypeIcon(item.type)} size={16} color="#E62026" />
+            <Text style={styles.paymentTypeText}>{getPaymentTypeText(item.type)}</Text>
+          </View>
+          <Text style={styles.paymentDescription}>{item.description}</Text>
+        </View>
         <View style={[styles.statusBadge, { backgroundColor: getStatusColor(item.status) }]}>
           <Text style={styles.statusText}>{getStatusText(item.status)}</Text>
         </View>
@@ -157,9 +181,9 @@ export const PaymentDetailScreen: React.FC<PaymentDetailScreenProps> = ({ naviga
       {/* Sección A: Historial de pagos realizados */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Historial de Pagos Realizados</Text>
-        {studentPaymentHistory.length > 0 ? (
+        {deportistaPaymentHistory.length > 0 ? (
           <FlatList
-            data={studentPaymentHistory}
+            data={deportistaPaymentHistory}
             renderItem={renderHistoryItem}
             keyExtractor={(item) => item.id}
             scrollEnabled={false}
@@ -230,8 +254,9 @@ const styles = StyleSheet.create({
     color: '#B3B3B3', // Gris medio
   },
   section: {
-    marginBottom: 30,
     paddingHorizontal: 15,
+    marginTop: 20,
+    marginBottom: 10,
   },
   sectionTitle: {
     fontSize: 18,
@@ -258,14 +283,28 @@ const styles = StyleSheet.create({
   paymentHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     marginBottom: 10,
+  },
+  paymentTitleContainer: {
+    flex: 1,
+    marginRight: 10,
+  },
+  paymentTypeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  paymentTypeText: {
+    fontSize: 12,
+    color: '#E62026',
+    fontWeight: '600',
+    marginLeft: 4,
   },
   paymentDescription: {
     fontSize: 16,
     fontWeight: 'bold',
     color: '#FFFFFF', // Blanco
-    flex: 1,
   },
   statusBadge: {
     paddingHorizontal: 8,

@@ -16,6 +16,8 @@ import { PaymentsScreen } from '../screens/PaymentsScreen';
 import { PaymentDetailScreen } from '../screens/PaymentDetailScreen';
 import { PaymentMethodScreen } from '../screens/PaymentMethodScreen';
 import { AdminPanelScreen } from '../screens/AdminPanelScreen';
+import { AdminPaymentsScreen } from '../screens/AdminPaymentsScreen';
+import { AdminChampionshipsScreen } from '../screens/AdminChampionshipsScreen';
 import { ManageChampionshipScreen } from '../screens/ManageChampionshipScreen';
 import { ReviewPaymentScreen } from '../screens/ReviewPaymentScreen';
 import { CardPaymentsScreen } from '../screens/CardPaymentsScreen';
@@ -326,6 +328,20 @@ export const AppNavigator = () => {
                   fontSize: 18,
                 },
                 headerBackTitleVisible: false, // Ocultar texto junto a la flecha
+              }}
+            />
+            <Stack.Screen 
+              name="AdminPayments" 
+              component={AdminPaymentsScreen}
+              options={{
+                headerShown: false, // Usar header personalizado
+              }}
+            />
+            <Stack.Screen 
+              name="AdminChampionships" 
+              component={AdminChampionshipsScreen}
+              options={{
+                headerShown: false, // Usar header personalizado
               }}
             />
           </>

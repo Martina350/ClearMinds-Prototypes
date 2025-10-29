@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   TextInput,
+  ScrollView,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useApp } from '../context/AppContext';
@@ -20,9 +21,17 @@ export const ChampionshipsScreen: React.FC<ChampionshipsScreenProps> = ({ naviga
   const { championships } = useApp();
   const [searchText, setSearchText] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
 
-  const categories = ['Sub-10', 'Sub-12', 'Sub-13', 'Sub-15'];
-  const genders = ['masculino', 'femenino'];
+  const categories = ['Sub-8', 'Sub-9', 'Sub-10', 'Sub-11', 'Sub-12', 'Sub-13', 'Sub-14', 'Sub-15', 'Sub-16', 'Sub-17'];
+
+  // Función para formatear fecha
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const months = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 
+                   'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+    return `${date.getDate()} de ${months[date.getMonth()]}`;
+  };
 
   const filteredChampionships = championships.filter(championship => {
     const matchesSearch = championship.name.toLowerCase().includes(searchText.toLowerCase());
@@ -36,7 +45,12 @@ export const ChampionshipsScreen: React.FC<ChampionshipsScreenProps> = ({ naviga
       onPress={() => navigation.navigate('ChampionshipDetail', { championship: item })}
     >
       <View style={styles.championshipHeader}>
-        <Text style={styles.championshipName}>{item.name}</Text>
+        <View style={styles.championshipTitleContainer}>
+          <Text style={styles.championshipName}>{item.name}</Text>
+          <View style={styles.tournamentTypeBadge}>
+            <Text style={styles.tournamentTypeText}>{item.tournamentType}</Text>
+          </View>
+        </View>
         <View style={styles.statusBadge}>
           <Text style={styles.statusText}>
             {item.isActive ? 'Activo' : 'Finalizado'}
@@ -46,17 +60,24 @@ export const ChampionshipsScreen: React.FC<ChampionshipsScreenProps> = ({ naviga
       
       <View style={styles.championshipInfo}>
         <View style={styles.infoRow}>
-          <Ionicons name="trophy-outline" size={16} color="#e74c3c" />
-          <Text style={styles.infoText}>{item.category}</Text>
+          <Ionicons name="trophy-outline" size={16} color="#E62026" />
+          <Text style={styles.infoText}>{item.category} - {item.gender}</Text>
         </View>
         
         <View style={styles.infoRow}>
-          <Ionicons name="people-outline" size={16} color="#e74c3c" />
-          <Text style={styles.infoText}>{item.gender}</Text>
+          <Ionicons name="calendar-outline" size={16} color="#E62026" />
+          <Text style={styles.infoText}>
+            Comienza el {formatDate(item.startDate)}
+          </Text>
         </View>
         
         <View style={styles.infoRow}>
-          <Ionicons name="calendar-outline" size={16} color="#e74c3c" />
+          <Ionicons name="flag-outline" size={16} color="#E62026" />
+          <Text style={styles.infoText}>{item.currentPhase}</Text>
+        </View>
+        
+        <View style={styles.infoRow}>
+          <Ionicons name="basketball-outline" size={16} color="#E62026" />
           <Text style={styles.infoText}>
             {item.matches.length} partido{item.matches.length !== 1 ? 's' : ''}
           </Text>
@@ -72,7 +93,7 @@ export const ChampionshipsScreen: React.FC<ChampionshipsScreenProps> = ({ naviga
             <Text style={styles.matchStatus}>
               {match.status === 'completed' 
                 ? `${match.homeScore} - ${match.awayScore}`
-                : `${match.date} ${match.time}`
+                : `${formatDate(match.date)} ${match.time}`
               }
             </Text>
           </View>
@@ -83,6 +104,11 @@ export const ChampionshipsScreen: React.FC<ChampionshipsScreenProps> = ({ naviga
           </Text>
         )}
       </View>
+
+      <TouchableOpacity style={styles.viewDetailsButton}>
+        <Text style={styles.viewDetailsButtonText}>Ver detalles y resultados</Text>
+        <Ionicons name="chevron-forward" size={18} color="#E62026" />
+      </TouchableOpacity>
     </TouchableOpacity>
   );
 
@@ -90,10 +116,11 @@ export const ChampionshipsScreen: React.FC<ChampionshipsScreenProps> = ({ naviga
     <View style={styles.container}>
       <View style={styles.searchContainer}>
         <View style={styles.searchInputContainer}>
-          <Ionicons name="search-outline" size={20} color="#7f8c8d" />
+          <Ionicons name="search-outline" size={20} color="#B3B3B3" />
           <TextInput
             style={styles.searchInput}
             placeholder="Buscar campeonatos..."
+            placeholderTextColor="#B3B3B3"
             value={searchText}
             onChangeText={setSearchText}
           />
@@ -101,39 +128,77 @@ export const ChampionshipsScreen: React.FC<ChampionshipsScreenProps> = ({ naviga
       </View>
 
       <View style={styles.filtersContainer}>
-        <Text style={styles.filterTitle}>Filtrar por categoría:</Text>
-        <View style={styles.categoryButtons}>
-          <TouchableOpacity
-            style={[
-              styles.categoryButton,
-              !selectedCategory && styles.categoryButtonActive
-            ]}
-            onPress={() => setSelectedCategory(null)}
-          >
-            <Text style={[
-              styles.categoryButtonText,
-              !selectedCategory && styles.categoryButtonTextActive
-            ]}>
-              Todas
-            </Text>
-          </TouchableOpacity>
-          {categories.map((category) => (
-            <TouchableOpacity
-              key={category}
-              style={[
-                styles.categoryButton,
-                selectedCategory === category && styles.categoryButtonActive
-              ]}
-              onPress={() => setSelectedCategory(category)}
+        <View style={styles.singleFilterRow}>
+          <View style={styles.categoryDropdownContainer}>
+            <TouchableOpacity 
+              style={styles.categoryDropdownButton}
+              onPress={() => setShowCategoryDropdown(!showCategoryDropdown)}
             >
-              <Text style={[
-                styles.categoryButtonText,
-                selectedCategory === category && styles.categoryButtonTextActive
-              ]}>
-                {category}
-              </Text>
+              <Text style={styles.categoryDropdownLabel}>Filtrar por categoría:</Text>
+              <View style={styles.categoryDropdownValue}>
+                <Text style={styles.categoryDropdownValueText}>
+                  {selectedCategory || 'Todas las categorías'}
+                </Text>
+                <Ionicons 
+                  name={showCategoryDropdown ? "chevron-up" : "chevron-down"} 
+                  size={18} 
+                  color="#E62026" 
+                />
+              </View>
             </TouchableOpacity>
-          ))}
+            
+            {showCategoryDropdown && (
+              <>
+                <TouchableOpacity 
+                  style={styles.dropdownOverlay}
+                  activeOpacity={1}
+                  onPress={() => setShowCategoryDropdown(false)}
+                />
+                <View style={styles.categoryDropdownList}>
+                  <ScrollView 
+                    style={styles.dropdownScrollView}
+                    showsVerticalScrollIndicator={true}
+                    nestedScrollEnabled={true}
+                  >
+                    <TouchableOpacity
+                      style={styles.categoryDropdownOption}
+                      onPress={() => {
+                        setSelectedCategory(null);
+                        setShowCategoryDropdown(false);
+                      }}
+                    >
+                      <Text style={styles.categoryDropdownOptionText}>Todas las categorías</Text>
+                    </TouchableOpacity>
+                    {categories.map((category, index) => (
+                      <TouchableOpacity
+                        key={category}
+                        style={[
+                          styles.categoryDropdownOption,
+                          index === categories.length - 1 && styles.lastDropdownOption
+                        ]}
+                        onPress={() => {
+                          setSelectedCategory(category);
+                          setShowCategoryDropdown(false);
+                        }}
+                      >
+                        <Text style={styles.categoryDropdownOptionText}>{category}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
+                </View>
+              </>
+            )}
+          </View>
+
+          <TouchableOpacity 
+            style={styles.clearFilterButton}
+            onPress={() => {
+              setSelectedCategory(null);
+              setShowCategoryDropdown(false);
+            }}
+          >
+            <Ionicons name="refresh" size={20} color="#E62026" />
+          </TouchableOpacity>
         </View>
       </View>
 
@@ -154,7 +219,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#0A0D14', // Negro profundo/azul marino oscuro
   },
   searchContainer: {
-    backgroundColor: '#0A0D14', // Negro profundo/azul marino oscuro
+    backgroundColor: '#0A0D14',
     paddingHorizontal: 15,
     paddingVertical: 10,
     borderBottomWidth: 1,
@@ -172,43 +237,108 @@ const styles = StyleSheet.create({
     flex: 1,
     marginLeft: 8,
     fontSize: 16,
-    color: '#0A0D14', // Negro profundo
+    color: '#FFFFFF', // Blanco
   },
   filtersContainer: {
-    backgroundColor: '#0A0D14', // Negro profundo/azul marino oscuro
+    backgroundColor: '#0A0D14',
     paddingHorizontal: 15,
-    paddingVertical: 15,
+    paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E5E5', // Gris claro
+    borderBottomColor: '#E5E5E5',
   },
-  filterTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#FFFFFF', // Blanco neutro
-    marginBottom: 10,
-  },
-  categoryButtons: {
+  singleFilterRow: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
-  categoryButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 15,
-    backgroundColor: '#E5E5E5', // Gris claro
-    marginRight: 8,
-    marginBottom: 8,
+  categoryDropdownContainer: {
+    flex: 1,
+    marginRight: 12,
+    position: 'relative',
+    zIndex: 9999,
   },
-  categoryButtonActive: {
-    backgroundColor: '#E62026', // Rojo competitivo
+  categoryDropdownButton: {
+    backgroundColor: '#1A1D24',
+    borderRadius: 8,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: '#E5E5E5',
   },
-  categoryButtonText: {
-    fontSize: 14,
-    color: '#B3B3B3', // Gris medio
+  categoryDropdownLabel: {
+    fontSize: 13,
+    color: '#B3B3B3',
+    marginBottom: 6,
     fontWeight: '500',
   },
-  categoryButtonTextActive: {
-    color: '#FFFFFF', // Blanco neutro
+  categoryDropdownValue: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  categoryDropdownValueText: {
+    fontSize: 15,
+    color: '#FFFFFF',
+    fontWeight: '600',
+    flex: 1,
+  },
+  categoryDropdownList: {
+    position: 'absolute',
+    top: '100%',
+    left: 0,
+    right: 0,
+    backgroundColor: '#1A1D24',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#E5E5E5',
+    marginTop: 4,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+    zIndex: 9999,
+    maxHeight: 180,
+    marginBottom: 20,
+  },
+  dropdownScrollView: {
+    maxHeight: 180,
+  },
+  categoryDropdownOption: {
+    paddingHorizontal: 14,
+    paddingVertical: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: '#2A2D34',
+  },
+  categoryDropdownOptionText: {
+    fontSize: 15,
+    color: '#FFFFFF',
+    fontWeight: '500',
+  },
+  lastDropdownOption: {
+    borderBottomWidth: 0,
+  },
+  clearFilterButton: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#1A1D24',
+    borderRadius: 8,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: '#E62026',
+    width: 50,
+    height: 50,
+  },
+  dropdownOverlay: {
+    position: 'absolute',
+    top: -50,
+    left: -15,
+    right: -15,
+    bottom: -300,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    zIndex: 9998,
   },
   listContainer: {
     padding: 15,
@@ -230,14 +360,33 @@ const styles = StyleSheet.create({
   championshipHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 12,
+  },
+  championshipTitleContainer: {
+    flex: 1,
+    flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 10,
+    flexWrap: 'wrap',
   },
   championshipName: {
     fontSize: 18,
     fontWeight: 'bold',
     color: '#E62026', // Rojo competitivo
-    flex: 1,
+    marginRight: 8,
+  },
+  tournamentTypeBadge: {
+    backgroundColor: '#2A2D34',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#E62026',
+  },
+  tournamentTypeText: {
+    color: '#E62026',
+    fontSize: 11,
+    fontWeight: '600',
   },
   statusBadge: {
     backgroundColor: '#F2AB16', // Amarillo alerta suave
@@ -246,7 +395,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   statusText: {
-    color: '#0A0D14', // Negro profundo
+    color: '#0A0D14',
     fontSize: 12,
     fontWeight: 'bold',
   },
@@ -256,36 +405,53 @@ const styles = StyleSheet.create({
   infoRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 5,
+    marginBottom: 8,
   },
   infoText: {
     marginLeft: 8,
     fontSize: 14,
-    color: '#FFFFFF', // Blanco
-    fontWeight: '600',
+    color: '#FFFFFF',
+    fontWeight: '500',
   },
   matchesPreview: {
     borderTopWidth: 1,
-    borderTopColor: '#E5E5E5', // Gris claro
+    borderTopColor: '#E5E5E5',
     paddingTop: 10,
+    marginBottom: 10,
   },
   matchPreview: {
-    marginBottom: 5,
+    marginBottom: 8,
   },
   matchText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#FFFFFF', // Blanco
+    color: '#FFFFFF',
+    marginBottom: 4,
   },
   matchStatus: {
     fontSize: 12,
-    color: '#B3B3B3', // Gris medio
+    color: '#B3B3B3',
     marginLeft: 10,
   },
   moreMatches: {
     fontSize: 12,
-    color: '#E62026', // Rojo competitivo
+    color: '#E62026',
     fontStyle: 'italic',
     marginTop: 5,
+  },
+  viewDetailsButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 10,
+    borderTopWidth: 1,
+    borderTopColor: '#E5E5E5',
+    marginTop: 5,
+  },
+  viewDetailsButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#E62026',
+    marginRight: 5,
   },
 });

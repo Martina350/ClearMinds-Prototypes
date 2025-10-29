@@ -19,12 +19,12 @@ interface AdminPanelScreenProps {
 
 export const AdminPanelScreen: React.FC<AdminPanelScreenProps> = ({ navigation }) => {
   const { students, payments, championships } = useApp();
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'payments' | 'championships'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard'>('dashboard');
 
   // Cálculos para el dashboard
   const totalStudents = students.length;
   const studentsUpToDate = students.filter(student => {
-    const studentPayments = payments.filter(payment => payment.studentId === student.id);
+    const studentPayments = payments.filter(payment => payment.deportistaId === student.id);
     const pendingPayments = studentPayments.filter(payment => 
       payment.status === 'pending' || payment.status === 'overdue'
     );
@@ -74,7 +74,7 @@ export const AdminPanelScreen: React.FC<AdminPanelScreenProps> = ({ navigation }
               <View style={styles.transferCard}>
                 <View style={styles.transferInfo}>
                   <Text style={styles.transferStudent}>
-                    {students.find(s => s.id === item.studentId)?.name}
+                    {students.find(s => s.id === item.deportistaId)?.name}
                   </Text>
                   <Text style={styles.transferAmount}>${item.amount}</Text>
                 </View>
@@ -108,14 +108,14 @@ export const AdminPanelScreen: React.FC<AdminPanelScreenProps> = ({ navigation }
         {studentsInDebt > 0 ? (
           <FlatList
             data={students.filter(student => {
-              const studentPayments = payments.filter(payment => payment.studentId === student.id);
+              const studentPayments = payments.filter(payment => payment.deportistaId === student.id);
               const pendingPayments = studentPayments.filter(payment => 
                 payment.status === 'pending' || payment.status === 'overdue'
               );
               return pendingPayments.length > 0;
             }).slice(0, 5)}
             renderItem={({ item }) => {
-              const studentPayments = payments.filter(payment => payment.studentId === item.id);
+              const studentPayments = payments.filter(payment => payment.deportistaId === item.id);
               const pendingPayments = studentPayments.filter(payment => 
                 payment.status === 'pending' || payment.status === 'overdue'
               );
@@ -141,143 +141,6 @@ export const AdminPanelScreen: React.FC<AdminPanelScreenProps> = ({ navigation }
     </ScrollView>
   );
 
-  const renderPayments = () => (
-    <ScrollView style={styles.tabContent}>
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Gestión de Pagos</Text>
-        
-        <TouchableOpacity 
-          style={styles.actionButton}
-          onPress={() => navigation.navigate('CardPayments')}
-        >
-          <Ionicons name="card-outline" size={20} color="white" />
-          <Text style={styles.actionButtonText}>Ver Pagos por Tarjeta</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity 
-          style={styles.actionButton}
-          onPress={() => navigation.navigate('ReviewPayment', { payment: pendingTransfers[0] })}
-        >
-          <Ionicons name="swap-horizontal-outline" size={20} color="white" />
-          <Text style={styles.actionButtonText}>Revisar Transferencias</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity 
-          style={styles.actionButton}
-          onPress={() => navigation.navigate('PaymentReport')}
-        >
-          <Ionicons name="document-text-outline" size={20} color="white" />
-          <Text style={styles.actionButtonText}>Reporte de Pagos</Text>
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Transferencias por Revisar</Text>
-        {pendingTransfers.length > 0 ? (
-          <FlatList
-            data={pendingTransfers}
-            renderItem={({ item }) => (
-              <View style={styles.paymentCard}>
-                <View style={styles.paymentHeader}>
-                  <Text style={styles.paymentStudent}>
-                    {students.find(s => s.id === item.studentId)?.name}
-                  </Text>
-                  <Text style={styles.paymentAmount}>${item.amount}</Text>
-                </View>
-                <Text style={styles.paymentDescription}>{item.description}</Text>
-                <Text style={styles.paymentDate}>Subido: {item.createdAt}</Text>
-                {item.receiptImage && (
-                  <Text style={styles.receiptInfo}>Comprobante: {item.receiptImage}</Text>
-                )}
-                <View style={styles.paymentActions}>
-                  <TouchableOpacity 
-                    style={styles.approveButton}
-                    onPress={() => handleTransferAction(item.id, 'approve')}
-                  >
-                    <Text style={styles.approveButtonText}>Aprobar</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity 
-                    style={styles.rejectButton}
-                    onPress={() => handleTransferAction(item.id, 'reject')}
-                  >
-                    <Text style={styles.rejectButtonText}>Rechazar</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            )}
-            keyExtractor={(item) => item.id}
-            scrollEnabled={false}
-          />
-        ) : (
-          <Text style={styles.emptyText}>No hay transferencias pendientes</Text>
-        )}
-      </View>
-    </ScrollView>
-  );
-
-  const renderChampionships = () => (
-    <ScrollView style={styles.tabContent}>
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Gestión de Campeonatos</Text>
-        
-        <TouchableOpacity 
-          style={styles.actionButton}
-          onPress={() => navigation.navigate('CreateChampionship')}
-        >
-          <Ionicons name="add-outline" size={20} color="white" />
-          <Text style={styles.actionButtonText}>Crear Campeonato</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity 
-          style={styles.actionButton}
-          onPress={() => navigation.navigate('ManageChampionship', { championship: championships[0] })}
-        >
-          <Ionicons name="calendar-outline" size={20} color="white" />
-          <Text style={styles.actionButtonText}>Gestionar Campeonato</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity 
-          style={styles.actionButton}
-          onPress={() => navigation.navigate('RegisterResult')}
-        >
-          <Ionicons name="trophy-outline" size={20} color="white" />
-          <Text style={styles.actionButtonText}>Registrar Resultado</Text>
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Campeonatos Activos</Text>
-        {championships.filter(c => c.isActive).length > 0 ? (
-          <FlatList
-            data={championships.filter(c => c.isActive)}
-            renderItem={({ item }) => (
-              <View style={styles.championshipCard}>
-                <Text style={styles.championshipName}>{item.name}</Text>
-                <Text style={styles.championshipCategory}>
-                  {item.category} - {item.gender}
-                </Text>
-                <Text style={styles.championshipMatches}>
-                  {item.matches.length} partidos programados
-                </Text>
-                <View style={styles.championshipActions}>
-                  <TouchableOpacity style={styles.editButton}>
-                    <Text style={styles.editButtonText}>Editar</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={styles.viewButton}>
-                    <Text style={styles.viewButtonText}>Ver Detalle</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            )}
-            keyExtractor={(item) => item.id}
-            scrollEnabled={false}
-          />
-        ) : (
-          <Text style={styles.emptyText}>No hay campeonatos activos</Text>
-        )}
-      </View>
-    </ScrollView>
-  );
 
   const handleTransferAction = (paymentId: string, action: 'approve' | 'reject') => {
     Alert.alert(
@@ -321,37 +184,35 @@ export const AdminPanelScreen: React.FC<AdminPanelScreenProps> = ({ navigation }
         </TouchableOpacity>
         
         <TouchableOpacity
-          style={[styles.tab, activeTab === 'payments' && styles.activeTab]}
-          onPress={() => setActiveTab('payments')}
+          style={styles.tab}
+          onPress={() => navigation.navigate('AdminPayments')}
         >
           <Ionicons 
             name="card-outline" 
             size={20} 
-            color={activeTab === 'payments' ? '#e74c3c' : '#7f8c8d'} 
+            color="#7f8c8d" 
           />
-          <Text style={[styles.tabText, activeTab === 'payments' && styles.activeTabText]}>
+          <Text style={styles.tabText}>
             Pagos
           </Text>
         </TouchableOpacity>
         
         <TouchableOpacity
-          style={[styles.tab, activeTab === 'championships' && styles.activeTab]}
-          onPress={() => setActiveTab('championships')}
+          style={styles.tab}
+          onPress={() => navigation.navigate('AdminChampionships')}
         >
           <Ionicons 
             name="trophy-outline" 
             size={20} 
-            color={activeTab === 'championships' ? '#e74c3c' : '#7f8c8d'} 
+            color="#7f8c8d" 
           />
-          <Text style={[styles.tabText, activeTab === 'championships' && styles.activeTabText]}>
+          <Text style={styles.tabText}>
             Campeonatos
           </Text>
         </TouchableOpacity>
       </View>
 
       {activeTab === 'dashboard' && renderDashboard()}
-      {activeTab === 'payments' && renderPayments()}
-      {activeTab === 'championships' && renderChampionships()}
     </View>
   );
 };

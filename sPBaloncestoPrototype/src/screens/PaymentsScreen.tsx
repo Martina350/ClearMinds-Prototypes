@@ -19,12 +19,12 @@ export const PaymentsScreen: React.FC<PaymentsScreenProps> = ({ navigation }) =>
   const { user } = useAuth();
   const { students, payments } = useApp();
 
-  // Filtrar estudiantes del padre logueado
-  const userStudents = students.filter(student => student.parentId === user?.id);
+  // Filtrar deportistas del padre logueado
+  const userDeportistas = students.filter(deportista => deportista.parentId === user?.id);
 
-  const getStudentPaymentStatus = (studentId: string) => {
-    const studentPayments = payments.filter(payment => payment.studentId === studentId);
-    const pendingPayments = studentPayments.filter(payment => 
+  const getDeportistaPaymentStatus = (deportistaId: string) => {
+    const deportistaPayments = payments.filter(payment => payment.deportistaId === deportistaId);
+    const pendingPayments = deportistaPayments.filter(payment => 
       payment.status === 'pending' || payment.status === 'overdue'
     );
     
@@ -35,8 +35,8 @@ export const PaymentsScreen: React.FC<PaymentsScreenProps> = ({ navigation }) =>
     return { status: 'pending', count: pendingPayments.length };
   };
 
-  const renderStudentCard = ({ item }: { item: Student }) => {
-    const paymentStatus = getStudentPaymentStatus(item.id);
+  const renderDeportistaCard = ({ item }: { item: Student }) => {
+    const paymentStatus = getDeportistaPaymentStatus(item.id);
     
     return (
       <TouchableOpacity
@@ -80,68 +80,29 @@ export const PaymentsScreen: React.FC<PaymentsScreenProps> = ({ navigation }) =>
     );
   };
 
-  const getOverallStatus = () => {
-    const totalStudents = userStudents.length;
-    const upToDateStudents = userStudents.filter(student => 
-      getStudentPaymentStatus(student.id).status === 'up_to_date'
-    ).length;
-    
-    return { totalStudents, upToDateStudents };
-  };
-
-  const overallStatus = getOverallStatus();
-
   return (
     <View style={styles.container}>
-      <View style={styles.summaryCard}>
-        <Text style={styles.summaryTitle}>Resumen de Pagos</Text>
-        <View style={styles.summaryStats}>
-          <View style={styles.statItem}>
-            <Text style={styles.statNumber}>{overallStatus.totalStudents}</Text>
-            <Text style={styles.statLabel}>Estudiante{overallStatus.totalStudents !== 1 ? 's' : ''}</Text>
-          </View>
-          
-          <View style={styles.statDivider} />
-          
-          <View style={styles.statItem}>
-            <Text style={[styles.statNumber, { color: '#27ae60' }]}>
-              {overallStatus.upToDateStudents}
-            </Text>
-            <Text style={styles.statLabel}>Al día</Text>
-          </View>
-          
-          <View style={styles.statDivider} />
-          
-          <View style={styles.statItem}>
-            <Text style={[styles.statNumber, { color: '#e74c3c' }]}>
-              {overallStatus.totalStudents - overallStatus.upToDateStudents}
-            </Text>
-            <Text style={styles.statLabel}>Pendientes</Text>
-          </View>
-        </View>
-      </View>
-
       <View style={styles.studentsHeader}>
-        <Text style={styles.studentsTitle}>Estado por Estudiante</Text>
+        <Text style={styles.studentsTitle}>Estado por Deportista</Text>
         <Text style={styles.studentsSubtitle}>
           Toca una tarjeta para ver el detalle de pagos
         </Text>
       </View>
 
       <FlatList
-        data={userStudents}
-        renderItem={renderStudentCard}
+        data={userDeportistas}
+        renderItem={renderDeportistaCard}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContainer}
         showsVerticalScrollIndicator={false}
       />
 
-      {userStudents.length === 0 && (
+      {userDeportistas.length === 0 && (
         <View style={styles.emptyState}>
           <Ionicons name="person-outline" size={60} color="#bdc3c7" />
-          <Text style={styles.emptyTitle}>Sin estudiantes registrados</Text>
+          <Text style={styles.emptyTitle}>Sin deportistas registrados</Text>
           <Text style={styles.emptyText}>
-            Contacta con la administración para registrar a tus hijos.
+            Contacta con la administración para registrar a tus hijos en la escuela de baloncesto.
           </Text>
         </View>
       )}
@@ -154,52 +115,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#0A0D14', // Negro profundo/azul marino oscuro
   },
-  summaryCard: {
-    backgroundColor: '#1A1D24', // Card oscuro
-    margin: 15,
-    borderRadius: 12,
-    padding: 20,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 8,
-  },
-  summaryTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#FFFFFF', // Blanco
-    marginBottom: 15,
-    textAlign: 'center',
-  },
-  summaryStats: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-  },
-  statItem: {
-    alignItems: 'center',
-  },
-  statNumber: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#FFFFFF', // Blanco
-  },
-  statLabel: {
-    fontSize: 12,
-    color: '#B3B3B3', // Gris medio
-    marginTop: 5,
-  },
-  statDivider: {
-    width: 1,
-    height: 40,
-    backgroundColor: '#E5E5E5', // Gris claro
-  },
   studentsHeader: {
     paddingHorizontal: 15,
+    paddingTop: 15,
     marginBottom: 10,
   },
   studentsTitle: {

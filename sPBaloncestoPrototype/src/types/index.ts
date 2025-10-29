@@ -8,12 +8,25 @@ export interface User {
   children?: Student[];
 }
 
-export interface Student {
+export interface Deportista {
   id: string;
   name: string;
   parentId: string;
-  category: 'Sub-10' | 'Sub-12' | 'Sub-13' | 'Sub-15';
+  category: 'Sub-8' | 'Sub-9' | 'Sub-10' | 'Sub-11' | 'Sub-12' | 'Sub-13' | 'Sub-14' | 'Sub-15' | 'Sub-16' | 'Sub-17';
   gender: 'masculino' | 'femenino';
+}
+
+// Alias para compatibilidad
+export type Student = Deportista;
+
+export interface Team {
+  id: string;
+  name: string;
+  points: number;
+  wins: number;
+  losses: number;
+  pointsFor: number;
+  pointsAgainst: number;
 }
 
 export interface Championship {
@@ -21,8 +34,12 @@ export interface Championship {
   name: string;
   category: string;
   gender: 'masculino' | 'femenino';
+  tournamentType: 'Nacional' | 'Regional';
   matches: Match[];
   isActive: boolean;
+  startDate: string;
+  currentPhase: string;
+  teams?: Team[];
 }
 
 export interface Match {
@@ -41,7 +58,7 @@ export interface Match {
 
 export interface Payment {
   id: string;
-  studentId: string;
+  deportistaId: string;
   description: string;
   amount: number;
   dueDate: string;
@@ -50,11 +67,15 @@ export interface Payment {
   paymentDate?: string;
   receiptImage?: string;
   createdAt: string;
+  type: 'mensualidad' | 'inscripcion_torneo' | 'inscripcion_evento';
+  period?: string; // Para mensualidades: "Enero 2024", "Febrero 2024", etc.
+  tournamentId?: string; // Para inscripciones a torneos
+  eventId?: string; // Para inscripciones a eventos
 }
 
 export interface PaymentHistory {
   id: string;
-  studentId: string;
+  deportistaId: string;
   description: string;
   amount: number;
   status: 'paid' | 'pending' | 'under_review';
@@ -62,6 +83,10 @@ export interface PaymentHistory {
   paymentDate?: string;
   receiptImage?: string;
   createdAt: string;
+  type: 'mensualidad' | 'inscripcion_torneo' | 'inscripcion_evento';
+  period?: string;
+  tournamentId?: string;
+  eventId?: string;
 }
 
 export interface AuthContextType {
@@ -72,9 +97,11 @@ export interface AuthContextType {
 }
 
 export interface AppContextType {
-  students: Student[];
+  deportistas: Deportista[];
   championships: Championship[];
   payments: Payment[];
   paymentHistory: PaymentHistory[];
   refreshData: () => Promise<void>;
+  // Alias para compatibilidad
+  students: Deportista[];
 }
