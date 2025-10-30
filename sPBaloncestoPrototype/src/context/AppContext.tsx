@@ -1,7 +1,7 @@
 // Contextos de autenticación y datos de la aplicación
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { User, Deportista, Championship, Payment, PaymentHistory, AuthContextType, AppContextType } from '../types';
+import { User, Deportista, Championship, Payment, PaymentHistory, AuthContextType, AppContextType, Match } from '../types';
 import { mockUsers, mockDeportistas, mockChampionships, mockPayments, mockPaymentHistory } from '../data/mockData';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -92,6 +92,35 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setPaymentHistory(mockPaymentHistory);
   };
 
+  const addMatchToChampionship = (championshipId: string, match: Match) => {
+    setChampionships(prev => prev.map(ch => {
+      if (ch.id === championshipId) {
+        return { ...ch, matches: [...ch.matches, match] };
+      }
+      return ch;
+    }));
+  };
+
+  const updateMatchInChampionship = (championshipId: string, matchId: string, updates: Partial<Match>) => {
+    setChampionships(prev => prev.map(ch => {
+      if (ch.id === championshipId) {
+        const updated = ch.matches.map(m => m.id === matchId ? { ...m, ...updates } as Match : m);
+        return { ...ch, matches: updated };
+      }
+      return ch;
+    }));
+  };
+
+  const removeMatchFromChampionship = (championshipId: string, matchId: string) => {
+    setChampionships(prev => prev.map(ch => {
+      if (ch.id === championshipId) {
+        const filtered = ch.matches.filter(m => m.id !== matchId);
+        return { ...ch, matches: filtered };
+      }
+      return ch;
+    }));
+  };
+
   return (
     <AppContext.Provider value={{ 
       deportistas,
@@ -99,7 +128,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       championships, 
       payments, 
       paymentHistory, 
-      refreshData 
+      refreshData,
+      addMatchToChampionship,
+      updateMatchInChampionship,
+      removeMatchFromChampionship,
     }}>
       {children}
     </AppContext.Provider>

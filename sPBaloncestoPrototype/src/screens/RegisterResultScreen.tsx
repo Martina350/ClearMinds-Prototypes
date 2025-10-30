@@ -1,5 +1,5 @@
 // Pantalla para registrar resultado de partido
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -11,18 +11,8 @@ import {
   FlatList,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-
-interface Match {
-  id: string;
-  homeTeam: string;
-  awayTeam: string;
-  category: string;
-  gender: string;
-  scheduledDate: string;
-  scheduledTime: string;
-  location: string;
-  status: 'scheduled' | 'in_progress' | 'completed';
-}
+import { useApp } from '../context/AppContext';
+import { Match } from '../types';
 
 interface MatchResult {
   homeScore: string;
@@ -35,48 +25,19 @@ interface MatchResult {
   mvp: string;
 }
 
-const mockMatches: Match[] = [
-  {
-    id: '1',
-    homeTeam: 'San Pedro',
-    awayTeam: 'Santa María',
-    category: 'Sub-15',
-    gender: 'Masculino',
-    scheduledDate: '2024-01-20',
-    scheduledTime: '16:00',
-    location: 'Coliseo Municipal',
-    status: 'scheduled',
-  },
-  {
-    id: '2',
-    homeTeam: 'Los Pinos',
-    awayTeam: 'San Pedro',
-    category: 'Sub-17',
-    gender: 'Femenino',
-    scheduledDate: '2024-01-21',
-    scheduledTime: '18:00',
-    location: 'Coliseo Municipal',
-    status: 'scheduled',
-  },
-  {
-    id: '3',
-    homeTeam: 'San Pedro',
-    awayTeam: 'El Roble',
-    category: 'Sub-13',
-    gender: 'Masculino',
-    scheduledDate: '2024-01-19',
-    scheduledTime: '14:00',
-    location: 'Coliseo Municipal',
-    status: 'completed',
-  },
-];
+// Los partidos vienen del contexto (championships.matches)
 
 interface RegisterResultScreenProps {
   navigation: any;
 }
 
 export const RegisterResultScreen: React.FC<RegisterResultScreenProps> = ({ navigation }) => {
-  const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
+  const { championships, updateMatchInChampionship } = useApp();
+  const allScheduled: (Match & { championshipId: string })[] = useMemo(() =>
+    championships.flatMap(ch => (ch.matches || []).filter(m => m.status === 'scheduled').map(m => ({ ...m, championshipId: ch.id }))),
+  [championships]);
+
+  const [selectedMatch, setSelectedMatch] = useState<(Match & { championshipId: string }) | null>(null);
   const [result, setResult] = useState<MatchResult>({
     homeScore: '',
     awayScore: '',
@@ -119,9 +80,13 @@ export const RegisterResultScreen: React.FC<RegisterResultScreenProps> = ({ navi
 
     setLoading(true);
     try {
-      // Aquí iría la lógica para registrar el resultado
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simular API call
-      
+      // Persistir resultado en contexto: marcar como completed y guardar marcador
+      updateMatchInChampionship(selectedMatch!.championshipId, selectedMatch!.id, {
+        status: 'completed',
+        homeScore: parseInt(result.homeScore),
+        awayScore: parseInt(result.awayScore),
+      });
+
       Alert.alert(
         'Éxito', 
         'Resultado registrado correctamente',
@@ -151,7 +116,7 @@ export const RegisterResultScreen: React.FC<RegisterResultScreenProps> = ({ navi
     }
   };
 
-  const renderMatchCard = ({ item }: { item: Match }) => (
+  const renderMatchCard = ({ item }: { item: Match & { championshipId: string } }) => (
     <TouchableOpacity
       style={[
         styles.matchCard,
@@ -180,8 +145,7 @@ export const RegisterResultScreen: React.FC<RegisterResultScreenProps> = ({ navi
       
       <View style={styles.matchDetails}>
         <Text style={styles.matchInfo}>{item.category} - {item.gender}</Text>
-        <Text style={styles.matchInfo}>{item.scheduledDate} a las {item.scheduledTime}</Text>
-        <Text style={styles.matchInfo}>{item.location}</Text>
+        <Text style={styles.matchInfo}>{item.date} a las {item.time}</Text>
       </View>
     </TouchableOpacity>
   );
@@ -221,7 +185,7 @@ export const RegisterResultScreen: React.FC<RegisterResultScreenProps> = ({ navi
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Partidos Disponibles</Text>
         <FlatList
-          data={mockMatches}
+          data={allScheduled}
           renderItem={renderMatchCard}
           keyExtractor={(item) => item.id}
           showsVerticalScrollIndicator={false}
@@ -276,8 +240,6 @@ export const RegisterResultScreen: React.FC<RegisterResultScreenProps> = ({ navi
                 {renderInput('Timeouts (Visitante)', 'awayTimeouts', '0', 'numeric')}
               </View>
             </View>
-
-            {renderInput('Jugador Más Valioso', 'mvp', 'Nombre del MVP')}
             {renderInput('Notas', 'notes', 'Observaciones del partido...', 'default', true)}
 
             <View style={styles.buttonContainer}>

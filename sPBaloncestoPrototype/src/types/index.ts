@@ -104,4 +104,7 @@ export interface AppContextType {
   refreshData: () => Promise<void>;
   // Alias para compatibilidad
   students: Deportista[];
+  addMatchToChampionship: (championshipId: string, match: Match) => void;
+  updateMatchInChampionship: (championshipId: string, matchId: string, updates: Partial<Match>) => void;
+  removeMatchFromChampionship: (championshipId: string, matchId: string) => void;
 }

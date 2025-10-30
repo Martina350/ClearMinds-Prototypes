@@ -43,9 +43,6 @@ export const AdminChampionshipsScreen: React.FC<AdminChampionshipsScreenProps> =
               <View style={styles.championshipCard}>
                 <View style={styles.championshipHeader}>
                   <Text style={styles.championshipName}>{item.name}</Text>
-                  <View style={styles.statusBadge}>
-                    <Text style={styles.statusText}>Activo</Text>
-                  </View>
                 </View>
                 <Text style={styles.championshipCategory}>
                   {item.category} - {item.gender}
@@ -57,12 +54,6 @@ export const AdminChampionshipsScreen: React.FC<AdminChampionshipsScreenProps> =
                   {item.matches.length} partidos programados
                 </Text>
                 <View style={styles.championshipActions}>
-                  <TouchableOpacity 
-                    style={styles.editButton}
-                    onPress={() => navigation.navigate('ManageChampionship', { championship: item })}
-                  >
-                    <Text style={styles.editButtonText}>Gestionar</Text>
-                  </TouchableOpacity>
                   <TouchableOpacity 
                     style={styles.viewButton}
                     onPress={() => navigation.navigate('ChampionshipDetail', { championship: item })}
@@ -147,7 +138,7 @@ export const AdminChampionshipsScreen: React.FC<AdminChampionshipsScreenProps> =
                     <Text style={styles.editButtonText}>Editar</Text>
                   </TouchableOpacity>
                   <TouchableOpacity 
-                    style={styles.viewButton}
+                    style={styles.detailButton}
                     onPress={() => navigation.navigate('ChampionshipDetail', { championship: item })}
                   >
                     <Text style={styles.viewButtonText}>Ver Detalle</Text>
@@ -418,6 +409,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   viewButton: {
+    backgroundColor: '#24C36B',
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+    borderRadius: 6,
+    marginLeft: 220,
+  },
+  detailButton: {
     backgroundColor: '#24C36B',
     paddingHorizontal: 15,
     paddingVertical: 8,
