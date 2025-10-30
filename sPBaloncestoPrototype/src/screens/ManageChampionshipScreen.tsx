@@ -106,6 +106,13 @@ export const ManageChampionshipScreen: React.FC<ManageChampionshipScreenProps> =
           <TouchableOpacity style={[styles.iconButton, { marginLeft: 8 }]} onPress={() => removeMatchFromChampionship(currentChampionship.id, match.id)}>
             <Ionicons name="trash" size={18} color="#E62026" />
           </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.quickActionButton, styles.finalizeButton]}
+            onPress={() => updateMatchInChampionship(currentChampionship.id, match.id, { status: 'completed', homeScore: 0, awayScore: 0 })}
+          >
+            <Ionicons name="checkmark" size={16} color="#FFFFFF" />
+            <Text style={styles.quickActionText}>Finalizar</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </View>
@@ -433,6 +440,23 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     paddingHorizontal: 8,
     paddingVertical: 6,
+  },
+  quickActionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginLeft: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 6,
+  },
+  finalizeButton: {
+    backgroundColor: '#24C36B',
+  },
+  quickActionText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: 'bold',
+    marginLeft: 6,
   },
   matchDate: {
     fontSize: 14,

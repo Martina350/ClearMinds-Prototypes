@@ -107,4 +107,6 @@ export interface AppContextType {
   addMatchToChampionship: (championshipId: string, match: Match) => void;
   updateMatchInChampionship: (championshipId: string, matchId: string, updates: Partial<Match>) => void;
   removeMatchFromChampionship: (championshipId: string, matchId: string) => void;
+  updatePaymentStatus: (paymentId: string, nextStatus: Payment['status']) => void;
+  updatePayment: (paymentId: string, updates: Partial<Payment>) => void;
 }

@@ -20,7 +20,7 @@ interface PaymentDetailScreenProps {
 
 export const PaymentDetailScreen: React.FC<PaymentDetailScreenProps> = ({ navigation, route }) => {
   const { student }: { student: Student } = route.params;
-  const { payments, paymentHistory } = useApp();
+  const { payments, paymentHistory, updatePayment } = useApp();
   const [activeTab, setActiveTab] = useState<'pending' | 'history'>('pending');
 
   const deportistaPayments = payments.filter(payment => payment.deportistaId === student.id);
@@ -215,7 +215,7 @@ export const PaymentDetailScreen: React.FC<PaymentDetailScreenProps> = ({ naviga
       </View>
 
       {/* Sección C: Pagar por transferencia */}
-      <View style={styles.section}>
+        <View style={styles.section}>
         <Text style={styles.sectionTitle}>Pagar por Transferencia</Text>
         <View style={styles.transferCard}>
           <Ionicons name="document-text-outline" size={40} color="#E62026" />
@@ -223,7 +223,18 @@ export const PaymentDetailScreen: React.FC<PaymentDetailScreenProps> = ({ naviga
           <Text style={styles.transferDescription}>
             Sube una foto o PDF del recibo para verificar tu pago.
           </Text>
-          <TouchableOpacity style={styles.selectFileButton}>
+          <TouchableOpacity
+            style={styles.selectFileButton}
+            onPress={() => {
+              const target = pendingPayments[0];
+              if (!target) {
+                Alert.alert('Sin deudas', 'No hay pagos pendientes para enviar comprobante.');
+                return;
+              }
+              updatePayment(target.id, { status: 'under_review', paymentMethod: 'transfer', receiptImage: 'local://comprobante.jpg', createdAt: new Date().toISOString() });
+              Alert.alert('Comprobante enviado', 'Tu pago quedó en revisión.');
+            }}
+          >
             <Text style={styles.selectFileText}>Seleccionar archivo</Text>
           </TouchableOpacity>
         </View>

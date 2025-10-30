@@ -13,6 +13,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import * as DocumentPicker from 'expo-document-picker';
 import { Payment, Student } from '../types';
+import { useApp } from '../context/AppContext';
 
 interface PaymentMethodScreenProps {
   navigation: any;
@@ -23,6 +24,7 @@ export const PaymentMethodScreen: React.FC<PaymentMethodScreenProps> = ({ naviga
   const { payment, student }: { payment: Payment; student: Student } = route.params;
   const [selectedMethod, setSelectedMethod] = useState<'card' | 'transfer' | null>(null);
   const [receiptImage, setReceiptImage] = useState<string | null>(null);
+  const { updatePaymentStatus, updatePayment } = useApp();
 
   const handleCardPayment = () => {
     Alert.alert(
@@ -33,12 +35,11 @@ export const PaymentMethodScreen: React.FC<PaymentMethodScreenProps> = ({ naviga
         { 
           text: 'Pagar', 
           onPress: () => {
-            // Simular procesamiento de pago
-            Alert.alert(
-              'Pago Exitoso',
-              'El pago se ha procesado correctamente.',
-              [{ text: 'OK', onPress: () => navigation.goBack() }]
-            );
+            updatePayment(payment.id, { paymentMethod: 'card' });
+            updatePaymentStatus(payment.id, 'paid');
+            Alert.alert('Pago Exitoso', 'El pago se ha procesado correctamente.', [
+              { text: 'OK', onPress: () => navigation.goBack() }
+            ]);
           }
         }
       ]
@@ -59,57 +60,66 @@ export const PaymentMethodScreen: React.FC<PaymentMethodScreenProps> = ({ naviga
   };
 
   const pickImageFromCamera = async () => {
-    const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
-    
-    if (permissionResult.granted === false) {
-      Alert.alert('Error', 'Permisos de cámara requeridos');
-      return;
-    }
-
-    const result = await ImagePicker.launchCameraAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
-
-    if (!result.canceled) {
-      setReceiptImage(result.assets[0].uri);
+    try {
+      const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
+      if (!permissionResult.granted) {
+        Alert.alert('Permisos requeridos', 'Habilita la cámara para continuar');
+        return;
+      }
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 0.8,
+      });
+      if (!result.canceled && result.assets && result.assets[0]?.uri) {
+        setReceiptImage(result.assets[0].uri);
+      }
+    } catch (e) {
+      Alert.alert('Aviso', 'No fue posible abrir la cámara. Usaremos un comprobante de ejemplo.');
+      setReceiptImage('https://picsum.photos/900/1600');
     }
   };
 
   const pickImageFromGallery = async () => {
-    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    
-    if (permissionResult.granted === false) {
-      Alert.alert('Error', 'Permisos de galería requeridos');
-      return;
-    }
-
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
-
-    if (!result.canceled) {
-      setReceiptImage(result.assets[0].uri);
+    try {
+      const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!permissionResult.granted) {
+        Alert.alert('Permisos requeridos', 'Habilita la galería para continuar');
+        return;
+      }
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 0.8,
+      });
+      if (!result.canceled && result.assets && result.assets[0]?.uri) {
+        setReceiptImage(result.assets[0].uri);
+      }
+    } catch (e) {
+      Alert.alert('Aviso', 'No fue posible abrir la galería. Usaremos un comprobante de ejemplo.');
+      setReceiptImage('https://picsum.photos/900/1600');
     }
   };
 
   const pickDocument = async () => {
     try {
-      const result = await DocumentPicker.getDocumentAsync({
+      const result: any = await DocumentPicker.getDocumentAsync({
         type: ['image/*', 'application/pdf'],
         copyToCacheDirectory: true,
       });
-
       if (!result.canceled) {
-        setReceiptImage(result.assets[0].uri);
+        const uri = result.assets?.[0]?.uri || result.uri;
+        if (uri) {
+          setReceiptImage(uri);
+          return;
+        }
       }
+      Alert.alert('Aviso', 'No se seleccionó documento.');
     } catch (error) {
-      Alert.alert('Error', 'No se pudo seleccionar el documento');
+      Alert.alert('Aviso', 'No fue posible abrir documentos. Usaremos un comprobante de ejemplo.');
+      setReceiptImage('https://picsum.photos/900/1600');
     }
   };
 
@@ -118,12 +128,11 @@ export const PaymentMethodScreen: React.FC<PaymentMethodScreenProps> = ({ naviga
       Alert.alert('Error', 'Debes seleccionar un comprobante');
       return;
     }
-
-    Alert.alert(
-      'Comprobante Enviado',
-      'El comprobante ha sido enviado para revisión. Recibirás una notificación cuando sea aprobado.',
-      [{ text: 'OK', onPress: () => navigation.goBack() }]
-    );
+    updatePayment(payment.id, { paymentMethod: 'transfer', receiptImage });
+    updatePaymentStatus(payment.id, 'under_review');
+    Alert.alert('Comprobante Enviado', 'El comprobante ha sido enviado para revisión. Recibirás una notificación cuando sea aprobado.', [
+      { text: 'OK', onPress: () => navigation.goBack() }
+    ]);
   };
 
   return (

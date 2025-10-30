@@ -20,7 +20,7 @@ interface AdminPaymentsScreenProps {
 }
 
 export const AdminPaymentsScreen: React.FC<AdminPaymentsScreenProps> = ({ navigation }) => {
-  const { deportistas, payments } = useApp();
+  const { deportistas, payments, updatePaymentStatus } = useApp();
   const [activeTab, setActiveTab] = useState<'transfers' | 'reports'>('transfers');
   const [receiptVisible, setReceiptVisible] = useState(false);
   const [receiptUri, setReceiptUri] = useState<string | null>(null);
@@ -172,10 +172,9 @@ export const AdminPaymentsScreen: React.FC<AdminPaymentsScreenProps> = ({ naviga
         { 
           text: action === 'approve' ? 'Aprobar' : 'Rechazar', 
           onPress: () => {
-            Alert.alert(
-              'Acción Completada',
-              `La transferencia ha sido ${action === 'approve' ? 'aprobada' : 'rechazada'}.`
-            );
+            const next = action === 'approve' ? 'paid' : 'pending';
+            updatePaymentStatus(paymentId, next as any);
+            Alert.alert('Acción Completada', `La transferencia ha sido ${action === 'approve' ? 'aprobada' : 'rechazada'}.`);
           }
         }
       ]
