@@ -19,7 +19,7 @@ interface AdminPaymentsScreenProps {
 
 export const AdminPaymentsScreen: React.FC<AdminPaymentsScreenProps> = ({ navigation }) => {
   const { deportistas, payments } = useApp();
-  const [activeTab, setActiveTab] = useState<'overview' | 'transfers' | 'reports'>('overview');
+  const [activeTab, setActiveTab] = useState<'transfers' | 'reports'>('transfers');
 
   // Cálculos para el resumen
   const totalPayments = payments.length;
@@ -29,98 +29,7 @@ export const AdminPaymentsScreen: React.FC<AdminPaymentsScreenProps> = ({ naviga
   const totalRevenue = completedPayments.reduce((sum, payment) => sum + payment.amount, 0);
   const totalPending = pendingPayments.reduce((sum, payment) => sum + payment.amount, 0);
 
-  const renderOverview = () => (
-    <ScrollView style={styles.tabContent}>
-      <View style={styles.summaryCards}>
-        <View style={styles.summaryCard}>
-          <Ionicons name="card-outline" size={30} color="#3498db" />
-          <Text style={styles.summaryNumber}>{totalPayments}</Text>
-          <Text style={styles.summaryLabel}>Total Pagos</Text>
-        </View>
-        
-        <View style={styles.summaryCard}>
-          <Ionicons name="checkmark-circle-outline" size={30} color="#27ae60" />
-          <Text style={styles.summaryNumber}>{completedPayments.length}</Text>
-          <Text style={styles.summaryLabel}>Completados</Text>
-        </View>
-        
-        <View style={styles.summaryCard}>
-          <Ionicons name="time-outline" size={30} color="#f39c12" />
-          <Text style={styles.summaryNumber}>{pendingTransfers.length}</Text>
-          <Text style={styles.summaryLabel}>Por Revisar</Text>
-        </View>
-        
-        <View style={styles.summaryCard}>
-          <Ionicons name="cash-outline" size={30} color="#e74c3c" />
-          <Text style={styles.summaryNumber}>${totalRevenue}</Text>
-          <Text style={styles.summaryLabel}>Ingresos</Text>
-        </View>
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Acciones Rápidas</Text>
-        
-        <TouchableOpacity 
-          style={styles.actionButton}
-          onPress={() => navigation.navigate('CardPayments')}
-        >
-          <Ionicons name="card-outline" size={20} color="white" />
-          <Text style={styles.actionButtonText}>Ver Pagos por Tarjeta</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity 
-          style={styles.actionButton}
-          onPress={() => navigation.navigate('ReviewPayment', { payment: pendingTransfers[0] })}
-        >
-          <Ionicons name="swap-horizontal-outline" size={20} color="white" />
-          <Text style={styles.actionButtonText}>Revisar Transferencias</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity 
-          style={styles.actionButton}
-          onPress={() => navigation.navigate('PaymentReport')}
-        >
-          <Ionicons name="document-text-outline" size={20} color="white" />
-          <Text style={styles.actionButtonText}>Generar Reporte</Text>
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Deportistas con Pagos Pendientes</Text>
-        {pendingPayments.length > 0 ? (
-          <FlatList
-            data={deportistas.filter(deportista => {
-              const deportistaPayments = payments.filter(payment => payment.deportistaId === deportista.id);
-              return deportistaPayments.some(payment => 
-                payment.status === 'pending' || payment.status === 'overdue'
-              );
-            })}
-            renderItem={({ item }) => {
-              const deportistaPayments = payments.filter(payment => payment.deportistaId === item.id);
-              const pending = deportistaPayments.filter(payment => 
-                payment.status === 'pending' || payment.status === 'overdue'
-              );
-              const totalDebt = pending.reduce((sum, payment) => sum + payment.amount, 0);
-              
-              return (
-                <View style={styles.debtCard}>
-                  <Text style={styles.debtStudent}>{item.name}</Text>
-                  <Text style={styles.debtAmount}>${totalDebt}</Text>
-                  <Text style={styles.debtCount}>
-                    {pending.length} pago{pending.length !== 1 ? 's' : ''} pendiente{pending.length !== 1 ? 's' : ''}
-                  </Text>
-                </View>
-              );
-            }}
-            keyExtractor={(item) => item.id}
-            scrollEnabled={false}
-          />
-        ) : (
-          <Text style={styles.emptyText}>¡Todos los deportistas están al día!</Text>
-        )}
-      </View>
-    </ScrollView>
-  );
+  // Se elimina el apartado de Resumen
 
   const renderTransfers = () => (
     <ScrollView style={styles.tabContent}>
@@ -241,20 +150,6 @@ export const AdminPaymentsScreen: React.FC<AdminPaymentsScreenProps> = ({ naviga
     <View style={styles.container}>
       <View style={styles.tabContainer}>
         <TouchableOpacity
-          style={[styles.tab, activeTab === 'overview' && styles.activeTab]}
-          onPress={() => setActiveTab('overview')}
-        >
-          <Ionicons 
-            name="analytics-outline" 
-            size={20} 
-            color={activeTab === 'overview' ? '#e74c3c' : '#7f8c8d'} 
-          />
-          <Text style={[styles.tabText, activeTab === 'overview' && styles.activeTabText]}>
-            Resumen
-          </Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity
           style={[styles.tab, activeTab === 'transfers' && styles.activeTab]}
           onPress={() => setActiveTab('transfers')}
         >
@@ -283,7 +178,6 @@ export const AdminPaymentsScreen: React.FC<AdminPaymentsScreenProps> = ({ naviga
         </TouchableOpacity>
       </View>
 
-      {activeTab === 'overview' && renderOverview()}
       {activeTab === 'transfers' && renderTransfers()}
       {activeTab === 'reports' && renderReports()}
     </View>

@@ -19,7 +19,7 @@ interface AdminChampionshipsScreenProps {
 
 export const AdminChampionshipsScreen: React.FC<AdminChampionshipsScreenProps> = ({ navigation }) => {
   const { championships } = useApp();
-  const [activeTab, setActiveTab] = useState<'overview' | 'active' | 'manage'>('overview');
+  const [activeTab, setActiveTab] = useState<'active' | 'manage'>('active');
 
   // Cálculos para el resumen
   const totalChampionships = championships.length;
@@ -30,83 +30,7 @@ export const AdminChampionshipsScreen: React.FC<AdminChampionshipsScreenProps> =
     sum + c.matches.filter(m => m.status === 'completed').length, 0
   );
 
-  const renderOverview = () => (
-    <ScrollView style={styles.tabContent}>
-      <View style={styles.summaryCards}>
-        <View style={styles.summaryCard}>
-          <Ionicons name="trophy-outline" size={30} color="#3498db" />
-          <Text style={styles.summaryNumber}>{totalChampionships}</Text>
-          <Text style={styles.summaryLabel}>Total Campeonatos</Text>
-        </View>
-        
-        <View style={styles.summaryCard}>
-          <Ionicons name="play-circle-outline" size={30} color="#27ae60" />
-          <Text style={styles.summaryNumber}>{activeChampionships.length}</Text>
-          <Text style={styles.summaryLabel}>Activos</Text>
-        </View>
-        
-        <View style={styles.summaryCard}>
-          <Ionicons name="checkmark-circle-outline" size={30} color="#f39c12" />
-          <Text style={styles.summaryNumber}>{completedChampionships.length}</Text>
-          <Text style={styles.summaryLabel}>Finalizados</Text>
-        </View>
-        
-        <View style={styles.summaryCard}>
-          <Ionicons name="basketball-outline" size={30} color="#e74c3c" />
-          <Text style={styles.summaryNumber}>{totalMatches}</Text>
-          <Text style={styles.summaryLabel}>Total Partidos</Text>
-        </View>
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Acciones Rápidas</Text>
-        
-        <TouchableOpacity 
-          style={styles.actionButton}
-          onPress={() => navigation.navigate('CreateChampionship')}
-        >
-          <Ionicons name="add-outline" size={20} color="white" />
-          <Text style={styles.actionButtonText}>Crear Campeonato</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity 
-          style={styles.actionButton}
-          onPress={() => navigation.navigate('ManageChampionship', { championship: activeChampionships[0] })}
-        >
-          <Ionicons name="calendar-outline" size={20} color="white" />
-          <Text style={styles.actionButtonText}>Gestionar Campeonato</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity 
-          style={styles.actionButton}
-          onPress={() => navigation.navigate('RegisterResult')}
-        >
-          <Ionicons name="trophy-outline" size={20} color="white" />
-          <Text style={styles.actionButtonText}>Registrar Resultado</Text>
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Estadísticas de Partidos</Text>
-        <View style={styles.statsContainer}>
-          <View style={styles.statItem}>
-            <Text style={styles.statLabel}>Partidos Completados</Text>
-            <Text style={styles.statValue}>{completedMatches}</Text>
-          </View>
-          <View style={styles.statItem}>
-            <Text style={styles.statLabel}>Partidos Restantes</Text>
-            <Text style={styles.statValue}>{totalMatches - completedMatches}</Text>
-          </View>
-          <View style={styles.statItem}>
-            <Text style={styles.statLabel}>Progreso General</Text>
-            <Text style={styles.statValue}>
-              {totalMatches > 0 ? Math.round((completedMatches / totalMatches) * 100) : 0}%
-            </Text>
-          </View>
-        </View>
-      </View>
-    </ScrollView>
-  );
+  // Se elimina el apartado de Resumen
 
   const renderActive = () => (
     <ScrollView style={styles.tabContent}>
@@ -266,20 +190,6 @@ export const AdminChampionshipsScreen: React.FC<AdminChampionshipsScreenProps> =
     <View style={styles.container}>
       <View style={styles.tabContainer}>
         <TouchableOpacity
-          style={[styles.tab, activeTab === 'overview' && styles.activeTab]}
-          onPress={() => setActiveTab('overview')}
-        >
-          <Ionicons 
-            name="analytics-outline" 
-            size={20} 
-            color={activeTab === 'overview' ? '#e74c3c' : '#7f8c8d'} 
-          />
-          <Text style={[styles.tabText, activeTab === 'overview' && styles.activeTabText]}>
-            Resumen
-          </Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity
           style={[styles.tab, activeTab === 'active' && styles.activeTab]}
           onPress={() => setActiveTab('active')}
         >
@@ -308,7 +218,6 @@ export const AdminChampionshipsScreen: React.FC<AdminChampionshipsScreenProps> =
         </TouchableOpacity>
       </View>
 
-      {activeTab === 'overview' && renderOverview()}
       {activeTab === 'active' && renderActive()}
       {activeTab === 'manage' && renderManage()}
     </View>
