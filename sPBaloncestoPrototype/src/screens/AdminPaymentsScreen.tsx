@@ -8,6 +8,8 @@ import {
   StyleSheet,
   ScrollView,
   Alert,
+  Modal,
+  Image,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useApp } from '../context/AppContext';
@@ -20,6 +22,9 @@ interface AdminPaymentsScreenProps {
 export const AdminPaymentsScreen: React.FC<AdminPaymentsScreenProps> = ({ navigation }) => {
   const { deportistas, payments } = useApp();
   const [activeTab, setActiveTab] = useState<'transfers' | 'reports'>('transfers');
+  const [receiptVisible, setReceiptVisible] = useState(false);
+  const [receiptUri, setReceiptUri] = useState<string | null>(null);
+  const [selectedReceiptPayment, setSelectedReceiptPayment] = useState<Payment | null>(null);
 
   // Cálculos para el resumen
   const totalPayments = payments.length;
@@ -48,9 +53,9 @@ export const AdminPaymentsScreen: React.FC<AdminPaymentsScreenProps> = ({ naviga
                 </View>
                 <Text style={styles.paymentDescription}>{item.description}</Text>
                 <Text style={styles.paymentDate}>Subido: {item.createdAt}</Text>
-                {item.receiptImage && (
-                  <Text style={styles.receiptInfo}>Comprobante: {item.receiptImage}</Text>
-                )}
+                <TouchableOpacity onPress={() => { setSelectedReceiptPayment(item); setReceiptUri((item.receiptImage as string) || null); setReceiptVisible(true); }}>
+                  <Text style={styles.receiptInfo}>Ver Comprobante</Text>
+                </TouchableOpacity>
                 <View style={styles.paymentActions}>
                   <TouchableOpacity 
                     style={styles.approveButton}
@@ -74,6 +79,45 @@ export const AdminPaymentsScreen: React.FC<AdminPaymentsScreenProps> = ({ naviga
           <Text style={styles.emptyText}>No hay transferencias pendientes</Text>
         )}
       </View>
+      <Modal
+        visible={receiptVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setReceiptVisible(false)}
+      >
+        <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={() => setReceiptVisible(false)}>
+          <View style={styles.modalContent}>
+            {receiptUri ? (
+              <Image source={{ uri: receiptUri }} style={styles.receiptImage} resizeMode="contain" />
+            ) : (
+              <View style={styles.generatedReceipt}>
+                <Text style={styles.generatedTitle}>Comprobante de Transferencia</Text>
+                <View style={styles.generatedRow}>
+                  <Text style={styles.generatedLabel}>Deportista</Text>
+                  <Text style={styles.generatedValue}>{deportistas.find(d => d.id === selectedReceiptPayment?.deportistaId)?.name || 'Desconocido'}</Text>
+                </View>
+                <View style={styles.generatedRow}>
+                  <Text style={styles.generatedLabel}>Descripción</Text>
+                  <Text style={styles.generatedValue}>{selectedReceiptPayment?.description || 'Pago/Transferencia'}</Text>
+                </View>
+                <View style={styles.generatedRow}>
+                  <Text style={styles.generatedLabel}>Monto</Text>
+                  <Text style={styles.generatedValue}>${selectedReceiptPayment?.amount?.toFixed?.(2) || '0.00'}</Text>
+                </View>
+                <View style={styles.generatedRow}>
+                  <Text style={styles.generatedLabel}>Fecha</Text>
+                  <Text style={styles.generatedValue}>{selectedReceiptPayment?.createdAt || '-'}</Text>
+                </View>
+                <View style={styles.generatedRow}>
+                  <Text style={styles.generatedLabel}>Referencia</Text>
+                  <Text style={styles.generatedValue}>{`SP-${selectedReceiptPayment?.id?.slice?.(0,6) || 'XXXXXX'}`}</Text>
+                </View>
+                <Text style={[styles.generatedFooter]}>Documento generado automáticamente para revisión</Text>
+              </View>
+            )}
+          </View>
+        </TouchableOpacity>
+      </Modal>
     </ScrollView>
   );
 
@@ -96,14 +140,6 @@ export const AdminPaymentsScreen: React.FC<AdminPaymentsScreenProps> = ({ naviga
         >
           <Ionicons name="card-outline" size={20} color="white" />
           <Text style={styles.actionButtonText}>Pagos por Tarjeta</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity 
-          style={styles.actionButton}
-          onPress={() => navigation.navigate('ReviewPayment', { payment: pendingTransfers[0] })}
-        >
-          <Ionicons name="swap-horizontal-outline" size={20} color="white" />
-          <Text style={styles.actionButtonText}>Transferencias</Text>
         </TouchableOpacity>
       </View>
 
@@ -380,6 +416,72 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 12,
     fontWeight: 'bold',
+  },
+  viewButton: {
+    backgroundColor: '#3498db',
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+    borderRadius: 6,
+    borderWidth: 0,
+  },
+  viewButtonText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    width: '90%',
+    height: '70%',
+    backgroundColor: '#000000',
+    borderRadius: 12,
+    padding: 12,
+  },
+  receiptImage: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 8,
+    backgroundColor: '#000000',
+  },
+  generatedReceipt: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 16,
+  },
+  generatedTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#0A0D14',
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  generatedRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E5E5',
+  },
+  generatedLabel: {
+    color: '#7f8c8d',
+    fontSize: 14,
+  },
+  generatedValue: {
+    color: '#0A0D14',
+    fontSize: 14,
+    fontWeight: '600',
+    marginLeft: 12,
+  },
+  generatedFooter: {
+    color: '#7f8c8d',
+    fontSize: 12,
+    textAlign: 'center',
+    marginTop: 12,
   },
   debtCard: {
     backgroundColor: '#2A2D34',

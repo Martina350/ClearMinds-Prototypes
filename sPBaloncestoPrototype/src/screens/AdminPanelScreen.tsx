@@ -123,10 +123,6 @@ export const AdminPanelScreen: React.FC<AdminPanelScreenProps> = ({ navigation }
           <Ionicons name="trophy-outline" size={20} color="#fff" />
           <Text style={styles.actionButtonText}>Gestionar Campeonatos</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.actionButton} onPress={() => navigation.navigate('ReviewPayment')}>
-          <Ionicons name="swap-horizontal-outline" size={20} color="#fff" />
-          <Text style={styles.actionButtonText}>Revisar Transferencias</Text>
-        </TouchableOpacity>
       </View>
 
       {/* Transferencias pendientes */}

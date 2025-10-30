@@ -1,5 +1,5 @@
 // Pantalla para ver pagos por tarjeta
-import React, { useState } from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -60,11 +60,6 @@ interface CardPaymentsScreenProps {
 }
 
 export const CardPaymentsScreen: React.FC<CardPaymentsScreenProps> = ({ navigation }) => {
-  const [selectedFilter, setSelectedFilter] = useState<'all' | 'approved' | 'pending' | 'rejected'>('all');
-
-  const filteredPayments = mockCardPayments.filter(payment => 
-    selectedFilter === 'all' || payment.status === selectedFilter
-  );
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -93,23 +88,7 @@ export const CardPaymentsScreen: React.FC<CardPaymentsScreenProps> = ({ navigati
     }
   };
 
-  const handlePaymentAction = (payment: CardPayment, action: 'approve' | 'reject') => {
-    Alert.alert(
-      'Confirmar Acción',
-      `¿Estás seguro de ${action === 'approve' ? 'aprobar' : 'rechazar'} el pago de ${payment.studentName}?`,
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        { 
-          text: action === 'approve' ? 'Aprobar' : 'Rechazar', 
-          style: action === 'approve' ? 'default' : 'destructive',
-          onPress: () => {
-            // Aquí iría la lógica para aprobar/rechazar el pago
-            Alert.alert('Éxito', `Pago ${action === 'approve' ? 'aprobado' : 'rechazado'} correctamente`);
-          }
-        }
-      ]
-    );
-  };
+  // Pagos con tarjeta son informativos (ya liquidados), no se aprueban/rechazan
 
   const renderPaymentCard = ({ item }: { item: CardPayment }) => (
     <View style={styles.paymentCard}>
@@ -117,14 +96,6 @@ export const CardPaymentsScreen: React.FC<CardPaymentsScreenProps> = ({ navigati
         <View style={styles.studentInfo}>
           <Text style={styles.studentName}>{item.studentName}</Text>
           <Text style={styles.studentCategory}>{item.category}</Text>
-        </View>
-        <View style={[styles.statusBadge, { backgroundColor: getStatusColor(item.status) }]}>
-          <Ionicons 
-            name={getStatusIcon(item.status) as any} 
-            size={16} 
-            color="#FFFFFF" 
-          />
-          <Text style={styles.statusText}>{getStatusText(item.status)}</Text>
         </View>
       </View>
 
@@ -154,61 +125,19 @@ export const CardPaymentsScreen: React.FC<CardPaymentsScreenProps> = ({ navigati
         </View>
       </View>
 
-      {item.status === 'pending' && (
-        <View style={styles.actionButtons}>
-          <TouchableOpacity 
-            style={[styles.actionButton, styles.approveButton]}
-            onPress={() => handlePaymentAction(item, 'approve')}
-          >
-            <Ionicons name="checkmark" size={16} color="#FFFFFF" />
-            <Text style={styles.actionButtonText}>Aprobar</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity 
-            style={[styles.actionButton, styles.rejectButton]}
-            onPress={() => handlePaymentAction(item, 'reject')}
-          >
-            <Ionicons name="close" size={16} color="#FFFFFF" />
-            <Text style={styles.actionButtonText}>Rechazar</Text>
-          </TouchableOpacity>
-        </View>
-      )}
+      {/* Sin acciones: pagos con tarjeta ya están procesados */}
     </View>
   );
 
-  const renderFilterButton = (filter: 'all' | 'approved' | 'pending' | 'rejected', label: string) => (
-    <TouchableOpacity
-      style={[
-        styles.filterButton,
-        selectedFilter === filter && styles.filterButtonActive
-      ]}
-      onPress={() => setSelectedFilter(filter)}
-    >
-      <Text style={[
-        styles.filterButtonText,
-        selectedFilter === filter && styles.filterButtonTextActive
-      ]}>
-        {label}
-      </Text>
-    </TouchableOpacity>
-  );
+  // Filtros removidos
 
   return (
     <View style={styles.container}>
-      {/* Filtros */}
-      <View style={styles.filtersContainer}>
-        <Text style={styles.filtersTitle}>Filtrar por estado:</Text>
-        <View style={styles.filtersRow}>
-          {renderFilterButton('all', 'Todos')}
-          {renderFilterButton('approved', 'Aprobados')}
-          {renderFilterButton('pending', 'Pendientes')}
-          {renderFilterButton('rejected', 'Rechazados')}
-        </View>
-      </View>
+      {/* Filtros removidos */}
 
       {/* Lista de pagos */}
       <FlatList
-        data={filteredPayments}
+        data={mockCardPayments}
         renderItem={renderPaymentCard}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContainer}
@@ -217,12 +146,7 @@ export const CardPaymentsScreen: React.FC<CardPaymentsScreenProps> = ({ navigati
           <View style={styles.emptyState}>
             <Ionicons name="card-outline" size={64} color="#B3B3B3" />
             <Text style={styles.emptyTitle}>No hay pagos por tarjeta</Text>
-            <Text style={styles.emptyText}>
-              {selectedFilter === 'all' 
-                ? 'No se encontraron pagos por tarjeta' 
-                : `No hay pagos ${selectedFilter === 'approved' ? 'aprobados' : selectedFilter === 'pending' ? 'pendientes' : 'rechazados'}`
-              }
-            </Text>
+            <Text style={styles.emptyText}>No se encontraron pagos por tarjeta</Text>
           </View>
         }
       />
