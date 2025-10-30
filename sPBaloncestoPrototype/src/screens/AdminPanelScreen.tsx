@@ -1,5 +1,5 @@
 // Panel Administrativo Móvil
-import React, { useState } from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -19,7 +19,6 @@ interface AdminPanelScreenProps {
 
 export const AdminPanelScreen: React.FC<AdminPanelScreenProps> = ({ navigation }) => {
   const { students, payments, championships } = useApp();
-  const [activeTab, setActiveTab] = useState<'dashboard'>('dashboard');
 
   // Cálculos para el dashboard
   const totalStudents = students.length;
@@ -167,52 +166,7 @@ export const AdminPanelScreen: React.FC<AdminPanelScreenProps> = ({ navigation }
         <Text style={styles.headerTitle}>Panel Administrativo</Text>
         <Text style={styles.headerSubtitle}>Escuela de Baloncesto San Pedro</Text>
       </View>
-
-      <View style={styles.tabContainer}>
-        <TouchableOpacity
-          style={[styles.tab, activeTab === 'dashboard' && styles.activeTab]}
-          onPress={() => setActiveTab('dashboard')}
-        >
-          <Ionicons 
-            name="analytics-outline" 
-            size={20} 
-            color={activeTab === 'dashboard' ? '#e74c3c' : '#7f8c8d'} 
-          />
-          <Text style={[styles.tabText, activeTab === 'dashboard' && styles.activeTabText]}>
-            Dashboard
-          </Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity
-          style={styles.tab}
-          onPress={() => navigation.navigate('AdminPayments')}
-        >
-          <Ionicons 
-            name="card-outline" 
-            size={20} 
-            color="#7f8c8d" 
-          />
-          <Text style={styles.tabText}>
-            Pagos
-          </Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity
-          style={styles.tab}
-          onPress={() => navigation.navigate('AdminChampionships')}
-        >
-          <Ionicons 
-            name="trophy-outline" 
-            size={20} 
-            color="#7f8c8d" 
-          />
-          <Text style={styles.tabText}>
-            Campeonatos
-          </Text>
-        </TouchableOpacity>
-      </View>
-
-      {activeTab === 'dashboard' && renderDashboard()}
+      {renderDashboard()}
     </View>
   );
 };

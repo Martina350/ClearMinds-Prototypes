@@ -132,56 +132,85 @@ const PaymentsStack = () => {
 const MainTabs = () => {
   const { user, logout } = useAuth();
 
+  const commonScreenOptions = ({ route }: any) => ({
+    tabBarIcon: ({ focused, color, size }: any) => {
+      let iconName: keyof typeof Ionicons.glyphMap;
+
+      // Íconos para tabs comunes y de admin
+      switch (route.name) {
+        case 'Home':
+          iconName = focused ? 'home' : 'home-outline';
+          break;
+        case 'Championships':
+        case 'AdminChampionshipsTab':
+          iconName = focused ? 'trophy' : 'trophy-outline';
+          break;
+        case 'Payments':
+        case 'AdminPaymentsTab':
+          iconName = focused ? 'card' : 'card-outline';
+          break;
+        case 'Admin':
+          iconName = focused ? 'settings' : 'settings-outline';
+          break;
+        default:
+          iconName = 'help-outline';
+      }
+
+      return <Ionicons name={iconName} size={size} color={color} />;
+    },
+    tabBarActiveTintColor: '#E62026',
+    tabBarInactiveTintColor: '#FFFFFF',
+    tabBarStyle: {
+      backgroundColor: '#0A0D14',
+      borderTopWidth: 1,
+      borderTopColor: '#E5E5E5',
+      paddingBottom: 8,
+      paddingTop: 8,
+      height: 64,
+    },
+    headerStyle: {
+      backgroundColor: '#E62026',
+    },
+    headerTintColor: '#FFFFFF',
+    // Evitar over-typing en headerTitleStyle que causa warnings en algunos tipos
+    headerRight: () => (
+      <TouchableOpacity
+        onPress={logout}
+        style={{ marginRight: 12 }}
+        accessibilityRole="button"
+        accessibilityLabel="Cerrar sesión"
+      >
+        <Ionicons name="log-out-outline" size={22} color="#ffffff" />
+      </TouchableOpacity>
+    ),
+  });
+
+  // Si es admin, mostrar tabs exclusivos de admin
+  if (user?.role === 'admin') {
+    return (
+      <Tab.Navigator screenOptions={commonScreenOptions}>
+        <Tab.Screen
+          name="Admin"
+          component={AdminPanelScreen}
+          options={{ title: 'Dashboard' }}
+        />
+        <Tab.Screen
+          name="AdminPaymentsTab"
+          component={AdminPaymentsScreen}
+          options={{ title: 'Gestión de Pagos', headerShown: true }}
+        />
+        <Tab.Screen
+          name="AdminChampionshipsTab"
+          component={AdminChampionshipsScreen}
+          options={{ title: 'Gestión de Campeonatos', headerShown: true }}
+        />
+      </Tab.Navigator>
+    );
+  }
+
+  // Tabs para usuarios no admin (padres)
   return (
-    <Tab.Navigator
-      screenOptions={({ route }) => ({
-        tabBarIcon: ({ focused, color, size }) => {
-          let iconName: keyof typeof Ionicons.glyphMap;
-
-          if (route.name === 'Home') {
-            iconName = focused ? 'home' : 'home-outline';
-          } else if (route.name === 'Championships') {
-            iconName = focused ? 'trophy' : 'trophy-outline';
-          } else if (route.name === 'Payments') {
-            iconName = focused ? 'card' : 'card-outline';
-          } else if (route.name === 'Admin') {
-            iconName = focused ? 'settings' : 'settings-outline';
-          } else {
-            iconName = 'help-outline';
-          }
-
-          return <Ionicons name={iconName} size={size} color={color} />;
-        },
-        tabBarActiveTintColor: '#E62026', // Rojo competitivo
-        tabBarInactiveTintColor: '#FFFFFF', // Blanco neutro con 60% opacidad
-        tabBarStyle: {
-          backgroundColor: '#0A0D14', // Negro profundo/azul marino oscuro
-          borderTopWidth: 1,
-          borderTopColor: '#E5E5E5', // Gris claro
-          paddingBottom: 8,
-          paddingTop: 8,
-          height: 64,
-        },
-        headerStyle: {
-          backgroundColor: '#E62026', // Rojo competitivo para todos los headers
-        },
-        headerTintColor: '#FFFFFF', // Blanco neutro
-        headerTitleStyle: {
-          fontWeight: 'bold',
-          fontSize: 18,
-        },
-        headerRight: () => (
-          <TouchableOpacity
-            onPress={logout}
-            style={{ marginRight: 12 }}
-            accessibilityRole="button"
-            accessibilityLabel="Cerrar sesión"
-          >
-            <Ionicons name="log-out-outline" size={22} color="#ffffff" />
-          </TouchableOpacity>
-        ),
-      })}
-    >
+    <Tab.Navigator screenOptions={commonScreenOptions}>
       <Tab.Screen 
         name="Home" 
         component={HomeScreen}
@@ -192,7 +221,7 @@ const MainTabs = () => {
         component={ChampionshipsStack}
         options={{ 
           title: 'Campeonatos',
-          headerShown: false // Ocultar header del tab para que use el del stack
+          headerShown: false
         }}
       />
       <Tab.Screen 
@@ -200,16 +229,9 @@ const MainTabs = () => {
         component={PaymentsStack}
         options={{ 
           title: 'Pagos',
-          headerShown: false // Ocultar header del tab para que use el del stack
+          headerShown: false
         }}
       />
-      {user?.role === 'admin' && (
-        <Tab.Screen 
-          name="Admin" 
-          component={AdminPanelScreen}
-          options={{ title: 'Admin' }}
-        />
-      )}
     </Tab.Navigator>
   );
 };
@@ -228,6 +250,23 @@ export const AppNavigator = () => {
         {isAuthenticated ? (
           <>
             <Stack.Screen name="MainTabs" component={MainTabs} />
+            <Stack.Screen 
+              name="ChampionshipDetail" 
+              component={ChampionshipDetailScreen}
+              options={{ 
+                headerShown: true,
+                title: 'Detalle del Campeonato',
+                headerStyle: {
+                  backgroundColor: '#E62026',
+                },
+                headerTintColor: '#FFFFFF',
+                headerTitleStyle: {
+                  fontWeight: 'bold',
+                  fontSize: 18,
+                },
+                headerBackTitleVisible: false,
+              }}
+            />
             <Stack.Screen 
               name="ManageChampionship" 
               component={ManageChampionshipScreen}

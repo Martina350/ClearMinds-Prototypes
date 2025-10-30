@@ -112,7 +112,6 @@ export const PaymentReportScreen: React.FC<PaymentReportScreenProps> = ({ naviga
     <ScrollView style={styles.container}>
       {/* Header con acciones */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Reporte de Pagos</Text>
         <View style={styles.headerActions}>
           <TouchableOpacity 
             style={styles.actionButton}

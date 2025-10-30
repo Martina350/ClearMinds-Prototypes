@@ -239,17 +239,6 @@ export const AdminPaymentsScreen: React.FC<AdminPaymentsScreenProps> = ({ naviga
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity 
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
-          <Ionicons name="arrow-back" size={24} color="white" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Gestión de Pagos</Text>
-        <View style={styles.placeholder} />
-      </View>
-
       <View style={styles.tabContainer}>
         <TouchableOpacity
           style={[styles.tab, activeTab === 'overview' && styles.activeTab]}
@@ -550,3 +539,4 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
   },
 });
+
