@@ -27,7 +27,7 @@ export const PaymentDetailScreen: React.FC<PaymentDetailScreenProps> = ({ naviga
   const deportistaPaymentHistory = paymentHistory.filter(payment => payment.deportistaId === student.id);
 
   const pendingPayments = deportistaPayments.filter(payment => 
-    payment.status === 'pending' || payment.status === 'overdue'
+    payment.status === 'pending' || payment.status === 'overdue' || payment.status === 'under_review'
   );
   const paidPayments = deportistaPayments.filter(payment => payment.status === 'paid');
 
@@ -212,32 +212,6 @@ export const PaymentDetailScreen: React.FC<PaymentDetailScreenProps> = ({ naviga
             <Text style={styles.emptyPendingText}>¡Todos los pagos al día!</Text>
           </View>
         )}
-      </View>
-
-      {/* Sección C: Pagar por transferencia */}
-        <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Pagar por Transferencia</Text>
-        <View style={styles.transferCard}>
-          <Ionicons name="document-text-outline" size={40} color="#E62026" />
-          <Text style={styles.transferTitle}>Adjunta el comprobante de pago</Text>
-          <Text style={styles.transferDescription}>
-            Sube una foto o PDF del recibo para verificar tu pago.
-          </Text>
-          <TouchableOpacity
-            style={styles.selectFileButton}
-            onPress={() => {
-              const target = pendingPayments[0];
-              if (!target) {
-                Alert.alert('Sin deudas', 'No hay pagos pendientes para enviar comprobante.');
-                return;
-              }
-              updatePayment(target.id, { status: 'under_review', paymentMethod: 'transfer', receiptImage: 'local://comprobante.jpg', createdAt: new Date().toISOString() });
-              Alert.alert('Comprobante enviado', 'Tu pago quedó en revisión.');
-            }}
-          >
-            <Text style={styles.selectFileText}>Seleccionar archivo</Text>
-          </TouchableOpacity>
-        </View>
       </View>
     </ScrollView>
   );

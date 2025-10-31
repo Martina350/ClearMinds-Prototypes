@@ -122,29 +122,31 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
 
   const updatePaymentStatus = (paymentId: string, nextStatus: Payment['status']) => {
-    setPayments(prev => prev.map(p => p.id === paymentId ? { ...p, status: nextStatus, paymentDate: nextStatus === 'paid' ? new Date().toISOString().slice(0,10) : p.paymentDate } : p));
-    // opcional: historial ligero
-    const p = payments.find(px => px.id === paymentId);
-    if (p) {
-      setPaymentHistory(prev => [
-        ...prev,
-        {
-          id: `hist-${Date.now()}`,
-          deportistaId: p.deportistaId,
-          description: p.description,
-          amount: p.amount,
-          status: nextStatus === 'paid' ? 'paid' : nextStatus === 'under_review' ? 'under_review' : 'pending',
-          paymentMethod: p.paymentMethod,
-          paymentDate: nextStatus === 'paid' ? new Date().toISOString() : undefined,
-          receiptImage: p.receiptImage,
-          createdAt: new Date().toISOString(),
-          type: p.type,
-          period: p.period,
-          tournamentId: p.tournamentId,
-          eventId: p.eventId,
-        }
-      ]);
-    }
+    setPayments(prev => {
+      const updated = prev.map(p => p.id === paymentId ? { ...p, status: nextStatus, paymentDate: nextStatus === 'paid' ? new Date().toISOString().slice(0,10) : p.paymentDate } : p);
+      const p = prev.find(px => px.id === paymentId);
+      if (p) {
+        setPaymentHistory(histPrev => [
+          ...histPrev,
+          {
+            id: `hist-${Date.now()}`,
+            deportistaId: p.deportistaId,
+            description: p.description,
+            amount: p.amount,
+            status: nextStatus === 'paid' ? 'paid' : nextStatus === 'under_review' ? 'under_review' : 'pending',
+            paymentMethod: p.paymentMethod,
+            paymentDate: nextStatus === 'paid' ? new Date().toISOString() : undefined,
+            receiptImage: p.receiptImage,
+            createdAt: new Date().toISOString(),
+            type: p.type,
+            period: p.period,
+            tournamentId: p.tournamentId,
+            eventId: p.eventId,
+          }
+        ]);
+      }
+      return updated;
+    });
   };
 
   const updatePayment = (paymentId: string, updates: Partial<Payment>) => {

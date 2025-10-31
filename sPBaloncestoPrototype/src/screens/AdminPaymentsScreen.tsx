@@ -173,7 +173,7 @@ export const AdminPaymentsScreen: React.FC<AdminPaymentsScreenProps> = ({ naviga
           text: action === 'approve' ? 'Aprobar' : 'Rechazar', 
           onPress: () => {
             const next = action === 'approve' ? 'paid' : 'pending';
-            updatePaymentStatus(paymentId, next as any);
+            updatePaymentStatus(paymentId, next);
             Alert.alert('Acción Completada', `La transferencia ha sido ${action === 'approve' ? 'aprobada' : 'rechazada'}.`);
           }
         }

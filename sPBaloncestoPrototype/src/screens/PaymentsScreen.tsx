@@ -25,7 +25,7 @@ export const PaymentsScreen: React.FC<PaymentsScreenProps> = ({ navigation }) =>
   const getDeportistaPaymentStatus = (deportistaId: string) => {
     const deportistaPayments = payments.filter(payment => payment.deportistaId === deportistaId);
     const pendingPayments = deportistaPayments.filter(payment => 
-      payment.status === 'pending' || payment.status === 'overdue'
+      payment.status === 'pending' || payment.status === 'overdue' || payment.status === 'under_review'
     );
     
     if (pendingPayments.length === 0) {
