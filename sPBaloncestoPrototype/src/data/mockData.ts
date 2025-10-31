@@ -889,6 +889,108 @@ export const mockPayments: Payment[] = [
     createdAt: '2024-04-01',
     type: 'inscripcion_evento',
     eventId: 'verano_2024'
+  },
+  {
+    id: '6',
+    deportistaId: '1',
+    description: 'Mensualidad Marzo 2024',
+    amount: 30,
+    dueDate: '2024-03-05',
+    status: 'paid',
+    paymentMethod: 'transfer',
+    paymentDate: '2024-03-02',
+    createdAt: '2024-03-01',
+    type: 'mensualidad',
+    period: 'Marzo 2024'
+  },
+  {
+    id: '7',
+    deportistaId: '1',
+    description: 'Mensualidad Abril 2024',
+    amount: 30,
+    dueDate: '2024-04-05',
+    status: 'paid',
+    paymentMethod: 'transfer',
+    paymentDate: '2024-04-03',
+    createdAt: '2024-04-01',
+    type: 'mensualidad',
+    period: 'Abril 2024'
+  },
+  {
+    id: '8',
+    deportistaId: '1',
+    description: 'Mensualidad Mayo 2024',
+    amount: 30,
+    dueDate: '2024-05-05',
+    status: 'paid',
+    paymentMethod: 'transfer',
+    paymentDate: '2024-05-02',
+    createdAt: '2024-05-01',
+    type: 'mensualidad',
+    period: 'Mayo 2024'
+  },
+  {
+    id: '9',
+    deportistaId: '2',
+    description: 'Mensualidad Febrero 2024',
+    amount: 30,
+    dueDate: '2024-02-05',
+    status: 'paid',
+    paymentMethod: 'transfer',
+    paymentDate: '2024-02-03',
+    createdAt: '2024-02-01',
+    type: 'mensualidad',
+    period: 'Febrero 2024'
+  },
+  {
+    id: '10',
+    deportistaId: '2',
+    description: 'Mensualidad Marzo 2024',
+    amount: 30,
+    dueDate: '2024-03-05',
+    status: 'paid',
+    paymentMethod: 'transfer',
+    paymentDate: '2024-03-02',
+    createdAt: '2024-03-01',
+    type: 'mensualidad',
+    period: 'Marzo 2024'
+  },
+  {
+    id: '11',
+    deportistaId: '1',
+    description: 'Uniforme Deportivo',
+    amount: 45,
+    dueDate: '2024-05-15',
+    status: 'paid',
+    paymentMethod: 'transfer',
+    paymentDate: '2024-05-10',
+    createdAt: '2024-05-01',
+    type: 'mensualidad'
+  },
+  {
+    id: '12',
+    deportistaId: '2',
+    description: 'Material Deportivo',
+    amount: 20,
+    dueDate: '2024-04-10',
+    status: 'paid',
+    paymentMethod: 'transfer',
+    paymentDate: '2024-04-08',
+    createdAt: '2024-04-01',
+    type: 'mensualidad'
+  },
+  {
+    id: '13',
+    deportistaId: '1',
+    description: 'Inscripción Torneo Regional Sub-15',
+    amount: 35,
+    dueDate: '2024-06-01',
+    status: 'paid',
+    paymentMethod: 'transfer',
+    paymentDate: '2024-05-28',
+    createdAt: '2024-05-15',
+    type: 'inscripcion_torneo',
+    tournamentId: 'regional_15'
   }
 ];
 

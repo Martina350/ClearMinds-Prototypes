@@ -18,7 +18,7 @@ interface AdminChampionshipsScreenProps {
 }
 
 export const AdminChampionshipsScreen: React.FC<AdminChampionshipsScreenProps> = ({ navigation }) => {
-  const { championships } = useApp();
+  const { championships, removeChampionship } = useApp();
   const [activeTab, setActiveTab] = useState<'active' | 'manage'>('active');
 
   // Cálculos para el resumen
@@ -169,6 +169,7 @@ export const AdminChampionshipsScreen: React.FC<AdminChampionshipsScreenProps> =
             text: 'Eliminar', 
             style: 'destructive',
             onPress: () => {
+              removeChampionship(championship.id);
               Alert.alert('Campeonato Eliminado', 'El campeonato ha sido eliminado.');
             }
           }

@@ -10,6 +10,7 @@ import {
   Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import RNCalendarEvents from 'react-native-calendar-events';
 import { Championship, Match, Team } from '../types';
 
 interface ChampionshipDetailScreenProps {
@@ -45,7 +46,7 @@ export const ChampionshipDetailScreen: React.FC<ChampionshipDetailScreenProps> =
     ? [...championship.teams].sort((a, b) => b.points - a.points)
     : [];
 
-  const handleAddToCalendar = (match: Match) => {
+  const handleAddToCalendar = async (match: Match) => {
     Alert.alert(
       'Añadir al calendario',
       `¿Deseas añadir el partido ${match.homeTeam} vs ${match.awayTeam} a tu calendario?`,
@@ -53,8 +54,29 @@ export const ChampionshipDetailScreen: React.FC<ChampionshipDetailScreenProps> =
         { text: 'Cancelar', style: 'cancel' },
         { 
           text: 'Añadir', 
-          onPress: () => {
-            Alert.alert('Éxito', 'Partido añadido al calendario');
+          onPress: async () => {
+            try {
+              // Solicitar permisos
+              const status = await RNCalendarEvents.requestPermissions();
+              if (status === 'authorized') {
+                // Crear evento
+                const eventDate = new Date(`${match.date}T${match.time}`);
+                const endDate = new Date(eventDate.getTime() + 90 * 60 * 1000); // Duración estimada 90 minutos
+                
+                await RNCalendarEvents.saveEvent(`${match.homeTeam} vs ${match.awayTeam}`, {
+                  startDate: eventDate.toISOString(),
+                  endDate: endDate.toISOString(),
+                  location: championship.name,
+                  notes: `Partido de ${match.category} ${match.gender}`,
+                });
+                
+                Alert.alert('Éxito', 'Partido añadido al calendario');
+              } else {
+                Alert.alert('Permisos necesarios', 'Por favor permite el acceso al calendario en la configuración');
+              }
+            } catch (error) {
+              Alert.alert('Error', 'No se pudo agregar el partido al calendario');
+            }
           }
         }
       ]

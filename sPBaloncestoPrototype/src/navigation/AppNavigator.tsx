@@ -21,6 +21,7 @@ import { AdminChampionshipsScreen } from '../screens/AdminChampionshipsScreen';
 import { ManageChampionshipScreen } from '../screens/ManageChampionshipScreen';
 import { ReviewPaymentScreen } from '../screens/ReviewPaymentScreen';
 import { CardPaymentsScreen } from '../screens/CardPaymentsScreen';
+import { TransferPaymentsScreen } from '../screens/TransferPaymentsScreen';
 import { PaymentReportScreen } from '../screens/PaymentReportScreen';
 import { CreateChampionshipScreen } from '../screens/CreateChampionshipScreen';
 import { RegisterResultScreen } from '../screens/RegisterResultScreen';
@@ -307,6 +308,23 @@ export const AppNavigator = () => {
               options={{
                 headerShown: true,
                 title: 'Pagos por Tarjeta',
+                headerStyle: {
+                  backgroundColor: '#E62026',
+                },
+                headerTintColor: '#FFFFFF',
+                headerTitleStyle: {
+                  fontWeight: 'bold',
+                  fontSize: 18,
+                },
+                headerBackTitleVisible: false, // Ocultar texto junto a la flecha
+              }}
+            />
+            <Stack.Screen 
+              name="TransferPayments" 
+              component={TransferPaymentsScreen}
+              options={{
+                headerShown: true,
+                title: 'Pagos por Transferencia',
                 headerStyle: {
                   backgroundColor: '#E62026',
                 },

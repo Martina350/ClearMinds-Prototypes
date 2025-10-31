@@ -18,7 +18,7 @@ interface AdminPanelScreenProps {
 }
 
 export const AdminPanelScreen: React.FC<AdminPanelScreenProps> = ({ navigation }) => {
-  const { students, payments, championships } = useApp();
+  const { students, payments, championships, updatePaymentStatus } = useApp();
 
   // Cálculos para el dashboard
   const totalStudents = students.length;
@@ -215,6 +215,8 @@ export const AdminPanelScreen: React.FC<AdminPanelScreenProps> = ({ navigation }
         { 
           text: action === 'approve' ? 'Aprobar' : 'Rechazar', 
           onPress: () => {
+            const nextStatus = action === 'approve' ? 'paid' : 'pending';
+            updatePaymentStatus(paymentId, nextStatus);
             Alert.alert(
               'Acción Completada',
               `La transferencia ha sido ${action === 'approve' ? 'aprobada' : 'rechazada'}.`

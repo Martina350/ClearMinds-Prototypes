@@ -141,6 +141,14 @@ export const AdminPaymentsScreen: React.FC<AdminPaymentsScreenProps> = ({ naviga
           <Ionicons name="card-outline" size={20} color="white" />
           <Text style={styles.actionButtonText}>Pagos por Tarjeta</Text>
         </TouchableOpacity>
+        
+        <TouchableOpacity 
+          style={styles.actionButton}
+          onPress={() => navigation.navigate('TransferPayments')}
+        >
+          <Ionicons name="swap-horizontal-outline" size={20} color="white" />
+          <Text style={styles.actionButtonText}>Pagos por Transferencia</Text>
+        </TouchableOpacity>
       </View>
 
       <View style={styles.section}>

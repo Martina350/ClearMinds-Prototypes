@@ -11,6 +11,8 @@ import {
   //Picker,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useApp } from '../context/AppContext';
+import { Championship } from '../types';
 
 interface ChampionshipForm {
   name: string;
@@ -24,14 +26,15 @@ interface ChampionshipForm {
   entryFee: string;
 }
 
-const categories = ['Sub-13', 'Sub-15', 'Sub-17', 'Sub-19', 'Senior'];
-const genders = ['Masculino', 'Femenino', 'Mixto'];
+const categories = ['Sub-8', 'Sub-9', 'Sub-10', 'Sub-11', 'Sub-12', 'Sub-13', 'Sub-14', 'Sub-15', 'Sub-16', 'Sub-17'];
+const genders = ['Masculino', 'Femenino'];
 
 interface CreateChampionshipScreenProps {
   navigation: any;
 }
 
 export const CreateChampionshipScreen: React.FC<CreateChampionshipScreenProps> = ({ navigation }) => {
+  const { addChampionship } = useApp();
   const [form, setForm] = useState<ChampionshipForm>({
     name: '',
     category: 'Sub-15',
@@ -82,8 +85,21 @@ export const CreateChampionshipScreen: React.FC<CreateChampionshipScreenProps> =
 
     setLoading(true);
     try {
-      // Aquí iría la lógica para crear el campeonato
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simular API call
+      // Convertir datos del formulario al formato de Championship
+      const newChampionship: Championship = {
+        id: `champ-${Date.now()}`,
+        name: form.name,
+        category: form.category,
+        gender: form.gender.toLowerCase() as 'masculino' | 'femenino',
+        tournamentType: 'Regional', // Por defecto
+        startDate: form.startDate,
+        currentPhase: 'Fase de Clasificación',
+        isActive: true,
+        matches: [],
+        teams: [],
+      };
+
+      addChampionship(newChampionship);
       
       Alert.alert(
         'Éxito', 

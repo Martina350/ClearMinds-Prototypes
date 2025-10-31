@@ -153,6 +153,18 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setPayments(prev => prev.map(p => p.id === paymentId ? { ...p, ...updates } : p));
   };
 
+  const addChampionship = (championship: Championship) => {
+    setChampionships(prev => [...prev, championship]);
+  };
+
+  const updateChampionship = (championshipId: string, updates: Partial<Championship>) => {
+    setChampionships(prev => prev.map(ch => ch.id === championshipId ? { ...ch, ...updates } : ch));
+  };
+
+  const removeChampionship = (championshipId: string) => {
+    setChampionships(prev => prev.filter(ch => ch.id !== championshipId));
+  };
+
   return (
     <AppContext.Provider value={{ 
       deportistas,
@@ -166,6 +178,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       removeMatchFromChampionship,
       updatePaymentStatus,
       updatePayment,
+      addChampionship,
+      updateChampionship,
+      removeChampionship,
     }}>
       {children}
     </AppContext.Provider>
