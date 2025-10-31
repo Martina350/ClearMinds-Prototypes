@@ -7,8 +7,10 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
+  Dimensions,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { BarChart } from 'react-native-chart-kit';
 
 interface PaymentStats {
   totalPayments: number;
@@ -107,6 +109,41 @@ export const PaymentReportScreen: React.FC<PaymentReportScreenProps> = ({ naviga
       </View>
     </View>
   );
+
+  // Preparar datos para el gráfico
+  const chartData = {
+    labels: mockStats.monthlyStats.map(stat => {
+      const monthAbbr = stat.month.split(' ')[0].slice(0, 3);
+      const year = stat.month.split(' ')[1]?.slice(-2) || '24';
+      return `${monthAbbr}/${year}`;
+    }),
+    datasets: [
+      {
+        data: mockStats.monthlyStats.map(stat => stat.payments),
+      },
+    ],
+  };
+
+  const chartConfig = {
+    backgroundColor: '#1A1D24',
+    backgroundGradientFrom: '#1A1D24',
+    backgroundGradientTo: '#1A1D24',
+    decimalPlaces: 0,
+    color: (opacity = 1) => `rgba(230, 32, 38, ${opacity})`, // Rojo San Pedro
+    labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+    style: {
+      borderRadius: 16,
+    },
+    propsForBackgroundLines: {
+      strokeDasharray: '', // solid lines
+      stroke: '#2A2D34',
+      strokeWidth: 1,
+    },
+    propsForLabels: {
+      fontSize: 10,
+      fontWeight: '600',
+    },
+  };
 
   return (
     <ScrollView style={styles.container}>
@@ -238,14 +275,24 @@ export const PaymentReportScreen: React.FC<PaymentReportScreenProps> = ({ naviga
         {mockStats.monthlyStats.map(renderMonthlyStat)}
       </View>
 
-      {/* Gráfico de tendencias (placeholder) */}
+      {/* Gráfico de tendencias */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Tendencia de Pagos</Text>
-        <View style={styles.chartPlaceholder}>
-          <Ionicons name="bar-chart" size={48} color="#B3B3B3" />
-          <Text style={styles.chartPlaceholderText}>Gráfico de tendencias</Text>
-          <Text style={styles.chartPlaceholderSubtext}>
-            Aquí se mostraría un gráfico con la evolución de los pagos
+        <View style={styles.chartContainer}>
+          <BarChart
+            data={chartData}
+            width={Dimensions.get('window').width - 60}
+            height={220}
+            yAxisLabel=""
+            yAxisSuffix=""
+            chartConfig={chartConfig}
+            fromZero
+            showValuesOnTopOfBars
+            withInnerLines={true}
+            style={styles.chart}
+          />
+          <Text style={styles.chartLegend}>
+            Número de pagos registrados por mes
           </Text>
         </View>
       </View>
@@ -444,11 +491,10 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#B3B3B3',
   },
-  chartPlaceholder: {
+  chartContainer: {
     backgroundColor: '#1A1D24', // Card oscuro
     borderRadius: 12,
-    padding: 40,
-    alignItems: 'center',
+    padding: 16,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -458,16 +504,15 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
   },
-  chartPlaceholderText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-    marginTop: 12,
-    marginBottom: 4,
+  chart: {
+    marginVertical: 8,
+    borderRadius: 16,
   },
-  chartPlaceholderSubtext: {
-    fontSize: 14,
+  chartLegend: {
+    fontSize: 12,
     color: '#B3B3B3',
     textAlign: 'center',
+    marginTop: 8,
+    fontStyle: 'italic',
   },
 });

@@ -24,7 +24,9 @@ export const PaymentDetailScreen: React.FC<PaymentDetailScreenProps> = ({ naviga
   const [activeTab, setActiveTab] = useState<'pending' | 'history'>('pending');
 
   const deportistaPayments = payments.filter(payment => payment.deportistaId === student.id);
-  const deportistaPaymentHistory = paymentHistory.filter(payment => payment.deportistaId === student.id);
+  const deportistaPaymentHistory = paymentHistory.filter(payment => 
+    payment.deportistaId === student.id && payment.status === 'paid'
+  );
 
   const pendingPayments = deportistaPayments.filter(payment => 
     payment.status === 'pending' || payment.status === 'overdue' || payment.status === 'under_review'
