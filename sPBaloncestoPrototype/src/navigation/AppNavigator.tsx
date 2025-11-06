@@ -4,8 +4,8 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { Ionicons } from '@expo/vector-icons';
-import { TouchableOpacity } from 'react-native';
-import { useAuth } from '../context/AppContext';
+import { TouchableOpacity, View, Text, StyleSheet } from 'react-native';
+import { useAuth, useApp } from '../context/AppContext';
 
 // Importar pantallas
 import { LoginScreen } from '../screens/LoginScreen';
@@ -25,6 +25,7 @@ import { TransferPaymentsScreen } from '../screens/TransferPaymentsScreen';
 import { PaymentReportScreen } from '../screens/PaymentReportScreen';
 import { CreateChampionshipScreen } from '../screens/CreateChampionshipScreen';
 import { RegisterResultScreen } from '../screens/RegisterResultScreen';
+import { RemindersScreen } from '../screens/RemindersScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -132,21 +133,42 @@ const PaymentsStack = () => {
 // Tabs principales
 const MainTabs = () => {
   const { user, logout } = useAuth();
+  const { 
+    getPendingPaymentsCount, 
+    getUnreadNotificationsCount, 
+    getUpcomingMatchesCount 
+  } = useApp();
+
+  // Badge component
+  const TabBarBadge = ({ count }: { count: number }) => {
+    if (count === 0) return null;
+    return (
+      <View style={badgeStyles.badge}>
+        <Text style={badgeStyles.badgeText}>{count > 9 ? '9+' : count}</Text>
+      </View>
+    );
+  };
 
   const commonScreenOptions = ({ route }: any) => ({
     tabBarIcon: ({ focused, color, size }: any) => {
       let iconName: keyof typeof Ionicons.glyphMap;
+      let badgeCount = 0;
 
       // Íconos para tabs comunes y de admin
       switch (route.name) {
         case 'Home':
           iconName = focused ? 'home' : 'home-outline';
+          badgeCount = getUnreadNotificationsCount();
           break;
         case 'Championships':
         case 'AdminChampionshipsTab':
           iconName = focused ? 'trophy' : 'trophy-outline';
+          badgeCount = getUpcomingMatchesCount();
           break;
         case 'Payments':
+          iconName = focused ? 'card' : 'card-outline';
+          badgeCount = user ? getPendingPaymentsCount(user.id) : 0;
+          break;
         case 'AdminPaymentsTab':
           iconName = focused ? 'card' : 'card-outline';
           break;
@@ -157,7 +179,12 @@ const MainTabs = () => {
           iconName = 'help-outline';
       }
 
-      return <Ionicons name={iconName} size={size} color={color} />;
+      return (
+        <View>
+          <Ionicons name={iconName} size={size} color={color} />
+          <TabBarBadge count={badgeCount} />
+        </View>
+      );
     },
     tabBarActiveTintColor: '#E62026',
     tabBarInactiveTintColor: '#FFFFFF',
@@ -401,6 +428,23 @@ export const AppNavigator = () => {
                 headerShown: false, // Usar header personalizado
               }}
             />
+            <Stack.Screen 
+              name="Reminders" 
+              component={RemindersScreen}
+              options={{
+                headerShown: true,
+                title: 'Recordatorios',
+                headerStyle: {
+                  backgroundColor: '#E62026',
+                },
+                headerTintColor: '#FFFFFF',
+                headerTitleStyle: {
+                  fontWeight: 'bold',
+                  fontSize: 18,
+                },
+                headerBackTitleVisible: false,
+              }}
+            />
           </>
         ) : (
           <Stack.Screen name="Login" component={LoginScreen} />
@@ -409,3 +453,24 @@ export const AppNavigator = () => {
     </NavigationContainer>
   );
 };
+
+// Estilos para badges
+const badgeStyles = StyleSheet.create({
+  badge: {
+    position: 'absolute',
+    top: -5,
+    right: -10,
+    backgroundColor: '#E62026',
+    borderRadius: 10,
+    minWidth: 18,
+    height: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 4,
+  },
+  badgeText: {
+    color: '#FFFFFF',
+    fontSize: 10,
+    fontWeight: 'bold',
+  },
+});

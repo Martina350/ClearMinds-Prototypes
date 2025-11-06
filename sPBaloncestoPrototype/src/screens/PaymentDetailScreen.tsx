@@ -8,10 +8,13 @@ import {
   StyleSheet,
   ScrollView,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useApp } from '../context/AppContext';
 import { Student, Payment, PaymentHistory } from '../types';
+import { generatePaymentReportPDF, generatePaymentReceiptPDF, sharePDF, generateStatisticsCSV } from '../utils/pdfGenerator';
+import { sendPaymentReportEmail, sendPaymentReceiptEmail } from '../utils/emailService';
 
 interface PaymentDetailScreenProps {
   navigation: any;
@@ -20,8 +23,9 @@ interface PaymentDetailScreenProps {
 
 export const PaymentDetailScreen: React.FC<PaymentDetailScreenProps> = ({ navigation, route }) => {
   const { student }: { student: Student } = route.params;
-  const { payments, paymentHistory, updatePayment } = useApp();
+  const { payments, paymentHistory, updatePayment, addNotification } = useApp();
   const [activeTab, setActiveTab] = useState<'pending' | 'history'>('pending');
+  const [loading, setLoading] = useState(false);
 
   const deportistaPayments = payments.filter(payment => payment.deportistaId === student.id);
   const deportistaPaymentHistory = paymentHistory.filter(payment => 
@@ -73,6 +77,104 @@ export const PaymentDetailScreen: React.FC<PaymentDetailScreenProps> = ({ naviga
 
   const handlePayment = (payment: Payment) => {
     navigation.navigate('PaymentMethod', { payment, student });
+  };
+
+  // Exportar reporte de pagos a PDF
+  const handleExportPDF = async () => {
+    try {
+      setLoading(true);
+      const allPayments = [...paidPayments, ...pendingPayments];
+      const pdfUri = await generatePaymentReportPDF(allPayments, student);
+      
+      if (pdfUri) {
+        const shared = await sharePDF(pdfUri, `reporte_pagos_${student.name}.pdf`);
+        if (shared) {
+          addNotification({
+            type: 'success',
+            title: 'Reporte Generado',
+            message: 'El reporte PDF ha sido generado exitosamente',
+          });
+        }
+      } else {
+        Alert.alert('Error', 'No se pudo generar el reporte PDF');
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Ocurrió un error al generar el reporte');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Enviar reporte por email
+  const handleSendEmail = async () => {
+    try {
+      setLoading(true);
+      const allPayments = [...paidPayments, ...pendingPayments];
+      const pdfUri = await generatePaymentReportPDF(allPayments, student);
+      const sent = await sendPaymentReportEmail(allPayments, student, pdfUri || undefined);
+      
+      if (sent) {
+        addNotification({
+          type: 'success',
+          title: 'Email Enviado',
+          message: 'El reporte ha sido enviado por email',
+        });
+      }
+    } catch (error) {
+      console.error('Error sending email:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Descargar estadísticas en CSV
+  const handleDownloadCSV = async () => {
+    try {
+      setLoading(true);
+      const allPayments = [...paidPayments, ...pendingPayments];
+      const csvUri = await generateStatisticsCSV(allPayments, student);
+      
+      if (csvUri) {
+        const { sharePDF } = await import('../utils/pdfGenerator');
+        await sharePDF(csvUri, `estadisticas_${student.name}.csv`);
+        addNotification({
+          type: 'success',
+          title: 'Estadísticas Descargadas',
+          message: 'Las estadísticas han sido generadas',
+        });
+      } else {
+        Alert.alert('Error', 'No se pudieron generar las estadísticas');
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Ocurrió un error al generar las estadísticas');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Compartir comprobante de pago específico
+  const handleShareReceipt = async (payment: Payment) => {
+    try {
+      setLoading(true);
+      const pdfUri = await generatePaymentReceiptPDF(payment, student);
+      
+      if (pdfUri) {
+        const shared = await sharePDF(pdfUri, `comprobante_${payment.id}.pdf`);
+        if (shared) {
+          addNotification({
+            type: 'success',
+            title: 'Comprobante Compartido',
+            message: 'El comprobante ha sido compartido exitosamente',
+          });
+        }
+      } else {
+        Alert.alert('Error', 'No se pudo generar el comprobante');
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Ocurrió un error al generar el comprobante');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const renderPaymentItem = ({ item }: { item: Payment }) => (
@@ -128,6 +230,16 @@ export const PaymentDetailScreen: React.FC<PaymentDetailScreenProps> = ({ naviga
         </TouchableOpacity>
       )}
 
+      {item.status === 'paid' && (
+        <TouchableOpacity
+          style={styles.shareButton}
+          onPress={() => handleShareReceipt(item)}
+        >
+          <Ionicons name="share-outline" size={18} color="#3498db" />
+          <Text style={styles.shareButtonText}>Compartir Comprobante</Text>
+        </TouchableOpacity>
+      )}
+
       {item.status === 'under_review' && (
         <View style={styles.reviewBadge}>
           <Ionicons name="time-outline" size={16} color="#3498db" />
@@ -180,6 +292,57 @@ export const PaymentDetailScreen: React.FC<PaymentDetailScreenProps> = ({ naviga
         </Text>
       </View>
 
+      {/* Sección de Acciones Rápidas */}
+      <View style={styles.actionsContainer}>
+        <Text style={styles.actionsTitle}>Acciones Rápidas</Text>
+        <View style={styles.actionsRow}>
+          <TouchableOpacity 
+            style={styles.actionCard}
+            onPress={handleExportPDF}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="#E62026" />
+            ) : (
+              <>
+                <Ionicons name="document-text-outline" size={24} color="#E62026" />
+                <Text style={styles.actionText}>Exportar PDF</Text>
+              </>
+            )}
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={styles.actionCard}
+            onPress={handleSendEmail}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="#3498db" />
+            ) : (
+              <>
+                <Ionicons name="mail-outline" size={24} color="#3498db" />
+                <Text style={styles.actionText}>Enviar Email</Text>
+              </>
+            )}
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={styles.actionCard}
+            onPress={handleDownloadCSV}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="#24C36B" />
+            ) : (
+              <>
+                <Ionicons name="download-outline" size={24} color="#24C36B" />
+                <Text style={styles.actionText}>Descargar CSV</Text>
+              </>
+            )}
+          </TouchableOpacity>
+        </View>
+      </View>
+
       {/* Sección A: Historial de pagos realizados */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Historial de Pagos Realizados</Text>
@@ -229,6 +392,60 @@ const styles = StyleSheet.create({
     padding: 20,
     borderBottomWidth: 1,
     borderBottomColor: '#E5E5E5', // Gris claro
+  },
+  actionsContainer: {
+    backgroundColor: '#1A1D24',
+    margin: 15,
+    padding: 15,
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  actionsTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    marginBottom: 12,
+  },
+  actionsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  actionCard: {
+    flex: 1,
+    backgroundColor: '#2A2D34',
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginHorizontal: 4,
+    minHeight: 80,
+    justifyContent: 'center',
+  },
+  actionText: {
+    color: '#FFFFFF',
+    fontSize: 11,
+    marginTop: 6,
+    textAlign: 'center',
+  },
+  shareButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: '#3498db',
+    borderRadius: 8,
+    padding: 10,
+    marginTop: 10,
+  },
+  shareButtonText: {
+    color: '#3498db',
+    fontSize: 14,
+    fontWeight: '600',
+    marginLeft: 6,
   },
   studentName: {
     fontSize: 24,

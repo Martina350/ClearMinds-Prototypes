@@ -8,15 +8,25 @@ import {
   Alert,
   TouchableOpacity,
   Linking,
+  ScrollView,
 } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { Ionicons } from '@expo/vector-icons';
 import { WEBVIEW_CONFIG } from '../config/webviewConfig';
+import { useApp } from '../context/AppContext';
+import { NotificationBanner } from '../components/NotificationBanner';
+import { UpcomingMatchesWidget } from '../components/UpcomingMatchesWidget';
 
-export const HomeScreen: React.FC = () => {
+interface HomeScreenProps {
+  navigation?: any;
+}
+
+export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [webViewKey, setWebViewKey] = useState(0);
+  const { championships, notifications, markNotificationAsRead } = useApp();
+  const [currentNotification, setCurrentNotification] = useState(notifications[0] || null);
 
   // URL del sitio web institucional
   const websiteUrl = WEBVIEW_CONFIG.INSTITUTIONAL_URL;
@@ -47,9 +57,39 @@ export const HomeScreen: React.FC = () => {
     Linking.openURL(websiteUrl);
   };
 
+  const handleNotificationDismiss = () => {
+    if (currentNotification) {
+      markNotificationAsRead(currentNotification.id);
+    }
+    // Mostrar siguiente notificación no leída
+    const unread = notifications.filter(n => !n.read && n.id !== currentNotification?.id);
+    setCurrentNotification(unread[0] || null);
+  };
+
+  // Actualizar notificación cuando cambien
+  React.useEffect(() => {
+    const unread = notifications.filter(n => !n.read);
+    if (unread.length > 0 && !currentNotification) {
+      setCurrentNotification(unread[0]);
+    }
+  }, [notifications]);
+
   if (error) {
     return (
-      <View style={styles.errorContainer}>
+      <View style={styles.mainContainer}>
+        <NotificationBanner
+          notification={currentNotification}
+          onDismiss={handleNotificationDismiss}
+        />
+        <UpcomingMatchesWidget 
+          championships={championships}
+          onMatchPress={(match, championship) => {
+            if (navigation) {
+              navigation.navigate('ChampionshipDetail', { championship });
+            }
+          }}
+        />
+        <View style={styles.errorContainer}>
         <Ionicons name="wifi-outline" size={80} color="#bdc3c7" />
         <Text style={styles.errorTitle}>Error de Conexión</Text>
         <Text style={styles.errorMessage}>
@@ -83,12 +123,29 @@ export const HomeScreen: React.FC = () => {
             • Realiza pagos desde la app
           </Text>
         </View>
+        </View>
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <View style={styles.mainContainer}>
+      <NotificationBanner
+        notification={currentNotification}
+        onDismiss={handleNotificationDismiss}
+      />
+      <UpcomingMatchesWidget 
+        championships={championships}
+        onMatchPress={(match, championship) => {
+          if (navigation) {
+            navigation.navigate('Championships', {
+              screen: 'ChampionshipDetail',
+              params: { championship },
+            });
+          }
+        }}
+      />
+      <View style={styles.container}>
       {loading && (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#e74c3c" />
@@ -109,11 +166,16 @@ export const HomeScreen: React.FC = () => {
         originWhitelist={['https://*', 'http://*']}
         setSupportMultipleWindows={false}
       />
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  mainContainer: {
+    flex: 1,
+    backgroundColor: '#0A0D14',
+  },
   container: {
     flex: 1,
     backgroundColor: '#0A0D14', // Negro profundo/azul marino oscuro

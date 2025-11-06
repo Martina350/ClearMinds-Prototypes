@@ -1,7 +1,7 @@
 // Contextos de autenticación y datos de la aplicación
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { User, Deportista, Championship, Payment, PaymentHistory, AuthContextType, AppContextType, Match } from '../types';
+import { User, Deportista, Championship, Payment, PaymentHistory, AuthContextType, AppContextType, Match, Notification, Reminder } from '../types';
 import { mockUsers, mockDeportistas, mockChampionships, mockPayments, mockPaymentHistory } from '../data/mockData';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -82,6 +82,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [championships, setChampionships] = useState<Championship[]>(mockChampionships);
   const [payments, setPayments] = useState<Payment[]>(mockPayments);
   const [paymentHistory, setPaymentHistory] = useState<PaymentHistory[]>(mockPaymentHistory);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [reminders, setReminders] = useState<Reminder[]>([]);
 
   const refreshData = async () => {
     // En una implementación real, aquí se harían llamadas a la API
@@ -165,6 +167,148 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setChampionships(prev => prev.filter(ch => ch.id !== championshipId));
   };
 
+  // Nuevas funcionalidades para notificaciones
+  const addNotification = (notification: Omit<Notification, 'id' | 'read' | 'createdAt'>) => {
+    const newNotification: Notification = {
+      ...notification,
+      id: Date.now().toString(),
+      read: false,
+      createdAt: new Date().toISOString(),
+    };
+    setNotifications(prev => [newNotification, ...prev]);
+  };
+
+  const markNotificationAsRead = (notificationId: string) => {
+    setNotifications(prev =>
+      prev.map(n => (n.id === notificationId ? { ...n, read: true } : n))
+    );
+  };
+
+  const clearNotifications = () => {
+    setNotifications([]);
+  };
+
+  // Funcionalidades para recordatorios
+  const addReminder = (reminder: Omit<Reminder, 'id' | 'createdAt'>) => {
+    const newReminder: Reminder = {
+      ...reminder,
+      id: Date.now().toString(),
+      createdAt: new Date().toISOString(),
+    };
+    setReminders(prev => [...prev, newReminder]);
+  };
+
+  const removeReminder = (reminderId: string) => {
+    setReminders(prev => prev.filter(r => r.id !== reminderId));
+  };
+
+  const toggleReminder = (reminderId: string) => {
+    setReminders(prev =>
+      prev.map(r => (r.id === reminderId ? { ...r, enabled: !r.enabled } : r))
+    );
+  };
+
+  // Contadores para badges
+  const getPendingPaymentsCount = (userId: string) => {
+    const userDeportistas = deportistas.filter(d => d.parentId === userId);
+    const deportistaIds = userDeportistas.map(d => d.id);
+    return payments.filter(
+      p =>
+        deportistaIds.includes(p.deportistaId) &&
+        (p.status === 'pending' || p.status === 'overdue')
+    ).length;
+  };
+
+  const getUnreadNotificationsCount = () => {
+    return notifications.filter(n => !n.read).length;
+  };
+
+  const getUpcomingMatchesCount = () => {
+    const today = new Date();
+    const nextWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
+    
+    let upcomingCount = 0;
+    championships.forEach(ch => {
+      ch.matches.forEach(match => {
+        const matchDate = new Date(match.date);
+        if (matchDate >= today && matchDate <= nextWeek && match.status === 'scheduled') {
+          upcomingCount++;
+        }
+      });
+    });
+    
+    return upcomingCount;
+  };
+
+  // Efecto para generar notificaciones automáticas
+  useEffect(() => {
+    const checkPaymentsAndMatches = () => {
+      const today = new Date();
+      
+      // Verificar pagos vencidos
+      payments.forEach(payment => {
+        const dueDate = new Date(payment.dueDate);
+        const daysUntilDue = Math.ceil((dueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+        
+        if (daysUntilDue <= 3 && daysUntilDue >= 0 && payment.status === 'pending') {
+          const deportista = deportistas.find(d => d.id === payment.deportistaId);
+          const existingNotification = notifications.find(
+            n => n.type === 'payment' && n.message.includes(payment.id)
+          );
+          
+          if (!existingNotification && deportista) {
+            addNotification({
+              type: 'payment',
+              title: 'Pago Próximo a Vencer',
+              message: `El pago de ${payment.description} para ${deportista.name} vence en ${daysUntilDue} día${daysUntilDue !== 1 ? 's' : ''}`,
+            });
+          }
+        } else if (daysUntilDue < 0 && payment.status === 'pending') {
+          const deportista = deportistas.find(d => d.id === payment.deportistaId);
+          const existingNotification = notifications.find(
+            n => n.type === 'payment' && n.title === 'Pago Vencido' && n.message.includes(payment.id)
+          );
+          
+          if (!existingNotification && deportista) {
+            addNotification({
+              type: 'payment',
+              title: 'Pago Vencido',
+              message: `⚠️ El pago de ${payment.description} para ${deportista.name} está vencido`,
+            });
+          }
+        }
+      });
+      
+      // Verificar próximos partidos
+      championships.forEach(ch => {
+        ch.matches.forEach(match => {
+          const matchDate = new Date(match.date);
+          const daysUntilMatch = Math.ceil((matchDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+          
+          if (daysUntilMatch <= 2 && daysUntilMatch >= 0 && match.status === 'scheduled') {
+            const existingNotification = notifications.find(
+              n => n.type === 'match' && n.message.includes(match.id)
+            );
+            
+            if (!existingNotification) {
+              addNotification({
+                type: 'match',
+                title: 'Próximo Partido',
+                message: `${match.homeTeam} vs ${match.awayTeam} - ${daysUntilMatch === 0 ? 'HOY' : `en ${daysUntilMatch} día${daysUntilMatch !== 1 ? 's' : ''}`}`,
+              });
+            }
+          }
+        });
+      });
+    };
+    
+    // Ejecutar al montar y cada hora
+    checkPaymentsAndMatches();
+    const interval = setInterval(checkPaymentsAndMatches, 60 * 60 * 1000);
+    
+    return () => clearInterval(interval);
+  }, [payments, championships, deportistas]);
+
   return (
     <AppContext.Provider value={{ 
       deportistas,
@@ -181,6 +325,18 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       addChampionship,
       updateChampionship,
       removeChampionship,
+      // Nuevas funcionalidades
+      notifications,
+      addNotification,
+      markNotificationAsRead,
+      clearNotifications,
+      reminders,
+      addReminder,
+      removeReminder,
+      toggleReminder,
+      getPendingPaymentsCount,
+      getUnreadNotificationsCount,
+      getUpcomingMatchesCount,
     }}>
       {children}
     </AppContext.Provider>

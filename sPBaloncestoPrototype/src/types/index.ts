@@ -96,6 +96,28 @@ export interface AuthContextType {
   isAuthenticated: boolean;
 }
 
+export interface Notification {
+  id: string;
+  type: 'payment' | 'match' | 'reminder' | 'success' | 'info';
+  title: string;
+  message: string;
+  action?: () => void;
+  actionLabel?: string;
+  read: boolean;
+  createdAt: string;
+}
+
+export interface Reminder {
+  id: string;
+  type: 'payment' | 'match';
+  title: string;
+  message: string;
+  targetDate: string;
+  targetId: string; // ID del pago o partido
+  enabled: boolean;
+  createdAt: string;
+}
+
 export interface AppContextType {
   deportistas: Deportista[];
   championships: Championship[];
@@ -112,4 +134,17 @@ export interface AppContextType {
   addChampionship: (championship: Championship) => void;
   updateChampionship: (championshipId: string, updates: Partial<Championship>) => void;
   removeChampionship: (championshipId: string) => void;
+  // Nuevas funcionalidades
+  notifications: Notification[];
+  addNotification: (notification: Omit<Notification, 'id' | 'read' | 'createdAt'>) => void;
+  markNotificationAsRead: (notificationId: string) => void;
+  clearNotifications: () => void;
+  reminders: Reminder[];
+  addReminder: (reminder: Omit<Reminder, 'id' | 'createdAt'>) => void;
+  removeReminder: (reminderId: string) => void;
+  toggleReminder: (reminderId: string) => void;
+  // Contadores para badges
+  getPendingPaymentsCount: (userId: string) => number;
+  getUnreadNotificationsCount: () => number;
+  getUpcomingMatchesCount: () => number;
 }
