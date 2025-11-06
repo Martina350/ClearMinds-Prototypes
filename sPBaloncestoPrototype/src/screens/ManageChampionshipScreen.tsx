@@ -23,25 +23,29 @@ interface ManageChampionshipScreenProps {
 export const ManageChampionshipScreen: React.FC<ManageChampionshipScreenProps> = ({ navigation, route }) => {
   const { championship } = route.params;
   const { addMatchToChampionship, updateMatchInChampionship, removeMatchFromChampionship, championships } = useApp();
-  // Nombre del club local y rivales conocidos (fuente institucional)
-  const sanPedroName = 'San Pedro';
-  const knownOpponents = [
-    'San Antonio',
+  
+  // Todos los equipos disponibles (incluye San Pedro y rivales)
+  const allTeams = [
+    'San Pedro',
     'San Pedro Rojo',
-    'Borregos 1',
     'San Pedro Blanco',
-    'Escuela Municipal Tena A',
+    'San Antonio',
+    'Santa María',
+    'Borregos 1',
     'Borregos 2',
+    'Escuela Municipal Tena A',
     'Escuela Municipal Tena B',
     'VO4',
-    'Santa María',
+    'Colegio Central',
+    'Instituto Norte',
   ];
 
-  const [homeTeam, setHomeTeam] = useState(sanPedroName);
-  const [awayTeam, setAwayTeam] = useState(knownOpponents[0]);
+  const [homeTeam, setHomeTeam] = useState('San Pedro');
+  const [awayTeam, setAwayTeam] = useState('San Antonio');
   const [matchDate, setMatchDate] = useState('');
   const [matchTime, setMatchTime] = useState('');
-  const [opponentPickerVisible, setOpponentPickerVisible] = useState(false);
+  const [homeTeamPickerVisible, setHomeTeamPickerVisible] = useState(false);
+  const [awayTeamPickerVisible, setAwayTeamPickerVisible] = useState(false);
   const [datePickerVisible, setDatePickerVisible] = useState(false);
   const [timePickerVisible, setTimePickerVisible] = useState(false);
   const [editingMatchId, setEditingMatchId] = useState<string | null>(null);
@@ -59,6 +63,7 @@ export const ManageChampionshipScreen: React.FC<ManageChampionshipScreenProps> =
     }
     if (editingMatchId) {
       updateMatchInChampionship(currentChampionship.id, editingMatchId, {
+        homeTeam,
         awayTeam,
         date: matchDate,
         time: matchTime,
@@ -69,7 +74,7 @@ export const ManageChampionshipScreen: React.FC<ManageChampionshipScreenProps> =
       const newMatch: Match = {
         id: Date.now().toString(),
         championshipId: currentChampionship.id,
-        homeTeam: sanPedroName,
+        homeTeam,
         awayTeam,
         date: matchDate,
         time: matchTime,
@@ -80,6 +85,9 @@ export const ManageChampionshipScreen: React.FC<ManageChampionshipScreenProps> =
       addMatchToChampionship(currentChampionship.id, newMatch);
       Alert.alert('Éxito', 'Partido guardado correctamente');
     }
+    // Limpiar formulario
+    setHomeTeam('San Pedro');
+    setAwayTeam('San Antonio');
     setMatchDate('');
     setMatchTime('');
   };
@@ -96,6 +104,7 @@ export const ManageChampionshipScreen: React.FC<ManageChampionshipScreenProps> =
       <View style={styles.matchDateTime}>
         <View style={{ flexDirection: 'row' }}>
           <TouchableOpacity style={styles.iconButton} onPress={() => {
+            setHomeTeam(match.homeTeam);
             setAwayTeam(match.awayTeam);
             setMatchDate(match.date);
             setMatchTime(match.time);
@@ -160,20 +169,24 @@ export const ManageChampionshipScreen: React.FC<ManageChampionshipScreenProps> =
           <View style={styles.inputRow}>
             <View style={styles.inputContainer}>
               <Text style={styles.inputLabel}>Equipo Local</Text>
-              <View style={styles.dropdownContainer}>
+              <TouchableOpacity 
+                style={styles.dropdownContainer}
+                onPress={() => setHomeTeamPickerVisible(true)}
+              >
                 <Text style={styles.dropdownText}>{homeTeam}</Text>
                 <Ionicons name="chevron-down" size={20} color="#FFFFFF" />
-              </View>
+              </TouchableOpacity>
             </View>
             
             <View style={styles.inputContainer}>
               <Text style={styles.inputLabel}>Equipo Visitante</Text>
-              <View style={styles.dropdownContainer}>
+              <TouchableOpacity 
+                style={styles.dropdownContainer}
+                onPress={() => setAwayTeamPickerVisible(true)}
+              >
                 <Text style={styles.dropdownText}>{awayTeam}</Text>
-                <TouchableOpacity onPress={() => setOpponentPickerVisible(true)}>
-                  <Ionicons name="chevron-down" size={20} color="#FFFFFF" />
-                </TouchableOpacity>
-              </View>
+                <Ionicons name="chevron-down" size={20} color="#FFFFFF" />
+              </TouchableOpacity>
             </View>
           </View>
 
@@ -212,27 +225,87 @@ export const ManageChampionshipScreen: React.FC<ManageChampionshipScreenProps> =
         <Text style={styles.sectionTitle}>Partidos Finalizados</Text>
         {finishedMatches.map(renderFinishedMatch)}
       </View>
+      {/* Modal para seleccionar equipo local */}
       <Modal
-        visible={opponentPickerVisible}
+        visible={homeTeamPickerVisible}
         transparent
         animationType="fade"
-        onRequestClose={() => setOpponentPickerVisible(false)}
+        onRequestClose={() => setHomeTeamPickerVisible(false)}
       >
-        <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={() => setOpponentPickerVisible(false)}>
+        <TouchableOpacity 
+          style={styles.modalOverlay} 
+          activeOpacity={1} 
+          onPress={() => setHomeTeamPickerVisible(false)}
+        >
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Selecciona equipo visitante</Text>
+            <Text style={styles.modalTitle}>Selecciona Equipo Local</Text>
             <FlatList
-              data={knownOpponents}
-              keyExtractor={(item, index) => `${item}-${index}`}
+              data={allTeams}
+              keyExtractor={(item, index) => `home-${item}-${index}`}
               renderItem={({ item }) => (
                 <TouchableOpacity
-                  style={styles.optionItem}
+                  style={[
+                    styles.optionItem,
+                    homeTeam === item && styles.optionItemSelected
+                  ]}
                   onPress={() => {
-                    setAwayTeam(item);
-                    setOpponentPickerVisible(false);
+                    setHomeTeam(item);
+                    setHomeTeamPickerVisible(false);
                   }}
                 >
-                  <Text style={styles.optionText}>{item}</Text>
+                  <Text style={[
+                    styles.optionText,
+                    homeTeam === item && styles.optionTextSelected
+                  ]}>
+                    {item}
+                  </Text>
+                  {homeTeam === item && (
+                    <Ionicons name="checkmark-circle" size={20} color="#E62026" />
+                  )}
+                </TouchableOpacity>
+              )}
+            />
+          </View>
+        </TouchableOpacity>
+      </Modal>
+
+      {/* Modal para seleccionar equipo visitante */}
+      <Modal
+        visible={awayTeamPickerVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setAwayTeamPickerVisible(false)}
+      >
+        <TouchableOpacity 
+          style={styles.modalOverlay} 
+          activeOpacity={1} 
+          onPress={() => setAwayTeamPickerVisible(false)}
+        >
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Selecciona Equipo Visitante</Text>
+            <FlatList
+              data={allTeams}
+              keyExtractor={(item, index) => `away-${item}-${index}`}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={[
+                    styles.optionItem,
+                    awayTeam === item && styles.optionItemSelected
+                  ]}
+                  onPress={() => {
+                    setAwayTeam(item);
+                    setAwayTeamPickerVisible(false);
+                  }}
+                >
+                  <Text style={[
+                    styles.optionText,
+                    awayTeam === item && styles.optionTextSelected
+                  ]}>
+                    {item}
+                  </Text>
+                  {awayTeam === item && (
+                    <Ionicons name="checkmark-circle" size={20} color="#E62026" />
+                  )}
                 </TouchableOpacity>
               )}
             />
@@ -500,13 +573,25 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   optionItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     paddingVertical: 12,
+    paddingHorizontal: 15,
     borderBottomWidth: 1,
     borderBottomColor: '#2A2D34',
+    borderRadius: 8,
+    marginBottom: 6,
+  },
+  optionItemSelected: {
+    backgroundColor: '#E62026',
   },
   optionText: {
     color: '#FFFFFF',
     fontSize: 14,
+  },
+  optionTextSelected: {
+    fontWeight: 'bold',
   },
 });
 

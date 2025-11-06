@@ -8,7 +8,7 @@ import {
   StyleSheet,
   ScrollView,
   Alert,
-  //Picker,
+  Modal,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useApp } from '../context/AppContext';
@@ -48,6 +48,8 @@ export const CreateChampionshipScreen: React.FC<CreateChampionshipScreenProps> =
   });
 
   const [loading, setLoading] = useState(false);
+  const [categoryPickerVisible, setCategoryPickerVisible] = useState(false);
+  const [genderPickerVisible, setGenderPickerVisible] = useState(false);
 
   const handleInputChange = (field: keyof ChampionshipForm, value: string) => {
     setForm(prev => ({
@@ -143,15 +145,15 @@ export const CreateChampionshipScreen: React.FC<CreateChampionshipScreenProps> =
   const renderPicker = (
     label: string,
     field: keyof ChampionshipForm,
-    options: string[]
+    options: string[],
+    onPress: () => void
   ) => (
     <View style={styles.inputContainer}>
       <Text style={styles.inputLabel}>{label}</Text>
-      <View style={styles.pickerContainer}>
+      <TouchableOpacity style={styles.pickerContainer} onPress={onPress}>
         <Text style={styles.pickerText}>{form[field]}</Text>
         <Ionicons name="chevron-down" size={20} color="#B3B3B3" />
-      </View>
-      {/* En una implementación real, aquí iría un picker modal */}
+      </TouchableOpacity>
     </View>
   );
 
@@ -172,8 +174,8 @@ export const CreateChampionshipScreen: React.FC<CreateChampionshipScreenProps> =
         )}
 
         <View style={styles.rowContainer}>
-          {renderPicker('Categoría *', 'category', categories)}
-          {renderPicker('Género *', 'gender', genders)}
+          {renderPicker('Categoría *', 'category', categories, () => setCategoryPickerVisible(true))}
+          {renderPicker('Género *', 'gender', genders, () => setGenderPickerVisible(true))}
         </View>
 
         <View style={styles.rowContainer}>
@@ -244,6 +246,92 @@ export const CreateChampionshipScreen: React.FC<CreateChampionshipScreenProps> =
           </TouchableOpacity>
         </View>
       </View>
+
+      {/* Modal para seleccionar categoría */}
+      <Modal
+        visible={categoryPickerVisible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setCategoryPickerVisible(false)}
+      >
+        <TouchableOpacity 
+          style={styles.modalOverlay} 
+          activeOpacity={1} 
+          onPress={() => setCategoryPickerVisible(false)}
+        >
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Selecciona una Categoría</Text>
+            <ScrollView style={styles.optionsContainer}>
+              {categories.map((category, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={[
+                    styles.optionItem,
+                    form.category === category && styles.optionItemSelected
+                  ]}
+                  onPress={() => {
+                    handleInputChange('category', category);
+                    setCategoryPickerVisible(false);
+                  }}
+                >
+                  <Text style={[
+                    styles.optionText,
+                    form.category === category && styles.optionTextSelected
+                  ]}>
+                    {category}
+                  </Text>
+                  {form.category === category && (
+                    <Ionicons name="checkmark-circle" size={20} color="#E62026" />
+                  )}
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        </TouchableOpacity>
+      </Modal>
+
+      {/* Modal para seleccionar género */}
+      <Modal
+        visible={genderPickerVisible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setGenderPickerVisible(false)}
+      >
+        <TouchableOpacity 
+          style={styles.modalOverlay} 
+          activeOpacity={1} 
+          onPress={() => setGenderPickerVisible(false)}
+        >
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Selecciona el Género</Text>
+            <ScrollView style={styles.optionsContainer}>
+              {genders.map((gender, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={[
+                    styles.optionItem,
+                    form.gender === gender && styles.optionItemSelected
+                  ]}
+                  onPress={() => {
+                    handleInputChange('gender', gender);
+                    setGenderPickerVisible(false);
+                  }}
+                >
+                  <Text style={[
+                    styles.optionText,
+                    form.gender === gender && styles.optionTextSelected
+                  ]}>
+                    {gender}
+                  </Text>
+                  {form.gender === gender && (
+                    <Ionicons name="checkmark-circle" size={20} color="#E62026" />
+                  )}
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        </TouchableOpacity>
+      </Modal>
     </ScrollView>
   );
 };
@@ -354,6 +442,50 @@ const styles = StyleSheet.create({
   createButtonText: {
     color: '#FFFFFF',
     fontSize: 16,
+    fontWeight: 'bold',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  modalContent: {
+    backgroundColor: '#1A1D24',
+    borderRadius: 12,
+    padding: 20,
+    width: '100%',
+    maxWidth: 400,
+    maxHeight: '70%',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    marginBottom: 15,
+    textAlign: 'center',
+  },
+  optionsContainer: {
+    maxHeight: 300,
+  },
+  optionItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 15,
+    borderRadius: 8,
+    marginBottom: 8,
+    backgroundColor: '#2A2D34',
+  },
+  optionItemSelected: {
+    backgroundColor: '#E62026',
+  },
+  optionText: {
+    fontSize: 16,
+    color: '#FFFFFF',
+  },
+  optionTextSelected: {
     fontWeight: 'bold',
   },
 });
